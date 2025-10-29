@@ -571,11 +571,39 @@ app.get('/api/my-umeyka/:userId', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => res.sendFile(__dirname + '/public/index.html'));
+// Эндпоинт для основной страницы
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
+// ==== ЭНДПОИНТЫ ДЛЯ ПОДДЕРЖАНИЯ АКТИВНОСТИ ====
+
+// Простой эндпоинт для проверки здоровья
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    message: 'Umeyka server is running',
+    version: '1.0.0'
+  });
+});
+
+// Эндпоинт для поддержания активности (для UptimeRobot)
+app.get('/keep-alive', (req, res) => {
+  res.json({ 
+    status: 'alive', 
+    timestamp: new Date().toISOString(),
+    server: 'Umeyka API'
+  });
+});
 
 // Запускаем бота
 bot.launch().then(() => {
   console.log('Telegram bot started');
 });
 
-app.listen(port, () => console.log(`Server running on port ${port}`));
+// ЗАПУСК СЕРВЕРА
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+  console.log('Connected to MongoDB');
+});
