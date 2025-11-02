@@ -1,833 +1,324 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Umeyka</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <style>
-    body { 
-      margin: 0; 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      color: white;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .main-buttons {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .secondary-buttons {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    button {
-      flex: 1;
-      padding: 15px;
-      border: none;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.2);
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-    }
-    button:hover {
-      background: rgba(255,255,255,0.3);
-      transform: translateY(-2px);
-    }
-    .form-section {
-      background: rgba(255,255,255,0.1);
-      padding: 20px;
-      border-radius: 15px;
-      backdrop-filter: blur(10px);
-      margin-bottom: 20px;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 8px;
-      box-sizing: border-box;
-      font-size: 16px;
-      background: rgba(255,255,255,0.9);
-    }
-    /* Стили для карты */
-    #map { 
-      height: 400px; 
-      border-radius: 15px;
-      margin-top: 15px;
-      border: 2px solid rgba(255,255,255,0.3);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    }
-    .skill-card {
-      background: rgba(255,255,255,0.9);
-      color: #333;
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border-left: 4px solid #667eea;
-    }
-    .skill-card:hover {
-      transform: translateX(5px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    .search-header {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-    .search-header input {
-      flex: 1;
-    }
-    .search-header button {
-      flex: 0 0 auto;
-    }
-    
-    /* Стили для чатов */
-    .chat-window {
-      position: fixed;
-      bottom: 0;
-      right: 20px;
-      width: 350px;
-      height: 500px;
-      background: white;
-      border-radius: 15px 15px 0 0;
-      box-shadow: 0 -5px 25px rgba(0,0,0,0.2);
-      display: none;
-      flex-direction: column;
-      z-index: 1000;
-    }
-    
-    .chat-header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 15px;
-      border-radius: 15px 15px 0 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .chat-messages {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      background: #f8f9fa;
-    }
-    
-    .message {
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 10px;
-      max-width: 80%;
-    }
-    
-    .message-outgoing {
-      background: #667eea;
-      color: white;
-      margin-left: auto;
-    }
-    
-    .message-incoming {
-      background: white;
-      border: 1px solid #e0e0e0;
-    }
-    
-    .chat-input {
-      display: flex;
-      padding: 15px;
-      border-top: 1px solid #e0e0e0;
-      background: white;
-    }
-    
-    .chat-input input {
-      flex: 1;
-      padding: 10px;
-      border: 1px solid #e0e0e0;
-      border-radius: 20px;
-      margin-right: 10px;
-      background: white;
-    }
-    
-    .review-modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      z-index: 1001;
-      display: none;
-      width: 90%;
-      max-width: 400px;
-    }
-    
-    .stars {
-      display: flex;
-      justify-content: center;
-      margin: 20px 0;
-    }
-    
-    .star {
-      font-size: 30px;
-      cursor: pointer;
-      margin: 0 5px;
-      color: #ddd;
-    }
-    
-    .star.active {
-      color: #ffc107;
-    }
-    
-    .close-button {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      background: none;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: #333;
-    }
-    
-    .action-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    
-    .action-buttons button {
-      flex: 1;
-      padding: 8px 15px;
-      font-size: 14px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umeyka - Найди мастера или стань им</title>
+    <style>
+        /* ОЧЕНЬ ПРОСТЫЕ СТИЛИ - для начала */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 60px;
+            margin: 40px 0 20px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            margin-bottom: 50px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+        
+        /* БОЛЬШИЕ КНОПКИ */
+        .big-button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 15px 0;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .big-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .hint {
+            margin-top: 40px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        /* Секции */
+        .section {
+            display: none;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        .skill-card {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            text-align: left;
+        }
+        
+        .back-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>🎨 Umeyka</h1>
-      <p>Найди мастеров или стань одним из них!</p>
-    </div>
-
-    <!-- Основные кнопки -->
-    <div class="main-buttons">
-      <button id="iAmUmeyka">Я умейка ✨</button>
-      <button id="iAmSearcher">Я ищу 🔍</button>
-    </div>
-
-    <!-- Дополнительные кнопки -->
-    <div class="secondary-buttons">
-      <button id="myChatsBtn">💬 Мои чаты</button>
-      <button id="addSkillBtn">➕ Добавить умейку</button>
-    </div>
-
-    <!-- Форма добавления умейки -->
-    <div id="umeykaForm" class="form-section" style="display: none;">
-      <h2>📝 Заполни свою умейку</h2>
-      <input id="skill" placeholder="Что умеешь? (например, Вязание, Ремонт, Программирование)" />
-      <input id="experience" placeholder="Опыт (например, 5 лет, 2 года, Начинающий)" />
-      <input id="price" type="number" placeholder="Цена за услугу (в рублях)" />
-      <button id="submitUmeyka">✅ Опубликовать умейку</button>
-      <div id="mySkills" style="margin-top: 20px;"></div>
-    </div>
-
-    <!-- Форма поиска -->
-    <div id="searchForm" class="form-section" style="display: none;">
-      <h2>🔎 Поиск умейки</h2>
-      <div class="search-header">
-        <input id="search" placeholder="Ищи навыки (например, вязание, ремонт, программирование)" />
-        <button id="searchButton">Найти</button>
-      </div>
-      <div id="map"></div>
-      <div id="searchResults"></div>
-    </div>
-
-    <!-- Секция чатов -->
-    <div id="chatsSection" class="form-section" style="display: none;">
-      <h2>💬 Мои чаты</h2>
-      <div id="chatsList"></div>
-    </div>
-  </div>
-
-  <!-- Окно чата -->
-  <div id="chatWindow" class="chat-window">
-    <div class="chat-header">
-      <span id="chatTitle">Чат</span>
-      <button id="closeChat" style="background: none; border: none; color: white; font-size: 20px;">×</button>
-    </div>
-    <div id="chatMessages" class="chat-messages"></div>
-    <div class="chat-input">
-      <input id="messageInput" placeholder="Введите сообщение..." />
-      <button id="sendMessage">📤</button>
-    </div>
-  </div>
-
-  <!-- Модальное окно отзыва -->
-  <div id="reviewModal" class="review-modal">
-    <button class="close-button" onclick="closeReviewModal()">×</button>
-    <h3>⭐ Оставьте отзыв</h3>
-    <p>Как вам работа с мастером?</p>
-    <div class="stars">
-      <span class="star" onclick="setRating(1)">★</span>
-      <span class="star" onclick="setRating(2)">★</span>
-      <span class="star" onclick="setRating(3)">★</span>
-      <span class="star" onclick="setRating(4)">★</span>
-      <span class="star" onclick="setRating(5)">★</span>
-    </div>
-    <textarea id="reviewComment" placeholder="Ваш комментарий (необязательно)" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px;"></textarea>
-    <button onclick="submitReview()" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px;">Отправить отзыв</button>
-  </div>
-
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
-    tg.enableClosingConfirmation();
-
-    // Элементы интерфейса
-    const elements = {
-      iAmUmeyka: document.getElementById('iAmUmeyka'),
-      iAmSearcher: document.getElementById('iAmSearcher'),
-      myChatsBtn: document.getElementById('myChatsBtn'),
-      addSkillBtn: document.getElementById('addSkillBtn'),
-      umeykaForm: document.getElementById('umeykaForm'),
-      searchForm: document.getElementById('searchForm'),
-      chatsSection: document.getElementById('chatsSection'),
-      submitUmeyka: document.getElementById('submitUmeyka'),
-      search: document.getElementById('search'),
-      searchButton: document.getElementById('searchButton'),
-      searchResults: document.getElementById('searchResults'),
-      mySkills: document.getElementById('mySkills')
-    };
-
-    let map = null;
-    let markers = [];
-    let userLocationMarker = null;
-    let currentChatId = null;
-    let currentUmeykaId = null;
-    let selectedRating = 0;
-
-    // Обработчики кнопок
-    elements.iAmUmeyka.addEventListener('click', showUmeykaForm);
-    elements.iAmSearcher.addEventListener('click', showSearchForm);
-    elements.myChatsBtn.addEventListener('click', showMyChats);
-    elements.addSkillBtn.addEventListener('click', showUmeykaForm);
-    elements.submitUmeyka.addEventListener('click', submitUmeyka);
-    elements.searchButton.addEventListener('click', performSearch);
-    elements.search.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') performSearch();
-    });
-
-    function showUmeykaForm() {
-      elements.umeykaForm.style.display = 'block';
-      elements.searchForm.style.display = 'none';
-      elements.chatsSection.style.display = 'none';
-      loadMySkills();
-    }
-
-    function showSearchForm() {
-      elements.umeykaForm.style.display = 'none';
-      elements.searchForm.style.display = 'block';
-      elements.chatsSection.style.display = 'none';
-      initMap();
-      performSearch();
-    }
-
-    function showMyChats() {
-      elements.umeykaForm.style.display = 'none';
-      elements.searchForm.style.display = 'none';
-      elements.chatsSection.style.display = 'block';
-      loadMyChats();
-    }
-
-    async function loadMySkills() {
-      if (!tg.initDataUnsafe.user?.id) return;
-      
-      try {
-        const response = await fetch(`/api/my-umeyka/${tg.initDataUnsafe.user.id}`);
-        const skills = await response.json();
-        
-        if (skills.length > 0) {
-          elements.mySkills.innerHTML = '<h3>📋 Ваши умейки:</h3>' + 
-            skills.map(skill => `
-              <div class="skill-card">
-                <strong>${skill.skill}</strong><br>
-                🎓 Опыт: ${skill.experience}<br>
-                💰 Цена: ${skill.price} руб.<br>
-                <small>📅 Добавлено: ${new Date(skill.createdAt).toLocaleDateString()}</small>
-              </div>
-            `).join('');
-        } else {
-          elements.mySkills.innerHTML = '<p>У вас пока нет опубликованных умейок</p>';
-        }
-      } catch (error) {
-        console.error('Error loading skills:', error);
-      }
-    }
-
-    async function loadMyChats() {
-      if (!tg.initDataUnsafe.user?.id) return;
-      
-      try {
-        const response = await fetch(`/api/my-chats/${tg.initDataUnsafe.user.id}`);
-        const chats = await response.json();
-        
-        const chatsList = document.getElementById('chatsList');
-        
-        if (chats.length > 0) {
-          chatsList.innerHTML = chats.map(chat => `
-            <div class="skill-card">
-              <strong>${chat.umeykaId.skill}</strong><br>
-              💰 ${chat.umeykaId.price} руб.<br>
-              <small>Создан: ${new Date(chat.createdAt).toLocaleDateString()}</small>
-              ${chat.clientUserId === tg.initDataUnsafe.user.id ? '<br><small>👤 Вы: Клиент</small>' : '<br><small>👨‍🏫 Вы: Мастер</small>'}
-              <div class="action-buttons">
-                <button onclick="openExistingChat('${chat._id}', '${chat.umeykaId.skill}')" 
-                        style="background: #667eea;">💬 Открыть чат</button>
-                ${chat.clientUserId === tg.initDataUnsafe.user.id ? 
-                  `<button onclick="openReviewForChat('${chat._id}')" style="background: #ffc107;">⭐ Завершить</button>` : 
-                  ''
-                }
-              </div>
-            </div>
-          `).join('');
-        } else {
-          chatsList.innerHTML = '<p>У вас пока нет активных чатов</p>';
-        }
-      } catch (error) {
-        console.error('Error loading chats:', error);
-        chatsList.innerHTML = '<p>Ошибка при загрузке чатов</p>';
-      }
-    }
-
-    // Функция для связи с умейкой
-    async function contactUmeyka(umeykaId, masterUserId, skill) {
-      try {
-        const response = await fetch('/api/create-chat', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': tg.initData
-          },
-          body: JSON.stringify({
-            masterUserId,
-            umeykaId
-          })
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-          currentChatId = data.chatId;
-          currentUmeykaId = umeykaId;
-          openChat(skill);
-          
-          if (data.isNew) {
-            alert('💬 Чат создан! Мастер получил уведомление.');
-          }
-        }
-      } catch (error) {
-        console.error('Error creating chat:', error);
-        alert('Ошибка при создании чата');
-      }
-    }
-
-    // Функция открытия чата
-    function openChat(skillName) {
-      document.getElementById('chatTitle').textContent = `Чат: ${skillName}`;
-      document.getElementById('chatWindow').style.display = 'flex';
-      loadChatMessages();
-    }
-
-    // Закрытие чата
-    document.getElementById('closeChat').addEventListener('click', () => {
-      document.getElementById('chatWindow').style.display = 'none';
-      currentChatId = null;
-    });
-
-    // Отправка сообщения
-    document.getElementById('sendMessage').addEventListener('click', sendMessage);
-    document.getElementById('messageInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
-
-    async function sendMessage() {
-      const input = document.getElementById('messageInput');
-      const text = input.value.trim();
-      
-      if (!text || !currentChatId) return;
-
-      try {
-        const response = await fetch('/api/send-message', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': tg.initData
-          },
-          body: JSON.stringify({
-            chatId: currentChatId,
-            text: text
-          })
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-          input.value = '';
-          loadChatMessages();
-        }
-      } catch (error) {
-        console.error('Error sending message:', error);
-        alert('Ошибка при отправке сообщения');
-      }
-    }
-
-    // Загрузка сообщений чата
-    async function loadChatMessages() {
-      if (!currentChatId) return;
-
-      try {
-        const response = await fetch(`/api/chat-messages/${currentChatId}`);
-        const messages = await response.json();
-        
-        const messagesContainer = document.getElementById('chatMessages');
-        messagesContainer.innerHTML = '';
-        
-        messages.forEach(message => {
-          const messageDiv = document.createElement('div');
-          messageDiv.className = `message ${message.fromUserId === tg.initDataUnsafe.user.id ? 'message-outgoing' : 'message-incoming'}`;
-          messageDiv.textContent = message.text;
-          messagesContainer.appendChild(messageDiv);
-        });
-        
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      } catch (error) {
-        console.error('Error loading messages:', error);
-      }
-    }
-
-    // Открытие существующего чата
-    function openExistingChat(chatId, skillName) {
-      currentChatId = chatId;
-      openChat(skillName);
-    }
-
-    // Открытие модального окна отзыва для конкретного чата
-    function openReviewForChat(chatId) {
-      currentChatId = chatId;
-      openReviewModal();
-    }
-
-    // Функции для отзывов
-    function openReviewModal() {
-      document.getElementById('reviewModal').style.display = 'block';
-      selectedRating = 0;
-      updateStars();
-    }
-
-    function closeReviewModal() {
-      document.getElementById('reviewModal').style.display = 'none';
-    }
-
-    function setRating(rating) {
-      selectedRating = rating;
-      updateStars();
-    }
-
-    function updateStars() {
-      const stars = document.querySelectorAll('.star');
-      stars.forEach((star, index) => {
-        star.classList.toggle('active', index < selectedRating);
-      });
-    }
-
-    async function submitReview() {
-      if (selectedRating === 0) {
-        alert('Пожалуйста, поставьте оценку');
-        return;
-      }
-
-      const comment = document.getElementById('reviewComment').value;
-
-      try {
-        const response = await fetch('/api/complete-chat', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': tg.initData
-          },
-          body: JSON.stringify({
-            chatId: currentChatId,
-            rating: selectedRating,
-            comment: comment
-          })
-        });
-
-        const data = await response.json();
-        
-        if (data.success) {
-          alert('✅ Спасибо за ваш отзыв!');
-          closeReviewModal();
-          document.getElementById('chatWindow').style.display = 'none';
-          currentChatId = null;
-          loadMyChats(); // Обновляем список чатов
-        }
-      } catch (error) {
-        console.error('Error submitting review:', error);
-        alert('Ошибка при отправке отзыва');
-      }
-    }
-
-    // Инициализация карты
-    function initMap() {
-      if (map) return;
-      
-      // Создаем карту с отключенной атрибуцией
-      map = L.map('map', {
-        attributionControl: false
-      }).setView([55.7558, 37.6173], 10);
-      
-      // CartoDB Positron
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        subdomains: 'abcd',
-        maxZoom: 20
-      }).addTo(map);
-
-      // Ограничиваем область просмотра
-      map.setMaxBounds([
-        [30, 19],  // Юго-запад
-        [70, 180]  // Северо-восток
-      ]);
-
-      // Запрос геолокации
-      initializeUserLocation();
-    }
-
-    function initializeUserLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            const { latitude, longitude } = position.coords;
-            map.setView([latitude, longitude], 13);
+    <div class="container">
+        <!-- ГЛАВНЫЙ ЭКРАН -->
+        <div id="mainScreen">
+            <div class="logo">🔧</div>
+            <h1>Umeyka</h1>
+            <p class="subtitle">Найди проверенного мастера для любого дела<br>или начни зарабатывать на своих навыках</p>
             
-            // Добавляем маркер текущего местоположения
-            userLocationMarker = L.marker([latitude, longitude], {
-              icon: L.divIcon({
-                className: 'user-location-marker',
-                html: '<div style="background: #4facfe; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"></div>',
-                iconSize: [20, 20],
-                iconAnchor: [10, 10]
-              })
-            })
-            .addTo(map)
-            .bindPopup('📍 Ваше местоположение')
-            .openPopup();
-          },
-          error => {
-            console.log('Geolocation unavailable');
-          }
-        );
-      }
-    }
+            <button class="big-button" onclick="showSection('clientSection')">
+                🔍 Я ищу мастера
+            </button>
+            
+            <button class="big-button" onclick="showSection('masterSection')">
+                ✨ Я мастер (Умейка)
+            </button>
+            
+            <p class="hint">Выберите вариант выше чтобы продолжить</p>
+        </div>
 
-    function createCustomIcon(color = '#667eea') {
-      return L.divIcon({
-        className: 'custom-marker',
-        html: `<div style="
-          background: ${color};
-          width: 100%;
-          height: 100%;
-          border-radius: 50%;
-          border: 3px solid white;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        "></div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
-      });
-    }
+        <!-- СЕКЦИЯ КЛИЕНТА -->
+        <div id="clientSection" class="section">
+            <button class="back-button" onclick="showMainScreen()">← Назад</button>
+            <h2>🔎 Поиск мастера</h2>
+            
+            <input type="text" id="searchQuery" class="input-field" placeholder="Что нужно сделать?">
+            <button class="big-button" onclick="searchSkills()">Найти умейки</button>
+            
+            <div id="searchResults" style="margin-top: 20px;"></div>
+        </div>
 
-    function clearMarkers() {
-      markers.forEach(marker => map.removeLayer(marker));
-      markers = [];
-    }
+        <!-- СЕКЦИЯ МАСТЕРА -->
+        <div id="masterSection" class="section">
+            <button class="back-button" onclick="showMainScreen()">← Назад</button>
+            <h2>📝 Добавить свою умейку</h2>
+            
+            <input type="text" id="skillName" class="input-field" placeholder="Что вы умеете?">
+            <input type="text" id="skillExperience" class="input-field" placeholder="Ваш опыт">
+            <input type="number" id="skillPrice" class="input-field" placeholder="Цена в рублях">
+            <button class="big-button" onclick="addSkill()">✅ Опубликовать умейку</button>
+            
+            <div id="mySkillsList" style="margin-top: 20px;"></div>
+        </div>
+    </div>
 
-    async function performSearch() {
-      const query = elements.search.value;
-      
-      try {
-        const response = await fetch(`/api/search-umeyka?query=${encodeURIComponent(query)}`);
-        const skills = await response.json();
+    <script>
+        // ПРОСТОЙ И ПОНЯТНЫЙ JavaScript
         
-        clearMarkers();
+        // Показываем главный экран
+        function showMainScreen() {
+            document.getElementById('mainScreen').style.display = 'block';
+            document.getElementById('clientSection').style.display = 'none';
+            document.getElementById('masterSection').style.display = 'none';
+        }
         
-        if (skills.length > 0) {
-          elements.searchResults.innerHTML = `
-            <h3>🎯 Найдено умейк: ${skills.length}</h3>
-            ${skills.map(skill => `
-              <div class="skill-card">
-                <strong>${skill.skill}</strong><br>
-                🎓 Опыт: ${skill.experience}<br>
-                💰 Цена: ${skill.price} руб.<br>
-                👤 Автор: ${skill.username || 'Аноним'}<br>
-                <small>📅 Добавлено: ${new Date(skill.createdAt).toLocaleDateString()}</small>
-                <div class="action-buttons">
-                  <button onclick="contactUmeyka('${skill._id}', ${skill.userId}, '${skill.skill}')" 
-                          style="background: #667eea;">💬 Написать</button>
-                  <button onclick="focusOnSkill(${skill.location.lat}, ${skill.location.lon})" 
-                          style="background: #4facfe;">📍 На карте</button>
-                </div>
-              </div>
-            `).join('')}
-          `;
-          
-          // Добавляем маркеры на карту
-          skills.forEach((skill, index) => {
-            if (skill.location && skill.location.lat && skill.location.lon) {
-              const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'];
-              const color = colors[index % colors.length];
-              
-              const marker = L.marker([skill.location.lat, skill.location.lon], {
-                icon: createCustomIcon(color)
-              }).addTo(map)
-              .bindPopup(`
-                <div style="min-width: 200px;">
-                  <h4 style="margin: 0 0 10px 0; color: #333;">${skill.skill}</h4>
-                  <p style="margin: 5px 0;">🎓 <strong>Опыт:</strong> ${skill.experience}</p>
-                  <p style="margin: 5px 0;">💰 <strong>Цена:</strong> ${skill.price} руб.</p>
-                  <p style="margin: 5px 0;">👤 <strong>Автор:</strong> ${skill.username || 'Аноним'}</p>
-                </div>
-              `);
-              
-              markers.push(marker);
+        // Показываем секцию
+        function showSection(sectionId) {
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('clientSection').style.display = 'none';
+            document.getElementById('masterSection').style.display = 'none';
+            
+            document.getElementById(sectionId).style.display = 'block';
+            
+            // Если показали секцию мастера - загружаем его умейки
+            if (sectionId === 'masterSection') {
+                loadMySkills();
             }
-          });
-          
-          // Если есть результаты, подгоняем карту чтобы показать все маркеры
-          if (markers.length > 0) {
-            const group = new L.featureGroup(markers);
-            map.fitBounds(group.getBounds().pad(0.1));
-          }
-          
-        } else {
-          elements.searchResults.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.8);">
-              <div style="font-size: 48px; margin-bottom: 20px;">🔍</div>
-              <h3>Ничего не найдено</h3>
-              <p>Попробуйте изменить поисковый запрос</p>
-            </div>
-          `;
         }
-      } catch (error) {
-        console.error('Search error:', error);
-        elements.searchResults.innerHTML = `
-          <div style="text-align: center; padding: 20px; color: #ff6b6b;">
-            <h3>❌ Ошибка при поиске</h3>
-            <p>Попробуйте позже</p>
-          </div>
-        `;
-      }
-    }
-
-    // Функция для фокуса на конкретной умейке
-    window.focusOnSkill = function(lat, lon) {
-      map.setView([lat, lon], 15);
-      // Открываем попап для маркера в этой позиции
-      markers.forEach(marker => {
-        const markerLatLng = marker.getLatLng();
-        if (Math.abs(markerLatLng.lat - lat) < 0.0001 && Math.abs(markerLatLng.lng - lon) < 0.0001) {
-          marker.openPopup();
-        }
-      });
-    }
-
-    async function submitUmeyka() {
-      const skill = document.getElementById('skill').value.trim();
-      const experience = document.getElementById('experience').value.trim();
-      const price = parseFloat(document.getElementById('price').value);
-
-      if (!skill || !experience || !price || price <= 0) {
-        alert('Заполните все поля корректно!');
-        return;
-      }
-
-      if (!tg.initData) {
-        alert('Ошибка авторизации. Перезапустите приложение.');
-        return;
-      }
-
-      // Запрашиваем геолокацию
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
+        
+        // Поиск умений
+        async function searchSkills() {
+            const query = document.getElementById('searchQuery').value.trim();
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!query) {
+                resultsDiv.innerHTML = '<p>Введите что ищете!</p>';
+                return;
+            }
+            
+            resultsDiv.innerHTML = '<p>🔍 Ищем... </p>';
             
             try {
-              const response = await fetch('/api/add-umeyka', {
-                method: 'POST',
-                headers: { 
-                  'Content-Type': 'application/json', 
-                  'Authorization': tg.initData 
-                },
-                body: JSON.stringify({
-                  skill,
-                  experience,
-                  price,
-                  location: { lat: latitude, lon: longitude },
-                  userId: tg.initDataUnsafe.user.id
-                })
-              });
-
-              const data = await response.json();
-              
-              if (data.success) {
-                alert('🎉 Умейка успешно добавлена!');
-                // Очищаем форму
-                document.getElementById('skill').value = '';
-                document.getElementById('experience').value = '';
-                document.getElementById('price').value = '';
-                // Обновляем список умейок
-                loadMySkills();
-              } else {
-                alert('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'));
-              }
+                const response = await fetch(`/api/search-umeyka?query=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка сервера');
+                }
+                
+                const skills = await response.json();
+                
+                if (skills.length > 0) {
+                    resultsDiv.innerHTML = '<h3>🎯 Найдено умейк: ' + skills.length + '</h3>' + 
+                        skills.map(skill => `
+                            <div class="skill-card">
+                                <strong>${skill.skill || 'Услуга'}</strong><br>
+                                🎓 Опыт: ${skill.experience || 'Не указан'}<br>
+                                💰 Цена: ${skill.price || '0'} руб.<br>
+                                <button onclick="contactMaster('${skill._id}', '${skill.skill}')" 
+                                        style="width: 100%; padding: 10px; margin-top: 10px; background: #667eea; color: white; border: none; border-radius: 5px;">
+                                    💬 Написать мастеру
+                                </button>
+                            </div>
+                        `).join('');
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <div style="font-size: 48px; margin-bottom: 10px;">🔍</div>
+                            <p>По запросу "${query}" ничего не найдено</p>
+                            <p>Попробуйте другой запрос</p>
+                        </div>
+                    `;
+                }
             } catch (error) {
-              console.error('Submit error:', error);
-              alert('❌ Ошибка при отправке данных');
+                console.error('Ошибка поиска:', error);
+                resultsDiv.innerHTML = `
+                    <div style="text-align: center; color: #ff6b6b;">
+                        <p>❌ Ошибка при поиске</p>
+                        <p>Попробуйте позже или проверьте подключение</p>
+                    </div>
+                `;
             }
-          },
-          (error) => {
-            alert('📍 Разрешите доступ к геолокации для добавления умейки');
-          }
-        );
-      } else {
-        alert('Ваш браузер не поддерживает геолокацию');
-      }
-    }
-
-    // Инициализация при загрузке
-    tg.ready();
-    tg.expand();
-  </script>
+        }
+        
+        // Добавление умения
+        async function addSkill() {
+            const skill = document.getElementById('skillName').value.trim();
+            const experience = document.getElementById('skillExperience').value.trim();
+            const price = document.getElementById('skillPrice').value;
+            
+            if (!skill || !experience || !price) {
+                alert('❌ Заполните все поля!');
+                return;
+            }
+            
+            if (price <= 0) {
+                alert('❌ Укажите правильную цену!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/add-umeyka', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        skill: skill,
+                        experience: experience,
+                        price: parseFloat(price),
+                        location: { lat: 55.7558, lon: 37.6173 }, // По умолчанию Москва
+                        userId: 'user-' + Date.now() // Временный ID
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('🎉 Умейка успешно добавлена!');
+                    // Очищаем поля
+                    document.getElementById('skillName').value = '';
+                    document.getElementById('skillExperience').value = '';
+                    document.getElementById('skillPrice').value = '';
+                    // Обновляем список
+                    loadMySkills();
+                } else {
+                    alert('❌ Ошибка: ' + (data.error || 'неизвестная ошибка'));
+                }
+            } catch (error) {
+                console.error('Ошибка добавления:', error);
+                alert('❌ Ошибка при добавлении умейки. Проверьте подключение.');
+            }
+        }
+        
+        // Загрузка моих умений
+        async function loadMySkills() {
+            try {
+                // Временно используем общий поиск чтобы показать что-то
+                const response = await fetch('/api/search-umeyka?query=ремонт');
+                const skills = await response.json();
+                
+                const skillsList = document.getElementById('mySkillsList');
+                
+                if (skills.length > 0) {
+                    skillsList.innerHTML = '<h3>Недавние умейки в системе:</h3>' + 
+                        skills.slice(0, 3).map(skill => `
+                            <div class="skill-card">
+                                <strong>${skill.skill || 'Услуга'}</strong><br>
+                                Опыт: ${skill.experience || 'Не указан'}<br>
+                                Цена: ${skill.price || '0'} руб.
+                            </div>
+                        `).join('');
+                } else {
+                    skillsList.innerHTML = '<p>В системе пока нет умейок. Будьте первым!</p>';
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                skillsList.innerHTML = '<p>Не удалось загрузить умейки</p>';
+            }
+        }
+        
+        // Контакт с мастером
+        function contactMaster(umeykaId, skillName) {
+            alert(`💬 Вы хотите написать мастеру по услуге: "${skillName}"\n\nID умейки: ${umeykaId}\n\n(В полной версии здесь откроется чат)`);
+        }
+        
+        // При загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Umeyka loaded!');
+        });
+    </script>
 </body>
 </html>
