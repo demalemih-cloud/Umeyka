@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Umeyka - Простой старт</title>
+  <style>
+    /* ОЧЕНЬ ПРОСТЫЕ СТИЛИ - чтобы точно работало */
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: white;
+      text-align: center;
+    }
+    
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .logo {
+      font-size: 60px;
+      margin: 20px 0;
+    }
+    
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      font-size: 16px;
+      margin-bottom: 40px;
+      opacity: 0.9;
+    }
+    
+    /* БОЛЬШИЕ КНОПКИ */
+    .big-button {
+      display: block;
+      width: 100%;
+      padding: 25px;
+      margin: 15px 0;
+      border: none;
+      border-radius: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    
+    .button-client {
+      background: #48bb78;
+    }
+    
+    .button-master {
+      background: #ed8936;
+    }
+    
+    .big-button:hover {
+      transform: scale(1.05);
+    }
+    
+    .hint {
+      margin-top: 40px;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+    
+    /* Простая форма */
+    .simple-form {
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px 0;
+    }
+    
+    .simple-input {
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    
+    .skill-card {
+      background: rgba(255,255,255,0.9);
+      color: #333;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">🔧</div>
+    <h1>Umeyka</h1>
+    <p class="subtitle">Найди мастера или стань им</p>
+    
+    <!-- БОЛЬШИЕ ПОНЯТНЫЕ КНОПКИ -->
+    <button class="big-button button-client" onclick="showClientSection()">
+      🔍 Я ищу мастера
+    </button>
+    
+    <button class="big-button button-master" onclick="showMasterSection()">
+      ✨ Я мастер
+    </button>
+    
+    <!-- Секция клиента -->
+    <div id="clientSection" style="display: none;">
+      <div class="simple-form">
+        <h2>🔎 Поиск мастера</h2>
+        <input type="text" id="searchInput" class="simple-input" placeholder="Что нужно сделать?">
+        <button class="big-button button-client" onclick="simpleSearch()">Найти</button>
+        
+        <div id="searchResults"></div>
+      </div>
+    </div>
+    
+    <!-- Секция мастера -->
+    <div id="masterSection" style="display: none;">
+      <div class="simple-form">
+        <h2>📝 Добавить услугу</h2>
+        <input type="text" id="skillInput" class="simple-input" placeholder="Что вы умеете?">
+        <input type="text" id="experienceInput" class="simple-input" placeholder="Ваш опыт">
+        <input type="number" id="priceInput" class="simple-input" placeholder="Цена в рублях">
+        <button class="big-button button-master" onclick="addSkill()">Добавить</button>
+        
+        <div id="mySkillsList"></div>
+      </div>
+    </div>
+    
+    <p class="hint">Выберите, что вы хотите сделать</p>
+  </div>
+
+  <script>
+    // ПРОСТОЙ JavaScript - чтобы точно работало
+    
+    // Показываем секцию клиента
+    function showClientSection() {
+      document.getElementById('clientSection').style.display = 'block';
+      document.getElementById('masterSection').style.display = 'none';
+      document.getElementById('searchResults').innerHTML = '<p>Введите что ищете выше и нажмите "Найти"</p>';
+    }
+    
+    // Показываем секцию мастера
+    function showMasterSection() {
+      document.getElementById('masterSection').style.display = 'block';
+      document.getElementById('clientSection').style.display = 'none';
+      loadMySkills();
+    }
+    
+    // Простой поиск
+    async function simpleSearch() {
+      const query = document.getElementById('searchInput').value;
+      if (!query) {
+        alert('Введите что ищете!');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/search-umeyka?query=${encodeURIComponent(query)}`);
+        const skills = await response.json();
+        
+        const resultsDiv = document.getElementById('searchResults');
+        
+        if (skills.length > 0) {
+          resultsDiv.innerHTML = '<h3>Найдено:</h3>' + 
+            skills.map(skill => `
+              <div class="skill-card">
+                <strong>${skill.skill}</strong><br>
+                Опыт: ${skill.experience}<br>
+                Цена: ${skill.price} руб.<br>
+                <button onclick="contactMaster('${skill._id}', '${skill.skill}')" 
+                        style="padding: 10px; margin-top: 10px; background: #667eea; color: white; border: none; border-radius: 5px; width: 100%;">
+                  💬 Написать мастеру
+                </button>
+              </div>
+            `).join('');
+        } else {
+          resultsDiv.innerHTML = '<p>Ничего не найдено. Попробуйте другой запрос.</p>';
+        }
+      } catch (error) {
+        console.error('Ошибка поиска:', error);
+        resultsDiv.innerHTML = '<p>Ошибка при поиске. Попробуйте позже.</p>';
+      }
+    }
+    
+    // Добавление умения
+    async function addSkill() {
+      const skill = document.getElementById('skillInput').value;
+      const experience = document.getElementById('experienceInput').value;
+      const price = document.getElementById('priceInput').value;
+      
+      if (!skill || !experience || !price) {
+        alert('Заполните все поля!');
+        return;
+      }
+      
+      try {
+        // Простая отправка без геолокации для начала
+        const response = await fetch('/api/add-umeyka', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            skill,
+            experience,
+            price: parseFloat(price),
+            location: { lat: 55.7558, lon: 37.6173 }, // Москва по умолчанию
+            userId: 'simple-user'
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('✅ Услуга добавлена!');
+          // Очищаем поля
+          document.getElementById('skillInput').value = '';
+          document.getElementById('experienceInput').value = '';
+          document.getElementById('priceInput').value = '';
+          // Обновляем список
+          loadMySkills();
+        } else {
+          alert('Ошибка: ' + (data.error || 'неизвестная ошибка'));
+        }
+      } catch (error) {
+        console.error('Ошибка добавления:', error);
+        alert('Ошибка при добавлении услуги');
+      }
+    }
+    
+    // Загрузка моих умений
+    async function loadMySkills() {
+      try {
+        const response = await fetch('/api/my-umeyka/simple-user');
+        const skills = await response.json();
+        
+        const skillsList = document.getElementById('mySkillsList');
+        
+        if (skills.length > 0) {
+          skillsList.innerHTML = '<h3>Ваши услуги:</h3>' + 
+            skills.map(skill => `
+              <div class="skill-card">
+                <strong>${skill.skill}</strong><br>
+                Опыт: ${skill.experience}<br>
+                Цена: ${skill.price} руб.
+              </div>
+            `).join('');
+        } else {
+          skillsList.innerHTML = '<p>У вас пока нет добавленных услуг</p>';
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки:', error);
+        skillsList.innerHTML = '<p>Ошибка при загрузке услуг</p>';
+      }
+    }
+    
+    // Контакт с мастером
+    function contactMaster(umeykaId, skillName) {
+      alert(`💬 Вы хотите написать мастеру по услуге: "${skillName}"\n\n(В полной версии здесь откроется чат)`);
+    }
+    
+    console.log("Простая версия Umeyka загружена!");
+  </script>
+</body>
+</html>
