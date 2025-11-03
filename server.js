@@ -11,9 +11,10 @@ const port = process.env.PORT || 3001;
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
+// Подключение к MongoDB
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
 // Схема для умейк
 const umeykaSchema = new mongoose.Schema({
@@ -66,15 +67,160 @@ const Chat = mongoose.model('Chat', chatSchema);
 const Message = mongoose.model('Message', messageSchema);
 const Review = mongoose.model('Review', reviewSchema);
 
-const BOT_TOKEN = process.env.BOT_TOKEN;
+const BOT_TOKEN = process.env.BOT_TOKEN || '8200421586:AAEo0V7Vkp7A3w0br0Wlx157UEGW7iKmr8o';
 const bot = new Telegraf(BOT_TOKEN);
 
-/* ---------- ВАЛИДАЦИЯ ---------- */
+// ========== WEBHOOK НАСТРОЙКА ==========
+
+// Установка webhook
+app.post('/set-webhook', async (req, res) => {
+  try {
+    console.log('🔄 Setting up webhook...');
+    
+    const webhookUrl = `https://umeyka-oocn.onrender.com/webhook`;
+    
+    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/setWebhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: webhookUrl,
+        drop_pending_updates: true,
+        allowed_updates: ['message', 'callback_query']
+      })
+    });
+    
+    const data = await response.json();
+    console.log('Webhook setup result:', data);
+    
+    res.json({ 
+      success: data.ok, 
+      message: data.description,
+      webhookUrl: webhookUrl
+    });
+    
+  } catch (error) {
+    console.error('❌ Webhook setup error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Webhook endpoint для Telegram
+app.post('/webhook', (req, res) => {
+  console.log('📨 Received webhook update:', req.body);
+  bot.handleUpdate(req.body);
+  res.sendStatus(200);
+});
+
+// ========== TELEGRAM BOT КОМАНДЫ ==========
+
+// Команда /start
+bot.start((ctx) => {
+  console.log('🚀 Start command received from:', ctx.from.id);
+  
+  const welcomeText = `🤝✨ *Добро пожаловать в Умейку!*
+
+Просто найди мастера для любого дела
+Или стань тем, кого ищут другие
+
+*Что умеет бот:*
+🔍 Найти мастера по услугам
+✨ Добавить свою услугу  
+💬 Общаться напрямую в чате
+⭐ Оставлять отзывы
+
+*Быстрые команды:*
+/search - 🔍 Найти мастера
+/add - ✨ Добавить услугу
+/help - ❓ Помощь
+
+*Или откройте веб-приложение:* 👇`;
+
+  ctx.reply(welcomeText, {
+    parse_mode: 'Markdown',
+    reply_markup: {
+      inline_keyboard: [[
+        {
+          text: '🚀 Открыть Umeyka',
+          web_app: { url: 'https://umeyka-oocn.onrender.com' }
+        }
+      ]]
+    }
+  });
+});
+
+// Команда /search
+bot.command('search', (ctx) => {
+  ctx.reply('🔍 *Поиск мастера*\n\nВведите услугу которую ищете:', {
+    parse_mode: 'Markdown',
+    reply_markup: {
+      inline_keyboard: [[
+        {
+          text: '🔍 Открыть поиск',
+          web_app: { url: 'https://umeyka-oocn.onrender.com' }
+        }
+      ]]
+    }
+  });
+});
+
+// Команда /add
+bot.command('add', (ctx) => {
+  ctx.reply('✨ *Добавление услуги*\n\nРасскажите о своей услуге в веб-приложении:', {
+    parse_mode: 'Markdown',
+    reply_markup: {
+      inline_keyboard: [[
+        {
+          text: '✨ Добавить услугу',
+          web_app: { url: 'https://umeyka-oocn.onrender.com' }
+        }
+      ]]
+    }
+  });
+});
+
+// Команда /help
+bot.command('help', (ctx) => {
+  ctx.reply(`❓ *Помощь по Умейке*
+
+*Как найти мастера:*
+1. Нажмите "🔍 Найти мастера"
+2. Введите нужную услугу
+3. Выберите подходящего мастера
+4. Напишите ему в чате
+
+*Как добавить услугу:*
+1. Нажмите "✨ Я мастер" 
+2. Заполните информацию об услуге
+3. Укажите цену и опыт
+4. Опубликуйте
+
+*По всем вопросам:* обращайтесь к @username_администратора`, {
+    parse_mode: 'Markdown'
+  });
+});
+
+// Обработка обычных сообщений
+bot.on('message', (ctx) => {
+  if (ctx.message.text && !ctx.message.text.startsWith('/')) {
+    ctx.reply('💡 Используйте команды или откройте веб-приложение для работы с Умейкой:', {
+      reply_markup: {
+        inline_keyboard: [[
+          {
+            text: '🚀 Открыть Umeyka',
+            web_app: { url: 'https://umeyka-oocn.onrender.com' }
+          }
+        ]]
+      }
+    });
+  }
+});
+
+// ========== ВАЛИДАЦИЯ TELEGRAM WEB APP ==========
+
 function validateInitData(initData) {
   console.log('\n=== ВАЛИДАЦИЯ НАЧАЛАСЬ ===');
   
   try {
-    // Парсим initData
     const params = new URLSearchParams(initData);
     const receivedHash = params.get('hash');
     
@@ -85,19 +231,17 @@ function validateInitData(initData) {
       return false;
     }
 
-    // Удаляем hash и signature из параметров для проверки
+    // Удаляем hash и signature из параметров
     params.delete('hash');
     params.delete('signature');
 
-    // Собираем data_check_string в правильном порядке
+    // Собираем data_check_string
     const dataCheckString = Array.from(params.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([key, value]) => {
-        // Для поля user парсим JSON и пересобираем без лишних пробелов
         if (key === 'user') {
           try {
             const userObj = JSON.parse(decodeURIComponent(value));
-            // Убираем экранирование в photo_url
             if (userObj.photo_url) {
               userObj.photo_url = userObj.photo_url.replace(/\\/g, '');
             }
@@ -111,8 +255,7 @@ function validateInitData(initData) {
       })
       .join('\n');
 
-    console.log('Data check string:');
-    console.log(dataCheckString);
+    console.log('Data check string length:', dataCheckString.length);
 
     // Создаем секретный ключ
     const secretKey = crypto.createHmac('sha256', 'WebAppData')
@@ -132,10 +275,7 @@ function validateInitData(initData) {
     const now = Math.floor(Date.now() / 1000);
     const tolerance = 24 * 60 * 60; // 24 часа
 
-    console.log('Auth date:', authDate);
-    console.log('Current time:', now);
-    console.log('Time difference:', now - authDate, 'seconds');
-    console.log('Auth date valid:', authDate >= now - tolerance);
+    console.log('Auth date check:', authDate >= now - tolerance);
 
     const isHashValid = calculatedHash === receivedHash;
     const isDateValid = authDate >= now - tolerance;
@@ -150,7 +290,7 @@ function validateInitData(initData) {
   }
 }
 
-/* ---------- ПРОСТАЯ ВАЛИДАЦИЯ (запасной вариант) ---------- */
+// Упрощенная валидация для тестирования
 function validateInitDataSimple(initData) {
   console.log('\n=== ПРОСТАЯ ВАЛИДАЦИЯ ===');
   
@@ -158,12 +298,11 @@ function validateInitDataSimple(initData) {
     const params = new URLSearchParams(initData);
     const authDate = parseInt(params.get('auth_date') || '0');
     const now = Math.floor(Date.now() / 1000);
-    const tolerance = 24 * 60 * 60; // 24 часа
+    const tolerance = 24 * 60 * 60;
 
     console.log('Auth date check:', authDate, 'vs', now);
     console.log('Time valid:', authDate >= now - tolerance);
 
-    // Для тестирования временно пропускаем хеш-проверку
     if (authDate >= now - tolerance) {
       console.log('✅ Альтернативная валидация: УСПЕХ');
       return true;
@@ -178,7 +317,7 @@ function validateInitDataSimple(initData) {
   }
 }
 
-/* ---------- API ---------- */
+// ========== API ЭНДПОИНТЫ ==========
 
 // Добавление умейки
 app.post('/api/add-umeyka', async (req, res) => {
@@ -196,7 +335,7 @@ app.post('/api/add-umeyka', async (req, res) => {
     // Пробуем основную валидацию
     let isValid = validateInitData(initData);
     
-    // Если основная не прошла, пробуем альтернативную (для тестирования)
+    // Если основная не прошла, пробуем альтернативную
     if (!isValid) {
       console.log('⚠️ Main validation failed, trying alternative...');
       isValid = validateInitDataSimple(initData);
@@ -248,7 +387,23 @@ app.post('/api/add-umeyka', async (req, res) => {
     });
     
     await newUmeyka.save();
-    console.log('✅ Umeyka saved successfully:', newUmeyka);
+    console.log('✅ Umeyka saved successfully:', newUmeyka._id);
+    
+    // Отправляем уведомление пользователю
+    try {
+      await bot.telegram.sendMessage(
+        userId,
+        `✨ *Новая услуга опубликована!*\n\n` +
+        `*Услуга:* ${skill}\n` +
+        `*Опыт:* ${experience}\n` +
+        `*Цена:* ${price} руб.\n\n` +
+        `Теперь клиенты могут найти вас в поиске! 🎉`,
+        { parse_mode: 'Markdown' }
+      );
+    } catch (error) {
+      console.log('⚠️ Could not send notification to user');
+    }
+    
     res.json({ 
       success: true, 
       message: 'Умейка успешно добавлена!',
@@ -317,11 +472,12 @@ app.post('/api/create-chat', async (req, res) => {
       if (umeyka) {
         await bot.telegram.sendMessage(
           masterUserId,
-          `💬 Новый заказ!\n\n` +
-          `Услуга: ${umeyka.skill}\n` +
-          `Цена: ${umeyka.price} руб.\n\n` +
+          `💬 *Новый заказ!*\n\n` +
+          `*Услуга:* ${umeyka.skill}\n` +
+          `*Цена:* ${umeyka.price} руб.\n\n` +
           `Клиент хочет связаться с вами. ` +
-          `Перейдите в приложение Umeyka для общения.`
+          `Перейдите в приложение Umeyka для общения.`,
+          { parse_mode: 'Markdown' }
         );
       }
     } catch (error) {
@@ -386,8 +542,9 @@ app.post('/api/send-message', async (req, res) => {
     try {
       await bot.telegram.sendMessage(
         recipientUserId,
-        `📨 Новое сообщение в Umeyka:\n\n${text}\n\n` +
-        `Перейдите в приложение для ответа.`
+        `📨 *Новое сообщение в Umeyka*\n\n${text}\n\n` +
+        `Перейдите в приложение для ответа.`,
+        { parse_mode: 'Markdown' }
       );
     } catch (error) {
       console.log('Could not send Telegram notification:', error);
@@ -476,11 +633,12 @@ app.post('/api/complete-chat', async (req, res) => {
       if (umeyka) {
         await bot.telegram.sendMessage(
           chat.masterUserId,
-          `⭐ Новый отзыв!\n\n` +
-          `Услуга: ${umeyka.skill}\n` +
-          `Оценка: ${'★'.repeat(rating)}${'☆'.repeat(5-rating)}\n` +
-          `Комментарий: ${comment || 'Без комментария'}\n\n` +
-          `Спасибо за вашу работу!`
+          `⭐ *Новый отзыв!*\n\n` +
+          `*Услуга:* ${umeyka.skill}\n` +
+          `*Оценка:* ${'★'.repeat(rating)}${'☆'.repeat(5-rating)}\n` +
+          `*Комментарий:* ${comment || 'Без комментария'}\n\n` +
+          `Спасибо за вашу работу! 🎉`,
+          { parse_mode: 'Markdown' }
         );
       }
     } catch (error) {
@@ -571,39 +729,60 @@ app.get('/api/my-umeyka/:userId', async (req, res) => {
   }
 });
 
+// ========== ОСНОВНЫЕ ЭНДПОИНТЫ ==========
+
 // Эндпоинт для основной страницы
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-// ==== ЭНДПОИНТЫ ДЛЯ ПОДДЕРЖАНИЯ АКТИВНОСТИ ====
+// Эндпоинт для простой версии
+app.get('/simple', (req, res) => {
+  res.sendFile(__dirname + '/public/simple-index.html');
+});
 
-// Простой эндпоинт для проверки здоровья
+// ========== ЭНДПОИНТЫ ДЛЯ ПОДДЕРЖАНИЯ АКТИВНОСТИ ==========
+
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
     message: 'Umeyka server is running',
-    version: '1.0.0'
+    version: '1.0.0',
+    bot: 'Ymeyka_bot'
   });
 });
 
-// Эндпоинт для поддержания активности (для UptimeRobot)
 app.get('/keep-alive', (req, res) => {
   res.json({ 
     status: 'alive', 
     timestamp: new Date().toISOString(),
-    server: 'Umeyka API'
+    server: 'Umeyka API',
+    bot: 'Active'
   });
 });
 
-// Запускаем бота
-bot.launch().then(() => {
-  console.log('Telegram bot started');
-});
+// ========== ЗАПУСК СЕРВЕРА ==========
 
-// ЗАПУСК СЕРВЕРА
+// Запускаем бота (используем polling для разработки, webhook для продакшена)
+if (process.env.NODE_ENV === 'production') {
+  // В продакшене используем webhook
+  console.log('🚀 Starting in PRODUCTION mode with webhook');
+} else {
+  // В разработке используем polling
+  bot.launch().then(() => {
+    console.log('🤖 Telegram bot started with polling');
+  });
+}
+
+// Graceful shutdown
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-  console.log('Connected to MongoDB');
+  console.log(`✅ Server running on port ${port}`);
+  console.log(`✅ MongoDB connected`);
+  console.log(`✅ Bot token: ${BOT_TOKEN ? 'SET' : 'MISSING'}`);
+  console.log(`🌐 Web App URL: https://umeyka-oocn.onrender.com`);
+  console.log(`🤖 Bot: @Ymeyka_bot`);
 });
