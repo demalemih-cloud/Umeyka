@@ -251,157 +251,188 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.enableClosingConfirmation();
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.enableClosingConfirmation();
 
-        function showMainScreen() {
-            document.getElementById('mainScreen').style.display = 'block';
-            document.getElementById('clientSection').style.display = 'none';
-            document.getElementById('masterSection').style.display = 'none';
+    function showMainScreen() {
+        document.getElementById('mainScreen').style.display = 'block';
+        document.getElementById('clientSection').style.display = 'none';
+        document.getElementById('masterSection').style.display = 'none';
+    }
+    
+    function showSection(sectionId) {
+        document.getElementById('mainScreen').style.display = 'none';
+        document.getElementById('clientSection').style.display = 'none';
+        document.getElementById('masterSection').style.display = 'none';
+        document.getElementById(sectionId).style.display = 'block';
+        
+        if (sectionId === 'masterSection') {
+            loadMySkills();
+        }
+    }
+    
+    async function searchSkills() {
+        const query = document.getElementById('searchQuery').value.trim();
+        const resultsDiv = document.getElementById('searchResults');
+        
+        if (!query) {
+            showNotification('Введите что ищете!');
+            return;
         }
         
-        function showSection(sectionId) {
-            document.getElementById('mainScreen').style.display = 'none';
-            document.getElementById('clientSection').style.display = 'none';
-            document.getElementById('masterSection').style.display = 'none';
-            document.getElementById(sectionId).style.display = 'block';
-            
-            if (sectionId === 'masterSection') {
-                loadMySkills();
-            }
-        }
+        resultsDiv.innerHTML = '<p>🔍 Ищем мастеров...</p>';
         
-        async function searchSkills() {
-            const query = document.getElementById('searchQuery').value.trim();
-            const resultsDiv = document.getElementById('searchResults');
+        try {
+            const response = await fetch(`/api/search-umeyka?query=${encodeURIComponent(query)}`);
+            if (!response.ok) throw new Error('Ошибка сервера');
             
-            if (!query) {
-                showNotification('Введите что ищете!');
-                return;
-            }
+            const skills = await response.json();
             
-            resultsDiv.innerHTML = '<p>🔍 Ищем мастеров...</p>';
-            
-            try {
-                const response = await fetch(`/api/search-umeyka?query=${encodeURIComponent(query)}`);
-                if (!response.ok) throw new Error('Ошибка сервера');
-                
-                const skills = await response.json();
-                
-                if (skills.length > 0) {
-                    resultsDiv.innerHTML = '<h3>🎯 Найдено: ' + skills.length + '</h3>' + 
-                        skills.map(skill => `
-                            <div class="skill-card">
-                                <strong>${skill.skill || 'Услуга'}</strong><br>
-                                🎓 ${skill.experience || 'Опыт не указан'}<br>
-                                💰 ${skill.price || '0'} руб.<br>
-                                <button onclick="contactMaster('${skill._id}', '${skill.skill}')" 
-                                        style="width: 100%; padding: 12px; margin-top: 12px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 16px;">
-                                    💬 Написать
-                                </button>
-                            </div>
-                        `).join('');
-                } else {
-                    resultsDiv.innerHTML = `
-                        <div style="text-align: center; padding: 30px;">
-                            <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
-                            <p>По запросу "${query}" ничего не найдено</p>
-                            <p style="margin-top: 10px; opacity: 0.7;">Попробуйте другой запрос</p>
+            if (skills.length > 0) {
+                resultsDiv.innerHTML = '<h3>🎯 Найдено: ' + skills.length + '</h3>' + 
+                    skills.map(skill => `
+                        <div class="skill-card">
+                            <strong>${skill.skill || 'Услуга'}</strong><br>
+                            🎓 ${skill.experience || 'Опыт не указан'}<br>
+                            💰 ${skill.price || '0'} руб.<br>
+                            <button onclick="contactMaster('${skill._id}', '${skill.skill}')" 
+                                    style="width: 100%; padding: 12px; margin-top: 12px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 16px;">
+                                💬 Написать
+                            </button>
                         </div>
-                    `;
-                }
-            } catch (error) {
+                    `).join('');
+            } else {
                 resultsDiv.innerHTML = `
-                    <div style="text-align: center; color: #ff6b6b; padding: 20px;">
-                        <p>❌ Ошибка при поиске</p>
-                        <p style="margin-top: 10px; opacity: 0.7;">Попробуйте позже</p>
+                    <div style="text-align: center; padding: 30px;">
+                        <div style="font-size: 48px; margin-bottom: 15px;">🔍</div>
+                        <p>По запросу "${query}" ничего не найдено</p>
+                        <p style="margin-top: 10px; opacity: 0.7;">Попробуйте другой запрос</p>
                     </div>
                 `;
             }
+        } catch (error) {
+            resultsDiv.innerHTML = `
+                <div style="text-align: center; color: #ff6b6b; padding: 20px;">
+                    <p>❌ Ошибка при поиске</p>
+                    <p style="margin-top: 10px; opacity: 0.7;">Попробуйте позже</p>
+                </div>
+            `;
         }
+    }
+    
+    async function addSkill() {
+        const skill = document.getElementById('skillName').value.trim();
+        const experience = document.getElementById('skillExperience').value.trim();
+        const price = document.getElementById('skillPrice').value;
         
-        async function addSkill() {
-            const skill = document.getElementById('skillName').value.trim();
-            const experience = document.getElementById('skillExperience').value.trim();
-            const price = document.getElementById('skillPrice').value;
-            
-            if (!skill || !experience || !price) {
-                showNotification('Заполните все поля!');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/add-umeyka', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        skill: skill,
-                        experience: experience,
-                        price: parseFloat(price),
-                        location: { lat: 55.7558, lon: 37.6173 },
-                        userId: tg.initDataUnsafe?.user?.id || 'telegram-user'
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showNotification('🎉 Услуга добавлена!');
-                    document.getElementById('skillName').value = '';
-                    document.getElementById('skillExperience').value = '';
-                    document.getElementById('skillPrice').value = '';
-                    loadMySkills();
-                } else {
-                    showNotification('❌ Ошибка при добавлении');
-                }
-            } catch (error) {
-                showNotification('❌ Ошибка соединения');
-            }
+        console.log('🔄 Пытаюсь добавить умейку:', { skill, experience, price });
+        
+        if (!skill || !experience || !price) {
+            showNotification('Заполните все поля!');
+            return;
         }
-        
-        async function loadMySkills() {
-            try {
-                const response = await fetch('/api/search-umeyka?query=ремонт');
-                const skills = await response.json();
-                const skillsList = document.getElementById('mySkillsList');
-                
-                if (skills.length > 0) {
-                    skillsList.innerHTML = '<h3>Недавние услуги:</h3>' + 
-                        skills.slice(0, 3).map(skill => `
-                            <div class="skill-card">
-                                <strong>${skill.skill}</strong><br>
-                                Опыт: ${skill.experience}<br>
-                                Цена: ${skill.price} руб.
-                            </div>
-                        `).join('');
-                } else {
-                    skillsList.innerHTML = '<p>Пока нет услуг. Будьте первым!</p>';
-                }
-            } catch (error) {
-                document.getElementById('mySkillsList').innerHTML = '<p>Ошибка загрузки</p>';
-            }
-        }
-        
-        function contactMaster(umeykaId, skillName) {
-            tg.showPopup({
-                title: '💬 Написать мастеру',
-                message: `Услуга: ${skillName}\n\nСвяжитесь с мастером для обсуждения деталей`,
-                buttons: [{ type: 'ok', text: 'Понятно' }]
+
+        try {
+            // Сначала диагностический запрос
+            console.log('🔍 Отправляю диагностический запрос...');
+            const debugResponse = await fetch('/api/debug-add-umeyka', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    skill: skill,
+                    experience: experience,
+                    price: price,
+                    location: { lat: 55.7558, lon: 37.6173 },
+                    userId: 'test_user_' + Date.now()
+                })
             });
-        }
-        
-        function showNotification(text) {
-            tg.showPopup({
-                title: 'Umeyka',
-                message: text,
-                buttons: [{ type: 'ok', text: 'OK' }]
+            
+            const debugData = await debugResponse.json();
+            console.log('📊 Диагностический ответ:', debugData);
+            
+            // Теперь реальный запрос с ПРОСТЫМИ данными
+            console.log('🚀 Отправляю реальный запрос...');
+            const response = await fetch('/api/add-umeyka', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    skill: skill,
+                    experience: experience,
+                    price: parseFloat(price),
+                    location: { lat: 55.7558, lon: 37.6173 },
+                    userId: 'user_' + Date.now() // ПРОСТОЙ ID вместо Telegram данных
+                })
             });
+            
+            const data = await response.json();
+            console.log('📨 Ответ от сервера:', data);
+            
+            if (data.success) {
+                showNotification(data.message || '🎉 Умейка успешно добавлена!');
+                document.getElementById('skillName').value = '';
+                document.getElementById('skillExperience').value = '';
+                document.getElementById('skillPrice').value = '';
+                loadMySkills();
+            } else {
+                showNotification('❌ Ошибка: ' + (data.error || 'неизвестная ошибка'));
+            }
+            
+        } catch (error) {
+            console.error('💥 Ошибка сети:', error);
+            showNotification('❌ Ошибка соединения с сервером');
         }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            tg.ready();
+    }
+    
+    async function loadMySkills() {
+        try {
+            const response = await fetch('/api/my-umeyka/test');
+            const skills = await response.json();
+            const skillsList = document.getElementById('mySkillsList');
+            
+            if (skills.length > 0) {
+                skillsList.innerHTML = '<h3>Недавние услуги:</h3>' + 
+                    skills.slice(0, 3).map(skill => `
+                        <div class="skill-card">
+                            <strong>${skill.skill}</strong><br>
+                            Опыт: ${skill.experience}<br>
+                            Цена: ${skill.price} руб.
+                        </div>
+                    `).join('');
+            } else {
+                skillsList.innerHTML = '<p>Пока нет услуг. Будьте первым!</p>';
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки:', error);
+            document.getElementById('mySkillsList').innerHTML = '<p>Ошибка загрузки</p>';
+        }
+    }
+    
+    function contactMaster(umeykaId, skillName) {
+        tg.showPopup({
+            title: '💬 Написать мастеру',
+            message: `Услуга: ${skillName}\n\nСвяжитесь с мастером для обсуждения деталей`,
+            buttons: [{ type: 'ok', text: 'Понятно' }]
         });
-    </script>
+    }
+    
+    function showNotification(text) {
+        tg.showPopup({
+            title: 'Umeyka',
+            message: text,
+            buttons: [{ type: 'ok', text: 'OK' }]
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        tg.ready();
+        console.log('✅ Umeyka app loaded');
+        console.log('🤖 Telegram Web App:', tg.initDataUnsafe);
+    });
+</script>
 </body>
 </html>
