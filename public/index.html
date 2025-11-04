@@ -277,7 +277,7 @@
         const resultsDiv = document.getElementById('searchResults');
         
         if (!query) {
-            showNotification('Введите что ищете!');
+            alert('Введите что ищете!');
             return;
         }
         
@@ -329,7 +329,7 @@
         console.log('🔄 Пытаюсь добавить умейку:', { skill, experience, price });
         
         if (!skill || !experience || !price) {
-            showNotification('Заполните все поля!');
+            alert('❌ Заполните все поля!');
             return;
         }
 
@@ -373,18 +373,18 @@
             console.log('📨 Ответ от сервера:', data);
             
             if (data.success) {
-                showNotification(data.message || '🎉 Умейка успешно добавлена!');
+                alert('🎉 Умейка успешно добавлена!');
                 document.getElementById('skillName').value = '';
                 document.getElementById('skillExperience').value = '';
                 document.getElementById('skillPrice').value = '';
                 loadMySkills();
             } else {
-                showNotification('❌ Ошибка: ' + (data.error || 'неизвестная ошибка'));
+                alert('❌ Ошибка: ' + (data.error || 'неизвестная ошибка'));
             }
             
         } catch (error) {
             console.error('💥 Ошибка сети:', error);
-            showNotification('❌ Ошибка соединения с сервером');
+            alert('❌ Ошибка соединения с сервером');
         }
     }
     
@@ -413,19 +413,13 @@
     }
     
     function contactMaster(umeykaId, skillName) {
-        tg.showPopup({
-            title: '💬 Написать мастеру',
-            message: `Услуга: ${skillName}\n\nСвяжитесь с мастером для обсуждения деталей`,
-            buttons: [{ type: 'ok', text: 'Понятно' }]
-        });
+        // Простое уведомление вместо popup для версии 6.0
+        alert(`💬 Услуга: ${skillName}\n\nСвяжитесь с мастером для обсуждения деталей`);
     }
     
     function showNotification(text) {
-        tg.showPopup({
-            title: 'Umeyka',
-            message: text,
-            buttons: [{ type: 'ok', text: 'OK' }]
-        });
+        // Простое уведомление через alert для версии 6.0
+        alert(text);
     }
     
     document.addEventListener('DOMContentLoaded', function() {
