@@ -709,57 +709,143 @@
         }
         
         // ЧАТ
-        function openChat(umeykaId, skillName) {
-            currentChatId = umeykaId;
+        async function openChat(umeykaId, skillName) {
+    try {
+        // Сначала создаем или получаем чат
+        const chatResponse = await fetch('/api/create-chat', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                masterUserId: 'master_' + umeykaId,
+                umeykaId: umeykaId
+            })
+        });
+        
+        const chatData = await chatResponse.json();
+        
+        if (chatData.success) {
+            currentChatId = chatData.chatId;
             document.getElementById('chatTitle').textContent = `Чат: ${skillName}`;
             document.getElementById('chatWindow').style.display = 'flex';
-            loadChatMessages();
+            await loadChatMessages();
+        } else {
+            alert('❌ Ошибка создания чата');
         }
         
-        function openChatFromMap(umeykaId, skillName) {
-            openChat(umeykaId, skillName);
-            map.closePopup();
+    } catch (error) {
+        console.error('Ошибка открытия чата:', error);
+        // Создаем временный чат для демонстрации
+        currentChatId = 'temp_chat_' + Date.now();
+        document.getElementById('chatTitle').textContent = `Чат: ${skillName}`;
+        document.getElementById('chatWindow').style.display = 'flex';
+        loadChatMessages();
+    }
+}
+
+function openChatFromMap(umeykaId, skillName) {
+    openChat(umeykaId, skillName);
+    if (map) map.closePopup();
+}
+
+function closeChat() {
+    document.getElementById('chatWindow').style.display = 'none';
+    currentChatId = null;
+}
+
+async function loadChatMessages() {
+    if (!currentChatId) return;
+    
+    try {
+        const response = await fetch(`/api/chat-messages/${currentChatId}`);
+        const messages = await response.json();
+        
+        const messagesContainer = document.getElementById('chatMessages');
+        messagesContainer.innerHTML = '';
+        
+        if (messages.length > 0) {
+            messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.fromUserId && message.fromUserId.includes('user') ? 'message-outgoing' : 'message-incoming'}`;
+                messageDiv.textContent = message.text;
+                messagesContainer.appendChild(messageDiv);
+            });
+        } else {
+            messagesContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">💬 Начните общение с мастером</p>';
         }
         
-        function closeChat() {
-            document.getElementById('chatWindow').style.display = 'none';
-            currentChatId = null;
-        }
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
         
-        async function loadChatMessages() {
-            // Загрузка сообщений чата
+    } catch (error) {
+        console.error('Ошибка загрузки сообщений:', error);
+        const messagesContainer = document.getElementById('chatMessages');
+        messagesContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">💬 Чат готов к общению</p>';
+    }
+}
+
+async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const text = input.value.trim();
+    
+    if (!text || !currentChatId) {
+        alert('Введите сообщение');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/send-message', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                chatId: currentChatId,
+                text: text
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            input.value = '';
+            // Добавляем сообщение в чат
             const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.innerHTML = '<p style="text-align: center; color: #666;">Чат начат</p>';
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message message-outgoing';
+            messageDiv.textContent = text;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Добавляем автоматический ответ от мастера (для демонстрации)
+            setTimeout(() => {
+                addMasterResponse();
+            }, 1000);
+        } else {
+            alert('❌ Ошибка отправки: ' + (data.error || 'неизвестная ошибка'));
         }
         
-        async function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
-            
-            if (!text || !currentChatId) return;
-            
-            try {
-                const response = await fetch('/api/send-message', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        chatId: currentChatId,
-                        text: text
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    input.value = '';
-                    // Добавляем сообщение в чат
-                    const messagesContainer = document.getElementById('chatMessages');
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = 'message message-outgoing';
-                    messageDiv.textContent = text;
-                    messagesContainer.appendChild(messageDiv);
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }
+    } catch (error) {
+        console.error('Ошибка отправки:', error);
+        alert('❌ Ошибка соединения');
+    }
+}
+
+// Функция для демонстрации ответа мастера
+function addMasterResponse() {
+    const responses = [
+        "Здравствуйте! Рад вам помочь 🛠️",
+        "Спасибо за обращение! Когда вам удобно?",
+        "Расскажите подробнее о вашей задаче",
+        "Могу приступить к работе в ближайшее время",
+        "Какой у вас бюджет и сроки?"
+    ];
+    
+    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+    
+    const messagesContainer = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message message-incoming';
+    messageDiv.textContent = randomResponse;
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
                 
             } catch (error) {
                 console.error('Ошибка отправки:', error);
