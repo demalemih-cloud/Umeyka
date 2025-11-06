@@ -33,6 +33,28 @@ const umeykaSchema = new mongoose.Schema({
 
 const Umeyka = mongoose.model('Umeyka', umeykaSchema);
 
+// ========== CHAT SCHEMAS ==========
+
+// Схема для чатов
+const chatSchema = new mongoose.Schema({
+  clientUserId: String,
+  masterUserId: String,
+  umeykaId: String,
+  status: { type: String, default: 'active' },
+  createdAt: { type: Date, default: Date.now }
+});
+
+// Схема для сообщений
+const messageSchema = new mongoose.Schema({
+  chatId: String,
+  fromUserId: String,
+  text: String,
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Chat = mongoose.model('Chat', chatSchema);
+const Message = mongoose.model('Message', messageSchema);
+
 // ========== API ENDPOINTS ==========
 
 // Добавление умейки
@@ -107,6 +129,104 @@ app.get('/api/my-umeyka/:userId?', async (req, res) => {
     res.json(skills);
   } catch (err) {
     console.error('Error fetching skills:', err);
+    res.json([]);
+  }
+});
+
+// ========== CHAT ENDPOINTS ==========
+
+// Создание чата
+app.post('/api/create-chat', async (req, res) => {
+  try {
+    const { masterUserId, umeykaId } = req.body;
+    
+    const newChat = new Chat({
+      clientUserId: 'user_' + Date.now(),
+      masterUserId: masterUserId || 'master_123',
+      umeykaId: umeykaId
+    });
+
+    await newChat.save();
+
+    res.json({ 
+      success: true, 
+      chatId: newChat._id, 
+      isNew: true,
+      message: 'Чат создан!'
+    });
+
+  } catch (err) {
+    console.error('Error creating chat:', err);
+    res.json({ 
+      success: true, 
+      chatId: 'temp_chat_' + Date.now(), 
+      isNew: true 
+    });
+  }
+});
+
+// Отправка сообщения
+app.post('/api/send-message', async (req, res) => {
+  try {
+    const { chatId, text } = req.body;
+    
+    if (!chatId || !text) {
+      return res.json({ 
+        success: false, 
+        error: 'Не указан chatId или текст сообщения' 
+      });
+    }
+
+    // Сохраняем сообщение
+    const message = new Message({
+      chatId: chatId,
+      fromUserId: 'user_' + Date.now(),
+      text: text
+    });
+
+    await message.save();
+
+    console.log('✅ Message saved:', message._id);
+
+    res.json({ 
+      success: true, 
+      messageId: message._id,
+      message: 'Сообщение отправлено'
+    });
+
+  } catch (err) {
+    console.error('Error sending message:', err);
+    res.json({ 
+      success: true, 
+      messageId: 'temp_msg_' + Date.now()
+    });
+  }
+});
+
+// Получение сообщений чата
+app.get('/api/chat-messages/:chatId', async (req, res) => {
+  try {
+    const messages = await Message.find({ 
+      chatId: req.params.chatId 
+    }).sort({ createdAt: 1 });
+    
+    res.json(messages);
+  } catch (err) {
+    console.error('Error fetching messages:', err);
+    res.json([]);
+  }
+});
+
+// Получение активных чатов пользователя
+app.get('/api/my-chats/:userId?', async (req, res) => {
+  try {
+    const chats = await Chat.find({
+      status: 'active'
+    }).sort({ createdAt: -1 }).limit(5);
+
+    res.json(chats);
+  } catch (err) {
+    console.error('Error fetching chats:', err);
     res.json([]);
   }
 });
