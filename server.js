@@ -33,8 +33,6 @@ const umeykaSchema = new mongoose.Schema({
 
 const Umeyka = mongoose.model('Umeyka', umeykaSchema);
 
-// ========== CHAT SCHEMAS ==========
-
 // Схема для чатов
 const chatSchema = new mongoose.Schema({
   clientUserId: String,
@@ -133,8 +131,6 @@ app.get('/api/my-umeyka/:userId?', async (req, res) => {
   }
 });
 
-// ========== CHAT ENDPOINTS ==========
-
 // Создание чата
 app.post('/api/create-chat', async (req, res) => {
   try {
@@ -177,7 +173,6 @@ app.post('/api/send-message', async (req, res) => {
       });
     }
 
-    // Сохраняем сообщение
     const message = new Message({
       chatId: chatId,
       fromUserId: 'user_' + Date.now(),
