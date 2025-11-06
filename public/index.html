@@ -441,107 +441,123 @@
         }
         
         function initMap() {
-  if (map) return;
-  
-  // Создаем карту с отключенной атрибуцией
-  map = L.map('map', {
-    attributionControl: false
-  }).setView([55.7558, 37.6173], 10);
-  
-  // CartoDB Positron
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20
-  }).addTo(map);
+    if (map) return;
+    
+    // Создаем карту с отключенной атрибуцией
+    map = L.map('map', {
+        attributionControl: false
+    }).setView([55.7558, 37.6173], 10);
+    
+    // CartoDB Positron - красивая светлая тема
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(map);
 
-  // Ограничиваем область просмотра
-  map.setMaxBounds([
-    [30, 19],  // Юго-запад
-    [70, 180]  // Северо-восток
-  ]);
+    // Ограничиваем область просмотра
+    map.setMaxBounds([
+        [30, 19],  // Юго-запад
+        [70, 180]  // Северо-восток
+    ]);
 
-  // Запрос геолокации
-  initializeUserLocation();
+    // Запрос геолокации
+    initializeUserLocation();
 }
 
-        
-        async function loadSkillsOnMap() {
-            try {
-                const response = await fetch('/api/search-umeyka?query=');
-                const skills = await response.json();
+function initializeUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const { latitude, longitude } = position.coords;
+                userLocation = { lat: latitude, lon: longitude };
+                map.setView([latitude, longitude], 13);
                 
-                // Очищаем старые маркеры
-                markers.forEach(marker => map.removeLayer(marker));
-                markers = [];
-                
-                skills.forEach(skill => {
-                    if (skill.location && skill.location.lat && skill.location.lon) {
-                        const marker = L.marker([skill.location.lat, skill.location.lon])
-                            .addTo(map)
-                            .bindPopup(`
-                                <div style="min-width: 200px;">
-                                    <h3>${skill.skill}</h3>
-                                    <p>🎓 Опыт: ${skill.experience}</p>
-                                    <p>💰 Цена: ${skill.price} руб.</p>
-                                    <p>⭐ Рейтинг: 4.8/5</p>
-                                    <button onclick="openChatFromMap('${skill._id}', '${skill.skill}')" 
-                                            style="width: 100%; padding: 8px; background: #667eea; color: white; border: none; border-radius: 5px; margin-top: 10px;">
-                                        💬 Начать чат
-                                    </button>
-                                </div>
-                            `);
-                        markers.push(marker);
-                    }
-                });
-                
-            } catch (error) {
-                console.error('Ошибка загрузки карты:', error);
+                // Добавляем красивый маркер текущего местоположения
+                L.marker([latitude, longitude], {
+                    icon: L.divIcon({
+                        className: 'user-location-marker',
+                        html: '<div style="background: #4facfe; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"></div>',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    })
+                })
+                .addTo(map)
+                .bindPopup('📍 Ваше местоположение')
+                .openPopup();
+            },
+            error => {
+                console.log('Геолокация недоступна');
+                // Используем местоположение по умолчанию
+                userLocation = { lat: 55.7558, lon: 37.6173 };
             }
+        );
+    }
+}
+
+function createCustomIcon(color = '#667eea') {
+    return L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="
+            background: ${color};
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        "></div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
+}
+
+async function loadSkillsOnMap() {
+    try {
+        const response = await fetch('/api/search-umeyka?query=');
+        const skills = await response.json();
+        
+        // Очищаем старые маркеры
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
+        
+        const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'];
+        
+        skills.forEach((skill, index) => {
+            if (skill.location && skill.location.lat && skill.location.lon) {
+                const color = colors[index % colors.length];
+                
+                const marker = L.marker([skill.location.lat, skill.location.lon], {
+                    icon: createCustomIcon(color)
+                })
+                .addTo(map)
+                .bindPopup(`
+                    <div style="min-width: 220px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                        <h3 style="margin: 0 0 10px 0; color: #333; font-size: 16px;">${skill.skill}</h3>
+                        <p style="margin: 5px 0; font-size: 14px;">🎓 <strong>Опыт:</strong> ${skill.experience}</p>
+                        <p style="margin: 5px 0; font-size: 14px;">💰 <strong>Цена:</strong> ${skill.price} руб.</p>
+                        <p style="margin: 5px 0; font-size: 14px;">⭐ <strong>Рейтинг:</strong> 4.8/5</p>
+                        <button onclick="openChatFromMap('${skill._id}', '${skill.skill}')" 
+                                style="width: 100%; padding: 10px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 14px; margin-top: 10px; cursor: pointer;">
+                            💬 Начать чат
+                        </button>
+                    </div>
+                `);
+                
+                markers.push(marker);
+            }
+        });
+        
+        // Если есть маркеры, подгоняем карту чтобы показать все
+        if (markers.length > 0 && userLocation) {
+            const group = new L.featureGroup(markers);
+            // Добавляем местоположение пользователя в границы
+            group.addLayer(L.marker([userLocation.lat, userLocation.lon]));
+            map.fitBounds(group.getBounds().pad(0.1));
         }
         
-        // ПОИСК ПОБЛИЗОСТИ
-        async function findNearbySkills() {
-            const locationInput = document.getElementById('locationInput').value;
-            const resultsDiv = document.getElementById('nearbyResults');
-            
-            if (!locationInput) {
-                alert('Укажите ваше местоположение');
-                return;
-            }
-            
-            resultsDiv.innerHTML = '<p>🔍 Ищем мастеров рядом...</p>';
-            
-            try {
-                const response = await fetch('/api/search-umeyka?query=');
-                const skills = await response.json();
-                
-                // Сортируем по расстоянию (в реальном приложении считали бы расстояние)
-                const sortedSkills = skills.sort((a, b) => a.price - b.price).slice(0, 10);
-                
-                if (sortedSkills.length > 0) {
-                    resultsDiv.innerHTML = '<h3>🎯 Мастера рядом:</h3>' + 
-                        sortedSkills.map(skill => `
-                            <div class="skill-card">
-                                <div class="skill-header">
-                                    <div class="skill-title">${skill.skill}</div>
-                                    <div class="skill-rating">★★★★☆ 4.8</div>
-                                </div>
-                                <div class="skill-price">${skill.price} руб.</div>
-                                <div class="skill-distance">📍 ~${Math.floor(Math.random() * 5) + 1} км от вас</div>
-                                <p>🎓 ${skill.experience}</p>
-                                <button class="chat-button" onclick="openChat('${skill._id}', '${skill.skill}')">
-                                    💬 Начать чат
-                                </button>
-                            </div>
-                        `).join('');
-                } else {
-                    resultsDiv.innerHTML = '<p>Пока нет мастеров поблизости</p>';
-                }
-                
-            } catch (error) {
-                resultsDiv.innerHTML = '<p>❌ Ошибка поиска</p>';
-            }
-        }
+    } catch (error) {
+        console.error('Ошибка загрузки карты:', error);
+    }
+}
         
         // ДОБАВЛЕНИЕ УМЕЙКИ
         async function addSkill() {
