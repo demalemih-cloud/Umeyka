@@ -449,124 +449,125 @@
             }
         };
         
-        window.openMap = function() {
-    console.log('🗺️ Opening map');
-    const mapSection = document.querySelector('.map-section');
-    const mapElement = document.getElementById('map');
+        // КАРТА - УЛУЧШЕННАЯ ВЕРСИЯ
+function initMap() {
+    if (map) return;
     
-    if (mapSection && mapElement) {
-        mapSection.classList.add('map-active');
-        
-        // Простая карта с изображением вместо Leaflet
-        mapElement.innerHTML = `
-            <div style="height: 100%; background: #f8f9fa; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #333;">
-                <div style="font-size: 48px; margin-bottom: 20px;">🗺️</div>
-                <h3 style="margin-bottom: 10px;">Карта мастеров</h3>
-                <p style="text-align: center; margin-bottom: 20px; opacity: 0.7;">
-                    Здесь будет карта с маркерами мастеров<br>
-                    В реальном приложении используется Leaflet.js
-                </p>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 80%;">
-                    <div style="background: #667eea; color: white; padding: 15px; border-radius: 10px; text-align: center;">
-                        <div style="font-size: 24px;">🔧</div>
-                        <div>Сантехник</div>
-                        <div style="font-size: 12px; opacity: 0.8;">1.2 км</div>
-                    </div>
-                    <div style="background: #48bb78; color: white; padding: 15px; border-radius: 10px; text-align: center;">
-                        <div style="font-size: 24px;">💡</div>
-                        <div>Электрик</div>
-                        <div style="font-size: 12px; opacity: 0.8;">0.8 км</div>
-                    </div>
-                    <div style="background: #ed8936; color: white; padding: 15px; border-radius: 10px; text-align: center;">
-                        <div style="font-size: 24px;">💻</div>
-                        <div>IT-мастер</div>
-                        <div style="font-size: 12px; opacity: 0.8;">2.1 км</div>
-                    </div>
-                    <div style="background: #9f7aea; color: white; padding: 15px; border-radius: 10px; text-align: center;">
-                        <div style="font-size: 24px;">🔨</div>
-                        <div>Ремонтник</div>
-                        <div style="font-size: 12px; opacity: 0.8;">1.5 км</div>
-                    </div>
-                </div>
-                <button onclick="contactMaster('map', 'Мастер с карты')" 
-                        style="margin-top: 20px; padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                    💬 Выбрать мастера
-                </button>
-            </div>
-        `;
-        
-        console.log('✅ Demo map displayed');
-    } else {
-        alert('❌ Элемент карты не найден');
-    }
-};
-        
-        window.addSkill = function() {
-            console.log('✨ Adding skill');
-            const skill = document.getElementById('skillName').value.trim();
-            const experience = document.getElementById('skillExperience').value.trim();
-            const price = document.getElementById('skillPrice').value;
-            
-            if (!skill || !experience || !price) {
-                alert('Заполните все поля!');
-                return;
-            }
-            
-            // Имитация сохранения
-            setTimeout(() => {
-                alert('🎉 Умейка "' + skill + '" добавлена!');
-                document.getElementById('skillName').value = '';
-                document.getElementById('skillExperience').value = '';
-                document.getElementById('skillPrice').value = '';
-                showMainScreen();
-            }, 500);
-        };
-        
-        window.findNearbySkills = function() {
-            console.log('📍 Finding nearby skills');
-            const locationInput = document.getElementById('locationInput').value;
-            const resultsDiv = document.getElementById('nearbyResults');
-            
-            if (!locationInput) {
-                alert('Укажите ваше местоположение');
-                return;
-            }
-            
-            if (resultsDiv) {
-                resultsDiv.innerHTML = '<p>🔍 Ищем мастеров рядом...</p>';
+    // Создаем карту с отключенной атрибуцией
+    map = L.map('map', {
+        attributionControl: false
+    }).setView([55.7558, 37.6173], 10);
+    
+    // CartoDB Positron - красивая светлая тема
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd',
+        maxZoom: 20
+    }).addTo(map);
+
+    // Ограничиваем область просмотра
+    map.setMaxBounds([
+        [30, 19],  // Юго-запад
+        [70, 180]  // Северо-восток
+    ]);
+
+    // Запрос геолокации
+    initializeUserLocation();
+}
+
+function initializeUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const { latitude, longitude } = position.coords;
+                userLocation = { lat: latitude, lon: longitude };
+                map.setView([latitude, longitude], 13);
                 
-                // Имитация поиска
-                setTimeout(() => {
-                    resultsDiv.innerHTML = `
-                        <h3>🎯 Мастера рядом:</h3>
-                        <div class="skill-card">
-                            <div class="skill-header">
-                                <div class="skill-title">Сантехник</div>
-                                <div class="skill-rating">★★★★☆ 4.8</div>
-                            </div>
-                            <div class="skill-price">2000 руб.</div>
-                            <div class="skill-distance">📍 ~1.5 км от вас</div>
-                            <p>🎓 Опыт: 7 лет</p>
-                            <button class="chat-button" onclick="contactMaster('plumber', 'Сантехник')">
-                                💬 Начать чат
-                            </button>
-                        </div>
-                        <div class="skill-card">
-                            <div class="skill-header">
-                                <div class="skill-title">Электрик</div>
-                                <div class="skill-rating">★★★★★ 5.0</div>
-                            </div>
-                            <div class="skill-price">1500 руб.</div>
-                            <div class="skill-distance">📍 ~2.3 км от вас</div>
-                            <p>🎓 Опыт: 10 лет</p>
-                            <button class="chat-button" onclick="contactMaster('electrician', 'Электрик')">
-                                💬 Начать чат
-                            </button>
-                        </div>
-                    `;
-                }, 1000);
+                // Добавляем красивый маркер текущего местоположения
+                L.marker([latitude, longitude], {
+                    icon: L.divIcon({
+                        className: 'user-location-marker',
+                        html: '<div style="background: #4facfe; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"></div>',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    })
+                })
+                .addTo(map)
+                .bindPopup('📍 Ваше местоположение')
+                .openPopup();
+            },
+            error => {
+                console.log('Геолокация недоступна');
+                // Используем местоположение по умолчанию
+                userLocation = { lat: 55.7558, lon: 37.6173 };
             }
-        };
+        );
+    }
+}
+
+function createCustomIcon(color = '#667eea') {
+    return L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="
+            background: ${color};
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        "></div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
+}
+
+async function loadSkillsOnMap() {
+    try {
+        const response = await fetch('/api/search-umeyka?query=');
+        const skills = await response.json();
+        
+        // Очищаем старые маркеры
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
+        
+        const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'];
+        
+        skills.forEach((skill, index) => {
+            if (skill.location && skill.location.lat && skill.location.lon) {
+                const color = colors[index % colors.length];
+                
+                const marker = L.marker([skill.location.lat, skill.location.lon], {
+                    icon: createCustomIcon(color)
+                })
+                .addTo(map)
+                .bindPopup(`
+                    <div style="min-width: 220px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                        <h3 style="margin: 0 0 10px 0; color: #333; font-size: 16px;">${skill.skill}</h3>
+                        <p style="margin: 5px 0; font-size: 14px;">🎓 <strong>Опыт:</strong> ${skill.experience}</p>
+                        <p style="margin: 5px 0; font-size: 14px;">💰 <strong>Цена:</strong> ${skill.price} руб.</p>
+                        <p style="margin: 5px 0; font-size: 14px;">⭐ <strong>Рейтинг:</strong> 4.8/5</p>
+                        <button onclick="openChatFromMap('${skill._id}', '${skill.skill}')" 
+                                style="width: 100%; padding: 10px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 14px; margin-top: 10px; cursor: pointer;">
+                            💬 Начать чат
+                        </button>
+                    </div>
+                `);
+                
+                markers.push(marker);
+            }
+        });
+        
+        // Если есть маркеры, подгоняем карту чтобы показать все
+        if (markers.length > 0 && userLocation) {
+            const group = new L.featureGroup(markers);
+            // Добавляем местоположение пользователя в границы
+            group.addLayer(L.marker([userLocation.lat, userLocation.lon]));
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
+        
+    } catch (error) {
+        console.error('Ошибка загрузки карты:', error);
+    }
+}
         
         window.contactMaster = function(umeykaId, skillName) {
             alert(`💬 Чат с мастером: ${skillName}\n\nВ реальном приложении откроется окно чата для общения.`);
