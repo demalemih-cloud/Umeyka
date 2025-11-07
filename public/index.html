@@ -450,50 +450,126 @@
         };
         
         window.openMap = function() {
-            console.log('🗺️ Opening map');
-            const mapSection = document.querySelector('.map-section');
-            if (mapSection) {
-                mapSection.classList.add('map-active');
-            }
-            alert('Карта открыта! В реальном приложении здесь будет карта с маркерами.');
-        };
+    console.log('🗺️ Opening map');
+    const mapSection = document.querySelector('.map-section');
+    const mapElement = document.getElementById('map');
+    
+    if (mapSection && mapElement) {
+        mapSection.classList.add('map-active');
         
-        window.searchSkills = function() {
-            console.log('🔍 Searching skills');
-            const query = document.getElementById('searchQuery').value.trim();
-            const resultsDiv = document.getElementById('searchResults');
-            
-            if (!query) {
-                alert('Введите что ищете!');
-                return;
-            }
-            
-            if (resultsDiv) {
-                resultsDiv.innerHTML = '<p>🔍 Ищем мастеров...</p>';
-                
-                // Имитация поиска
-                setTimeout(() => {
-                    resultsDiv.innerHTML = `
-                        <div class="skill-card">
-                            <strong>Ремонт компьютеров</strong><br>
-                            🎓 Опыт: 5 лет<br>
-                            💰 Цена: 1500 руб.<br>
-                            <button onclick="contactMaster('test1', 'Ремонт компьютеров')" style="width: 100%; padding: 12px; margin-top: 12px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 16px;">
-                                💬 Написать
-                            </button>
-                        </div>
-                        <div class="skill-card">
-                            <strong>Установка Windows</strong><br>
-                            🎓 Опыт: 3 года<br>
-                            💰 Цена: 1000 руб.<br>
-                            <button onclick="contactMaster('test2', 'Установка Windows')" style="width: 100%; padding: 12px; margin-top: 12px; background: #667eea; color: white; border: none; border-radius: 10px; font-size: 16px;">
-                                💬 Написать
-                            </button>
-                        </div>
-                    `;
-                }, 1000);
-            }
-        };
+        // Проверяем, инициализирована ли уже карта
+        if (!window.map) {
+            initMap();
+        } else {
+            // Если карта уже есть, просто показываем её
+            mapElement.style.display = 'block';
+        }
+        
+        // Показываем демо-маркеры
+        showDemoMarkers();
+    } else {
+        alert('❌ Элемент карты не найден');
+    }
+};
+
+// Функция для инициализации карты
+function initMap() {
+    console.log('🔄 Initializing map...');
+    
+    try {
+        // Создаем карту с отключенной атрибуцией
+        window.map = L.map('map', {
+            attributionControl: false
+        }).setView([55.7558, 37.6173], 10);
+        
+        // CartoDB Positron - красивая светлая тема
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(window.map);
+
+        // Ограничиваем область просмотра
+        window.map.setMaxBounds([
+            [30, 19],  // Юго-запад
+            [70, 180]  // Северо-восток
+        ]);
+
+        console.log('✅ Map initialized successfully');
+        
+    } catch (error) {
+        console.error('❌ Map initialization error:', error);
+        alert('❌ Ошибка загрузки карты. Проверьте подключение к интернету.');
+    }
+}
+
+// Функция для показа демо-маркеров
+function showDemoMarkers() {
+    if (!window.map) return;
+    
+    // Очищаем старые маркеры
+    if (window.markers) {
+        window.markers.forEach(marker => window.map.removeLayer(marker));
+    }
+    window.markers = [];
+    
+    // Демо-данные маркеров
+    const demoSkills = [
+        { lat: 55.7558, lon: 37.6173, skill: "Ремонт компьютеров", experience: "5 лет", price: 1500 },
+        { lat: 55.7520, lon: 37.6175, skill: "Сантехник", experience: "7 лет", price: 2000 },
+        { lat: 55.7590, lon: 37.6160, skill: "Электрик", experience: "10 лет", price: 1800 },
+        { lat: 55.7500, lon: 37.6200, skill: "Мастер по ремонту", experience: "3 года", price: 1200 }
+    ];
+    
+    const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe'];
+    
+    demoSkills.forEach((skill, index) => {
+        const color = colors[index % colors.length];
+        
+        const marker = L.marker([skill.lat, skill.lon], {
+            icon: createCustomIcon(color)
+        })
+        .addTo(window.map)
+        .bindPopup(`
+            <div style="min-width: 220px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                <h3 style="margin: 0 0 10px 0; color: #333; font-size: 16px;">${skill.skill}</h3>
+                <p style="margin: 5px 0; font-size: 14px;">🎓 <strong>Опыт:</strong> ${skill.experience}</p>
+                <p style="margin: 5px 0; font-size: 14px;">💰 <strong>Цена:</strong> ${skill.price} руб.</p>
+                <p style="margin: 5px 0; font-size: 14px;">⭐ <strong>Рейтинг:</strong> 4.8/5</p>
+                <button onclick="contactMaster('${skill.skill}', '${skill.skill}')" 
+                        style="width: 100%; padding: 10px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 14px; margin-top: 10px; cursor: pointer;">
+                    💬 Начать чат
+                </button>
+            </div>
+        `);
+        
+        window.markers.push(marker);
+    });
+    
+    // Подгоняем карту чтобы показать все маркеры
+    if (window.markers.length > 0) {
+        const group = new L.featureGroup(window.markers);
+        window.map.fitBounds(group.getBounds().pad(0.1));
+    }
+    
+    console.log('📍 Added', window.markers.length, 'demo markers');
+}
+
+// Функция для создания кастомных маркеров
+function createCustomIcon(color = '#667eea') {
+    return L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="
+            background: ${color};
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        "></div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
+}
         
         window.addSkill = function() {
             console.log('✨ Adding skill');
