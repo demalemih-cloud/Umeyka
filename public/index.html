@@ -365,10 +365,24 @@
         };
 
         function initMap() {
-            if (map) return;
-            
-            // Создаем карту
-            map = L.map('map').setView([55.7558, 37.6173], 10);
+  if (map) return;
+  
+  // Создаем карту с отключенной атрибуцией
+  map = L.map('map', {
+    attributionControl: false
+  }).setView([55.7558, 37.6173], 10);
+  
+  // CartoDB Positron
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 20
+  }).addTo(map);
+
+  // Ограничиваем область просмотра
+  map.setMaxBounds([
+    [30, 19],  // Юго-запад
+    [70, 180]  // Северо-восток
+  ]);
             
             // Добавляем слой карты
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
