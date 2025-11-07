@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
+        /* Стили остаются прежними, но добавлены небольшие улучшения */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -29,7 +30,6 @@
             padding: 0;
         }
         
-        /* ВЕРХНЯЯ ЧАСТЬ - НАЗВАНИЕ И РЕЙТИНГ */
         .header {
             padding: 30px 20px 20px;
             text-align: center;
@@ -68,7 +68,6 @@
             margin-right: 8px;
         }
         
-        /* СРЕДНЯЯ ЧАСТЬ - ОСНОВНЫЕ КНОПКИ */
         .main-buttons {
             padding: 40px 20px 20px;
             display: flex;
@@ -90,6 +89,7 @@
             font-weight: 600;
             text-decoration: none;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
         
         .main-button:active {
@@ -110,7 +110,6 @@
             margin-right: 12px;
         }
         
-        /* НИЖНЯЯ ЧАСТЬ - КАРТА */
         .map-section {
             padding: 20px;
         }
@@ -125,9 +124,9 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
+            margin-bottom: 15px;
         }
         
-        /* СЕКЦИИ */
         .section {
             display: none;
             position: fixed;
@@ -183,7 +182,6 @@
             margin-top: 10px;
         }
         
-        /* КАРТОЧКИ УМЕЕК */
         .skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -195,7 +193,7 @@
         
         .skill-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 10px;
         }
@@ -236,113 +234,33 @@
             cursor: pointer;
         }
         
-        /* КАРТА */
         #map {
-            height: 500px;
+            height: 400px;
             border-radius: 15px;
             margin-top: 15px;
-            display: none;
             border: 2px solid rgba(255,255,255,0.3);
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            display: none;
         }
         
         .map-active #map {
             display: block;
         }
         
-        /* Кастомные маркеры */
-        .user-location-marker {
-            background: none !important;
-            border: none !important;
-        }
-        
-        .custom-marker {
-            background: none !important;
-            border: none !important;
-        }
-        
-        /* Стили для попапов карты */
-        .leaflet-popup-content {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 8px 12px;
-        }
-        
-        .leaflet-popup-content-wrapper {
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
-        
-        /* ЧАТ */
-        .chat-window {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 70vh;
-            background: white;
-            border-radius: 20px 20px 0 0;
-            z-index: 2000;
-            display: none;
-            flex-direction: column;
-        }
-        
-        .chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .loading {
+            text-align: center;
             padding: 20px;
-            border-radius: 20px 20px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-size: 16px;
         }
         
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #f8f9fa;
-        }
-        
-        .message {
-            margin-bottom: 10px;
-            padding: 12px 16px;
-            border-radius: 15px;
-            max-width: 80%;
-        }
-        
-        .message-outgoing {
-            background: #667eea;
-            color: white;
-            margin-left: auto;
-        }
-        
-        .message-incoming {
-            background: white;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .chat-input {
-            display: flex;
+        .error-message {
+            background: rgba(255,0,0,0.1);
+            color: #ff6b6b;
             padding: 15px;
-            border-top: 1px solid #e0e0e0;
-            background: white;
-        }
-        
-        .chat-input input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 20px;
-            margin-right: 10px;
-        }
-        
-        .send-button {
-            background: #667eea;
-            border: none;
-            border-radius: 20px;
-            color: white;
-            padding: 12px 20px;
-            cursor: pointer;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid rgba(255,0,0,0.2);
         }
     </style>
 </head>
@@ -350,7 +268,6 @@
     <div class="container">
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
-            <!-- ВЕРХНЯЯ ЧАСТЬ -->
             <div class="header">
                 <div class="logo">🤝✨</div>
                 <div class="app-title">Umeyka</div>
@@ -361,7 +278,6 @@
                 </div>
             </div>
             
-            <!-- СРЕДНЯЯ ЧАСТЬ -->
             <div class="main-buttons">
                 <button class="main-button button-master" onclick="showSection('masterSection')">
                     <span class="button-icon">✨</span>
@@ -373,7 +289,6 @@
                 </button>
             </div>
             
-            <!-- НИЖНЯЯ ЧАСТЬ -->
             <div class="map-section">
                 <button class="map-button" onclick="openMap()">
                     🗺️ Поиск по карте
@@ -388,8 +303,8 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
                 
-                <input type="text" id="skillName" class="input-field" placeholder="Моё умение">
-                <input type="text" id="skillExperience" class="input-field" placeholder="Мой опыт">
+                <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)">
+                <input type="text" id="skillExperience" class="input-field" placeholder="Мой опыт (например: 3 года)">
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях">
                 
                 <button class="submit-button" onclick="addSkill()">✅ Опубликовать умейку</button>
@@ -404,41 +319,29 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">🔍 Найти мастера</h2>
                 
-                <input type="text" id="locationInput" class="input-field" placeholder="📍 Я рядом (ваше местоположение)">
-                <button class="submit-button" onclick="findNearbySkills()">Найти мастеров рядом</button>
+                <input type="text" id="searchInput" class="input-field" placeholder="🔎 Что ищем? (например: сантехник, электрик)">
+                <button class="submit-button" onclick="searchSkills()">Найти мастеров</button>
                 
-                <div id="nearbyResults" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- ОКНО ЧАТА -->
-        <div id="chatWindow" class="chat-window">
-            <div class="chat-header">
-                <span id="chatTitle">Чат с мастером</span>
-                <button onclick="closeChat()" style="background: none; border: none; color: white; font-size: 20px;">×</button>
-            </div>
-            <div id="chatMessages" class="chat-messages"></div>
-            <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Введите сообщение...">
-                <button class="send-button" onclick="sendMessage()">📤</button>
+                <div id="searchResults" style="margin-top: 20px;"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Сначала объявляем все функции ГЛОБАЛЬНО
+        // Глобальные переменные
+        let map = null;
+        let userLocation = null;
+        let markers = [];
+
+        // Основные функции навигации
         window.showMainScreen = function() {
-            console.log('🏠 Showing main screen');
             document.getElementById('mainScreen').style.display = 'block';
             document.getElementById('masterSection').style.display = 'none';
             document.getElementById('clientSection').style.display = 'none';
-            if (document.querySelector('.map-section')) {
-                document.querySelector('.map-section').classList.remove('map-active');
-            }
+            document.querySelector('.map-section').classList.remove('map-active');
         };
         
         window.showSection = function(sectionId) {
-            console.log('📱 Showing section:', sectionId);
             document.getElementById('mainScreen').style.display = 'none';
             document.getElementById('masterSection').style.display = 'none';
             document.getElementById('clientSection').style.display = 'none';
@@ -448,181 +351,227 @@
                 loadMySkills();
             }
         };
-        
-        // КАРТА - УЛУЧШЕННАЯ ВЕРСИЯ
-function initMap() {
-    if (map) return;
-    
-    // Создаем карту с отключенной атрибуцией
-    map = L.map('map', {
-        attributionControl: false
-    }).setView([55.7558, 37.6173], 10);
-    
-    // CartoDB Positron - красивая светлая тема
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        subdomains: 'abcd',
-        maxZoom: 20
-    }).addTo(map);
 
-    // Ограничиваем область просмотра
-    map.setMaxBounds([
-        [30, 19],  // Юго-запад
-        [70, 180]  // Северо-восток
-    ]);
-
-    // Запрос геолокации
-    initializeUserLocation();
-}
-
-function initializeUserLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            position => {
-                const { latitude, longitude } = position.coords;
-                userLocation = { lat: latitude, lon: longitude };
-                map.setView([latitude, longitude], 13);
-                
-                // Добавляем красивый маркер текущего местоположения
-                L.marker([latitude, longitude], {
-                    icon: L.divIcon({
-                        className: 'user-location-marker',
-                        html: '<div style="background: #4facfe; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"></div>',
-                        iconSize: [20, 20],
-                        iconAnchor: [10, 10]
-                    })
-                })
-                .addTo(map)
-                .bindPopup('📍 Ваше местоположение')
-                .openPopup();
-            },
-            error => {
-                console.log('Геолокация недоступна');
-                // Используем местоположение по умолчанию
-                userLocation = { lat: 55.7558, lon: 37.6173 };
+        // Работа с картой
+        window.openMap = function() {
+            const mapSection = document.querySelector('.map-section');
+            mapSection.classList.add('map-active');
+            
+            if (!map) {
+                initMap();
+            } else {
+                loadSkillsOnMap();
             }
-        );
-    }
-}
+        };
 
-function createCustomIcon(color = '#667eea') {
-    return L.divIcon({
-        className: 'custom-marker',
-        html: `<div style="
-            background: ${color};
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        "></div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
-    });
-}
+        function initMap() {
+            if (map) return;
+            
+            // Создаем карту
+            map = L.map('map').setView([55.7558, 37.6173], 10);
+            
+            // Добавляем слой карты
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
 
-async function loadSkillsOnMap() {
-    try {
-        const response = await fetch('/api/search-umeyka?query=');
-        const skills = await response.json();
-        
-        // Очищаем старые маркеры
-        markers.forEach(marker => map.removeLayer(marker));
-        markers = [];
-        
-        const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'];
-        
-        skills.forEach((skill, index) => {
-            if (skill.location && skill.location.lat && skill.location.lon) {
-                const color = colors[index % colors.length];
+            // Получаем местоположение пользователя
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const { latitude, longitude } = position.coords;
+                        userLocation = { lat: latitude, lon: longitude };
+                        map.setView([latitude, longitude], 13);
+                        
+                        // Добавляем маркер текущего местоположения
+                        L.marker([latitude, longitude])
+                            .addTo(map)
+                            .bindPopup('📍 Ваше местоположение')
+                            .openPopup();
+                            
+                        loadSkillsOnMap();
+                    },
+                    error => {
+                        console.log('Геолокация недоступна');
+                        userLocation = { lat: 55.7558, lon: 37.6173 };
+                        loadSkillsOnMap();
+                    }
+                );
+            } else {
+                userLocation = { lat: 55.7558, lon: 37.6173 };
+                loadSkillsOnMap();
+            }
+        }
+
+        async function loadSkillsOnMap() {
+            try {
+                const response = await fetch('/api/search-umeyka?query=');
+                const skills = await response.json();
                 
-                const marker = L.marker([skill.location.lat, skill.location.lon], {
-                    icon: createCustomIcon(color)
-                })
-                .addTo(map)
-                .bindPopup(`
-                    <div style="min-width: 220px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
-                        <h3 style="margin: 0 0 10px 0; color: #333; font-size: 16px;">${skill.skill}</h3>
-                        <p style="margin: 5px 0; font-size: 14px;">🎓 <strong>Опыт:</strong> ${skill.experience}</p>
-                        <p style="margin: 5px 0; font-size: 14px;">💰 <strong>Цена:</strong> ${skill.price} руб.</p>
-                        <p style="margin: 5px 0; font-size: 14px;">⭐ <strong>Рейтинг:</strong> 4.8/5</p>
-                        <button onclick="openChatFromMap('${skill._id}', '${skill.skill}')" 
-                                style="width: 100%; padding: 10px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 14px; margin-top: 10px; cursor: pointer;">
-                            💬 Начать чат
+                // Очищаем старые маркеры
+                markers.forEach(marker => map.removeLayer(marker));
+                markers = [];
+                
+                skills.forEach(skill => {
+                    if (skill.location && skill.location.lat && skill.location.lon) {
+                        const marker = L.marker([skill.location.lat, skill.location.lon])
+                            .addTo(map)
+                            .bindPopup(`
+                                <div style="min-width: 200px;">
+                                    <h3 style="margin: 0 0 10px 0;">${skill.skill}</h3>
+                                    <p style="margin: 5px 0;">🎓 ${skill.experience}</p>
+                                    <p style="margin: 5px 0;">💰 ${skill.price} руб.</p>
+                                    <p style="margin: 5px 0;">👤 ${skill.username}</p>
+                                    <button onclick="contactMaster('${skill._id}', '${skill.skill}')" 
+                                            style="width: 100%; padding: 8px; background: #667eea; color: white; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">
+                                        💬 Написать
+                                    </button>
+                                </div>
+                            `);
+                        
+                        markers.push(marker);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Ошибка загрузки карты:', error);
+            }
+        }
+
+        // Добавление умения
+        window.addSkill = async function() {
+            const skill = document.getElementById('skillName').value;
+            const experience = document.getElementById('skillExperience').value;
+            const price = document.getElementById('skillPrice').value;
+            
+            if (!skill || !experience || !price) {
+                alert('❌ Заполните все поля!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/add-umeyka', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        skill,
+                        experience,
+                        price: parseInt(price),
+                        location: userLocation || { lat: 55.7558, lon: 37.6173 }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Умейка успешно добавлена!');
+                    document.getElementById('skillName').value = '';
+                    document.getElementById('skillExperience').value = '';
+                    document.getElementById('skillPrice').value = '';
+                    loadMySkills();
+                } else {
+                    alert('❌ Ошибка: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Ошибка добавления:', error);
+                alert('❌ Ошибка при добавлении умейки');
+            }
+        };
+
+        // Поиск умений
+        window.searchSkills = async function() {
+            const query = document.getElementById('searchInput').value;
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (!query.trim()) {
+                resultsDiv.innerHTML = '<div class="error-message">❌ Введите запрос для поиска</div>';
+                return;
+            }
+            
+            resultsDiv.innerHTML = '<div class="loading">🔍 Ищем мастеров...</div>';
+            
+            try {
+                const response = await fetch(`/api/search-umeyka?query=${encodeURIComponent(query)}`);
+                const skills = await response.json();
+                
+                if (skills.length === 0) {
+                    resultsDiv.innerHTML = '<div class="error-message">😔 Ничего не найдено. Попробуйте другой запрос.</div>';
+                    return;
+                }
+                
+                resultsDiv.innerHTML = skills.map(skill => `
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-title">${skill.skill}</div>
+                            <div class="skill-rating">★★★★★</div>
+                        </div>
+                        <div class="skill-price">${skill.price} ₽</div>
+                        <div class="skill-distance">🎓 ${skill.experience}</div>
+                        <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
+                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}')">
+                            💬 Написать мастеру
                         </button>
                     </div>
-                `);
+                `).join('');
                 
-                markers.push(marker);
-            }
-        });
-        
-        // Если есть маркеры, подгоняем карту чтобы показать все
-        if (markers.length > 0 && userLocation) {
-            const group = new L.featureGroup(markers);
-            // Добавляем местоположение пользователя в границы
-            group.addLayer(L.marker([userLocation.lat, userLocation.lon]));
-            map.fitBounds(group.getBounds().pad(0.1));
-        }
-        
-    } catch (error) {
-        console.error('Ошибка загрузки карты:', error);
-    }
-}
-        
-        window.contactMaster = function(umeykaId, skillName) {
-            alert(`💬 Чат с мастером: ${skillName}\n\nВ реальном приложении откроется окно чата для общения.`);
-        };
-        
-        window.openChatFromMap = function(umeykaId, skillName) {
-            contactMaster(umeykaId, skillName);
-        };
-        
-        window.closeChat = function() {
-            document.getElementById('chatWindow').style.display = 'none';
-        };
-        
-        window.sendMessage = function() {
-            alert('📤 Сообщение отправлено!');
-            document.getElementById('messageInput').value = '';
-        };
-        
-        // Вспомогательные функции
-        function loadMySkills() {
-            console.log('📋 Loading my skills');
-            const skillsList = document.getElementById('mySkillsList');
-            if (skillsList) {
-                skillsList.innerHTML = '<p>Ваши умейки появятся здесь после добавления</p>';
-            }
-        }
-        
-        // ИНИЦИАЛИЗАЦИЯ TELEGRAM
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            try {
-                tg.expand();
-                console.log('✅ Telegram Web App initialized');
             } catch (error) {
-                console.log('⚠️ Telegram Web App error:', error);
+                console.error('Ошибка поиска:', error);
+                resultsDiv.innerHTML = '<div class="error-message">❌ Ошибка при поиске. Попробуйте позже.</div>';
             }
-        } else {
-            console.log('⚠️ Telegram Web App not available');
+        };
+
+        // Загрузка моих умений
+        async function loadMySkills() {
+            const skillsList = document.getElementById('mySkillsList');
+            skillsList.innerHTML = '<div class="loading">📋 Загружаем ваши умейки...</div>';
+            
+            try {
+                // Для демо используем случайный ID
+                const response = await fetch('/api/my-umeyka/123');
+                const skills = await response.json();
+                
+                if (skills.length === 0) {
+                    skillsList.innerHTML = '<div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">У вас пока нет добавленных умений</div>';
+                    return;
+                }
+                
+                skillsList.innerHTML = skills.map(skill => `
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-title">${skill.skill}</div>
+                            <div class="skill-rating">★★★★★</div>
+                        </div>
+                        <div class="skill-price">${skill.price} ₽</div>
+                        <div class="skill-distance">🎓 ${skill.experience}</div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                skillsList.innerHTML = '<div class="error-message">❌ Ошибка при загрузке ваших умений</div>';
+            }
         }
-        
-        // ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
+
+        // Контакт с мастером
+        window.contactMaster = function(umeykaId, skillName) {
+            alert(`💬 Чат с мастером: "${skillName}"\n\nВ реальном приложении здесь откроется окно чата для общения с мастером!`);
+        };
+
+        // Инициализация приложения
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Umeyka app loaded successfully!');
-            console.log('✅ All functions are available:', {
-                showMainScreen: typeof showMainScreen,
-                showSection: typeof showSection,
-                openMap: typeof openMap,
-                addSkill: typeof addSkill,
-                searchSkills: typeof searchSkills,
-                findNearbySkills: typeof findNearbySkills,
-                contactMaster: typeof contactMaster
-            });
-            
-            // Показываем главный экран
             showMainScreen();
+            
+            // Инициализируем Telegram Web App
+            const tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.ready();
+                tg.expand();
+                console.log('✅ Telegram Web App initialized');
+            }
         });
     </script>
 </body>
