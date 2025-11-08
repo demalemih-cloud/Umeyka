@@ -262,6 +262,174 @@
             text-align: center;
             border: 1px solid rgba(255,0,0,0.2);
         }
+
+        /* НОВЫЕ СТИЛИ ДЛЯ ЛИЧНОГО КАБИНЕТА */
+        .profile-skill-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .profile-skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .skill-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .small-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .edit-button {
+            background: #4299e1;
+            color: white;
+        }
+
+        .delete-button {
+            background: #f56565;
+            color: white;
+        }
+
+        .rating-badge {
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .chat-item {
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+            padding: 15px;
+            margin: 8px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-item:hover {
+            background: rgba(255,255,255,1);
+            transform: translateX(5px);
+        }
+
+        .chat-partner {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .chat-preview {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+        }
+
+        .unread-badge {
+            background: #e53e3e;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .rating-stars {
+            color: #FFD700;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .rating-details {
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .rating-label {
+            width: 100px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .rating-value {
+            width: 40px;
+            text-align: right;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .rating-progress {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .rating-progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -286,6 +454,12 @@
                 <button class="main-button button-client" onclick="showSection('clientSection')">
                     <span class="button-icon">🔍</span>
                     Я ищу
+                </button>
+                <!-- НОВАЯ КНОПКА ЛИЧНОГО КАБИНЕТА -->
+                <button class="main-button" onclick="showProfileSection()" 
+                        style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">
+                    <span class="button-icon">👤</span>
+                    Личный кабинет
                 </button>
             </div>
             
@@ -325,6 +499,127 @@
                 <div id="searchResults" style="margin-top: 20px;"></div>
             </div>
         </div>
+
+        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА -->
+        <div id="profileSection" class="section">
+            <button class="back-button" onclick="showMainScreen()">← Назад</button>
+            
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
+                
+                <!-- Профиль пользователя -->
+                <div id="userProfile">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">
+                            👤
+                        </div>
+                        <h3 id="userName">Пользователь</h3>
+                        <p id="userBio" style="opacity: 0.8; margin: 10px 0;">Расскажите о себе...</p>
+                    </div>
+                    
+                    <button class="main-button" onclick="editProfile()" style="margin-bottom: 15px;">
+                        ✏️ Редактировать профиль
+                    </button>
+                </div>
+                
+                <!-- Статистика -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px;">📊 Моя статистика</h3>
+                    <div id="userStats" class="stats-grid">
+                        <!-- Статистика загрузится через JavaScript -->
+                    </div>
+                </div>
+                
+                <!-- Мои умейки -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px;">✨ Мои умейки</h3>
+                    <div id="profileSkillsList"></div>
+                    
+                    <button class="main-button button-master" onclick="showSection('masterSection')" style="margin-top: 15px;">
+                        ➕ Добавить новую умейку
+                    </button>
+                </div>
+                
+                <!-- Мои чаты -->
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px;">💬 Активные чаты</h3>
+                    <div id="userChatsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+        <div id="editProfileSection" class="section">
+            <button class="back-button" onclick="showProfileSection()">← Назад</button>
+            
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
+                
+                <input type="text" id="editFirstName" class="input-field" placeholder="Имя">
+                <input type="text" id="editLastName" class="input-field" placeholder="Фамилия">
+                <input type="tel" id="editPhone" class="input-field" placeholder="Телефон">
+                <textarea id="editBio" class="input-field" placeholder="О себе" style="height: 100px; resize: vertical;"></textarea>
+                
+                <button class="submit-button" onclick="saveProfile()">💾 Сохранить профиль</button>
+            </div>
+        </div>
+
+        <!-- ФОРМА РЕДАКТИРОВАНИЯ УМЕЙКИ -->
+        <div id="editUmeykaSection" class="section">
+            <button class="back-button" onclick="showProfileSection()">← Назад</button>
+            
+            <div class="form-section">
+                <h2 id="editUmeykaTitle" style="margin-bottom: 20px; text-align: center;">✏️ Настройка умейки</h2>
+                
+                <input type="hidden" id="editUmeykaId">
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="color: white; display: block; margin-bottom: 5px;">📷 Фотографии работ</label>
+                    <input type="file" id="umeykaPhotos" multiple accept="image/*" style="width: 100%; margin: 5px 0;">
+                    <div id="photosPreview" style="margin-top: 10px;"></div>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="color: white; display: block; margin-bottom: 5px;">🎥 Видео работ</label>
+                    <input type="file" id="umeykaVideos" multiple accept="video/*" style="width: 100%; margin: 5px 0;">
+                    <div id="videosPreview" style="margin-top: 10px;"></div>
+                </div>
+                
+                <textarea id="editUmeykaDescription" class="input-field" placeholder="Подробное описание услуги" style="height: 100px; resize: vertical;"></textarea>
+                
+                <input type="text" id="editUmeykaTags" class="input-field" placeholder="Теги (через запятую)">
+                
+                <div id="umeykaRating" style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; margin: 15px 0;">
+                    <h4 style="margin-bottom: 10px; color: #333;">⭐ Рейтинг: <span id="ratingValue">0</span>/10</h4>
+                    <div id="ratingDetails" class="rating-details">
+                        <!-- Детали рейтинга загрузятся через JavaScript -->
+                    </div>
+                    <div style="color: #666; font-size: 14px; text-align: center;">
+                        Отзывов: <span id="ratingCount">0</span>
+                    </div>
+                </div>
+                
+                <button class="submit-button" onclick="saveUmeyka()">💾 Сохранить умейку</button>
+            </div>
+        </div>
+
+        <!-- ОКНО ЧАТА -->
+        <div id="chatWindow" class="section">
+            <button class="back-button" onclick="closeChat()">← Назад к чатам</button>
+            
+            <div class="form-section">
+                <h2 id="chatTitle" style="margin-bottom: 20px; text-align: center;">💬 Чат</h2>
+                
+                <div id="chatMessages" style="height: 300px; overflow-y: auto; margin-bottom: 20px; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px;">
+                    <!-- Сообщения чата -->
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="messageInput" class="input-field" placeholder="Введите сообщение..." style="flex: 1;">
+                    <button class="submit-button" onclick="sendChatMessage()" style="width: auto; padding: 15px 20px;">📤</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -332,12 +627,19 @@
         let map = null;
         let userLocation = null;
         let markers = [];
+        let currentUserId = 123; // Для демо, в реальном приложении берем из Telegram
+        let currentChatId = null;
 
-        // Основные функции навигации
+        // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
+
         window.showMainScreen = function() {
             document.getElementById('mainScreen').style.display = 'block';
             document.getElementById('masterSection').style.display = 'none';
             document.getElementById('clientSection').style.display = 'none';
+            document.getElementById('profileSection').style.display = 'none';
+            document.getElementById('editProfileSection').style.display = 'none';
+            document.getElementById('editUmeykaSection').style.display = 'none';
+            document.getElementById('chatWindow').style.display = 'none';
             document.querySelector('.map-section').classList.remove('map-active');
         };
         
@@ -345,12 +647,484 @@
             document.getElementById('mainScreen').style.display = 'none';
             document.getElementById('masterSection').style.display = 'none';
             document.getElementById('clientSection').style.display = 'none';
+            document.getElementById('profileSection').style.display = 'none';
+            document.getElementById('editProfileSection').style.display = 'none';
+            document.getElementById('editUmeykaSection').style.display = 'none';
+            document.getElementById('chatWindow').style.display = 'none';
             document.getElementById(sectionId).style.display = 'block';
             
             if (sectionId === 'masterSection') {
                 loadMySkills();
             }
         };
+
+        // ========== ЛИЧНЫЙ КАБИНЕТ ==========
+
+        window.showProfileSection = function() {
+            showSection('profileSection');
+            loadUserProfile();
+            loadUserStats();
+            loadProfileSkills();
+            loadUserChats();
+        };
+
+        window.editProfile = function() {
+            showSection('editProfileSection');
+            loadEditProfileForm();
+        };
+
+        // Загрузка профиля пользователя
+        async function loadUserProfile() {
+            try {
+                const response = await fetch(`/api/user-profile/${currentUserId}`);
+                const profile = await response.json();
+                
+                document.getElementById('userName').textContent = 
+                    `${profile.firstName} ${profile.lastName || ''}`.trim() || 'Пользователь';
+                document.getElementById('userBio').textContent = profile.bio || 'Расскажите о себе...';
+                
+                if (profile.avatar) {
+                    document.getElementById('userAvatar').innerHTML = 
+                        `<img src="${profile.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                }
+                
+            } catch (error) {
+                console.error('Ошибка загрузки профиля:', error);
+                showError('userProfile', 'Ошибка загрузки профиля');
+            }
+        }
+
+        // Загрузка формы редактирования профиля
+        async function loadEditProfileForm() {
+            try {
+                const response = await fetch(`/api/user-profile/${currentUserId}`);
+                const profile = await response.json();
+                
+                document.getElementById('editFirstName').value = profile.firstName || '';
+                document.getElementById('editLastName').value = profile.lastName || '';
+                document.getElementById('editPhone').value = profile.phone || '';
+                document.getElementById('editBio').value = profile.bio || '';
+                
+            } catch (error) {
+                console.error('Ошибка загрузки формы профиля:', error);
+                alert('❌ Ошибка загрузки формы профиля');
+            }
+        }
+
+        // Сохранение профиля
+        async function saveProfile() {
+            try {
+                const profileData = {
+                    userId: currentUserId,
+                    firstName: document.getElementById('editFirstName').value,
+                    lastName: document.getElementById('editLastName').value,
+                    phone: document.getElementById('editPhone').value,
+                    bio: document.getElementById('editBio').value
+                };
+                
+                const response = await fetch('/api/update-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(profileData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Профиль успешно сохранен!');
+                    showProfileSection();
+                } else {
+                    alert('❌ Ошибка сохранения профиля: ' + data.error);
+                }
+                
+            } catch (error) {
+                console.error('Ошибка сохранения профиля:', error);
+                alert('❌ Ошибка сохранения профиля');
+            }
+        }
+
+        // Загрузка статистики пользователя
+        async function loadUserStats() {
+            try {
+                const response = await fetch(`/api/user-stats/${currentUserId}`);
+                const stats = await response.json();
+                
+                const statsHtml = `
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.totalUmeykas}</div>
+                        <div class="stat-label">Умейки</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.totalChats}</div>
+                        <div class="stat-label">Активные чаты</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.completedChats}</div>
+                        <div class="stat-label">Завершено</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.averageRating}</div>
+                        <div class="stat-label">Рейтинг</div>
+                    </div>
+                `;
+                
+                document.getElementById('userStats').innerHTML = statsHtml;
+                
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+                document.getElementById('userStats').innerHTML = '<div class="error-message">Ошибка загрузки статистики</div>';
+            }
+        }
+
+        // Загрузка умений в профиле
+        async function loadProfileSkills() {
+            try {
+                const response = await fetch(`/api/my-umeyka/${currentUserId}`);
+                const skills = await response.json();
+                
+                const skillsList = document.getElementById('profileSkillsList');
+                
+                if (skills.length === 0) {
+                    skillsList.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">
+                            У вас пока нет добавленных умений
+                        </div>
+                    `;
+                    return;
+                }
+                
+                skillsList.innerHTML = skills.map(skill => `
+                    <div class="profile-skill-card">
+                        <div class="profile-skill-header">
+                            <div>
+                                <strong>${skill.skill}</strong>
+                                <div style="font-size: 14px; color: #666;">${skill.experience}</div>
+                            </div>
+                            <div class="rating-badge">
+                                ${skill.rating?.average?.toFixed(1) || '0'}/10
+                            </div>
+                        </div>
+                        <div style="color: #48bb78; font-weight: bold; margin: 5px 0;">
+                            ${skill.price} ₽
+                        </div>
+                        ${skill.description ? `<div style="font-size: 14px; color: #666; margin: 5px 0;">${skill.description}</div>` : ''}
+                        <div class="skill-actions">
+                            <button class="small-button edit-button" onclick="editUmeyka('${skill._id}')">
+                                ✏️ Настроить
+                            </button>
+                            <button class="small-button delete-button" onclick="deleteUmeyka('${skill._id}')">
+                                🗑️ Удалить
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Ошибка загрузки умений:', error);
+                showError('profileSkillsList', 'Ошибка загрузки умений');
+            }
+        }
+
+        // Редактирование умейки
+        window.editUmeyka = async function(umeykaId) {
+            try {
+                const response = await fetch(`/api/search-umeyka?query=`);
+                const skills = await response.json();
+                const skill = skills.find(s => s._id === umeykaId);
+                
+                if (!skill) {
+                    alert('Умейка не найдена');
+                    return;
+                }
+                
+                document.getElementById('editUmeykaId').value = umeykaId;
+                document.getElementById('editUmeykaTitle').textContent = `✏️ Настройка: ${skill.skill}`;
+                document.getElementById('editUmeykaDescription').value = skill.description || '';
+                document.getElementById('editUmeykaTags').value = skill.tags?.join(', ') || '';
+                
+                // Заполняем рейтинг
+                updateRatingDisplay(skill.rating);
+                
+                showSection('editUmeykaSection');
+                
+            } catch (error) {
+                console.error('Ошибка загрузки умейки:', error);
+                alert('❌ Ошибка загрузки умейки');
+            }
+        };
+
+        // Обновление отображения рейтинга
+        function updateRatingDisplay(rating) {
+            if (!rating) {
+                rating = { average: 0, count: 0, details: { quality: 0, speed: 0, communication: 0, price: 0 } };
+            }
+            
+            document.getElementById('ratingValue').textContent = rating.average.toFixed(1);
+            document.getElementById('ratingCount').textContent = rating.count;
+            
+            const detailsHtml = `
+                <div class="rating-bar">
+                    <div class="rating-label">Качество</div>
+                    <div class="rating-value">${rating.details.quality.toFixed(1)}</div>
+                    <div class="rating-progress">
+                        <div class="rating-progress-fill" style="width: ${rating.details.quality * 10}%"></div>
+                    </div>
+                </div>
+                <div class="rating-bar">
+                    <div class="rating-label">Скорость</div>
+                    <div class="rating-value">${rating.details.speed.toFixed(1)}</div>
+                    <div class="rating-progress">
+                        <div class="rating-progress-fill" style="width: ${rating.details.speed * 10}%"></div>
+                    </div>
+                </div>
+                <div class="rating-bar">
+                    <div class="rating-label">Общение</div>
+                    <div class="rating-value">${rating.details.communication.toFixed(1)}</div>
+                    <div class="rating-progress">
+                        <div class="rating-progress-fill" style="width: ${rating.details.communication * 10}%"></div>
+                    </div>
+                </div>
+                <div class="rating-bar">
+                    <div class="rating-label">Цена</div>
+                    <div class="rating-value">${rating.details.price.toFixed(1)}</div>
+                    <div class="rating-progress">
+                        <div class="rating-progress-fill" style="width: ${rating.details.price * 10}%"></div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('ratingDetails').innerHTML = detailsHtml;
+        }
+
+        // Сохранение умейки
+        window.saveUmeyka = async function() {
+            try {
+                const umeykaId = document.getElementById('editUmeykaId').value;
+                const updateData = {
+                    umeykaId,
+                    description: document.getElementById('editUmeykaDescription').value,
+                    tags: document.getElementById('editUmeykaTags').value.split(',').map(tag => tag.trim()).filter(tag => tag)
+                };
+                
+                // Здесь будет обработка загрузки фото и видео
+                // Пока оставляем заглушку
+                
+                const response = await fetch('/api/update-umeyka', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Умейка успешно обновлена!');
+                    showProfileSection();
+                } else {
+                    alert('❌ Ошибка обновления умейки: ' + data.error);
+                }
+                
+            } catch (error) {
+                console.error('Ошибка сохранения умейки:', error);
+                alert('❌ Ошибка сохранения умейки');
+            }
+        };
+
+        // Удаление умейки
+        window.deleteUmeyka = async function(umeykaId) {
+            if (!confirm('❌ Вы уверены, что хотите удалить эту умейку?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/delete-umeyka/${umeykaId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userId: currentUserId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('🗑️ Умейка удалена!');
+                    loadProfileSkills();
+                } else {
+                    alert('❌ Ошибка удаления умейки: ' + data.error);
+                }
+                
+            } catch (error) {
+                console.error('Ошибка удаления умейки:', error);
+                alert('❌ Ошибка удаления умейки');
+            }
+        };
+
+        // ========== СИСТЕМА ЧАТОВ ==========
+
+        // Загрузка чатов пользователя
+        async function loadUserChats() {
+            try {
+                const response = await fetch(`/api/user-chats/${currentUserId}`);
+                const chats = await response.json();
+                
+                const chatsList = document.getElementById('userChatsList');
+                
+                if (chats.length === 0) {
+                    chatsList.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">
+                            У вас пока нет активных чатов
+                        </div>
+                    `;
+                    return;
+                }
+                
+                chatsList.innerHTML = chats.map(chat => {
+                    const isClient = chat.clientUserId === currentUserId;
+                    const partnerName = isClient ? 
+                        `Мастер: ${chat.umeykaId?.username || 'Неизвестно'}` : 
+                        `Клиент: ID${chat.clientUserId}`;
+                    
+                    const lastMessageTime = new Date(chat.lastMessageTime).toLocaleTimeString('ru-RU', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    const unreadBadge = chat.unreadCount > 0 ? 
+                        `<div class="unread-badge">${chat.unreadCount}</div>` : '';
+                    
+                    return `
+                        <div class="chat-item" onclick="openChatWindow('${chat._id}', '${partnerName}')">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div style="flex: 1;">
+                                    <div class="chat-partner">${partnerName}</div>
+                                    <div class="chat-preview">${chat.lastMessage}</div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="chat-time">${lastMessageTime}</div>
+                                    ${unreadBadge}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Ошибка загрузки чатов:', error);
+                showError('userChatsList', 'Ошибка загрузки чатов');
+            }
+        }
+
+        // Открытие окна чата
+        window.openChatWindow = async function(chatId, partnerName) {
+            try {
+                currentChatId = chatId;
+                document.getElementById('chatTitle').textContent = `💬 Чат с ${partnerName}`;
+                
+                // Загружаем сообщения
+                const response = await fetch(`/api/chat-messages/${chatId}`);
+                const messages = await response.json();
+                
+                const messagesHtml = messages.map(message => {
+                    const isMyMessage = message.fromUserId === currentUserId;
+                    const messageTime = new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    return `
+                        <div style="margin-bottom: 10px; text-align: ${isMyMessage ? 'right' : 'left'};">
+                            <div style="display: inline-block; max-width: 80%;">
+                                <div style="background: ${isMyMessage ? '#667eea' : '#e2e8f0'}; 
+                                            color: ${isMyMessage ? 'white' : '#2d3748'}; 
+                                            padding: 10px 15px; 
+                                            border-radius: 15px; 
+                                            word-wrap: break-word;">
+                                    ${message.text}
+                                </div>
+                                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                    ${messageTime}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('chatMessages').innerHTML = messagesHtml || '<div style="text-align: center; color: #666;">Нет сообщений</div>';
+                document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+                
+                showSection('chatWindow');
+                
+            } catch (error) {
+                console.error('Ошибка открытия чата:', error);
+                alert('❌ Ошибка открытия чата');
+            }
+        };
+
+        // Закрытие чата
+        window.closeChat = function() {
+            showProfileSection();
+            currentChatId = null;
+        };
+
+        // Отправка сообщения в чат
+        window.sendChatMessage = async function() {
+            try {
+                const messageInput = document.getElementById('messageInput');
+                const text = messageInput.value.trim();
+                
+                if (!text) {
+                    alert('Введите сообщение');
+                    return;
+                }
+                
+                if (!currentChatId) {
+                    alert('Чат не выбран');
+                    return;
+                }
+                
+                const response = await fetch('/api/send-message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chatId: currentChatId,
+                        fromUserId: currentUserId,
+                        text: text
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    messageInput.value = '';
+                    // Обновляем окно чата
+                    openChatWindow(currentChatId, document.getElementById('chatTitle').textContent.replace('💬 Чат с ', ''));
+                } else {
+                    alert('❌ Ошибка отправки сообщения: ' + data.error);
+                }
+                
+            } catch (error) {
+                console.error('Ошибка отправки сообщения:', error);
+                alert('❌ Ошибка отправки сообщения');
+            }
+        };
+
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = `<div class="error-message">${message}</div>`;
+            }
+        }
+
+        // ========== СУЩЕСТВУЮЩИЕ ФУНКЦИИ КАРТЫ И ПОИСКА ==========
 
         // Работа с картой
         window.openMap = function() {
@@ -365,32 +1139,15 @@
         };
 
         function initMap() {
-  if (map) return;
-  
-  // Создаем карту с отключенной атрибуцией
-  map = L.map('map', {
-    attributionControl: false
-  }).setView([55.7558, 37.6173], 10);
-  
-  // CartoDB Positron
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20
-  }).addTo(map);
-
-  // Ограничиваем область просмотра
-  map.setMaxBounds([
-    [30, 19],  // Юго-запад
-    [70, 180]  // Северо-восток
-  ]);
+            if (map) return;
             
-            // Добавляем слой карты
+            map = L.map('map').setView([55.7558, 37.6173], 10);
+            
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors',
                 maxZoom: 19
             }).addTo(map);
 
-            // Получаем местоположение пользователя
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     position => {
@@ -398,7 +1155,6 @@
                         userLocation = { lat: latitude, lon: longitude };
                         map.setView([latitude, longitude], 13);
                         
-                        // Добавляем маркер текущего местоположения
                         L.marker([latitude, longitude])
                             .addTo(map)
                             .bindPopup('📍 Ваше местоположение')
@@ -423,7 +1179,6 @@
                 const response = await fetch('/api/search-umeyka?query=');
                 const skills = await response.json();
                 
-                // Очищаем старые маркеры
                 markers.forEach(marker => map.removeLayer(marker));
                 markers = [];
                 
@@ -436,8 +1191,9 @@
                                     <h3 style="margin: 0 0 10px 0;">${skill.skill}</h3>
                                     <p style="margin: 5px 0;">🎓 ${skill.experience}</p>
                                     <p style="margin: 5px 0;">💰 ${skill.price} руб.</p>
+                                    <p style="margin: 5px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '0'}/10</p>
                                     <p style="margin: 5px 0;">👤 ${skill.username}</p>
-                                    <button onclick="contactMaster('${skill._id}', '${skill.skill}')" 
+                                    <button onclick="contactMaster('${skill._id}', '${skill.skill}', ${skill.userId})" 
                                             style="width: 100%; padding: 8px; background: #667eea; color: white; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">
                                         💬 Написать
                                     </button>
@@ -474,7 +1230,8 @@
                         skill,
                         experience,
                         price: parseInt(price),
-                        location: userLocation || { lat: 55.7558, lon: 37.6173 }
+                        location: userLocation || { lat: 55.7558, lon: 37.6173 },
+                        userId: currentUserId
                     })
                 });
                 
@@ -520,12 +1277,13 @@
                     <div class="skill-card">
                         <div class="skill-header">
                             <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">★★★★★</div>
+                            <div class="skill-rating">${'★'.repeat(Math.floor(skill.rating?.average || 0))}${'☆'.repeat(10-Math.floor(skill.rating?.average || 0))}</div>
                         </div>
                         <div class="skill-price">${skill.price} ₽</div>
                         <div class="skill-distance">🎓 ${skill.experience}</div>
+                        <div style="color: #666; margin-bottom: 15px;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '0'}/10</div>
                         <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
-                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}')">
+                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', ${skill.userId})">
                             💬 Написать мастеру
                         </button>
                     </div>
@@ -543,8 +1301,7 @@
             skillsList.innerHTML = '<div class="loading">📋 Загружаем ваши умейки...</div>';
             
             try {
-                // Для демо используем случайный ID
-                const response = await fetch('/api/my-umeyka/123');
+                const response = await fetch(`/api/my-umeyka/${currentUserId}`);
                 const skills = await response.json();
                 
                 if (skills.length === 0) {
@@ -556,10 +1313,11 @@
                     <div class="skill-card">
                         <div class="skill-header">
                             <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">★★★★★</div>
+                            <div class="skill-rating">${'★'.repeat(Math.floor(skill.rating?.average || 0))}${'☆'.repeat(10-Math.floor(skill.rating?.average || 0))}</div>
                         </div>
                         <div class="skill-price">${skill.price} ₽</div>
                         <div class="skill-distance">🎓 ${skill.experience}</div>
+                        <div style="color: #666;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '0'}/10</div>
                     </div>
                 `).join('');
                 
@@ -570,8 +1328,39 @@
         }
 
         // Контакт с мастером
-        window.contactMaster = function(umeykaId, skillName) {
-            alert(`💬 Чат с мастером: "${skillName}"\n\nВ реальном приложении здесь откроется окно чата для общения с мастером!`);
+        window.contactMaster = async function(umeykaId, skillName, masterUserId) {
+            try {
+                const response = await fetch('/api/create-chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        clientUserId: currentUserId,
+                        masterUserId: masterUserId,
+                        umeykaId: umeykaId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`💬 Чат с мастером "${skillName}" создан!`);
+                    if (data.isNew) {
+                        // Переходим в чат
+                        openChatWindow(data.chatId, `Мастер: ${skillName}`);
+                    } else {
+                        // Открываем существующий чат
+                        openChatWindow(data.chatId, `Мастер: ${skillName}`);
+                    }
+                } else {
+                    alert('❌ Ошибка создания чата: ' + data.error);
+                }
+                
+            } catch (error) {
+                console.error('Ошибка создания чата:', error);
+                alert('❌ Ошибка создания чата');
+            }
         };
 
         // Инициализация приложения
@@ -579,12 +1368,18 @@
             console.log('🚀 Umeyka app loaded successfully!');
             showMainScreen();
             
-            // Инициализируем Telegram Web App
             const tg = window.Telegram?.WebApp;
             if (tg) {
                 tg.ready();
                 tg.expand();
                 console.log('✅ Telegram Web App initialized');
+                
+                // Получаем данные пользователя из Telegram
+                if (tg.initDataUnsafe.user) {
+                    const user = tg.initDataUnsafe.user;
+                    currentUserId = user.id;
+                    console.log('👤 User ID:', currentUserId);
+                }
             }
         });
     </script>
