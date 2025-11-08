@@ -1139,75 +1139,28 @@
         };
 
         function initMap() {
-            if (map) return;
-            
-            map = L.map('map').setView([55.7558, 37.6173], 10);
-            
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-                maxZoom: 19
-            }).addTo(map);
+  if (map) return;
+  
+  // Создаем карту с отключенной атрибуцией
+  map = L.map('map', {
+    attributionControl: false
+  }).setView([55.7558, 37.6173], 10);
+  
+  // CartoDB Positron
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 20
+  }).addTo(map);
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    position => {
-                        const { latitude, longitude } = position.coords;
-                        userLocation = { lat: latitude, lon: longitude };
-                        map.setView([latitude, longitude], 13);
-                        
-                        L.marker([latitude, longitude])
-                            .addTo(map)
-                            .bindPopup('📍 Ваше местоположение')
-                            .openPopup();
-                            
-                        loadSkillsOnMap();
-                    },
-                    error => {
-                        console.log('Геолокация недоступна');
-                        userLocation = { lat: 55.7558, lon: 37.6173 };
-                        loadSkillsOnMap();
-                    }
-                );
-            } else {
-                userLocation = { lat: 55.7558, lon: 37.6173 };
-                loadSkillsOnMap();
-            }
-        }
+  // Ограничиваем область просмотра
+  map.setMaxBounds([
+    [30, 19],  // Юго-запад
+    [70, 180]  // Северо-восток
+  ]);
 
-        async function loadSkillsOnMap() {
-            try {
-                const response = await fetch('/api/search-umeyka?query=');
-                const skills = await response.json();
-                
-                markers.forEach(marker => map.removeLayer(marker));
-                markers = [];
-                
-                skills.forEach(skill => {
-                    if (skill.location && skill.location.lat && skill.location.lon) {
-                        const marker = L.marker([skill.location.lat, skill.location.lon])
-                            .addTo(map)
-                            .bindPopup(`
-                                <div style="min-width: 200px;">
-                                    <h3 style="margin: 0 0 10px 0;">${skill.skill}</h3>
-                                    <p style="margin: 5px 0;">🎓 ${skill.experience}</p>
-                                    <p style="margin: 5px 0;">💰 ${skill.price} руб.</p>
-                                    <p style="margin: 5px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '0'}/10</p>
-                                    <p style="margin: 5px 0;">👤 ${skill.username}</p>
-                                    <button onclick="contactMaster('${skill._id}', '${skill.skill}', ${skill.userId})" 
-                                            style="width: 100%; padding: 8px; background: #667eea; color: white; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">
-                                        💬 Написать
-                                    </button>
-                                </div>
-                            `);
-                        
-                        markers.push(marker);
-                    }
-                });
-                
-            } catch (error) {
-                console.error('Ошибка загрузки карты:', error);
-            }
-        }
+  // Запрос геолокации
+  initializeUserLocation();
+}
 
         // Добавление умения
         window.addSkill = async function() {
