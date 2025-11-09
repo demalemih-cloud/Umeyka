@@ -1124,7 +1124,7 @@
             }
         }
 
-        // ========== СУЩЕСТВУЮЩИЕ ФУНКЦИИ КАРТЫ И ПОИСКА ==========
+        // ========== ОБНОВЛЕННАЯ ФУНКЦИЯ КАРТЫ (БЕЗ ФЛАГОВ) ==========
 
         // Работа с картой
         window.openMap = function() {
@@ -1139,28 +1139,93 @@
         };
 
         function initMap() {
-  if (map) return;
-  
-  // Создаем карту с отключенной атрибуцией
-  map = L.map('map', {
-    attributionControl: false
-  }).setView([55.7558, 37.6173], 10);
-  
-  // CartoDB Positron
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20
-  }).addTo(map);
+          if (map) return;
+          
+          // Создаем карту с отключенной атрибуцией
+          map = L.map('map', {
+            attributionControl: false
+          }).setView([55.7558, 37.6173], 10);
+          
+          // CartoDB Positron - красивая светлая тема без флагов
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 20
+          }).addTo(map);
 
-  // Ограничиваем область просмотра
-  map.setMaxBounds([
-    [30, 19],  // Юго-запад
-    [70, 180]  // Северо-восток
-  ]);
+          // Ограничиваем область просмотра
+          map.setMaxBounds([
+            [30, 19],  // Юго-запад
+            [70, 180]  // Северо-восток
+          ]);
 
-  // Запрос геолокации
-  initializeUserLocation();
-}
+          // Запрос геолокации
+          initializeUserLocation();
+        }
+
+        function initializeUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const { latitude, longitude } = position.coords;
+                        userLocation = { lat: latitude, lon: longitude };
+                        map.setView([latitude, longitude], 13);
+                        
+                        // Добавляем красивый маркер текущего местоположения
+                        L.marker([latitude, longitude])
+                            .addTo(map)
+                            .bindPopup('📍 Ваше местоположение')
+                            .openPopup();
+                            
+                        loadSkillsOnMap();
+                    },
+                    error => {
+                        console.log('Геолокация недоступна');
+                        userLocation = { lat: 55.7558, lon: 37.6173 };
+                        loadSkillsOnMap();
+                    }
+                );
+            } else {
+                userLocation = { lat: 55.7558, lon: 37.6173 };
+                loadSkillsOnMap();
+            }
+        }
+
+        async function loadSkillsOnMap() {
+            try {
+                const response = await fetch('/api/search-umeyka?query=');
+                const skills = await response.json();
+                
+                markers.forEach(marker => map.removeLayer(marker));
+                markers = [];
+                
+                skills.forEach(skill => {
+                    if (skill.location && skill.location.lat && skill.location.lon) {
+                        const marker = L.marker([skill.location.lat, skill.location.lon])
+                            .addTo(map)
+                            .bindPopup(`
+                                <div style="min-width: 200px;">
+                                    <h3 style="margin: 0 0 10px 0;">${skill.skill}</h3>
+                                    <p style="margin: 5px 0;">🎓 ${skill.experience}</p>
+                                    <p style="margin: 5px 0;">💰 ${skill.price} руб.</p>
+                                    <p style="margin: 5px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '0'}/10</p>
+                                    <p style="margin: 5px 0;">👤 ${skill.username}</p>
+                                    <button onclick="contactMaster('${skill._id}', '${skill.skill}', ${skill.userId})" 
+                                            style="width: 100%; padding: 8px; background: #667eea; color: white; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">
+                                        💬 Написать
+                                    </button>
+                                </div>
+                            `);
+                        
+                        markers.push(marker);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Ошибка загрузки карты:', error);
+            }
+        }
+
+        // ========== СУЩЕСТВУЮЩИЕ ФУНКЦИИ ==========
 
         // Добавление умения
         window.addSkill = async function() {
