@@ -19,7 +19,7 @@ mongoose.connect(MONGODB_URI)
 
 // ========== ОБНОВЛЕННЫЕ СХЕМЫ ==========
 
-// Схема для профиля пользователя
+// Схема для профиля пользователя с системой звезд
 const userProfileSchema = new mongoose.Schema({
   userId: { type: Number, unique: true, required: true },
   firstName: String,
@@ -28,11 +28,31 @@ const userProfileSchema = new mongoose.Schema({
   bio: String,
   avatar: String,
   location: { lat: Number, lon: Number },
+  
+  // Система звезд и монетизация
+  stars: { type: Number, default: 0 },
+  premium: { 
+    isActive: { type: Boolean, default: false },
+    expiresAt: Date,
+    subscriptionId: String
+  },
+  referralCode: String,
+  referredBy: Number,
+  referralCount: { type: Number, default: 0 },
+  completedDeals: { type: Number, default: 0 },
+  
+  // Кастомизация профиля
+  customProfile: {
+    backgroundColor: { type: String, default: '#667eea' },
+    textColor: { type: String, default: '#ffffff' },
+    isGold: { type: Boolean, default: false }
+  },
+  
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
 
-// Обновленная схема умейки с медиа и рейтингами
+// Обновленная схема умейки с улучшенными рейтингами
 const umeykaSchema = new mongoose.Schema({
   skill: String,
   experience: String,
@@ -43,11 +63,13 @@ const umeykaSchema = new mongoose.Schema({
   telegramUsername: String,
   isActive: { type: Boolean, default: true },
   
-  // НОВЫЕ ПОЛЯ ДЛЯ ЛИЧНОГО КАБИНЕТА:
+  // Медиа и описание
   photos: [String],
   videos: [String],
   description: String,
   tags: [String],
+  
+  // Рейтинги и отзывы
   rating: {
     average: { type: Number, default: 0 },
     count: { type: Number, default: 0 },
@@ -59,8 +81,89 @@ const umeykaSchema = new mongoose.Schema({
     }
   },
   
+  // Продвижение
+  isPromoted: { type: Boolean, default: false },
+  promotionExpires: Date,
+  isTopMaster: { type: Boolean, default: false },
+  
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
+});
+
+// Схема для сделок с комиссией
+const dealSchema = new mongoose.Schema({
+  umeykaId: mongoose.Schema.Types.ObjectId,
+  masterUserId: Number,
+  clientUserId: Number,
+  chatId: mongoose.Schema.Types.ObjectId,
+  
+  // Основные условия сделки
+  title: String,
+  description: String,
+  period: String,
+  amount: Number,
+  qualityLevel: String, // "premium", "standard", "economy"
+  
+  // Дополнительные условия
+  selectedOptions: [String],
+  additionalTerms: {
+    quality: Boolean,
+    price: Boolean,
+    timeRange: Boolean
+  },
+  
+  // Комиссия и оплата
+  commission: { type: Number, default: 0 }, // 5% комиссия
+  totalAmount: Number, // Сумма с комиссией
+  isPaid: { type: Boolean, default: false },
+  paymentId: String,
+  
+  // Статус и подписи
+  status: {
+    type: String,
+    enum: ['draft', 'pending_signature', 'active', 'completed', 'cancelled'],
+    default: 'draft'
+  },
+  
+  // Электронные подписи
+  signatures: {
+    master: {
+      signed: { type: Boolean, default: false },
+      signedAt: Date,
+      ipAddress: String
+    },
+    client: {
+      signed: { type: Boolean, default: false },
+      signedAt: Date,
+      ipAddress: String
+    }
+  },
+  
+  // Отзывы после завершения
+  masterReview: {
+    rating: Number,
+    comment: String,
+    createdAt: Date
+  },
+  clientReview: {
+    rating: Number,
+    comment: String,
+    createdAt: Date
+  },
+  
+  createdAt: { type: Date, default: Date.now },
+  activatedAt: Date,
+  completedAt: Date
+});
+
+// Схема для отзывов о проекте
+const projectReviewSchema = new mongoose.Schema({
+  userId: Number,
+  username: String,
+  rating: { type: Number, min: 1, max: 5 },
+  comment: String,
+  isApproved: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now }
 });
 
 const chatSchema = new mongoose.Schema({
@@ -83,7 +186,6 @@ const messageSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-// Обновленная схема отзывов с детальными рейтингами
 const reviewSchema = new mongoose.Schema({
   chatId: mongoose.Schema.Types.ObjectId,
   clientUserId: Number,
@@ -102,9 +204,339 @@ const reviewSchema = new mongoose.Schema({
 
 const UserProfile = mongoose.model('UserProfile', userProfileSchema);
 const Umeyka = mongoose.model('Umeyka', umeykaSchema);
+const Deal = mongoose.model('Deal', dealSchema);
+const ProjectReview = mongoose.model('ProjectReview', projectReviewSchema);
 const Chat = mongoose.model('Chat', chatSchema);
 const Message = mongoose.model('Message', messageSchema);
 const Review = mongoose.model('Review', reviewSchema);
+
+// ========== СИСТЕМА ЗВЕЗД И МОНЕТИЗАЦИИ ==========
+
+// Добавление звезд пользователю
+app.post('/api/add-stars', async (req, res) => {
+  try {
+    const { userId, stars, reason } = req.body; // reason: 'referral', 'deal_completed'
+    
+    const user = await UserProfile.findOne({ userId: parseInt(userId) });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    user.stars += stars;
+    user.updatedAt = new Date();
+    
+    // Обновляем статус топ-мастера
+    if (user.stars >= 10) {
+      await Umeyka.updateMany(
+        { userId: parseInt(userId) },
+        { isTopMaster: true }
+      );
+    }
+    
+    // Проверяем достижение 1000 звезд для золотой карточки
+    if (user.stars >= 1000 && !user.customProfile.isGold) {
+      user.customProfile.isGold = true;
+    }
+    
+    await user.save();
+    
+    res.json({ 
+      success: true, 
+      newStars: user.stars,
+      isTopMaster: user.stars >= 10,
+      isGold: user.customProfile.isGold
+    });
+    
+  } catch (err) {
+    console.error('Error adding stars:', err);
+    res.status(500).json({ error: 'Failed to add stars' });
+  }
+});
+
+// Активация премиум-подписки
+app.post('/api/activate-premium', async (req, res) => {
+  try {
+    const { userId, subscriptionId, durationMonths = 1 } = req.body;
+    
+    const user = await UserProfile.findOne({ userId: parseInt(userId) });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const expiresAt = new Date();
+    expiresAt.setMonth(expiresAt.getMonth() + durationMonths);
+    
+    user.premium = {
+      isActive: true,
+      expiresAt: expiresAt,
+      subscriptionId: subscriptionId
+    };
+    user.updatedAt = new Date();
+    
+    await user.save();
+    
+    res.json({ 
+      success: true, 
+      premium: user.premium,
+      message: 'Премиум-подписка активирована!'
+    });
+    
+  } catch (err) {
+    console.error('Error activating premium:', err);
+    res.status(500).json({ error: 'Failed to activate premium' });
+  }
+});
+
+// Обновление кастомизации профиля
+app.post('/api/update-profile-customization', async (req, res) => {
+  try {
+    const { userId, backgroundColor, textColor } = req.body;
+    
+    const user = await UserProfile.findOne({ userId: parseInt(userId) });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Проверяем, есть ли у пользователя достаточно звезд для кастомизации
+    if (user.stars < 1) {
+      return res.status(400).json({ error: 'Недостаточно звезд для кастомизации' });
+    }
+    
+    if (backgroundColor) user.customProfile.backgroundColor = backgroundColor;
+    if (textColor) user.customProfile.textColor = textColor;
+    user.updatedAt = new Date();
+    
+    await user.save();
+    
+    res.json({ 
+      success: true, 
+      customProfile: user.customProfile
+    });
+    
+  } catch (err) {
+    console.error('Error updating customization:', err);
+    res.status(500).json({ error: 'Failed to update customization' });
+  }
+});
+
+// Реферальная система
+app.post('/api/use-referral', async (req, res) => {
+  try {
+    const { userId, referralCode } = req.body;
+    
+    // Находим пользователя, который пригласил
+    const referrer = await UserProfile.findOne({ referralCode });
+    
+    if (!referrer) {
+      return res.status(404).json({ error: 'Реферальный код не найден' });
+    }
+    
+    if (referrer.userId === parseInt(userId)) {
+      return res.status(400).json({ error: 'Нельзя использовать собственный реферальный код' });
+    }
+    
+    // Добавляем звезды пригласившему
+    referrer.stars += 1;
+    referrer.referralCount += 1;
+    referrer.updatedAt = new Date();
+    await referrer.save();
+    
+    // Обновляем профиль нового пользователя
+    const newUser = await UserProfile.findOne({ userId: parseInt(userId) });
+    if (newUser) {
+      newUser.referredBy = referrer.userId;
+      newUser.updatedAt = new Date();
+      await newUser.save();
+    }
+    
+    res.json({ 
+      success: true,
+      referrerName: referrer.firstName || 'Пользователь',
+      starsAdded: 1
+    });
+    
+  } catch (err) {
+    console.error('Error using referral:', err);
+    res.status(500).json({ error: 'Failed to use referral code' });
+  }
+});
+
+// Генерация реферального кода
+app.post('/api/generate-referral', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    
+    const user = await UserProfile.findOne({ userId: parseInt(userId) });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Генерируем уникальный реферальный код
+    if (!user.referralCode) {
+      const referralCode = crypto.randomBytes(4).toString('hex').toUpperCase();
+      user.referralCode = referralCode;
+      user.updatedAt = new Date();
+      await user.save();
+    }
+    
+    res.json({ 
+      success: true, 
+      referralCode: user.referralCode,
+      referralUrl: `https://t.me/umeyka_bot?start=${user.referralCode}`
+    });
+    
+  } catch (err) {
+    console.error('Error generating referral:', err);
+    res.status(500).json({ error: 'Failed to generate referral' });
+  }
+});
+
+// ========== СИСТЕМА СДЕЛОК С КОМИССИЕЙ ==========
+
+// Создание сделки с комиссией
+app.post('/api/create-deal', async (req, res) => {
+  try {
+    const { 
+      umeykaId, masterUserId, clientUserId, chatId, 
+      title, description, period, amount, qualityLevel, 
+      selectedOptions, additionalTerms 
+    } = req.body;
+    
+    // Рассчитываем комиссию 5%
+    const commission = amount * 0.05;
+    const totalAmount = amount + commission;
+    
+    const newDeal = new Deal({
+      umeykaId,
+      masterUserId,
+      clientUserId,
+      chatId,
+      title,
+      description,
+      period,
+      amount,
+      qualityLevel,
+      selectedOptions,
+      additionalTerms,
+      commission,
+      totalAmount,
+      status: 'pending_signature'
+    });
+    
+    await newDeal.save();
+    
+    res.json({ 
+      success: true, 
+      dealId: newDeal._id,
+      commission: commission,
+      totalAmount: totalAmount,
+      message: 'Сделка создана и отправлена на подпись'
+    });
+    
+  } catch (err) {
+    console.error('Error creating deal:', err);
+    res.status(500).json({ error: 'Failed to create deal' });
+  }
+});
+
+// Завершение сделки с начислением звезд
+app.post('/api/complete-deal', async (req, res) => {
+  try {
+    const { dealId, userId, actualResults } = req.body;
+    
+    const deal = await Deal.findById(dealId);
+    
+    if (!deal) {
+      return res.status(404).json({ error: 'Deal not found' });
+    }
+    
+    // Проверяем, что пользователь является участником сделки
+    if (deal.masterUserId !== userId && deal.clientUserId !== userId) {
+      return res.status(403).json({ error: 'Not authorized' });
+    }
+    
+    deal.status = 'completed';
+    deal.completedAt = new Date();
+    deal.actualResults = actualResults;
+    
+    await deal.save();
+    
+    // Начисляем звезды мастеру за завершенную сделку
+    if (deal.masterUserId) {
+      await fetch('http://localhost:3001/api/add-stars', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: deal.masterUserId,
+          stars: 1,
+          reason: 'deal_completed'
+        })
+      });
+    }
+    
+    res.json({ 
+      success: true, 
+      deal: deal,
+      message: 'Сделка завершена! Начислена 1 звезда.'
+    });
+    
+  } catch (err) {
+    console.error('Error completing deal:', err);
+    res.status(500).json({ error: 'Failed to complete deal' });
+  }
+});
+
+// ========== СИСТЕМА ОТЗЫВОВ О ПРОЕКТЕ ==========
+
+// Добавление отзыва о проекте
+app.post('/api/add-project-review', async (req, res) => {
+  try {
+    const { userId, username, rating, comment } = req.body;
+    
+    const review = new ProjectReview({
+      userId,
+      username,
+      rating,
+      comment
+    });
+    
+    await review.save();
+    
+    res.json({ 
+      success: true, 
+      reviewId: review._id,
+      message: 'Спасибо за ваш отзыв!'
+    });
+    
+  } catch (err) {
+    console.error('Error adding project review:', err);
+    res.status(500).json({ error: 'Failed to add review' });
+  }
+});
+
+// Получение отзывов о проекте
+app.get('/api/project-reviews', async (req, res) => {
+  try {
+    const reviews = await ProjectReview.find({ isApproved: true })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .lean();
+    
+    res.json(reviews);
+    
+  } catch (err) {
+    console.error('Error fetching project reviews:', err);
+    res.status(500).json({ error: 'Failed to fetch reviews' });
+  }
+});
+
+// ========== СУЩЕСТВУЮЩИЕ API ENDPOINTS ==========
 
 // Упрощенная валидация для демо
 function validateInitDataSimple(initData) {
@@ -122,9 +554,7 @@ function validateInitDataSimple(initData) {
   }
 }
 
-// ========== СУЩЕСТВУЮЩИЕ API ROUTES ==========
-
-// Добавление умейки (упрощенное для демо)
+// Добавление умейки
 app.post('/api/add-umeyka', async (req, res) => {
   try {
     console.log('📝 Adding new umeyka');
@@ -192,7 +622,8 @@ app.get('/api/search-umeyka', async (req, res) => {
           price: 1500,
           location: { lat: 55.7558, lon: 37.6176 },
           username: 'Алексей',
-          rating: { average: 8.7, count: 15, details: { quality: 9, speed: 8, communication: 9, price: 8 } }
+          rating: { average: 8.7, count: 15, details: { quality: 9, speed: 8, communication: 9, price: 8 } },
+          isTopMaster: true
         },
         {
           _id: '2', 
@@ -201,7 +632,7 @@ app.get('/api/search-umeyka', async (req, res) => {
           price: 3000,
           location: { lat: 55.7520, lon: 37.6170 },
           username: 'Сергей',
-          rating: { average: 9.2, count: 8, details: { quality: 9, speed: 10, communication: 8, price: 9 } }
+          rating: { average: 7.2, count: 8, details: { quality: 7, speed: 8, communication: 7, price: 7 } }
         },
         {
           _id: '3',
@@ -210,7 +641,8 @@ app.get('/api/search-umeyka', async (req, res) => {
           price: 800,
           location: { lat: 55.7580, lon: 37.6160 },
           username: 'Марина',
-          rating: { average: 7.8, count: 22, details: { quality: 8, speed: 7, communication: 9, price: 7 } }
+          rating: { average: 9.5, count: 22, details: { quality: 10, speed: 9, communication: 9, price: 10 } },
+          isTopMaster: true
         }
       ];
       return res.json(demoSkills);
@@ -238,8 +670,6 @@ app.get('/api/my-umeyka/:userId', async (req, res) => {
   }
 });
 
-// ========== НОВЫЕ API ROUTES ДЛЯ ЛИЧНОГО КАБИНЕТА ==========
-
 // Получение профиля пользователя
 app.get('/api/user-profile/:userId', async (req, res) => {
   try {
@@ -249,11 +679,20 @@ app.get('/api/user-profile/:userId', async (req, res) => {
     
     if (!profile) {
       // Создаем базовый профиль если не существует
+      const referralCode = crypto.randomBytes(4).toString('hex').toUpperCase();
+      
       profile = new UserProfile({
         userId: parseInt(userId),
         firstName: 'Пользователь',
         bio: 'Расскажите о себе...',
-        location: { lat: 55.7558, lon: 37.6173 }
+        location: { lat: 55.7558, lon: 37.6173 },
+        referralCode: referralCode,
+        stars: 3, // Начальные звезды для демо
+        customProfile: {
+          backgroundColor: '#667eea',
+          textColor: '#ffffff',
+          isGold: false
+        }
       });
       await profile.save();
     }
@@ -297,384 +736,43 @@ app.post('/api/update-profile', async (req, res) => {
   }
 });
 
-// Обновление умейки (добавление фото, видео, описания)
-app.post('/api/update-umeyka', async (req, res) => {
-  try {
-    const { umeykaId, photos, videos, description, tags } = req.body;
-    
-    const umeyka = await Umeyka.findById(umeykaId);
-    
-    if (!umeyka) {
-      return res.status(404).json({ error: 'Umeyka not found' });
-    }
-    
-    if (photos !== undefined) umeyka.photos = photos;
-    if (videos !== undefined) umeyka.videos = videos;
-    if (description !== undefined) umeyka.description = description;
-    if (tags !== undefined) umeyka.tags = tags;
-    
-    umeyka.updatedAt = new Date();
-    
-    await umeyka.save();
-    
-    res.json({ success: true, umeyka });
-    
-  } catch (err) {
-    console.error('Error updating umeyka:', err);
-    res.status(500).json({ error: 'Failed to update umeyka' });
-  }
-});
-
-// Добавление рейтинга к умейке (10-бальная система)
-app.post('/api/add-rating', async (req, res) => {
-  try {
-    const { umeykaId, rating, quality, speed, communication, price, comment, clientUserId } = req.body;
-    
-    const umeyka = await Umeyka.findById(umeykaId);
-    
-    if (!umeyka) {
-      return res.status(404).json({ error: 'Umeyka not found' });
-    }
-    
-    // Проверяем валидность рейтингов (1-10)
-    if (rating < 1 || rating > 10 || quality < 1 || quality > 10 || 
-        speed < 1 || speed > 10 || communication < 1 || communication > 10 || 
-        price < 1 || price > 10) {
-      return res.status(400).json({ error: 'Ratings must be between 1 and 10' });
-    }
-    
-    // Обновляем общий рейтинг
-    const newCount = umeyka.rating.count + 1;
-    const newAverage = (umeyka.rating.average * umeyka.rating.count + rating) / newCount;
-    
-    // Обновляем детальные рейтинги
-    const details = umeyka.rating.details;
-    details.quality = (details.quality * umeyka.rating.count + quality) / newCount;
-    details.speed = (details.speed * umeyka.rating.count + speed) / newCount;
-    details.communication = (details.communication * umeyka.rating.count + communication) / newCount;
-    details.price = (details.price * umeyka.rating.count + price) / newCount;
-    
-    umeyka.rating = {
-      average: parseFloat(newAverage.toFixed(1)),
-      count: newCount,
-      details: {
-        quality: parseFloat(details.quality.toFixed(1)),
-        speed: parseFloat(details.speed.toFixed(1)),
-        communication: parseFloat(details.communication.toFixed(1)),
-        price: parseFloat(details.price.toFixed(1))
-      }
-    };
-    
-    await umeyka.save();
-    
-    // Создаем запись отзыва
-    const review = new Review({
-      umeykaId,
-      clientUserId,
-      masterUserId: umeyka.userId,
-      rating,
-      comment,
-      details: { quality, speed, communication, price },
-      createdAt: new Date()
-    });
-    
-    await review.save();
-    
-    res.json({ 
-      success: true, 
-      newRating: umeyka.rating,
-      reviewId: review._id 
-    });
-    
-  } catch (err) {
-    console.error('Error adding rating:', err);
-    res.status(500).json({ error: 'Failed to add rating' });
-  }
-});
-
-// Получение отзывов для умейки
-app.get('/api/umeyka-reviews/:umeykaId', async (req, res) => {
-  try {
-    const { umeykaId } = req.params;
-    
-    const reviews = await Review.find({ umeykaId })
-      .sort({ createdAt: -1 })
-      .limit(50)
-      .lean();
-    
-    res.json(reviews);
-    
-  } catch (err) {
-    console.error('Error fetching reviews:', err);
-    res.status(500).json({ error: 'Failed to fetch reviews' });
-  }
-});
-
-// Создание чата с мастером
-app.post('/api/create-chat', async (req, res) => {
-  try {
-    const { clientUserId, masterUserId, umeykaId } = req.body;
-    
-    // Проверяем существующий активный чат
-    const existingChat = await Chat.findOne({
-      clientUserId,
-      masterUserId,
-      umeykaId,
-      status: 'active'
-    });
-
-    if (existingChat) {
-      return res.json({ 
-        success: true, 
-        chatId: existingChat._id, 
-        isNew: false 
-      });
-    }
-
-    // Создаем новый чат
-    const newChat = new Chat({
-      clientUserId,
-      masterUserId,
-      umeykaId
-    });
-
-    await newChat.save();
-
-    res.json({ 
-      success: true, 
-      chatId: newChat._id, 
-      isNew: true 
-    });
-
-  } catch (err) {
-    console.error('Error creating chat:', err);
-    res.status(500).json({ error: 'Failed to create chat' });
-  }
-});
-
-// Отправка сообщения в чат
-app.post('/api/send-message', async (req, res) => {
-  try {
-    const { chatId, fromUserId, text } = req.body;
-    
-    if (!chatId || !fromUserId || !text) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    // Проверяем существование чата
-    const chat = await Chat.findById(chatId);
-    if (!chat) {
-      return res.status(404).json({ error: 'Chat not found' });
-    }
-
-    // Создаем сообщение
-    const message = new Message({
-      chatId,
-      fromUserId,
-      text
-    });
-
-    await message.save();
-
-    res.json({ 
-      success: true, 
-      messageId: message._id,
-      createdAt: message.createdAt 
-    });
-
-  } catch (err) {
-    console.error('Error sending message:', err);
-    res.status(500).json({ error: 'Failed to send message' });
-  }
-});
-
-// Получение сообщений чата
-app.get('/api/chat-messages/:chatId', async (req, res) => {
-  try {
-    const { chatId } = req.params;
-    
-    const messages = await Message.find({ chatId })
-      .sort({ createdAt: 1 })
-      .lean();
-
-    res.json(messages);
-
-  } catch (err) {
-    console.error('Error fetching messages:', err);
-    res.status(500).json({ error: 'Failed to fetch messages' });
-  }
-});
-
-// Получение активных чатов пользователя
-app.get('/api/user-chats/:userId', async (req, res) => {
+// Получение сделок пользователя
+app.get('/api/user-deals/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     
-    const chats = await Chat.find({
+    const deals = await Deal.find({
       $or: [
-        { clientUserId: parseInt(userId) },
-        { masterUserId: parseInt(userId) }
-      ],
-      status: 'active'
+        { masterUserId: parseInt(userId) },
+        { clientUserId: parseInt(userId) }
+      ]
     })
     .populate('umeykaId')
     .sort({ createdAt: -1 })
     .lean();
     
-    // Добавляем последние сообщения для каждого чата
-    const chatsWithLastMessage = await Promise.all(
-      chats.map(async (chat) => {
-        const lastMessage = await Message.findOne({ chatId: chat._id })
-          .sort({ createdAt: -1 })
-          .lean();
-        
-        const unreadCount = await Message.countDocuments({
-          chatId: chat._id,
-          fromUserId: { $ne: parseInt(userId) },
-          createdAt: { $gt: new Date(Date.now() - 24 * 60 * 60 * 1000) } // за последние 24 часа
-        });
-        
-        return {
-          ...chat,
-          lastMessage: lastMessage?.text || 'Чат начат',
-          lastMessageTime: lastMessage?.createdAt || chat.createdAt,
-          unreadCount
-        };
-      })
-    );
-    
-    res.json(chatsWithLastMessage);
+    res.json(deals);
     
   } catch (err) {
-    console.error('Error fetching user chats:', err);
-    res.status(500).json({ error: 'Failed to fetch chats' });
+    console.error('Error fetching user deals:', err);
+    res.status(500).json({ error: 'Failed to fetch deals' });
   }
 });
 
-// Завершение чата
-app.post('/api/complete-chat', async (req, res) => {
-  try {
-    const { chatId, userId } = req.body;
-    
-    const chat = await Chat.findById(chatId);
-    
-    if (!chat) {
-      return res.status(404).json({ error: 'Chat not found' });
-    }
-    
-    // Проверяем, что пользователь является участником чата
-    if (chat.clientUserId !== parseInt(userId) && chat.masterUserId !== parseInt(userId)) {
-      return res.status(403).json({ error: 'Not authorized' });
-    }
-    
-    chat.status = 'completed';
-    chat.completedAt = new Date();
-    
-    await chat.save();
-    
-    res.json({ success: true, chat });
-    
-  } catch (err) {
-    console.error('Error completing chat:', err);
-    res.status(500).json({ error: 'Failed to complete chat' });
-  }
-});
-
-// Удаление умейки
-app.delete('/api/delete-umeyka/:umeykaId', async (req, res) => {
-  try {
-    const { umeykaId } = req.params;
-    const { userId } = req.body;
-    
-    const umeyka = await Umeyka.findById(umeykaId);
-    
-    if (!umeyka) {
-      return res.status(404).json({ error: 'Umeyka not found' });
-    }
-    
-    // Проверяем, что пользователь является владельцем умейки
-    if (umeyka.userId !== parseInt(userId)) {
-      return res.status(403).json({ error: 'Not authorized' });
-    }
-    
-    // Мягкое удаление - деактивация
-    umeyka.isActive = false;
-    await umeyka.save();
-    
-    res.json({ success: true, message: 'Umeyka deleted successfully' });
-    
-  } catch (err) {
-    console.error('Error deleting umeyka:', err);
-    res.status(500).json({ error: 'Failed to delete umeyka' });
-  }
-});
-
-// Получение статистики пользователя
-app.get('/api/user-stats/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params;
-    
-    const totalUmeykas = await Umeyka.countDocuments({ 
-      userId: parseInt(userId), 
-      isActive: true 
-    });
-    
-    const totalChats = await Chat.countDocuments({
-      $or: [
-        { clientUserId: parseInt(userId) },
-        { masterUserId: parseInt(userId) }
-      ],
-      status: 'active'
-    });
-    
-    const completedChats = await Chat.countDocuments({
-      $or: [
-        { clientUserId: parseInt(userId) },
-        { masterUserId: parseInt(userId) }
-      ],
-      status: 'completed'
-    });
-    
-    // Средний рейтинг пользователя
-    const userUmeykas = await Umeyka.find({ 
-      userId: parseInt(userId) 
-    });
-    
-    let totalRating = 0;
-    let ratedUmeykas = 0;
-    
-    userUmeykas.forEach(umeyka => {
-      if (umeyka.rating.count > 0) {
-        totalRating += umeyka.rating.average;
-        ratedUmeykas++;
-      }
-    });
-    
-    const averageRating = ratedUmeykas > 0 ? totalRating / ratedUmeykas : 0;
-    
-    res.json({
-      totalUmeykas,
-      totalChats,
-      completedChats,
-      averageRating: parseFloat(averageRating.toFixed(1)),
-      totalReviews: ratedUmeykas
-    });
-    
-  } catch (err) {
-    console.error('Error fetching user stats:', err);
-    res.status(500).json({ error: 'Failed to fetch user stats' });
-  }
-});
-
-// ========== HEALTH CHECK ENDPOINTS ==========
-
+// Health check endpoints
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
     message: 'Umeyka server is running',
-    version: '3.0.0',
-    features: ['personal-cabinet', '10-point-ratings', 'chat-system', 'media-uploads']
+    version: '4.0.0',
+    features: [
+      'star-system',
+      'premium-subscriptions', 
+      'referral-program',
+      'deal-commission',
+      'project-reviews'
+    ]
   });
 });
 
@@ -682,28 +780,16 @@ app.get('/keep-alive', (req, res) => {
   res.json({ 
     status: 'alive', 
     timestamp: new Date().toISOString(),
-    server: 'Umeyka API v3.0',
-    endpoints: [
-      '/api/user-profile/:userId',
-      '/api/update-profile',
-      '/api/update-umeyka', 
-      '/api/add-rating',
-      '/api/user-chats/:userId',
-      '/api/create-chat',
-      '/api/send-message',
-      '/api/chat-messages/:chatId'
-    ]
+    server: 'Umeyka API v4.0'
   });
 });
 
-// ========== ЗАПУСК СЕРВЕРА ==========
-
+// Запуск сервера
 app.listen(port, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${port}`);
   console.log(`📱 Umeyka Mini App ready!`);
-  console.log(`👤 Personal Cabinet features: ENABLED`);
-  console.log(`⭐ 10-point rating system: ENABLED`);
-  console.log(`💬 Chat system: ENABLED`);
+  console.log(`⭐ Star System: ENABLED`);
+  console.log(`💰 Monetization: ENABLED`);
+  console.log(`🎯 Referral Program: ENABLED`);
   console.log(`🔗 Health check: http://localhost:${port}/health`);
-  console.log(`📊 API Documentation: http://localhost:${port}/keep-alive`);
 });
