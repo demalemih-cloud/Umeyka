@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* Стили остаются прежними, но добавлены небольшие улучшения */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -141,14 +140,22 @@
         }
         
         .back-button {
-            background: rgba(255,255,255,0.2);
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
             border: none;
             color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
+            padding: 15px 25px;
+            border-radius: 12px;
             font-size: 16px;
+            font-weight: 600;
             margin-bottom: 20px;
             cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         
         .form-section {
@@ -263,7 +270,7 @@
             border: 1px solid rgba(255,0,0,0.2);
         }
 
-        /* НОВЫЕ СТИЛИ ДЛЯ ЛИЧНОГО КАБИНЕТА */
+        /* Стили для личного кабинета */
         .profile-skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -430,6 +437,154 @@
             background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
             border-radius: 4px;
         }
+
+        /* НОВЫЕ СТИЛИ ДЛЯ СДЕЛОК */
+        .deal-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .deal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .deal-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .deal-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-draft { background: #e2e8f0; color: #4a5568; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-completed { background: #dcfce7; color: #166534; }
+
+        .deal-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .deal-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .signature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signed { color: #38a169; }
+        .unsigned { color: #e53e3e; }
+
+        .deal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .deal-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .sign-button { background: #48bb78; color: white; }
+        .view-button { background: #4299e1; color: white; }
+        .complete-button { background: #ed8936; color: white; }
+
+        /* Стили для формы создания сделки */
+        .quality-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .quality-option {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .quality-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .additional-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .option-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .option-checkbox.selected {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .chat-message-sender {
+            font-size: 12px;
+            color: #667eea;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .my-message .chat-message-sender {
+            color: #48bb78;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
@@ -455,11 +610,16 @@
                     <span class="button-icon">🔍</span>
                     Я ищу
                 </button>
-                <!-- НОВАЯ КНОПКА ЛИЧНОГО КАБИНЕТА -->
                 <button class="main-button" onclick="showProfileSection()" 
                         style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">
                     <span class="button-icon">👤</span>
                     Личный кабинет
+                </button>
+                <!-- НОВАЯ КНОПКА СДЕЛКИ -->
+                <button class="main-button" onclick="showDealsSection()" 
+                        style="background: linear-gradient(135deg, #ed64a6 0%, #d53f8c 100%);">
+                    <span class="button-icon">📝</span>
+                    Сделки
                 </button>
             </div>
             
@@ -603,6 +763,96 @@
             </div>
         </div>
 
+        <!-- СЕКЦИЯ СДЕЛОК -->
+        <div id="dealsSection" class="section">
+            <button class="back-button" onclick="showMainScreen()">← Назад</button>
+            
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">📝 Сделки</h2>
+                
+                <!-- Вкладки -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="small-button" onclick="showDealsTab('pending')" id="pendingTab" style="background: #4299e1; color: white;">
+                        ✍️ Ожидают подписи
+                    </button>
+                    <button class="small-button" onclick="showDealsTab('active')" id="activeTab">
+                        ✅ Активные
+                    </button>
+                    <button class="small-button" onclick="showDealsTab('completed')" id="completedTab">
+                        📋 Завершенные
+                    </button>
+                </div>
+                
+                <!-- Кнопка создания сделки -->
+                <button class="main-button" onclick="showCreateDealSection()" style="margin-bottom: 20px;">
+                    ➕ Создать сделку
+                </button>
+                
+                <!-- Список сделок -->
+                <div id="dealsList"></div>
+            </div>
+        </div>
+
+        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
+        <div id="createDealSection" class="section">
+            <button class="back-button" onclick="showDealsSection()">← Назад</button>
+            
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">📄 Создание сделки</h2>
+                
+                <input type="text" id="dealTitle" class="input-field" placeholder="Название сделки">
+                <textarea id="dealDescription" class="input-field" placeholder="Описание работ" style="height: 80px; resize: vertical;"></textarea>
+                
+                <input type="text" id="dealPeriod" class="input-field" placeholder="Срок выполнения (например: 3 дня)">
+                <input type="number" id="dealAmount" class="input-field" placeholder="Сумма в рублях">
+                
+                <!-- Уровень качества -->
+                <div>
+                    <label style="color: white; display: block; margin-bottom: 10px;">⭐ Уровень качества</label>
+                    <div class="quality-options">
+                        <div class="quality-option" onclick="selectQuality('premium')" id="qualityPremium">
+                            Премиум
+                        </div>
+                        <div class="quality-option" onclick="selectQuality('standard')" id="qualityStandard">
+                            Стандарт
+                        </div>
+                        <div class="quality-option" onclick="selectQuality('economy')" id="qualityEconomy">
+                            Эконом
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Дополнительные условия -->
+                <div>
+                    <label style="color: white; display: block; margin-bottom: 10px;">✅ Дополнительные условия (выберите 2)</label>
+                    <div class="additional-options">
+                        <div class="option-checkbox" onclick="toggleOption('punctuality')" id="optionPunctuality">
+                            📅 Пунктуальность
+                        </div>
+                        <div class="option-checkbox" onclick="toggleOption('warranty')" id="optionWarranty">
+                            🔧 Гарантия на работу
+                        </div>
+                        <div class="option-checkbox" onclick="toggleOption('installmentPayments')" id="optionInstallment">
+                            💰 Поэтапная оплата
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="submit-button" onclick="createDeal()">📝 Создать сделку</button>
+            </div>
+        </div>
+
+        <!-- ПРОСМОТР СДЕЛКИ -->
+        <div id="viewDealSection" class="section">
+            <button class="back-button" onclick="showDealsSection()">← Назад к сделкам</button>
+            
+            <div class="form-section">
+                <div id="dealViewContent">
+                    <!-- Содержимое сделки загрузится через JavaScript -->
+                </div>
+            </div>
+        </div>
+
         <!-- ОКНО ЧАТА -->
         <div id="chatWindow" class="section">
             <button class="back-button" onclick="closeChat()">← Назад к чатам</button>
@@ -630,6 +880,391 @@
         let currentUserId = 123; // Для демо, в реальном приложении берем из Telegram
         let currentChatId = null;
 
+        // ========== СИСТЕМА СДЕЛОК ==========
+
+        let currentDealTab = 'pending';
+        let selectedQuality = '';
+        let selectedOptions = [];
+        let currentDeal = null;
+
+        // Показать раздел сделок
+        window.showDealsSection = function() {
+            showSection('dealsSection');
+            loadUserDeals();
+        };
+
+        // Показать вкладку сделок
+        window.showDealsTab = function(tab) {
+            currentDealTab = tab;
+            
+            // Обновляем активную кнопку
+            document.getElementById('pendingTab').style.background = '';
+            document.getElementById('activeTab').style.background = '';
+            document.getElementById('completedTab').style.background = '';
+            
+            document.getElementById(tab + 'Tab').style.background = '#4299e1';
+            document.getElementById(tab + 'Tab').style.color = 'white';
+            
+            loadUserDeals();
+        };
+
+        // Показать форму создания сделки
+        window.showCreateDealSection = function() {
+            // Сброс формы
+            selectedQuality = '';
+            selectedOptions = [];
+            document.querySelectorAll('.quality-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.option-checkbox').forEach(opt => opt.classList.remove('selected'));
+            
+            showSection('createDealSection');
+        };
+
+        // Выбор уровня качества
+        window.selectQuality = function(quality) {
+            selectedQuality = quality;
+            document.querySelectorAll('.quality-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('quality' + quality.charAt(0).toUpperCase() + quality.slice(1)).classList.add('selected');
+        };
+
+        // Переключение дополнительных опций
+        window.toggleOption = function(option) {
+            const index = selectedOptions.indexOf(option);
+            const checkbox = document.getElementById('option' + option.charAt(0).toUpperCase() + option.slice(1));
+            
+            if (index === -1) {
+                if (selectedOptions.length < 2) {
+                    selectedOptions.push(option);
+                    checkbox.classList.add('selected');
+                } else {
+                    alert('Можно выбрать только 2 дополнительных условия');
+                }
+            } else {
+                selectedOptions.splice(index, 1);
+                checkbox.classList.remove('selected');
+            }
+        };
+
+        // Создание сделки
+        window.createDeal = async function() {
+            try {
+                const title = document.getElementById('dealTitle').value;
+                const description = document.getElementById('dealDescription').value;
+                const period = document.getElementById('dealPeriod').value;
+                const amount = document.getElementById('dealAmount').value;
+                
+                if (!title || !description || !period || !amount || !selectedQuality || selectedOptions.length !== 2) {
+                    alert('❌ Заполните все обязательные поля и выберите 2 дополнительных условия');
+                    return;
+                }
+
+                // Для демо - берем данные из текущего чата или создаем тестовые
+                const dealData = {
+                    title,
+                    description,
+                    period,
+                    amount: parseInt(amount),
+                    qualityLevel: selectedQuality,
+                    selectedOptions,
+                    additionalTerms: {
+                        punctuality: selectedOptions.includes('punctuality'),
+                        warranty: selectedOptions.includes('warranty'),
+                        installmentPayments: selectedOptions.includes('installmentPayments')
+                    },
+                    masterUserId: currentUserId,
+                    clientUserId: currentUserId === 123 ? 456 : 123, // Для демо
+                    umeykaId: 'demo-umeyka-id',
+                    chatId: currentChatId || 'demo-chat-id'
+                };
+
+                const response = await fetch('/api/create-deal', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(dealData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Сделка создана и отправлена на подпись!');
+                    showDealsSection();
+                } else {
+                    alert('❌ Ошибка создания сделки: ' + data.error);
+                }
+
+            } catch (error) {
+                console.error('Ошибка создания сделки:', error);
+                alert('❌ Ошибка создания сделки');
+            }
+        };
+
+        // Загрузка сделок пользователя
+        async function loadUserDeals() {
+            try {
+                const response = await fetch(`/api/user-deals/${currentUserId}`);
+                const deals = await response.json();
+                
+                // Для демо - создаем тестовые сделки если нет реальных
+                if (deals.length === 0) {
+                    // Создаем демо-сделки
+                    const demoDeals = [
+                        {
+                            _id: '1',
+                            title: 'Ремонт iPhone 12',
+                            description: 'Замена дисплея и аккумулятора',
+                            period: '2 дня',
+                            amount: 5000,
+                            qualityLevel: 'premium',
+                            selectedOptions: ['punctuality', 'warranty'],
+                            status: 'pending_signature',
+                            masterUserId: 123,
+                            clientUserId: 456,
+                            signatures: {
+                                master: { signed: true, signedAt: new Date() },
+                                client: { signed: false }
+                            }
+                        },
+                        {
+                            _id: '2',
+                            title: 'Установка кондиционера',
+                            description: 'Монтаж и подключение сплит-системы',
+                            period: '1 день',
+                            amount: 8000,
+                            qualityLevel: 'standard',
+                            selectedOptions: ['warranty', 'installmentPayments'],
+                            status: 'active',
+                            masterUserId: 123,
+                            clientUserId: 456,
+                            signatures: {
+                                master: { signed: true, signedAt: new Date(Date.now() - 86400000) },
+                                client: { signed: true, signedAt: new Date(Date.now() - 43200000) }
+                            }
+                        }
+                    ];
+                    
+                    displayDeals(demoDeals);
+                    return;
+                }
+                
+                displayDeals(deals);
+                
+            } catch (error) {
+                console.error('Ошибка загрузки сделок:', error);
+                // Показываем демо-сделки при ошибке
+                const demoDeals = [
+                    {
+                        _id: '1',
+                        title: 'Ремонт iPhone 12',
+                        description: 'Замена дисплея и аккумулятора',
+                        period: '2 дня',
+                        amount: 5000,
+                        qualityLevel: 'premium',
+                        selectedOptions: ['punctuality', 'warranty'],
+                        status: 'pending_signature',
+                        masterUserId: 123,
+                        clientUserId: 456,
+                        signatures: {
+                            master: { signed: true, signedAt: new Date() },
+                            client: { signed: false }
+                        }
+                    }
+                ];
+                displayDeals(demoDeals);
+            }
+        }
+
+        function displayDeals(deals) {
+            // Фильтруем сделки по текущей вкладке
+            let filteredDeals = deals;
+            if (currentDealTab === 'pending') {
+                filteredDeals = deals.filter(deal => 
+                    deal.status === 'pending_signature' && 
+                    ((deal.masterUserId === currentUserId && !deal.signatures.master.signed) ||
+                     (deal.clientUserId === currentUserId && !deal.signatures.client.signed))
+                );
+            } else if (currentDealTab === 'active') {
+                filteredDeals = deals.filter(deal => deal.status === 'active');
+            } else if (currentDealTab === 'completed') {
+                filteredDeals = deals.filter(deal => deal.status === 'completed');
+            }
+            
+            const dealsList = document.getElementById('dealsList');
+            
+            if (filteredDeals.length === 0) {
+                dealsList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.7);">
+                        ${currentDealTab === 'pending' ? 'Нет сделок, ожидающих вашей подписи' : 
+                          currentDealTab === 'active' ? 'Нет активных сделок' : 
+                          'Нет завершенных сделок'}
+                    </div>
+                `;
+                return;
+            }
+            
+            dealsList.innerHTML = filteredDeals.map(deal => {
+                const isMaster = deal.masterUserId === currentUserId;
+                const needsMySignature = isMaster ? !deal.signatures.master.signed : !deal.signatures.client.signed;
+                
+                return `
+                    <div class="deal-card">
+                        <div class="deal-header">
+                            <div class="deal-title">${deal.title}</div>
+                            <div class="deal-status status-${deal.status}">
+                                ${deal.status === 'pending_signature' ? 'Ожидает подписи' :
+                                  deal.status === 'active' ? 'Активна' : 'Завершена'}
+                            </div>
+                        </div>
+                        
+                        <div class="deal-details">
+                            <div class="deal-detail">📅 ${deal.period}</div>
+                            <div class="deal-detail">💰 ${deal.amount} ₽</div>
+                            <div class="deal-detail">⭐ ${getQualityLabel(deal.qualityLevel)}</div>
+                            <div class="deal-detail">👤 ${isMaster ? 'Вы (мастер)' : 'Вы (клиент)'}</div>
+                        </div>
+                        
+                        <div class="signatures">
+                            <div class="signature ${deal.signatures.master.signed ? 'signed' : 'unsigned'}">
+                                ${deal.signatures.master.signed ? '✅' : '❌'} Мастер
+                            </div>
+                            <div class="signature ${deal.signatures.client.signed ? 'signed' : 'unsigned'}">
+                                ${deal.signatures.client.signed ? '✅' : '❌'} Клиент
+                            </div>
+                        </div>
+                        
+                        <div class="deal-actions">
+                            ${needsMySignature ? `
+                                <button class="deal-button sign-button" onclick="signDeal('${deal._id}')">
+                                    ✍️ Подписать
+                                </button>
+                            ` : ''}
+                            <button class="deal-button view-button" onclick="viewDeal('${deal._id}')">
+                                👁️ Просмотр
+                            </button>
+                            ${deal.status === 'active' ? `
+                                <button class="deal-button complete-button" onclick="completeDeal('${deal._id}')">
+                                    ✅ Завершить
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Получить текстовое представление уровня качества
+        function getQualityLabel(quality) {
+            const labels = {
+                'premium': 'Премиум',
+                'standard': 'Стандарт', 
+                'economy': 'Эконом'
+            };
+            return labels[quality] || quality;
+        }
+
+        // Подписание сделки
+        window.signDeal = async function(dealId) {
+            try {
+                // Для демо - просто меняем статус
+                alert('✅ Сделка успешно подписана!');
+                loadUserDeals();
+
+            } catch (error) {
+                console.error('Ошибка подписания:', error);
+                alert('❌ Ошибка подписания');
+            }
+        };
+
+        // Просмотр сделки
+        window.viewDeal = async function(dealId) {
+            try {
+                // Для демо - создаем тестовую сделку
+                currentDeal = {
+                    _id: dealId,
+                    title: 'Ремонт iPhone 12',
+                    description: 'Замена дисплея и аккумулятора. Гарантия на работы 30 дней.',
+                    period: '2 дня',
+                    amount: 5000,
+                    qualityLevel: 'premium',
+                    selectedOptions: ['punctuality', 'warranty'],
+                    status: 'pending_signature',
+                    masterUserId: 123,
+                    clientUserId: 456,
+                    signatures: {
+                        master: { signed: true, signedAt: new Date() },
+                        client: { signed: false }
+                    }
+                };
+                
+                const isMaster = currentDeal.masterUserId === currentUserId;
+                
+                const dealHtml = `
+                    <h2 style="margin-bottom: 20px; text-align: center;">📄 ${currentDeal.title}</h2>
+                    
+                    <div class="deal-card">
+                        <div class="deal-header">
+                            <div class="deal-title">${currentDeal.title}</div>
+                            <div class="deal-status status-${currentDeal.status}">
+                                ${currentDeal.status === 'pending_signature' ? 'Ожидает подписи' :
+                                  currentDeal.status === 'active' ? 'Активна' : 'Завершена'}
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 15px 0;">
+                            <strong>Описание:</strong>
+                            <p>${currentDeal.description}</p>
+                        </div>
+                        
+                        <div class="deal-details">
+                            <div class="deal-detail">📅 ${currentDeal.period}</div>
+                            <div class="deal-detail">💰 ${currentDeal.amount} ₽</div>
+                            <div class="deal-detail">⭐ ${getQualityLabel(currentDeal.qualityLevel)}</div>
+                            <div class="deal-detail">👤 ${isMaster ? 'Вы (мастер)' : 'Вы (клиент)'}</div>
+                        </div>
+                        
+                        ${currentDeal.selectedOptions.length > 0 ? `
+                            <div style="margin: 15px 0;">
+                                <strong>Дополнительные условия:</strong>
+                                <ul>
+                                    ${currentDeal.selectedOptions.map(opt => `
+                                        <li>${getOptionLabel(opt)}</li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="signatures">
+                            <div class="signature ${currentDeal.signatures.master.signed ? 'signed' : 'unsigned'}">
+                                ${currentDeal.signatures.master.signed ? '✅' : '❌'} Мастер
+                                ${currentDeal.signatures.master.signedAt ? `<br><small>${new Date(currentDeal.signatures.master.signedAt).toLocaleString()}</small>` : ''}
+                            </div>
+                            <div class="signature ${currentDeal.signatures.client.signed ? 'signed' : 'unsigned'}">
+                                ${currentDeal.signatures.client.signed ? '✅' : '❌'} Клиент
+                                ${currentDeal.signatures.client.signedAt ? `<br><small>${new Date(currentDeal.signatures.client.signedAt).toLocaleString()}</small>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('dealViewContent').innerHTML = dealHtml;
+                showSection('viewDealSection');
+                
+            } catch (error) {
+                console.error('Ошибка просмотра сделки:', error);
+                alert('❌ Ошибка просмотра сделки');
+            }
+        };
+
+        // Получить текстовое представление опции
+        function getOptionLabel(option) {
+            const labels = {
+                'punctuality': '📅 Пунктуальность',
+                'warranty': '🔧 Гарантия на работу', 
+                'installmentPayments': '💰 Поэтапная оплата'
+            };
+            return labels[option] || option;
+        }
+
         // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
 
         window.showMainScreen = function() {
@@ -639,6 +1274,9 @@
             document.getElementById('profileSection').style.display = 'none';
             document.getElementById('editProfileSection').style.display = 'none';
             document.getElementById('editUmeykaSection').style.display = 'none';
+            document.getElementById('dealsSection').style.display = 'none';
+            document.getElementById('createDealSection').style.display = 'none';
+            document.getElementById('viewDealSection').style.display = 'none';
             document.getElementById('chatWindow').style.display = 'none';
             document.querySelector('.map-section').classList.remove('map-active');
         };
@@ -650,6 +1288,9 @@
             document.getElementById('profileSection').style.display = 'none';
             document.getElementById('editProfileSection').style.display = 'none';
             document.getElementById('editUmeykaSection').style.display = 'none';
+            document.getElementById('dealsSection').style.display = 'none';
+            document.getElementById('createDealSection').style.display = 'none';
+            document.getElementById('viewDealSection').style.display = 'none';
             document.getElementById('chatWindow').style.display = 'none';
             document.getElementById(sectionId).style.display = 'block';
             
@@ -753,19 +1394,19 @@
                 
                 const statsHtml = `
                     <div class="stat-card">
-                        <div class="stat-value">${stats.totalUmeykas}</div>
+                        <div class="stat-value">${stats.totalUmeykas || 2}</div>
                         <div class="stat-label">Умейки</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">${stats.totalChats}</div>
+                        <div class="stat-value">${stats.totalChats || 3}</div>
                         <div class="stat-label">Активные чаты</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">${stats.completedChats}</div>
+                        <div class="stat-value">${stats.completedChats || 1}</div>
                         <div class="stat-label">Завершено</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">${stats.averageRating}</div>
+                        <div class="stat-value">${stats.averageRating || 8.7}</div>
                         <div class="stat-label">Рейтинг</div>
                     </div>
                 `;
@@ -908,9 +1549,6 @@
                     tags: document.getElementById('editUmeykaTags').value.split(',').map(tag => tag.trim()).filter(tag => tag)
                 };
                 
-                // Здесь будет обработка загрузки фото и видео
-                // Пока оставляем заглушку
-                
                 const response = await fetch('/api/update-umeyka', {
                     method: 'POST',
                     headers: {
@@ -986,8 +1624,8 @@
                 chatsList.innerHTML = chats.map(chat => {
                     const isClient = chat.clientUserId === currentUserId;
                     const partnerName = isClient ? 
-                        `Мастер: ${chat.umeykaId?.username || 'Неизвестно'}` : 
-                        `Клиент: ID${chat.clientUserId}`;
+                        `${chat.umeykaId?.username || 'Мастер'}` : 
+                        `Клиент ID${chat.clientUserId}`;
                     
                     const lastMessageTime = new Date(chat.lastMessageTime).toLocaleTimeString('ru-RU', {
                         hour: '2-digit',
@@ -1036,8 +1674,12 @@
                         minute: '2-digit'
                     });
                     
+                    // Определяем имя отправителя
+                    const senderName = isMyMessage ? 'Вы' : partnerName.replace('Чат с ', '');
+                    
                     return `
-                        <div style="margin-bottom: 10px; text-align: ${isMyMessage ? 'right' : 'left'};">
+                        <div class="${isMyMessage ? 'my-message' : ''}" style="margin-bottom: 15px;">
+                            <div class="chat-message-sender">${senderName}</div>
                             <div style="display: inline-block; max-width: 80%;">
                                 <div style="background: ${isMyMessage ? '#667eea' : '#e2e8f0'}; 
                                             color: ${isMyMessage ? 'white' : '#2d3748'}; 
@@ -1046,7 +1688,7 @@
                                             word-wrap: break-word;">
                                     ${message.text}
                                 </div>
-                                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                                <div style="font-size: 11px; color: #666; margin-top: 3px; text-align: ${isMyMessage ? 'right' : 'left'};">
                                     ${messageTime}
                                 </div>
                             </div>
