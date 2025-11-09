@@ -8,965 +8,632 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* Стили остаются прежними, но добавлены небольшие улучшения */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+        /* Существующие стили остаются... */
         
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
-            line-height: 1.5;
-        }
-        
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 0;
-        }
-        
-        .header {
-            padding: 30px 20px 20px;
-            text-align: center;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-        }
-        
-        .logo {
-            font-size: 50px;
-            margin-bottom: 10px;
-        }
-        
-        .app-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .app-description {
-            font-size: 16px;
-            opacity: 0.9;
-            margin-bottom: 15px;
-        }
-        
-        .rating {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        
-        .stars {
-            color: #FFD700;
-            margin-right: 8px;
-        }
-        
-        .main-buttons {
-            padding: 40px 20px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .main-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 25px 20px;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .main-button:active {
-            transform: scale(0.98);
-            background: rgba(255,255,255,0.25);
-        }
-        
-        .button-master {
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-        }
-        
-        .button-client {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        }
-        
-        .button-icon {
-            font-size: 24px;
-            margin-right: 12px;
-        }
-        
-        .map-section {
-            padding: 20px;
-        }
-        
-        .map-button {
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 15px;
-        }
-        
-        .section {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: 1000;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        
-        .back-button {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            cursor: pointer;
-        }
-        
-        .form-section {
-            background: rgba(255,255,255,0.1);
-            padding: 25px 20px;
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
-            margin-bottom: 20px;
-        }
-        
-        .input-field {
-            width: 100%;
-            padding: 18px;
-            margin: 12px 0;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            background: rgba(255,255,255,0.95);
-        }
-        
-        .submit-button {
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        
-        .skill-card {
+        /* НОВЫЕ СТИЛИ ДЛЯ СДЕЛОК */
+        .deal-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
             padding: 20px;
             margin: 15px 0;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
         }
-        
-        .skill-header {
+
+        .deal-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
-        
-        .skill-title {
+
+        .deal-title {
             font-size: 18px;
             font-weight: 700;
             flex: 1;
         }
-        
-        .skill-rating {
-            color: #FFD700;
-            font-size: 14px;
-        }
-        
-        .skill-price {
-            font-size: 20px;
-            font-weight: 700;
-            color: #48bb78;
-            margin: 10px 0;
-        }
-        
-        .skill-distance {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 15px;
-        }
-        
-        .chat-button {
-            width: 100%;
-            padding: 15px;
-            background: #667eea;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
+
+        .deal-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 600;
-            cursor: pointer;
-        }
-        
-        #map {
-            height: 400px;
-            border-radius: 15px;
-            margin-top: 15px;
-            border: 2px solid rgba(255,255,255,0.3);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            display: none;
-        }
-        
-        .map-active #map {
-            display: block;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 20px;
-            font-size: 16px;
-        }
-        
-        .error-message {
-            background: rgba(255,0,0,0.1);
-            color: #ff6b6b;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            text-align: center;
-            border: 1px solid rgba(255,0,0,0.2);
         }
 
-        /* НОВЫЕ СТИЛИ ДЛЯ ЛИЧНОГО КАБИНЕТА */
-        .profile-skill-card {
-            background: rgba(255,255,255,0.95);
-            color: #2d3748;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 12px;
-            border-left: 4px solid #667eea;
-        }
+        .status-draft { background: #e2e8f0; color: #4a5568; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-completed { background: #dcfce7; color: #166534; }
 
-        .profile-skill-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .skill-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .small-button {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .edit-button {
-            background: #4299e1;
-            color: white;
-        }
-
-        .delete-button {
-            background: #f56565;
-            color: white;
-        }
-
-        .rating-badge {
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            color: #744210;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .chat-item {
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-            padding: 15px;
-            margin: 8px 0;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .chat-item:hover {
-            background: rgba(255,255,255,1);
-            transform: translateX(5px);
-        }
-
-        .chat-partner {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .chat-preview {
-            font-size: 14px;
-            color: #666;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .chat-time {
-            font-size: 12px;
-            color: #999;
-            text-align: right;
-        }
-
-        .unread-badge {
-            background: #e53e3e;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            margin-left: auto;
-        }
-
-        .stats-grid {
+        .deal-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin: 15px 0;
         }
 
-        .stat-card {
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .rating-stars {
-            color: #FFD700;
-            font-size: 16px;
-            margin: 5px 0;
-        }
-
-        .rating-details {
-            background: rgba(255,255,255,0.9);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-        }
-
-        .rating-bar {
+        .deal-detail {
             display: flex;
             align-items: center;
-            margin: 8px 0;
-        }
-
-        .rating-label {
-            width: 100px;
+            gap: 8px;
             font-size: 14px;
-            color: #666;
         }
 
-        .rating-value {
-            width: 40px;
-            text-align: right;
-            font-weight: bold;
-            margin-right: 10px;
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
         }
 
-        .rating-progress {
+        .signature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signed { color: #38a169; }
+        .unsigned { color: #e53e3e; }
+
+        .deal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .deal-button {
             flex: 1;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
         }
 
-        .rating-progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            border-radius: 4px;
+        .sign-button { background: #48bb78; color: white; }
+        .view-button { background: #4299e1; color: white; }
+        .complete-button { background: #ed8936; color: white; }
+
+        /* Стили для формы создания сделки */
+        .quality-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .quality-option {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quality-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .additional-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .option-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .option-checkbox.selected {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .chat-message-sender {
+            font-size: 12px;
+            color: #667eea;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .my-message .chat-message-sender {
+            color: #48bb78;
+            text-align: right;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- ГЛАВНЫЙ ЭКРАН -->
-        <div id="mainScreen">
-            <div class="header">
-                <div class="logo">🤝✨</div>
-                <div class="app-title">Umeyka</div>
-                <div class="app-description">Мастера на все руки рядом с вами</div>
-                <div class="rating">
-                    <span class="stars">★★★★★</span>
-                    <span>4.9/5</span>
+        <!-- Существующие секции остаются... -->
+
+        <!-- СЕКЦИЯ СДЕЛОК -->
+        <div id="dealsSection" class="section">
+            <button class="back-button" onclick="showMainScreen()">← Назад</button>
+            
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">📝 Сделки</h2>
+                
+                <!-- Вкладки -->
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <button class="small-button" onclick="showDealsTab('pending')" id="pendingTab" style="background: #4299e1; color: white;">
+                        ✍️ Ожидают подписи
+                    </button>
+                    <button class="small-button" onclick="showDealsTab('active')" id="activeTab">
+                        ✅ Активные
+                    </button>
+                    <button class="small-button" onclick="showDealsTab('completed')" id="completedTab">
+                        📋 Завершенные
+                    </button>
                 </div>
-            </div>
-            
-            <div class="main-buttons">
-                <button class="main-button button-master" onclick="showSection('masterSection')">
-                    <span class="button-icon">✨</span>
-                    Я умейка
+                
+                <!-- Кнопка создания сделки -->
+                <button class="main-button" onclick="showCreateDealSection()" style="margin-bottom: 20px;">
+                    ➕ Создать сделку
                 </button>
-                <button class="main-button button-client" onclick="showSection('clientSection')">
-                    <span class="button-icon">🔍</span>
-                    Я ищу
-                </button>
-                <!-- НОВАЯ КНОПКА ЛИЧНОГО КАБИНЕТА -->
-                <button class="main-button" onclick="showProfileSection()" 
-                        style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">
-                    <span class="button-icon">👤</span>
-                    Личный кабинет
-                </button>
-            </div>
-            
-            <div class="map-section">
-                <button class="map-button" onclick="openMap()">
-                    🗺️ Поиск по карте
-                </button>
-                <div id="map"></div>
+                
+                <!-- Список сделок -->
+                <div id="dealsList"></div>
             </div>
         </div>
 
-        <!-- СЕКЦИЯ МАСТЕРА -->
-        <div id="masterSection" class="section">
-            <button class="back-button" onclick="showMainScreen()">← Назад</button>
-            <div class="form-section">
-                <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
-                
-                <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)">
-                <input type="text" id="skillExperience" class="input-field" placeholder="Мой опыт (например: 3 года)">
-                <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях">
-                
-                <button class="submit-button" onclick="addSkill()">✅ Опубликовать умейку</button>
-                
-                <div id="mySkillsList" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- СЕКЦИЯ КЛИЕНТА -->
-        <div id="clientSection" class="section">
-            <button class="back-button" onclick="showMainScreen()">← Назад</button>
-            <div class="form-section">
-                <h2 style="margin-bottom: 20px; text-align: center;">🔍 Найти мастера</h2>
-                
-                <input type="text" id="searchInput" class="input-field" placeholder="🔎 Что ищем? (например: сантехник, электрик)">
-                <button class="submit-button" onclick="searchSkills()">Найти мастеров</button>
-                
-                <div id="searchResults" style="margin-top: 20px;"></div>
-            </div>
-        </div>
-
-        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА -->
-        <div id="profileSection" class="section">
-            <button class="back-button" onclick="showMainScreen()">← Назад</button>
+        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
+        <div id="createDealSection" class="section">
+            <button class="back-button" onclick="showDealsSection()">← Назад</button>
             
             <div class="form-section">
-                <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
+                <h2 style="margin-bottom: 20px; text-align: center;">📄 Создание сделки</h2>
                 
-                <!-- Профиль пользователя -->
-                <div id="userProfile">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">
-                            👤
+                <input type="text" id="dealTitle" class="input-field" placeholder="Название сделки">
+                <textarea id="dealDescription" class="input-field" placeholder="Описание работ" style="height: 80px; resize: vertical;"></textarea>
+                
+                <input type="text" id="dealPeriod" class="input-field" placeholder="Срок выполнения (например: 3 дня)">
+                <input type="number" id="dealAmount" class="input-field" placeholder="Сумма в рублях">
+                
+                <!-- Уровень качества -->
+                <div>
+                    <label style="color: white; display: block; margin-bottom: 10px;">⭐ Уровень качества</label>
+                    <div class="quality-options">
+                        <div class="quality-option" onclick="selectQuality('premium')" id="qualityPremium">
+                            Премиум
                         </div>
-                        <h3 id="userName">Пользователь</h3>
-                        <p id="userBio" style="opacity: 0.8; margin: 10px 0;">Расскажите о себе...</p>
-                    </div>
-                    
-                    <button class="main-button" onclick="editProfile()" style="margin-bottom: 15px;">
-                        ✏️ Редактировать профиль
-                    </button>
-                </div>
-                
-                <!-- Статистика -->
-                <div style="margin-top: 30px;">
-                    <h3 style="margin-bottom: 15px;">📊 Моя статистика</h3>
-                    <div id="userStats" class="stats-grid">
-                        <!-- Статистика загрузится через JavaScript -->
+                        <div class="quality-option" onclick="selectQuality('standard')" id="qualityStandard">
+                            Стандарт
+                        </div>
+                        <div class="quality-option" onclick="selectQuality('economy')" id="qualityEconomy">
+                            Эконом
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Мои умейки -->
-                <div style="margin-top: 30px;">
-                    <h3 style="margin-bottom: 15px;">✨ Мои умейки</h3>
-                    <div id="profileSkillsList"></div>
-                    
-                    <button class="main-button button-master" onclick="showSection('masterSection')" style="margin-top: 15px;">
-                        ➕ Добавить новую умейку
-                    </button>
+                <!-- Дополнительные условия -->
+                <div>
+                    <label style="color: white; display: block; margin-bottom: 10px;">✅ Дополнительные условия (выберите 2)</label>
+                    <div class="additional-options">
+                        <div class="option-checkbox" onclick="toggleOption('punctuality')" id="optionPunctuality">
+                            📅 Пунктуальность
+                        </div>
+                        <div class="option-checkbox" onclick="toggleOption('warranty')" id="optionWarranty">
+                            🔧 Гарантия на работу
+                        </div>
+                        <div class="option-checkbox" onclick="toggleOption('installmentPayments')" id="optionInstallment">
+                            💰 Поэтапная оплата
+                        </div>
+                    </div>
                 </div>
                 
-                <!-- Мои чаты -->
-                <div style="margin-top: 30px;">
-                    <h3 style="margin-bottom: 15px;">💬 Активные чаты</h3>
-                    <div id="userChatsList"></div>
-                </div>
+                <button class="submit-button" onclick="createDeal()">📝 Создать сделку</button>
             </div>
         </div>
 
-        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
-        <div id="editProfileSection" class="section">
-            <button class="back-button" onclick="showProfileSection()">← Назад</button>
+        <!-- ПРОСМОТР СДЕЛКИ -->
+        <div id="viewDealSection" class="section">
+            <button class="back-button" onclick="showDealsSection()">← Назад к сделкам</button>
             
             <div class="form-section">
-                <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
-                
-                <input type="text" id="editFirstName" class="input-field" placeholder="Имя">
-                <input type="text" id="editLastName" class="input-field" placeholder="Фамилия">
-                <input type="tel" id="editPhone" class="input-field" placeholder="Телефон">
-                <textarea id="editBio" class="input-field" placeholder="О себе" style="height: 100px; resize: vertical;"></textarea>
-                
-                <button class="submit-button" onclick="saveProfile()">💾 Сохранить профиль</button>
-            </div>
-        </div>
-
-        <!-- ФОРМА РЕДАКТИРОВАНИЯ УМЕЙКИ -->
-        <div id="editUmeykaSection" class="section">
-            <button class="back-button" onclick="showProfileSection()">← Назад</button>
-            
-            <div class="form-section">
-                <h2 id="editUmeykaTitle" style="margin-bottom: 20px; text-align: center;">✏️ Настройка умейки</h2>
-                
-                <input type="hidden" id="editUmeykaId">
-                
-                <div style="margin-bottom: 15px;">
-                    <label style="color: white; display: block; margin-bottom: 5px;">📷 Фотографии работ</label>
-                    <input type="file" id="umeykaPhotos" multiple accept="image/*" style="width: 100%; margin: 5px 0;">
-                    <div id="photosPreview" style="margin-top: 10px;"></div>
-                </div>
-                
-                <div style="margin-bottom: 15px;">
-                    <label style="color: white; display: block; margin-bottom: 5px;">🎥 Видео работ</label>
-                    <input type="file" id="umeykaVideos" multiple accept="video/*" style="width: 100%; margin: 5px 0;">
-                    <div id="videosPreview" style="margin-top: 10px;"></div>
-                </div>
-                
-                <textarea id="editUmeykaDescription" class="input-field" placeholder="Подробное описание услуги" style="height: 100px; resize: vertical;"></textarea>
-                
-                <input type="text" id="editUmeykaTags" class="input-field" placeholder="Теги (через запятую)">
-                
-                <div id="umeykaRating" style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; margin: 15px 0;">
-                    <h4 style="margin-bottom: 10px; color: #333;">⭐ Рейтинг: <span id="ratingValue">0</span>/10</h4>
-                    <div id="ratingDetails" class="rating-details">
-                        <!-- Детали рейтинга загрузятся через JavaScript -->
-                    </div>
-                    <div style="color: #666; font-size: 14px; text-align: center;">
-                        Отзывов: <span id="ratingCount">0</span>
-                    </div>
-                </div>
-                
-                <button class="submit-button" onclick="saveUmeyka()">💾 Сохранить умейку</button>
-            </div>
-        </div>
-
-        <!-- ОКНО ЧАТА -->
-        <div id="chatWindow" class="section">
-            <button class="back-button" onclick="closeChat()">← Назад к чатам</button>
-            
-            <div class="form-section">
-                <h2 id="chatTitle" style="margin-bottom: 20px; text-align: center;">💬 Чат</h2>
-                
-                <div id="chatMessages" style="height: 300px; overflow-y: auto; margin-bottom: 20px; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px;">
-                    <!-- Сообщения чата -->
-                </div>
-                
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="messageInput" class="input-field" placeholder="Введите сообщение..." style="flex: 1;">
-                    <button class="submit-button" onclick="sendChatMessage()" style="width: auto; padding: 15px 20px;">📤</button>
+                <div id="dealViewContent">
+                    <!-- Содержимое сделки загрузится через JavaScript -->
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Глобальные переменные
-        let map = null;
-        let userLocation = null;
-        let markers = [];
-        let currentUserId = 123; // Для демо, в реальном приложении берем из Telegram
-        let currentChatId = null;
+        // ========== СИСТЕМА СДЕЛОК ==========
 
-        // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
+        let currentDealTab = 'pending';
+        let selectedQuality = '';
+        let selectedOptions = [];
+        let currentDeal = null;
 
-        window.showMainScreen = function() {
-            document.getElementById('mainScreen').style.display = 'block';
-            document.getElementById('masterSection').style.display = 'none';
-            document.getElementById('clientSection').style.display = 'none';
-            document.getElementById('profileSection').style.display = 'none';
-            document.getElementById('editProfileSection').style.display = 'none';
-            document.getElementById('editUmeykaSection').style.display = 'none';
-            document.getElementById('chatWindow').style.display = 'none';
-            document.querySelector('.map-section').classList.remove('map-active');
+        // Показать раздел сделок
+        window.showDealsSection = function() {
+            showSection('dealsSection');
+            loadUserDeals();
         };
-        
-        window.showSection = function(sectionId) {
-            document.getElementById('mainScreen').style.display = 'none';
-            document.getElementById('masterSection').style.display = 'none';
-            document.getElementById('clientSection').style.display = 'none';
-            document.getElementById('profileSection').style.display = 'none';
-            document.getElementById('editProfileSection').style.display = 'none';
-            document.getElementById('editUmeykaSection').style.display = 'none';
-            document.getElementById('chatWindow').style.display = 'none';
-            document.getElementById(sectionId).style.display = 'block';
+
+        // Показать вкладку сделок
+        window.showDealsTab = function(tab) {
+            currentDealTab = tab;
             
-            if (sectionId === 'masterSection') {
-                loadMySkills();
-            }
+            // Обновляем активную кнопку
+            document.getElementById('pendingTab').style.background = '';
+            document.getElementById('activeTab').style.background = '';
+            document.getElementById('completedTab').style.background = '';
+            
+            document.getElementById(tab + 'Tab').style.background = '#4299e1';
+            document.getElementById(tab + 'Tab').style.color = 'white';
+            
+            loadUserDeals();
         };
 
-        // ========== ЛИЧНЫЙ КАБИНЕТ ==========
-
-        window.showProfileSection = function() {
-            showSection('profileSection');
-            loadUserProfile();
-            loadUserStats();
-            loadProfileSkills();
-            loadUserChats();
+        // Показать форму создания сделки
+        window.showCreateDealSection = function() {
+            // Сброс формы
+            selectedQuality = '';
+            selectedOptions = [];
+            document.querySelectorAll('.quality-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.option-checkbox').forEach(opt => opt.classList.remove('selected'));
+            
+            showSection('createDealSection');
         };
 
-        window.editProfile = function() {
-            showSection('editProfileSection');
-            loadEditProfileForm();
+        // Выбор уровня качества
+        window.selectQuality = function(quality) {
+            selectedQuality = quality;
+            document.querySelectorAll('.quality-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('quality' + quality.charAt(0).toUpperCase() + quality.slice(1)).classList.add('selected');
         };
 
-        // Загрузка профиля пользователя
-        async function loadUserProfile() {
-            try {
-                const response = await fetch(`/api/user-profile/${currentUserId}`);
-                const profile = await response.json();
-                
-                document.getElementById('userName').textContent = 
-                    `${profile.firstName} ${profile.lastName || ''}`.trim() || 'Пользователь';
-                document.getElementById('userBio').textContent = profile.bio || 'Расскажите о себе...';
-                
-                if (profile.avatar) {
-                    document.getElementById('userAvatar').innerHTML = 
-                        `<img src="${profile.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        // Переключение дополнительных опций
+        window.toggleOption = function(option) {
+            const index = selectedOptions.indexOf(option);
+            const checkbox = document.getElementById('option' + option.charAt(0).toUpperCase() + option.slice(1));
+            
+            if (index === -1) {
+                if (selectedOptions.length < 2) {
+                    selectedOptions.push(option);
+                    checkbox.classList.add('selected');
+                } else {
+                    alert('Можно выбрать только 2 дополнительных условия');
                 }
-                
-            } catch (error) {
-                console.error('Ошибка загрузки профиля:', error);
-                showError('userProfile', 'Ошибка загрузки профиля');
+            } else {
+                selectedOptions.splice(index, 1);
+                checkbox.classList.remove('selected');
             }
-        }
+        };
 
-        // Загрузка формы редактирования профиля
-        async function loadEditProfileForm() {
+        // Создание сделки
+        window.createDeal = async function() {
             try {
-                const response = await fetch(`/api/user-profile/${currentUserId}`);
-                const profile = await response.json();
+                const title = document.getElementById('dealTitle').value;
+                const description = document.getElementById('dealDescription').value;
+                const period = document.getElementById('dealPeriod').value;
+                const amount = document.getElementById('dealAmount').value;
                 
-                document.getElementById('editFirstName').value = profile.firstName || '';
-                document.getElementById('editLastName').value = profile.lastName || '';
-                document.getElementById('editPhone').value = profile.phone || '';
-                document.getElementById('editBio').value = profile.bio || '';
-                
-            } catch (error) {
-                console.error('Ошибка загрузки формы профиля:', error);
-                alert('❌ Ошибка загрузки формы профиля');
-            }
-        }
+                if (!title || !description || !period || !amount || !selectedQuality || selectedOptions.length !== 2) {
+                    alert('❌ Заполните все обязательные поля и выберите 2 дополнительных условия');
+                    return;
+                }
 
-        // Сохранение профиля
-        async function saveProfile() {
-            try {
-                const profileData = {
-                    userId: currentUserId,
-                    firstName: document.getElementById('editFirstName').value,
-                    lastName: document.getElementById('editLastName').value,
-                    phone: document.getElementById('editPhone').value,
-                    bio: document.getElementById('editBio').value
+                // Для демо - берем данные из текущего чата или создаем тестовые
+                const dealData = {
+                    title,
+                    description,
+                    period,
+                    amount: parseInt(amount),
+                    qualityLevel: selectedQuality,
+                    selectedOptions,
+                    additionalTerms: {
+                        punctuality: selectedOptions.includes('punctuality'),
+                        warranty: selectedOptions.includes('warranty'),
+                        installmentPayments: selectedOptions.includes('installmentPayments')
+                    },
+                    masterUserId: currentUserId,
+                    clientUserId: currentUserId === 123 ? 456 : 123, // Для демо
+                    umeykaId: 'demo-umeyka-id',
+                    chatId: currentChatId || 'demo-chat-id'
                 };
-                
-                const response = await fetch('/api/update-profile', {
+
+                const response = await fetch('/api/create-deal', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(profileData)
+                    body: JSON.stringify(dealData)
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
-                    alert('✅ Профиль успешно сохранен!');
-                    showProfileSection();
+                    alert('✅ Сделка создана и отправлена на подпись!');
+                    showDealsSection();
                 } else {
-                    alert('❌ Ошибка сохранения профиля: ' + data.error);
+                    alert('❌ Ошибка создания сделки: ' + data.error);
+                }
+
+            } catch (error) {
+                console.error('Ошибка создания сделки:', error);
+                alert('❌ Ошибка создания сделки');
+            }
+        };
+
+        // Загрузка сделок пользователя
+        async function loadUserDeals() {
+            try {
+                const response = await fetch(`/api/user-deals/${currentUserId}`);
+                const deals = await response.json();
+                
+                // Фильтруем сделки по текущей вкладке
+                let filteredDeals = deals;
+                if (currentDealTab === 'pending') {
+                    filteredDeals = deals.filter(deal => 
+                        deal.status === 'pending_signature' && 
+                        ((deal.masterUserId === currentUserId && !deal.signatures.master.signed) ||
+                         (deal.clientUserId === currentUserId && !deal.signatures.client.signed))
+                    );
+                } else if (currentDealTab === 'active') {
+                    filteredDeals = deals.filter(deal => deal.status === 'active');
+                } else if (currentDealTab === 'completed') {
+                    filteredDeals = deals.filter(deal => deal.status === 'completed');
                 }
                 
-            } catch (error) {
-                console.error('Ошибка сохранения профиля:', error);
-                alert('❌ Ошибка сохранения профиля');
-            }
-        }
-
-        // Загрузка статистики пользователя
-        async function loadUserStats() {
-            try {
-                const response = await fetch(`/api/user-stats/${currentUserId}`);
-                const stats = await response.json();
+                const dealsList = document.getElementById('dealsList');
                 
-                const statsHtml = `
-                    <div class="stat-card">
-                        <div class="stat-value">${stats.totalUmeykas}</div>
-                        <div class="stat-label">Умейки</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${stats.totalChats}</div>
-                        <div class="stat-label">Активные чаты</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${stats.completedChats}</div>
-                        <div class="stat-label">Завершено</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${stats.averageRating}</div>
-                        <div class="stat-label">Рейтинг</div>
-                    </div>
-                `;
-                
-                document.getElementById('userStats').innerHTML = statsHtml;
-                
-            } catch (error) {
-                console.error('Ошибка загрузки статистики:', error);
-                document.getElementById('userStats').innerHTML = '<div class="error-message">Ошибка загрузки статистики</div>';
-            }
-        }
-
-        // Загрузка умений в профиле
-        async function loadProfileSkills() {
-            try {
-                const response = await fetch(`/api/my-umeyka/${currentUserId}`);
-                const skills = await response.json();
-                
-                const skillsList = document.getElementById('profileSkillsList');
-                
-                if (skills.length === 0) {
-                    skillsList.innerHTML = `
-                        <div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">
-                            У вас пока нет добавленных умений
+                if (filteredDeals.length === 0) {
+                    dealsList.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.7);">
+                            ${currentDealTab === 'pending' ? 'Нет сделок, ожидающих вашей подписи' : 
+                              currentDealTab === 'active' ? 'Нет активных сделок' : 
+                              'Нет завершенных сделок'}
                         </div>
                     `;
                     return;
                 }
                 
-                skillsList.innerHTML = skills.map(skill => `
-                    <div class="profile-skill-card">
-                        <div class="profile-skill-header">
-                            <div>
-                                <strong>${skill.skill}</strong>
-                                <div style="font-size: 14px; color: #666;">${skill.experience}</div>
+                dealsList.innerHTML = filteredDeals.map(deal => {
+                    const isMaster = deal.masterUserId === currentUserId;
+                    const needsMySignature = isMaster ? !deal.signatures.master.signed : !deal.signatures.client.signed;
+                    
+                    return `
+                        <div class="deal-card">
+                            <div class="deal-header">
+                                <div class="deal-title">${deal.title}</div>
+                                <div class="deal-status status-${deal.status}">
+                                    ${deal.status === 'pending_signature' ? 'Ожидает подписи' :
+                                      deal.status === 'active' ? 'Активна' : 'Завершена'}
+                                </div>
                             </div>
-                            <div class="rating-badge">
-                                ${skill.rating?.average?.toFixed(1) || '0'}/10
+                            
+                            <div class="deal-details">
+                                <div class="deal-detail">📅 ${deal.period}</div>
+                                <div class="deal-detail">💰 ${deal.amount} ₽</div>
+                                <div class="deal-detail">⭐ ${getQualityLabel(deal.qualityLevel)}</div>
+                                <div class="deal-detail">👤 ${isMaster ? 'Вы (мастер)' : 'Вы (клиент)'}</div>
+                            </div>
+                            
+                            <div class="signatures">
+                                <div class="signature ${deal.signatures.master.signed ? 'signed' : 'unsigned'}">
+                                    ${deal.signatures.master.signed ? '✅' : '❌'} Мастер
+                                </div>
+                                <div class="signature ${deal.signatures.client.signed ? 'signed' : 'unsigned'}">
+                                    ${deal.signatures.client.signed ? '✅' : '❌'} Клиент
+                                </div>
+                            </div>
+                            
+                            <div class="deal-actions">
+                                ${needsMySignature ? `
+                                    <button class="deal-button sign-button" onclick="signDeal('${deal._id}')">
+                                        ✍️ Подписать
+                                    </button>
+                                ` : ''}
+                                <button class="deal-button view-button" onclick="viewDeal('${deal._id}')">
+                                    👁️ Просмотр
+                                </button>
+                                ${deal.status === 'active' ? `
+                                    <button class="deal-button complete-button" onclick="completeDeal('${deal._id}')">
+                                        ✅ Завершить
+                                    </button>
+                                ` : ''}
                             </div>
                         </div>
-                        <div style="color: #48bb78; font-weight: bold; margin: 5px 0;">
-                            ${skill.price} ₽
-                        </div>
-                        ${skill.description ? `<div style="font-size: 14px; color: #666; margin: 5px 0;">${skill.description}</div>` : ''}
-                        <div class="skill-actions">
-                            <button class="small-button edit-button" onclick="editUmeyka('${skill._id}')">
-                                ✏️ Настроить
-                            </button>
-                            <button class="small-button delete-button" onclick="deleteUmeyka('${skill._id}')">
-                                🗑️ Удалить
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 
             } catch (error) {
-                console.error('Ошибка загрузки умений:', error);
-                showError('profileSkillsList', 'Ошибка загрузки умений');
+                console.error('Ошибка загрузки сделок:', error);
+                showError('dealsList', 'Ошибка загрузки сделок');
             }
         }
 
-        // Редактирование умейки
-        window.editUmeyka = async function(umeykaId) {
-            try {
-                const response = await fetch(`/api/search-umeyka?query=`);
-                const skills = await response.json();
-                const skill = skills.find(s => s._id === umeykaId);
-                
-                if (!skill) {
-                    alert('Умейка не найдена');
-                    return;
-                }
-                
-                document.getElementById('editUmeykaId').value = umeykaId;
-                document.getElementById('editUmeykaTitle').textContent = `✏️ Настройка: ${skill.skill}`;
-                document.getElementById('editUmeykaDescription').value = skill.description || '';
-                document.getElementById('editUmeykaTags').value = skill.tags?.join(', ') || '';
-                
-                // Заполняем рейтинг
-                updateRatingDisplay(skill.rating);
-                
-                showSection('editUmeykaSection');
-                
-            } catch (error) {
-                console.error('Ошибка загрузки умейки:', error);
-                alert('❌ Ошибка загрузки умейки');
-            }
-        };
-
-        // Обновление отображения рейтинга
-        function updateRatingDisplay(rating) {
-            if (!rating) {
-                rating = { average: 0, count: 0, details: { quality: 0, speed: 0, communication: 0, price: 0 } };
-            }
-            
-            document.getElementById('ratingValue').textContent = rating.average.toFixed(1);
-            document.getElementById('ratingCount').textContent = rating.count;
-            
-            const detailsHtml = `
-                <div class="rating-bar">
-                    <div class="rating-label">Качество</div>
-                    <div class="rating-value">${rating.details.quality.toFixed(1)}</div>
-                    <div class="rating-progress">
-                        <div class="rating-progress-fill" style="width: ${rating.details.quality * 10}%"></div>
-                    </div>
-                </div>
-                <div class="rating-bar">
-                    <div class="rating-label">Скорость</div>
-                    <div class="rating-value">${rating.details.speed.toFixed(1)}</div>
-                    <div class="rating-progress">
-                        <div class="rating-progress-fill" style="width: ${rating.details.speed * 10}%"></div>
-                    </div>
-                </div>
-                <div class="rating-bar">
-                    <div class="rating-label">Общение</div>
-                    <div class="rating-value">${rating.details.communication.toFixed(1)}</div>
-                    <div class="rating-progress">
-                        <div class="rating-progress-fill" style="width: ${rating.details.communication * 10}%"></div>
-                    </div>
-                </div>
-                <div class="rating-bar">
-                    <div class="rating-label">Цена</div>
-                    <div class="rating-value">${rating.details.price.toFixed(1)}</div>
-                    <div class="rating-progress">
-                        <div class="rating-progress-fill" style="width: ${rating.details.price * 10}%"></div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('ratingDetails').innerHTML = detailsHtml;
+        // Получить текстовое представление уровня качества
+        function getQualityLabel(quality) {
+            const labels = {
+                'premium': 'Премиум',
+                'standard': 'Стандарт', 
+                'economy': 'Эконом'
+            };
+            return labels[quality] || quality;
         }
 
-        // Сохранение умейки
-        window.saveUmeyka = async function() {
+        // Подписание сделки
+        window.signDeal = async function(dealId) {
             try {
-                const umeykaId = document.getElementById('editUmeykaId').value;
-                const updateData = {
-                    umeykaId,
-                    description: document.getElementById('editUmeykaDescription').value,
-                    tags: document.getElementById('editUmeykaTags').value.split(',').map(tag => tag.trim()).filter(tag => tag)
-                };
+                const userType = currentUserId === currentDeal?.masterUserId ? 'master' : 'client';
                 
-                // Здесь будет обработка загрузки фото и видео
-                // Пока оставляем заглушку
-                
-                const response = await fetch('/api/update-umeyka', {
+                const response = await fetch('/api/sign-deal', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(updateData)
+                    body: JSON.stringify({
+                        dealId,
+                        userId: currentUserId,
+                        userType
+                    })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
-                    alert('✅ Умейка успешно обновлена!');
-                    showProfileSection();
+                    alert('✅ Сделка успешно подписана!');
+                    loadUserDeals();
                 } else {
-                    alert('❌ Ошибка обновления умейки: ' + data.error);
+                    alert('❌ Ошибка подписания: ' + data.error);
                 }
-                
+
             } catch (error) {
-                console.error('Ошибка сохранения умейки:', error);
-                alert('❌ Ошибка сохранения умейки');
+                console.error('Ошибка подписания:', error);
+                alert('❌ Ошибка подписания');
             }
         };
 
-        // Удаление умейки
-        window.deleteUmeyka = async function(umeykaId) {
-            if (!confirm('❌ Вы уверены, что хотите удалить эту умейку?')) {
-                return;
-            }
-            
+        // Просмотр сделки
+        window.viewDeal = async function(dealId) {
             try {
-                const response = await fetch(`/api/delete-umeyka/${umeykaId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId: currentUserId })
-                });
+                const response = await fetch(`/api/user-deals/${currentUserId}`);
+                const deals = await response.json();
+                currentDeal = deals.find(d => d._id === dealId);
                 
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert('🗑️ Умейка удалена!');
-                    loadProfileSkills();
-                } else {
-                    alert('❌ Ошибка удаления умейки: ' + data.error);
+                if (!currentDeal) {
+                    alert('Сделка не найдена');
+                    return;
                 }
                 
+                const isMaster = currentDeal.masterUserId === currentUserId;
+                
+                const dealHtml = `
+                    <h2 style="margin-bottom: 20px; text-align: center;">📄 ${currentDeal.title}</h2>
+                    
+                    <div class="deal-card">
+                        <div class="deal-header">
+                            <div class="deal-title">${currentDeal.title}</div>
+                            <div class="deal-status status-${currentDeal.status}">
+                                ${currentDeal.status === 'pending_signature' ? 'Ожидает подписи' :
+                                  currentDeal.status === 'active' ? 'Активна' : 'Завершена'}
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 15px 0;">
+                            <strong>Описание:</strong>
+                            <p>${currentDeal.description}</p>
+                        </div>
+                        
+                        <div class="deal-details">
+                            <div class="deal-detail">📅 ${currentDeal.period}</div>
+                            <div class="deal-detail">💰 ${currentDeal.amount} ₽</div>
+                            <div class="deal-detail">⭐ ${getQualityLabel(currentDeal.qualityLevel)}</div>
+                            <div class="deal-detail">👤 ${isMaster ? 'Вы (мастер)' : 'Вы (клиент)'}</div>
+                        </div>
+                        
+                        ${currentDeal.selectedOptions.length > 0 ? `
+                            <div style="margin: 15px 0;">
+                                <strong>Дополнительные условия:</strong>
+                                <ul>
+                                    ${currentDeal.selectedOptions.map(opt => `
+                                        <li>${getOptionLabel(opt)}</li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="signatures">
+                            <div class="signature ${currentDeal.signatures.master.signed ? 'signed' : 'unsigned'}">
+                                ${currentDeal.signatures.master.signed ? '✅' : '❌'} Мастер
+                                ${currentDeal.signatures.master.signedAt ? `<br><small>${new Date(currentDeal.signatures.master.signedAt).toLocaleString()}</small>` : ''}
+                            </div>
+                            <div class="signature ${currentDeal.signatures.client.signed ? 'signed' : 'unsigned'}">
+                                ${currentDeal.signatures.client.signed ? '✅' : '❌'} Клиент
+                                ${currentDeal.signatures.client.signedAt ? `<br><small>${new Date(currentDeal.signatures.client.signedAt).toLocaleString()}</small>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('dealViewContent').innerHTML = dealHtml;
+                showSection('viewDealSection');
+                
             } catch (error) {
-                console.error('Ошибка удаления умейки:', error);
-                alert('❌ Ошибка удаления умейки');
+                console.error('Ошибка просмотра сделки:', error);
+                alert('❌ Ошибка просмотра сделки');
             }
         };
 
-        // ========== СИСТЕМА ЧАТОВ ==========
+        // Получить текстовое представление опции
+        function getOptionLabel(option) {
+            const labels = {
+                'punctuality': '📅 Пунктуальность',
+                'warranty': '🔧 Гарантия на работу', 
+                'installmentPayments': '💰 Поэтапная оплата'
+            };
+            return labels[option] || option;
+        }
 
-        // Загрузка чатов пользователя
+        // ========== ИСПРАВЛЕНИЯ ДЛЯ ЧАТА ==========
+
+        // Обновляем функцию открытия чата для отображения имен
+        window.openChatWindow = async function(chatId, partnerName) {
+            try {
+                currentChatId = chatId;
+                document.getElementById('chatTitle').textContent = `💬 Чат с ${partnerName}`;
+                
+                // Загружаем сообщения
+                const response = await fetch(`/api/chat-messages/${chatId}`);
+                const messages = await response.json();
+                
+                const messagesHtml = messages.map(message => {
+                    const isMyMessage = message.fromUserId === currentUserId;
+                    const messageTime = new Date(message.createdAt).toLocaleTimeString('ru-RU', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    // Определяем имя отправителя
+                    const senderName = isMyMessage ? 'Вы' : partnerName.replace('Чат с ', '');
+                    
+                    return `
+                        <div class="${isMyMessage ? 'my-message' : ''}" style="margin-bottom: 15px;">
+                            <div class="chat-message-sender">${senderName}</div>
+                            <div style="display: inline-block; max-width: 80%;">
+                                <div style="background: ${isMyMessage ? '#667eea' : '#e2e8f0'}; 
+                                            color: ${isMyMessage ? 'white' : '#2d3748'}; 
+                                            padding: 10px 15px; 
+                                            border-radius: 15px; 
+                                            word-wrap: break-word;">
+                                    ${message.text}
+                                </div>
+                                <div style="font-size: 11px; color: #666; margin-top: 3px; text-align: ${isMyMessage ? 'right' : 'left'};">
+                                    ${messageTime}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('chatMessages').innerHTML = messagesHtml || '<div style="text-align: center; color: #666;">Нет сообщений</div>';
+                document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+                
+                showSection('chatWindow');
+                
+            } catch (error) {
+                console.error('Ошибка открытия чата:', error);
+                alert('❌ Ошибка открытия чата');
+            }
+        };
+
+        // Обновляем функцию загрузки чатов для корректного отображения имен
         async function loadUserChats() {
             try {
                 const response = await fetch(`/api/user-chats/${currentUserId}`);
@@ -986,8 +653,8 @@
                 chatsList.innerHTML = chats.map(chat => {
                     const isClient = chat.clientUserId === currentUserId;
                     const partnerName = isClient ? 
-                        `Мастер: ${chat.umeykaId?.username || 'Неизвестно'}` : 
-                        `Клиент: ID${chat.clientUserId}`;
+                        `${chat.umeykaId?.username || 'Мастер'}` : 
+                        `Клиент ID${chat.clientUserId}`;
                     
                     const lastMessageTime = new Date(chat.lastMessageTime).toLocaleTimeString('ru-RU', {
                         hour: '2-digit',
@@ -1019,387 +686,9 @@
             }
         }
 
-        // Открытие окна чата
-        window.openChatWindow = async function(chatId, partnerName) {
-            try {
-                currentChatId = chatId;
-                document.getElementById('chatTitle').textContent = `💬 Чат с ${partnerName}`;
-                
-                // Загружаем сообщения
-                const response = await fetch(`/api/chat-messages/${chatId}`);
-                const messages = await response.json();
-                
-                const messagesHtml = messages.map(message => {
-                    const isMyMessage = message.fromUserId === currentUserId;
-                    const messageTime = new Date(message.createdAt).toLocaleTimeString('ru-RU', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                    
-                    return `
-                        <div style="margin-bottom: 10px; text-align: ${isMyMessage ? 'right' : 'left'};">
-                            <div style="display: inline-block; max-width: 80%;">
-                                <div style="background: ${isMyMessage ? '#667eea' : '#e2e8f0'}; 
-                                            color: ${isMyMessage ? 'white' : '#2d3748'}; 
-                                            padding: 10px 15px; 
-                                            border-radius: 15px; 
-                                            word-wrap: break-word;">
-                                    ${message.text}
-                                </div>
-                                <div style="font-size: 12px; color: #666; margin-top: 5px;">
-                                    ${messageTime}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                document.getElementById('chatMessages').innerHTML = messagesHtml || '<div style="text-align: center; color: #666;">Нет сообщений</div>';
-                document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-                
-                showSection('chatWindow');
-                
-            } catch (error) {
-                console.error('Ошибка открытия чата:', error);
-                alert('❌ Ошибка открытия чата');
-            }
-        };
-
-        // Закрытие чата
-        window.closeChat = function() {
-            showProfileSection();
-            currentChatId = null;
-        };
-
-        // Отправка сообщения в чат
-        window.sendChatMessage = async function() {
-            try {
-                const messageInput = document.getElementById('messageInput');
-                const text = messageInput.value.trim();
-                
-                if (!text) {
-                    alert('Введите сообщение');
-                    return;
-                }
-                
-                if (!currentChatId) {
-                    alert('Чат не выбран');
-                    return;
-                }
-                
-                const response = await fetch('/api/send-message', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chatId: currentChatId,
-                        fromUserId: currentUserId,
-                        text: text
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    messageInput.value = '';
-                    // Обновляем окно чата
-                    openChatWindow(currentChatId, document.getElementById('chatTitle').textContent.replace('💬 Чат с ', ''));
-                } else {
-                    alert('❌ Ошибка отправки сообщения: ' + data.error);
-                }
-                
-            } catch (error) {
-                console.error('Ошибка отправки сообщения:', error);
-                alert('❌ Ошибка отправки сообщения');
-            }
-        };
-
-        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
-
-        function showError(elementId, message) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.innerHTML = `<div class="error-message">${message}</div>`;
-            }
-        }
-
-        // ========== ОБНОВЛЕННАЯ ФУНКЦИЯ КАРТЫ (БЕЗ ФЛАГОВ) ==========
-
-        // Работа с картой
-        window.openMap = function() {
-            const mapSection = document.querySelector('.map-section');
-            mapSection.classList.add('map-active');
-            
-            if (!map) {
-                initMap();
-            } else {
-                loadSkillsOnMap();
-            }
-        };
-
-        function initMap() {
-          if (map) return;
-          
-          // Создаем карту с отключенной атрибуцией
-          map = L.map('map', {
-            attributionControl: false
-          }).setView([55.7558, 37.6173], 10);
-          
-          // CartoDB Positron - красивая светлая тема без флагов
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            subdomains: 'abcd',
-            maxZoom: 20
-          }).addTo(map);
-
-          // Ограничиваем область просмотра
-          map.setMaxBounds([
-            [30, 19],  // Юго-запад
-            [70, 180]  // Северо-восток
-          ]);
-
-          // Запрос геолокации
-          initializeUserLocation();
-        }
-
-        function initializeUserLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    position => {
-                        const { latitude, longitude } = position.coords;
-                        userLocation = { lat: latitude, lon: longitude };
-                        map.setView([latitude, longitude], 13);
-                        
-                        // Добавляем красивый маркер текущего местоположения
-                        L.marker([latitude, longitude])
-                            .addTo(map)
-                            .bindPopup('📍 Ваше местоположение')
-                            .openPopup();
-                            
-                        loadSkillsOnMap();
-                    },
-                    error => {
-                        console.log('Геолокация недоступна');
-                        userLocation = { lat: 55.7558, lon: 37.6173 };
-                        loadSkillsOnMap();
-                    }
-                );
-            } else {
-                userLocation = { lat: 55.7558, lon: 37.6173 };
-                loadSkillsOnMap();
-            }
-        }
-
-        async function loadSkillsOnMap() {
-            try {
-                const response = await fetch('/api/search-umeyka?query=');
-                const skills = await response.json();
-                
-                markers.forEach(marker => map.removeLayer(marker));
-                markers = [];
-                
-                skills.forEach(skill => {
-                    if (skill.location && skill.location.lat && skill.location.lon) {
-                        const marker = L.marker([skill.location.lat, skill.location.lon])
-                            .addTo(map)
-                            .bindPopup(`
-                                <div style="min-width: 200px;">
-                                    <h3 style="margin: 0 0 10px 0;">${skill.skill}</h3>
-                                    <p style="margin: 5px 0;">🎓 ${skill.experience}</p>
-                                    <p style="margin: 5px 0;">💰 ${skill.price} руб.</p>
-                                    <p style="margin: 5px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '0'}/10</p>
-                                    <p style="margin: 5px 0;">👤 ${skill.username}</p>
-                                    <button onclick="contactMaster('${skill._id}', '${skill.skill}', ${skill.userId})" 
-                                            style="width: 100%; padding: 8px; background: #667eea; color: white; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">
-                                        💬 Написать
-                                    </button>
-                                </div>
-                            `);
-                        
-                        markers.push(marker);
-                    }
-                });
-                
-            } catch (error) {
-                console.error('Ошибка загрузки карты:', error);
-            }
-        }
-
-        // ========== СУЩЕСТВУЮЩИЕ ФУНКЦИИ ==========
-
-        // Добавление умения
-        window.addSkill = async function() {
-            const skill = document.getElementById('skillName').value;
-            const experience = document.getElementById('skillExperience').value;
-            const price = document.getElementById('skillPrice').value;
-            
-            if (!skill || !experience || !price) {
-                alert('❌ Заполните все поля!');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/add-umeyka', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        skill,
-                        experience,
-                        price: parseInt(price),
-                        location: userLocation || { lat: 55.7558, lon: 37.6173 },
-                        userId: currentUserId
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert('✅ Умейка успешно добавлена!');
-                    document.getElementById('skillName').value = '';
-                    document.getElementById('skillExperience').value = '';
-                    document.getElementById('skillPrice').value = '';
-                    loadMySkills();
-                } else {
-                    alert('❌ Ошибка: ' + data.error);
-                }
-            } catch (error) {
-                console.error('Ошибка добавления:', error);
-                alert('❌ Ошибка при добавлении умейки');
-            }
-        };
-
-        // Поиск умений
-        window.searchSkills = async function() {
-            const query = document.getElementById('searchInput').value;
-            const resultsDiv = document.getElementById('searchResults');
-            
-            if (!query.trim()) {
-                resultsDiv.innerHTML = '<div class="error-message">❌ Введите запрос для поиска</div>';
-                return;
-            }
-            
-            resultsDiv.innerHTML = '<div class="loading">🔍 Ищем мастеров...</div>';
-            
-            try {
-                const response = await fetch(`/api/search-umeyka?query=${encodeURIComponent(query)}`);
-                const skills = await response.json();
-                
-                if (skills.length === 0) {
-                    resultsDiv.innerHTML = '<div class="error-message">😔 Ничего не найдено. Попробуйте другой запрос.</div>';
-                    return;
-                }
-                
-                resultsDiv.innerHTML = skills.map(skill => `
-                    <div class="skill-card">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">${'★'.repeat(Math.floor(skill.rating?.average || 0))}${'☆'.repeat(10-Math.floor(skill.rating?.average || 0))}</div>
-                        </div>
-                        <div class="skill-price">${skill.price} ₽</div>
-                        <div class="skill-distance">🎓 ${skill.experience}</div>
-                        <div style="color: #666; margin-bottom: 15px;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '0'}/10</div>
-                        <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
-                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', ${skill.userId})">
-                            💬 Написать мастеру
-                        </button>
-                    </div>
-                `).join('');
-                
-            } catch (error) {
-                console.error('Ошибка поиска:', error);
-                resultsDiv.innerHTML = '<div class="error-message">❌ Ошибка при поиске. Попробуйте позже.</div>';
-            }
-        };
-
-        // Загрузка моих умений
-        async function loadMySkills() {
-            const skillsList = document.getElementById('mySkillsList');
-            skillsList.innerHTML = '<div class="loading">📋 Загружаем ваши умейки...</div>';
-            
-            try {
-                const response = await fetch(`/api/my-umeyka/${currentUserId}`);
-                const skills = await response.json();
-                
-                if (skills.length === 0) {
-                    skillsList.innerHTML = '<div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.7);">У вас пока нет добавленных умений</div>';
-                    return;
-                }
-                
-                skillsList.innerHTML = skills.map(skill => `
-                    <div class="skill-card">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">${'★'.repeat(Math.floor(skill.rating?.average || 0))}${'☆'.repeat(10-Math.floor(skill.rating?.average || 0))}</div>
-                        </div>
-                        <div class="skill-price">${skill.price} ₽</div>
-                        <div class="skill-distance">🎓 ${skill.experience}</div>
-                        <div style="color: #666;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '0'}/10</div>
-                    </div>
-                `).join('');
-                
-            } catch (error) {
-                console.error('Ошибка загрузки:', error);
-                skillsList.innerHTML = '<div class="error-message">❌ Ошибка при загрузке ваших умений</div>';
-            }
-        }
-
-        // Контакт с мастером
-        window.contactMaster = async function(umeykaId, skillName, masterUserId) {
-            try {
-                const response = await fetch('/api/create-chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        clientUserId: currentUserId,
-                        masterUserId: masterUserId,
-                        umeykaId: umeykaId
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert(`💬 Чат с мастером "${skillName}" создан!`);
-                    if (data.isNew) {
-                        // Переходим в чат
-                        openChatWindow(data.chatId, `Мастер: ${skillName}`);
-                    } else {
-                        // Открываем существующий чат
-                        openChatWindow(data.chatId, `Мастер: ${skillName}`);
-                    }
-                } else {
-                    alert('❌ Ошибка создания чата: ' + data.error);
-                }
-                
-            } catch (error) {
-                console.error('Ошибка создания чата:', error);
-                alert('❌ Ошибка создания чата');
-            }
-        };
-
-        // Инициализация приложения
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Umeyka app loaded successfully!');
-            showMainScreen();
-            
-            const tg = window.Telegram?.WebApp;
-            if (tg) {
-                tg.ready();
-                tg.expand();
-                console.log('✅ Telegram Web App initialized');
-                
-                // Получаем данные пользователя из Telegram
-                if (tg.initDataUnsafe.user) {
-                    const user = tg.initDataUnsafe.user;
-                    currentUserId = user.id;
-                    console.log('👤 User ID:', currentUserId);
-                }
-            }
-        });
+        // Добавляем кнопку "Сделки" в главное меню
+        // Обновляем раздел с кнопками в главном экране:
+        // В существующий HTML добавляем новую кнопку:
     </script>
 </body>
 </html>
