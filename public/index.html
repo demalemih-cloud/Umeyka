@@ -2198,7 +2198,30 @@ function showNotification(message) {
             `;
         };
         window.contactMaster = function() { alert('Чат создан! (демо)'); };
-
+        
+        // Функция копирования реферальной ссылки
+        window.copyReferralLink = function() {
+            const link = 'https://t.me/umeyka_bot';
+            
+            // Создаем временное поле для копирования
+            const input = document.createElement('input');
+            input.value = link;
+            document.body.appendChild(input);
+            input.select();
+            input.setSelectionRange(0, 99999); // Для мобильных устройств
+            
+            // Пробуем скопировать
+            try {
+                document.execCommand('copy');
+                alert('✅ Ссылка скопирована!\n\nОтправь друзьям в Telegram:\n' + link);
+            } catch (err) {
+                // Если не получилось, показываем ссылку для ручного копирования
+                alert('📋 Скопируйте ссылку вручную:\n\n' + link);
+            }
+            
+            // Убираем временное поле
+            document.body.removeChild(input);
+        };
     </script>
 </body>
 </html>
