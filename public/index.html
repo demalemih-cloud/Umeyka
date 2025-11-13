@@ -2267,6 +2267,58 @@ function showNotification(message) {
             // Убираем временное поле
             document.body.removeChild(input);
         };
+
+                // Функция отправки другу через Telegram
+        window.shareToFriend = function() {
+            const shareUrl = 'https://t.me/umeyka_bot';
+            const shareText = 'Привет! Нашел крутое приложение для поиска мастеров - Umeyka! 🛠️\n\nЗарегистрируйся по ссылке и получи +1 звезду на старт:';
+            
+            // Пробуем использовать современный Web Share API (работает на мобильных)
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Umeyka - Мастера рядом',
+                    text: shareText,
+                    url: shareUrl
+                })
+                .then(() => console.log('Успешный шаринг'))
+                .catch(error => {
+                    // Если нативный шаринг не сработал, используем Telegram
+                    shareViaTelegram(shareUrl, shareText);
+                });
+            } else {
+                // Для десктопов и старых браузеров
+                shareViaTelegram(shareUrl, shareText);
+            }
+        };
+
+        // Шаринг через Telegram
+        function shareViaTelegram(url, text) {
+            const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            
+            const width = 600;
+            const height = 400;
+            const left = (screen.width - width) / 2;
+            const top = (screen.height - height) / 2;
+            
+            const shareWindow = window.open(
+                telegramShareUrl,
+                'Поделиться в Telegram',
+                `width=${width},height=${height},left=${left},top=${top}`
+            );
+            
+            // Если окно не открылось (например, в мобильном приложении)
+            if (!shareWindow || shareWindow.closed || typeof shareWindow.closed == 'undefined') {
+                // Показываем инструкцию
+                showShareInstructions();
+            }
+        }
+
+        // Показать инструкцию по шарингу
+        function showShareInstructions() {
+            const message = `📤 Чтобы отправить другу:\n\n1. Нажми "📋 Скопировать ссылку"\n2. Открой Telegram\n3. Выбери друга из списка контактов\n4. Отправь ему ссылку: https://t.me/umeyka_bot\n\nИли просто перешли это сообщение!`;
+            
+            alert(message);
+        }
     </script>
 </body>
 </html>
