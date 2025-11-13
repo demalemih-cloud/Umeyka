@@ -1523,29 +1523,21 @@
 
         // ========== РЕФЕРАЛЬНАЯ СИСТЕМА ==========
 
-        // Загрузка реферальной информации
-        async function loadReferralInfo() {
-            try {
-                const response = await fetch('/api/generate-referral', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ userId: currentUserId })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    document.getElementById('referralCode').textContent = data.referralCode;
-                }
-
-            } catch (error) {
-                console.error('Ошибка загрузки реферальной информации:', error);
-                document.getElementById('referralCode').textContent = 'Ошибка загрузки';
-            }
-        }
-
+// Загрузка реферальной информации
+async function loadReferralInfo() {
+    try {
+        // Показываем прямую ссылку на бота
+        document.getElementById('referralLink').textContent = 'https://t.me/umeyka_bot';
+        
+        // Для демо - показываем тестовые данные
+        document.getElementById('referralCount').textContent = '3';
+        document.getElementById('referralStars').textContent = '3';
+        
+    } catch (error) {
+        console.error('Ошибка загрузки реферальной информации:', error);
+        document.getElementById('referralLink').textContent = 'https://t.me/umeyka_bot';
+    }
+}
 // Копирование реферальной ссылки
 loadReferralInfo = function() {
     const referralUrl = 'https://t.me/umeyka_bot';
