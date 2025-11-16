@@ -1480,31 +1480,30 @@
         // Показать вкладку в личном кабинете
         window.showProfileTab = function(tab) {
             currentProfileTab = tab;
-            
+    
             // Скрываем все вкладки
             document.getElementById('profileStats').style.display = 'none';
             document.getElementById('profileSkills').style.display = 'none';
             document.getElementById('profileDeals').style.display = 'none';
             document.getElementById('profileChats').style.display = 'none';
-            
+    
             // Показываем выбранную вкладку
             document.getElementById('profile' + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = 'block';
-            
+    
             // Обновляем активные кнопки
-            document.getElementById('statsTab').style.background = '';
-            document.getElementById('skillsTab').style.background = '';
-            document.getElementById('dealsTab').style.background = '';
-            document.getElementById('chatsTab').style.background = '';
-            
-            document.getElementById(tab + 'Tab').style.background = '#4299e1';
-            document.getElementById(tab + 'Tab').style.color = 'white';
-            
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+            button.classList.remove('active');
+            });
+     
+            document.getElementById(tab + 'Tab').classList.add('active');
+    
             // Если выбраны сделки, загружаем их
             if (tab === 'deals') {
                 loadUserDeals();
             }
         };
-
+ 
         // ========== СИСТЕМА ЗВЕЗД И КАСТОМИЗАЦИИ ==========
 
         // Загрузка звездной системы
