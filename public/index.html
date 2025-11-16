@@ -325,12 +325,49 @@
             gap: 8px;
         }
 
-        .small-button {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
+        /* Стили для кнопок вкладок */
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 120px;
+            padding: 18px 15px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-button:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .tab-button:active {
+            transform: translateY(0);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .edit-button {
@@ -1115,20 +1152,20 @@
  </div>
                 
                 <!-- Вкладки личного кабинета -->
-                <div style="display: flex; gap: 10px; margin: 20px 0;">
-                    <button class="small-button" onclick="showProfileTab('stats')" id="statsTab" style="background: #4299e1; color: white;">
-                        📊 Статистика
-                    </button>
-                    <button class="small-button" onclick="showProfileTab('skills')" id="skillsTab">
-                        ✨ Мои умейки
-                    </button>
-                    <button class="small-button" onclick="showProfileTab('deals')" id="dealsTab">
-                        📝 Сделки
-                    </button>
-                    <button class="small-button" onclick="showProfileTab('chats')" id="chatsTab">
-                        💬 Чаты
-                    </button>
-                </div>
+<div class="tab-buttons">
+    <button class="tab-button active" onclick="showProfileTab('stats')" id="statsTab">
+        📊 Статистика
+    </button>
+    <button class="tab-button" onclick="showProfileTab('skills')" id="skillsTab">
+        ✨ Мои умейки
+    </button>
+    <button class="tab-button" onclick="showProfileTab('deals')" id="dealsTab">
+        📝 Сделки
+    </button>
+    <button class="tab-button" onclick="showProfileTab('chats')" id="chatsTab">
+        💬 Чаты
+    </button>
+</div>
                 
                 <!-- Статистика -->
                 <div id="profileStats" class="profile-tab">
