@@ -1188,17 +1188,17 @@
                     <h3 style="margin-bottom: 15px;">📝 Мои сделки</h3>
                     
                     <!-- Вкладки сделок -->
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <button class="small-button" onclick="showDealsTab('pending')" id="pendingDealsTab" style="background: #4299e1; color: white;">
-                            ✍️ Ожидают подписи
-                        </button>
-                        <button class="small-button" onclick="showDealsTab('active')" id="activeDealsTab">
-                            ✅ Активные
-                        </button>
-                        <button class="small-button" onclick="showDealsTab('completed')" id="completedDealsTab">
-                            📋 Завершенные
-                        </button>
-                    </div>
+                <div class="deals-tab-buttons">
+                    <button class="deals-tab-button active" onclick="showDealsTab('pending')" id="pendingDealsTab">
+                         ✍️ Ожидают подписи
+                    </button>
+                    <button class="small-button" onclick="showDealsTab('active')" id="activeDealsTab">
+                        ✅ Активные
+                    </button>
+                    <button class="deals-tab-button" onclick="showDealsTab('active')" id="activeDealsTab">
+                        📋 Завершенные
+                    </button>
+                </div>
                     
                     <!-- Кнопка создания сделки -->
                     <button class="main-button" onclick="showCreateDealSection()" style="margin-bottom: 20px;">
@@ -1687,13 +1687,15 @@ function showNotification(message) {
         window.showDealsTab = function(tab) {
             currentDealTab = tab;
             
-            document.getElementById('pendingDealsTab').style.background = '';
-            document.getElementById('activeDealsTab').style.background = '';
-            document.getElementById('completedDealsTab').style.background = '';
-            
-            document.getElementById(tab + 'DealsTab').style.background = '#4299e1';
-            document.getElementById(tab + 'DealsTab').style.color = 'white';
-            
+            // Обновляем активные кнопки
+            const dealsTabButtons = document.querySelectorAll('.deals-tab-button');
+            dealsTabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+    
+            document.getElementById(tab + 'DealsTab').classList.add('active');
+    
+            // Загружаем сделки для выбранной вкладки
             loadUserDeals();
         };
 
