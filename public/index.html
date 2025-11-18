@@ -1034,66 +1034,6 @@
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             border: 2px solid rgba(255,255,255,0.5);
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
-            
-        /* Стили для кнопок приглашения друзей */
-        .referral-simple {
-            background: rgba(255,255,255,0.1);
-            padding: 25px 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-        }
-
-        .referral-buttons-simple {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .referral-btn {
-            width: 100%;
-            padding: 20px;
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .referral-btn-orange {
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        .referral-btn-green {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        .referral-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-
-        .referral-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .btn-icon {
-            font-size: 20px;
-        }
-
-        .btn-text {
-            font-size: 16px;
         }
     </style>
 </head>
@@ -1187,39 +1127,96 @@
                         ✏️ Редактировать профиль
                     </button>
                 </div>
-
-                <!-- Приглашение друзей -->
-                <div class="referral-simple">
-                    <h3 style="text-align: center; margin-bottom: 20px; color: white; font-size: 20px;">👥 Пригласи друзей</h3>
-    
-                    <div class="referral-buttons-simple">
-                        <button class="referral-btn referral-btn-orange" onclick="shareToFriend()">
-                            <span class="btn-icon">📤</span>
-                            <span class="btn-text">Отправить другу</span>
-                        </button>
-        
-                        <button class="referral-btn referral-btn-green" onclick="copyReferralLink()">
-                            <span class="btn-icon">📋</span>
-                            <span class="btn-text">Скопировать ссылку</span>
-                        </button>
+                
+                <!-- Звездная система -->
+                <div id="starsSystem" class="stars-system">
+                    <h3 style="margin-bottom: 15px; text-align: center;">🌟 Звездная система</h3>
+                    <div class="stars-display">
+                        <div class="stars-count" id="starsCount">0</div>
+                        <div id="starsIcons">⭐</div>
+                    </div>
+                    
+                    <div class="star-levels">
+                        <div class="star-level" id="level1">
+                            <span>1-4 звезды</span>
+                            <span>🎨 Базовая кастомизация</span>
+                        </div>
+                        <div class="star-level" id="level5">
+                            <span>5-9 звезд</span>
+                            <span>🚀 Выделение в поиске</span>
+                        </div>
+                        <div class="star-level" id="level10">
+                            <span>10+ звезд</span>
+                            <span>🏆 Топ-мастер</span>
+                        </div>
+                        <div class="star-level" id="level1000">
+                            <span>1000+ звезд</span>
+                            <span>🥇 Золотая карточка</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Кастомизация профиля -->
+                <div id="customizationSection" class="customization-section" style="display: none;">
+                    <h3 style="margin-bottom: 15px; text-align: center;">🎨 Кастомизация профиля</h3>
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Цвет фона:</label>
+                        <div class="color-picker">
+                            <div class="color-option selected" style="background: #667eea;" onclick="selectColor('#667eea')"></div>
+                            <div class="color-option" style="background: #48bb78;" onclick="selectColor('#48bb78')"></div>
+                            <div class="color-option" style="background: #ed8936;" onclick="selectColor('#ed8936')"></div>
+                            <div class="color-option" style="background: #9f7aea;" onclick="selectColor('#9f7aea')"></div>
+                            <div class="color-option" style="background: #ed64a6;" onclick="selectColor('#ed64a6')"></div>
+                            <div class="color-option" style="background: #38b2ac;" onclick="selectColor('#38b2ac')"></div>
+                            <div class="color-option" style="background: #e53e3e;" onclick="selectColor('#e53e3e')"></div>
+                            <div class="color-option" style="background: #2d3748;" onclick="selectColor('#2d3748')"></div>
+                        </div>
+                    </div>
+                    <button class="submit-button" onclick="saveCustomization()">💾 Сохранить дизайн</button>
+                </div>
+
+<!-- Реферальная программа -->
+<div class="referral-section">
+    <div class="referral-title">
+        <span>👥</span>
+        <span>Пригласи друзей</span>
+    </div>
+    
+    <div class="referral-description">
+        Дари друзьям +1 звезду за регистрацию<br>и получай +1 звезду за каждого приглашенного!
+    </div>
+    
+    <div class="referral-benefits">
+        <div class="referral-benefit">🎁 Друг получает +1 звезду</div>
+        <div class="referral-benefit">⭐ Вы получаете +1 звезду</div>
+    </div>
+    
+    <div class="referral-buttons">
+        <button class="referral-button share-button" onclick="shareToFriend()">
+            📤 Отправить другу
+        </button>
+        
+        <button class="referral-button copy-button" onclick="copyReferralLink()">
+            📋 Скопировать ссылку
+        </button>
+    </div>
+ </div>
                 
                 <!-- Вкладки личного кабинета -->
-                <div class="tab-buttons">
-                    <button class="tab-button active" onclick="showProfileTab('stats')" id="statsTab">
-                        📊 Статистика
-                    </button>
-                    <button class="tab-button" onclick="showProfileTab('skills')" id="skillsTab">
-                        ✨ Мои умейки
-                    </button>
-                    <button class="tab-button" onclick="showProfileTab('deals')" id="dealsTab">
-                        📝 Сделки
-                    </button>
-                    <button class="tab-button" onclick="showProfileTab('chats')" id="chatsTab">
-                        💬 Чаты
-                    </button>
-                </div>
+<div class="tab-buttons">
+    <button class="tab-button active" onclick="showProfileTab('stats')" id="statsTab">
+        📊 Статистика
+    </button>
+    <button class="tab-button" onclick="showProfileTab('skills')" id="skillsTab">
+        ✨ Мои умейки
+    </button>
+    <button class="tab-button" onclick="showProfileTab('deals')" id="dealsTab">
+        📝 Сделки
+    </button>
+    <button class="tab-button" onclick="showProfileTab('chats')" id="chatsTab">
+        💬 Чаты
+    </button>
+</div>
                 
                 <!-- Статистика -->
                 <div id="profileStats" class="profile-tab">
@@ -2364,24 +2361,19 @@ function showNotification(message) {
             document.body.removeChild(input);
         };
 
-               // Улучшенная функция отправки другу
+                // Функция отправки другу через Telegram
         window.shareToFriend = function() {
             const shareUrl = 'https://t.me/umeyka_bot';
-            const shareText = 'Привет! Нашел крутое приложение для поиска мастеров - Umeyka! 🛠️\n\nЗарегистрируйся по ссылке и начни находить проверенных мастеров для любых задач!';
-    
-            // Показываем уведомление о начале отправки
-            showNotification('📤 Открываем Telegram...', 'info');
-    
-            // Пробуем использовать современный Web Share API
+            const shareText = 'Привет! Нашел крутое приложение для поиска мастеров - Umeyka! 🛠️\n\nЗарегистрируйся по ссылке и получи +1 звезду на старт:';
+            
+            // Пробуем использовать современный Web Share API (работает на мобильных)
             if (navigator.share) {
                 navigator.share({
                     title: 'Umeyka - Мастера рядом',
                     text: shareText,
                     url: shareUrl
                 })
-                .then(() => {
-                    showNotification('✅ Сообщение отправлено!', 'success');
-                })
+                .then(() => console.log('Успешный шаринг'))
                 .catch(error => {
                     // Если нативный шаринг не сработал, используем Telegram
                     shareViaTelegram(shareUrl, shareText);
@@ -2391,95 +2383,6 @@ function showNotification(message) {
                 shareViaTelegram(shareUrl, shareText);
             }
         };
-
-        // Улучшенная функция копирования ссылки
-        window.copyReferralLink = function() {
-            const link = 'https://t.me/umeyka_bot';
-            const message = 'Привет! Нашел крутое приложение Umeyka для поиска мастеров! Зарегистрируйся: ';
-    
-            // Показываем уведомление о начале копирования
-            showNotification('📋 Копируем ссылку...', 'info');
-    
-            const input = document.createElement('input');
-            input.value = message + link;
-            document.body.appendChild(input);
-            input.select();
-            input.setSelectionRange(0, 99999);
-    
-            try {
-                document.execCommand('copy');
-                showNotification('✅ Ссылка скопирована! Теперь вставь в Telegram', 'success');
-            } catch (err) {
-                showNotification('❌ Не удалось скопировать', 'error');
-            }
-    
-            document.body.removeChild(input);
-        };
-
-        // Функция для красивых уведомлений
-        function showNotification(message, type = 'info') {
-            // Удаляем старое уведомление если есть
-            const oldNotification = document.getElementById('customNotification');
-            if (oldNotification) {
-                oldNotification.remove();
-            }
-    
-            const backgroundColor = type === 'success' ? 
-                'linear-gradient(135deg, #48bb78 0%, #38a169 100%)' :
-                type === 'error' ? 
-                'linear-gradient(135deg, #e53e3e 0%, #c53030 100%)' :
-                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-    
-            const notification = document.createElement('div');
-            notification.id = 'customNotification';
-            notification.innerHTML = `
-                <div style="
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: ${backgroundColor};
-                    color: white;
-                    padding: 20px 30px;
-                    border-radius: 15px;
-                    font-size: 16px;
-                    font-weight: 600;
-                    text-align: center;
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                    z-index: 10000;
-                    animation: notificationSlide 0.3s ease-out;
-                ">
-                    ${message}
-                </div>
-            `;
-    
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes notificationSlide {
-                    from { 
-                        opacity: 0; 
-                        transform: translate(-50%, -40%); 
-                    }
-                    to { 
-                        opacity: 1; 
-                        transform: translate(-50%, -50%); 
-                    }
-                }
-            `;
-    
-            document.head.appendChild(style);
-            document.body.appendChild(notification);
-    
-            // Удаляем уведомление через 3 секунды
-            setTimeout(() => {
-                if (document.body.contains(notification)) {
-                    document.body.removeChild(notification);
-                }
-                if (document.head.contains(style)) {
-                    document.head.removeChild(style);
-                }
-            }, 3000);
-        }
 
         // Шаринг через Telegram
         function shareViaTelegram(url, text) {
