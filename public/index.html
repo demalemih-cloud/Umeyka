@@ -1257,15 +1257,26 @@
         <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
         <div id="editProfileSection" class="section">
             <button class="back-button" onclick="showProfileSection()">← Назад</button>
-            
+    
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
-                
-                <input type="text" id="editFirstName" class="input-field" placeholder="Имя">
-                <input type="text" id="editLastName" class="input-field" placeholder="Фамилия">
-                <input type="tel" id="editPhone" class="input-field" placeholder="Телефон">
-                <textarea id="editBio" class="input-field" placeholder="О себе" style="height: 100px; resize: vertical;"></textarea>
-                
+        
+                <!-- Аватар -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div id="avatarPreview" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; cursor: pointer;" onclick="changeAvatar()">
+                        👤
+                    </div>
+                    <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Нажмите на аватар для выбора</div>
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                </div>
+        
+                <!-- Основная информация -->
+                <input type="text" id="editFirstName" class="input-field" placeholder="Имя *" required>
+                <input type="number" id="editAge" class="input-field" placeholder="Возраст">
+                <input type="text" id="editExperience" class="input-field" placeholder="Общий опыт работы (например: 5 лет)">
+                <input type="text" id="editContact" class="input-field" placeholder="Контактная информация (телефон, Telegram)">
+                <textarea id="editBio" class="input-field" placeholder="О себе (расскажите о ваших навыках и опыте) *" style="height: 120px; resize: vertical;" required></textarea>
+        
                 <button class="submit-button" onclick="saveProfile()">💾 Сохранить профиль</button>
             </div>
         </div>
