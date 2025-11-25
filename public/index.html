@@ -997,56 +997,6 @@
             border: 2px solid rgba(255,255,255,0.5);
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
         }
-
-        // ========== КОНФИГУРАЦИЯ API ==========
-        const API_URL = 'https://umeyka-oocn.onrender.com';
-        let currentUserId = null;
-
-        // Функция для работы с API
-        async function apiRequest(endpoint, options = {}) {
-            try {
-                console.log('📡 API Request:', `${API_URL}${endpoint}`);
-        
-                const response = await fetch(`${API_URL}${endpoint}`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...options.headers,
-                    },
-                    ...options
-                });
-        
-                const result = await response.json();
-                console.log('✅ API Response:', result);
-                return result;
-            } catch (error) {
-                console.error('❌ API Error:', error);
-                return { success: false, error: 'Network error' };
-            }
-        }
-
-        // Авторизация через Telegram
-        async function telegramAuth(userData) {
-            const result = await apiRequest('/api/auth/telegram', {
-                method: 'POST',
-                body: JSON.stringify(userData)
-            });
-    
-            if (result.success) {
-                localStorage.setItem('user', JSON.stringify(result.user));
-                currentUserId = result.user.telegramId;
-                return result.user;
-            }
-            return null;
-        }
-
-        // Загрузка профиля пользователя
-        async function loadUserProfile(telegramId) {
-            const result = await apiRequest(`/api/user/${telegramId}`);
-            if (result.success) {
-                return result.user;
-            }
-            return null;
-        }
     </style>
 </head>
 <body>
