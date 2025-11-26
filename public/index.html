@@ -1400,6 +1400,34 @@
     let currentUserId = null;
     let currentAvatar = null;
 
+    // Локальное хранилище для демо
+    function getLocalStorage(key) {
+        try {
+            return JSON.parse(localStorage.getItem(key));
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function setLocalStorage(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {
+            console.error('Ошибка сохранения в localStorage:', e);
+        }
+    }
+
+    // Демо данные пользователя
+    const demoUserData = {
+        firstName: 'Пользователь',
+        age: null,
+        experience: '',
+        contact: '',
+        bio: 'Расскажите о себе...',
+        avatar: null,
+        skills: []
+    };    
+
     // Функция для работы с API
     async function apiRequest(endpoint, options = {}) {
         try {
@@ -1446,28 +1474,30 @@
     // Функция для загрузки существующего профиля в форму
     async function loadProfileToForm() {
         try {
-            const response = await fetch(`/api/user-profile/${currentUserId}`);
-            const profile = await response.json();
+            // Для демо - используем localStorage
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
             
-            if (profile.success) {
-                const user = profile.user;
-                
-                // Заполняем поля формы
-                document.getElementById('editFirstName').value = user.firstName || '';
-                document.getElementById('editAge').value = user.age || '';
-                document.getElementById('editExperience').value = user.experience || '';
-                document.getElementById('editContact').value = user.contact || '';
-                document.getElementById('editBio').value = user.bio || '';
-                
-                // Устанавливаем аватар
-                if (user.avatar) {
-                    currentAvatar = user.avatar;
-                    document.getElementById('avatarPreview').innerHTML = 
-                        `<img src="${user.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                }
+            // Заполняем поля формы
+            document.getElementById('editFirstName').value = userData.firstName || '';
+            document.getElementById('editAge').value = userData.age || '';
+            document.getElementById('editExperience').value = userData.experience || '';
+            document.getElementById('editContact').value = userData.contact || '';
+            document.getElementById('editBio').value = userData.bio || '';
+            
+            // Устанавливаем аватар
+            if (userData.avatar) {
+                currentAvatar = userData.avatar;
+                document.getElementById('avatarPreview').innerHTML = 
+                    `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            } else {
+                document.getElementById('avatarPreview').innerHTML = '👤';
             }
+            
         } catch (error) {
             console.error('Ошибка загрузки профиля:', error);
+            // Заполняем демо данные при ошибке
+            document.getElementById('editFirstName').value = 'Пользователь';
+            document.getElementById('editBio').value = 'Расскажите о себе...';
         }
     }
 
@@ -1491,26 +1521,16 @@
                 experience: experience.trim(),
                 contact: contact.trim(),
                 bio: bio.trim(),
-                avatar: currentAvatar
+                avatar: currentAvatar,
+                skills: getLocalStorage(`user_${currentUserId}_skills`) || []
             };
 
-            const response = await fetch(`/api/user-profile/${currentUserId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(profileData)
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                alert('✅ Профиль успешно сохранен!');
-                showProfileSection();
-                loadUserProfileDisplay(); // Обновляем отображение профиля
-            } else {
-                alert('❌ Ошибка сохранения профиля: ' + data.error);
-            }
+            // Сохраняем в localStorage для демо
+            setLocalStorage(`user_${currentUserId}`, profileData);
+            
+            alert('✅ Профиль успешно сохранен! (локально)');
+            showProfileSection();
+            loadUserProfileDisplay(); // Обновляем отображение профиля
 
         } catch (error) {
             console.error('Ошибка сохранения профиля:', error);
@@ -1518,48 +1538,40 @@
         }
     };
 
-    // Функция показа секции редактирования профиля
-    window.editProfile = function() {
-        showSection('editProfileSection');
-        loadProfileToForm(); // Загружаем данные в форму при открытии
-    };
-
     // Функция отображения профиля пользователя
     async function loadUserProfileDisplay() {
         try {
-            const response = await fetch(`/api/user-profile/${currentUserId}`);
-            const profile = await response.json();
+            // Для демо - используем localStorage
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
             
-            if (profile.success) {
-                const user = profile.user;
-                
-                document.getElementById('userName').textContent = 
-                    user.firstName || 'Пользователь';
-                
-                // Обновляем аватар в профиле
-                const avatarElement = document.getElementById('userAvatar');
-                if (user.avatar) {
-                    avatarElement.innerHTML = 
-                        `<img src="${user.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                } else {
-                    avatarElement.innerHTML = '👤';
-                    avatarElement.style.backgroundColor = '#667eea';
-                }
-                
-                // Показываем дополнительную информацию если есть
-                let userInfo = user.bio || 'Расскажите о себе...';
-                if (user.age || user.experience || user.contact) {
-                    userInfo += '<br><br>';
-                    if (user.age) userInfo += `🎂 Возраст: ${user.age} лет<br>`;
-                    if (user.experience) userInfo += `🎓 Опыт: ${user.experience}<br>`;
-                    if (user.contact) userInfo += `📞 Контакты: ${user.contact}`;
-                }
-                
-                document.getElementById('userBio').innerHTML = userInfo;
+            document.getElementById('userName').textContent = 
+                userData.firstName || 'Пользователь';
+            
+            // Обновляем аватар в профиле
+            const avatarElement = document.getElementById('userAvatar');
+            if (userData.avatar) {
+                avatarElement.innerHTML = 
+                    `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            } else {
+                avatarElement.innerHTML = '👤';
+                avatarElement.style.backgroundColor = '#667eea';
             }
+            
+            // Показываем дополнительную информацию если есть
+            let userInfo = userData.bio || 'Расскажите о себе...';
+            if (userData.age || userData.experience || userData.contact) {
+                userInfo += '<br><br>';
+                if (userData.age) userInfo += `🎂 Возраст: ${userData.age} лет<br>`;
+                if (userData.experience) userInfo += `🎓 Опыт: ${userData.experience}<br>`;
+                if (userData.contact) userInfo += `📞 Контакты: ${userData.contact}`;
+            }
+            
+            document.getElementById('userBio').innerHTML = userInfo;
         } catch (error) {
             console.error('Ошибка загрузки профиля:', error);
-            showError('userProfile', 'Ошибка загрузки профиля');
+            // Показываем демо данные
+            document.getElementById('userName').textContent = 'Пользователь';
+            document.getElementById('userBio').textContent = 'Расскажите о себе...';
         }
     }
 
@@ -1811,7 +1823,6 @@
     // Инициализация приложения
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Umeyka app loaded successfully!');
-        showMainScreen();
         
         const tg = window.Telegram?.WebApp;
         if (tg) {
@@ -1823,7 +1834,20 @@
                 const user = tg.initDataUnsafe.user;
                 currentUserId = user.id;
                 console.log('👤 User ID:', currentUserId);
+                
+                // Показываем главный экран после инициализации
+                showMainScreen();
+            } else {
+                // Если нет данных пользователя, используем демо ID
+                currentUserId = 123;
+                console.log('👤 Demo User ID:', currentUserId);
+                showMainScreen();
             }
+        } else {
+            // Если не в Telegram, используем демо ID
+            currentUserId = 123;
+            console.log('👤 Demo User ID (not in Telegram):', currentUserId);
+            showMainScreen();
         }
     });
 
