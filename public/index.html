@@ -1664,32 +1664,25 @@
             }
 
             const skillData = {
+                _id: Date.now().toString(), // Генерируем ID
                 skillName: skillName.trim(),
                 experience: skillExperience.trim(),
-                price: parseInt(skillPrice)
+                price: parseInt(skillPrice),
+                createdAt: new Date()
             };
 
-            const response = await fetch(`/api/skills/${currentUserId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(skillData)
-            });
+            // Сохраняем в localStorage
+            const currentSkills = getLocalStorage(`user_${currentUserId}_skills`) || [];
+            currentSkills.push(skillData);
+            setLocalStorage(`user_${currentUserId}_skills`, currentSkills);
 
-            const data = await response.json();
-
-            if (data.success) {
-                alert('✅ Умейка успешно добавлена!');
-                // Очищаем поля
-                document.getElementById('skillName').value = '';
-                document.getElementById('skillExperience').value = '';
-                document.getElementById('skillPrice').value = '';
-                loadMySkills(); // Обновляем список
-            } else {
-                alert('❌ Ошибка добавления умейки: ' + data.error);
-            }
-
+            alert('✅ Умейка успешно добавлена! (локально)');
+            // Очищаем поля
+            document.getElementById('skillName').value = '';
+            document.getElementById('skillExperience').value = '';
+            document.getElementById('skillPrice').value = '';
+            loadMySkills(); // Обновляем список
+            
         } catch (error) {
             console.error('Ошибка добавления умейки:', error);
             alert('❌ Ошибка добавления умейки');
@@ -1699,13 +1692,11 @@
     // Загрузка моих умейок
     async function loadMySkills() {
         try {
-            const response = await fetch(`/api/skills/${currentUserId}`);
-            const data = await response.json();
-            
+            const skills = getLocalStorage(`user_${currentUserId}_skills`) || [];
             const skillsList = document.getElementById('mySkillsList');
             
-            if (data.success && data.skills && data.skills.length > 0) {
-                skillsList.innerHTML = data.skills.map(skill => `
+            if (skills.length > 0) {
+                skillsList.innerHTML = skills.map(skill => `
                     <div class="skill-card">
                         <div class="skill-header">
                             <div class="skill-title">${skill.skillName}</div>
@@ -1734,13 +1725,11 @@
     // Загрузка умейок в профиле
     async function loadProfileSkills() {
         try {
-            const response = await fetch(`/api/skills/${currentUserId}`);
-            const data = await response.json();
-            
+            const skills = getLocalStorage(`user_${currentUserId}_skills`) || [];
             const skillsList = document.getElementById('profileSkillsList');
             
-            if (data.success && data.skills && data.skills.length > 0) {
-                skillsList.innerHTML = data.skills.map(skill => `
+            if (skills.length > 0) {
+                skillsList.innerHTML = skills.map(skill => `
                     <div class="profile-skill-card">
                         <div class="profile-skill-header">
                             <div class="skill-title">${skill.skillName}</div>
@@ -1767,16 +1756,21 @@
         }
     }
 
-    // Заглушки для редактирования и удаления умейок
-    window.editSkill = function(skillId) {
-        alert('Редактирование умейки в разработке!');
-    };
-
+    // Удаление умейки
     window.deleteSkill = function(skillId) {
         if (confirm('Удалить эту умейку?')) {
-            alert('Умейка удалена! (функция в разработке)');
-            loadMySkills();
-            loadProfileSkills();
+            try {
+                const skills = getLocalStorage(`user_${currentUserId}_skills`) || [];
+                const updatedSkills = skills.filter(skill => skill._id !== skillId);
+                setLocalStorage(`user_${currentUserId}_skills`, updatedSkills);
+                
+                alert('✅ Умейка удалена!');
+                loadMySkills();
+                loadProfileSkills();
+            } catch (error) {
+                console.error('Ошибка удаления умейки:', error);
+                alert('❌ Ошибка удаления умейки');
+            }
         }
     };
 
