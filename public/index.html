@@ -1004,15 +1004,23 @@
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
             <div class="header">
-                <button class="about-button" onclick="showAboutSection()">ℹ️ О проекте</button>
-                <div class="logo">🤝✨</div>
-                <div class="app-title">Umeyka</div>
-                <div class="app-description">Мастера на все руки рядом с вами</div>
-                <div class="rating">
-                    <span class="stars">★★★★★</span>
-                    <span>4.9/5</span>
-                </div>
+                <div class="logo">🔧</div>
+                <div class="app-title">Умейка</div>
+                <div class="app-description">Мастера рядом с вами</div>
             </div>
+    
+            <div class="main-buttons">
+                <button class="main-button button-client" onclick="showSection('findMaster')">
+                    🔍 Найти мастера
+                </button>
+                <button class="main-button button-master" onclick="showSection('becomeMaster')">
+                    ✨ Я мастер
+                </button>
+                <button class="main-button" onclick="showProfileSection()">
+                    👤 Мой профиль
+                </button>
+            </div>
+        </div>
             
             <div class="main-buttons">
                 <button class="main-button button-master" onclick="showSection('masterSection')">
@@ -1039,18 +1047,25 @@
         </div>
 
         <!-- СЕКЦИЯ МАСТЕРА -->
-        <div id="masterSection" class="section">
+        <div id="becomeMaster" class="section">
             <button class="back-button" onclick="showMainScreen()">← Назад</button>
             <div class="form-section">
-                <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
-                
-                <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)">
-                <input type="text" id="skillExperience" class="input-field" placeholder="Мой опыт (например: 3 года)">
-                <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях">
-                
-                <button class="submit-button" onclick="addSkill()">✅ Опубликовать умейку</button>
-                
-                <div id="mySkillsList" style="margin-top: 20px;"></div>
+                <h2 style="margin-bottom: 20px; text-align: center;">✨ Чем вы можете помочь?</h2>
+        
+                <!-- Простой выбор категорий -->
+                <div class="category-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0;">
+                    <button class="category-btn" onclick="selectCategory('ремонт')" style="padding: 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 16px; cursor: pointer;">🔧 Ремонт</button>
+                    <button class="category-btn" onclick="selectCategory('уборка')" style="padding: 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 16px; cursor: pointer;">🧹 Уборка</button>
+                    <button class="category-btn" onclick="selectCategory('красота')" style="padding: 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 16px; cursor: pointer;">💅 Красота</button>
+                    <button class="category-btn" onclick="selectCategory('обучение')" style="padding: 15px; border: 2px solid rgba(255,255,255,0.3); border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 16px; cursor: pointer;">📚 Обучение</button>
+                </div>
+        
+                <input type="text" id="simpleSkillName" class="input-field" placeholder="Например: починить кран">
+                <input type="number" id="simpleSkillPrice" class="input-field" placeholder="Цена в рублях">
+        
+                <button class="submit-button" onclick="addSimpleSkill()">
+                    ✅ Разместить объявление
+                </button>
             </div>
         </div>
 
