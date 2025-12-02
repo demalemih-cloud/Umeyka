@@ -1599,46 +1599,88 @@
         }
     };
 
-    // Функция отображения профиля пользователя
+    // Функция отображения профиля пользователя в личном кабинете
     async function loadUserProfileDisplay() {
         try {
             console.log('📱 Загрузка профиля для отображения');
-            // Для демо - используем localStorage
-            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-            
-            document.getElementById('userName').textContent = 
-                userData.firstName || 'Пользователь';
-            
-            // Обновляем аватар в профиле
+        
+            // Получаем данные пользователя
+            let userData = getLocalStorage(`user_${currentUserId}`);
+        
+            // Если нет данных, создаем демо профиль
+            if (!userData) {
+                const tg = window.Telegram?.WebApp;
+                if (tg && tg.initDataUnsafe?.user) {
+                    const tgUser = tg.initDataUnsafe.user;
+                    userData = {
+                        firstName: tgUser.first_name || 'Пользователь',
+                        age: null,
+                        experience: '',
+                        contact: '',
+                        bio: 'Расскажите о себе...',
+                        avatar: null,
+                        telegramId: tgUser.id,
+                        createdAt: new Date().toISOString()
+                    };
+                } else {
+                    userData = { ...demoUserData };
+                }
+                // Сохраняем новый профиль
+                setLocalStorage(`user_${currentUserId}`, userData);
+            }
+        
+            // Обновляем интерфейс
+            const userNameElement = document.getElementById('userName');
+            const userBioElement = document.getElementById('userBio');
             const avatarElement = document.getElementById('userAvatar');
-            if (userData.avatar) {
-                avatarElement.innerHTML = 
-                    `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                avatarElement.style.backgroundColor = 'transparent';
-            } else {
-                avatarElement.innerHTML = '👤';
-                avatarElement.style.backgroundColor = '#667eea';
+        
+            if (userNameElement) {
+                userNameElement.textContent = userData.firstName || 'Пользователь';
+            }
+        
+            // Обновляем аватар
+            if (avatarElement) {
+                if (userData.avatar) {
+                    avatarElement.innerHTML = 
+                        `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                    avatarElement.style.backgroundColor = 'transparent';
+                } else {
+                    avatarElement.innerHTML = '👤';
+                    avatarElement.style.backgroundColor = '#667eea';
+                }
+            }
+        
+            // Формируем информацию о пользователе
+            if (userBioElement) {
+                let userInfo = userData.bio || 'Расскажите о себе...';
+            
+            // Добавляем дополнительную информацию если есть
+            const additionalInfo = [];
+            if (userData.age) additionalInfo.push(`🎂 Возраст: ${userData.age} лет`);
+            if (userData.experience) additionalInfo.push(`🎓 Опыт: ${userData.experience}`);
+            if (userData.contact) additionalInfo.push(`📞 Контакты: ${userData.contact}`);
+            
+            if (additionalInfo.length > 0) {
+                userInfo += '<br><br><div style="font-size: 14px;">' + 
+                           additionalInfo.join('<br>') + '</div>';
             }
             
-            // Показываем дополнительную информацию если есть
-            let userInfo = userData.bio || 'Расскажите о себе...';
-            if (userData.age || userData.experience || userData.contact) {
-                userInfo += '<br><br>';
-                if (userData.age) userInfo += `🎂 Возраст: ${userData.age} лет<br>`;
-                if (userData.experience) userInfo += `🎓 Опыт: ${userData.experience}<br>`;
-                if (userData.contact) userInfo += `📞 Контакты: ${userData.contact}`;
-            }
-            
-            document.getElementById('userBio').innerHTML = userInfo;
-            console.log('✅ Профиль загружен для отображения');
-            
-        } catch (error) {
-            console.error('❌ Ошибка загрузки профиля для отображения:', error);
-            // Показываем демо данные
+            userBioElement.innerHTML = userInfo;
+        }
+        
+        console.log('✅ Профиль загружен для отображения');
+        
+    } catch (error) {
+        console.error('❌ Ошибка загрузки профиля для отображения:', error);
+        // Показываем демо данные
+        if (document.getElementById('userName')) {
             document.getElementById('userName').textContent = 'Пользователь';
+        }
+        if (document.getElementById('userBio')) {
             document.getElementById('userBio').textContent = 'Расскажите о себе...';
         }
     }
+}
 
     // Функция показа секции редактирования профиля
     window.editProfile = function() {
@@ -1933,20 +1975,47 @@
     // Инициализация приложения
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Umeyka app loaded successfully!');
-        showMainScreen();
-        
+    
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
             tg.expand();
             console.log('✅ Telegram Web App initialized');
-            
+        
             if (tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
                 currentUserId = user.id;
-                console.log('👤 User ID:', currentUserId);
+                console.log('👤 User ID from Telegram:', currentUserId);
+            
+                // Проверяем, есть ли профиль
+                if (!getLocalStorage(`user_${currentUserId}`)) {
+                    console.log('👤 Создание нового профиля для Telegram пользователя');
+                    const newUser = {
+                        firstName: user.first_name || 'Пользователь',
+                        username: user.username || '',
+                        telegramId: user.id,
+                        bio: 'Расскажите о себе...',
+                        avatar: null,
+                        age: null,
+                        experience: '',
+                        contact: '',
+                        createdAt: new Date().toISOString()
+                    };
+                    setLocalStorage(`user_${currentUserId}`, newUser);
+                }
+            } else {
+                // Если нет данных пользователя, используем демо ID
+                currentUserId = 123;
+                console.log('👤 Demo User ID:', currentUserId);
             }
+        } else {
+            // Если не в Telegram, используем демо ID
+            currentUserId = 123;
+            console.log('👤 Demo User ID (not in Telegram):', currentUserId);
         }
+    
+        // Показываем главный экран
+        showMainScreen();
     });
 
     // Заглушки для отсутствующих функций
