@@ -1400,6 +1400,42 @@
     let currentUserId = null;
     let currentAvatar = null;
 
+    // ========== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ==========
+
+    // Функции для работы с localStorage
+    function getLocalStorage(key) {
+        try {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : null;
+        } catch (error) {
+            console.error('❌ Ошибка чтения из localStorage:', error);
+            return null;
+        }
+    }
+
+    function setLocalStorage(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+            return true;
+        } catch (error) {
+            console.error('❌ Ошибка записи в localStorage:', error);
+            return false;
+        }
+    }
+
+    // Демо данные пользователя (если нет реальных)
+    const demoUserData = {
+        firstName: 'Пользователь',
+        age: null,
+        experience: '',
+        contact: '',
+        bio: 'Расскажите о себе...',
+        avatar: null,
+        skills: [],
+        rating: 0,
+        completedDeals: 0
+    };
+
     // Функция для работы с API
     async function apiRequest(endpoint, options = {}) {
         try {
