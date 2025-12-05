@@ -1469,34 +1469,11 @@
     window.handleAvatarUpload = function(event) {
         const file = event.target.files[0];
         if (file) {
-            // Проверяем размер файла (не больше 2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                alert('❌ Файл слишком большой! Максимальный размер: 2MB');
-                return;
-            }
-            
-            // Проверяем тип файла
-            if (!file.type.startsWith('image/')) {
-                alert('❌ Пожалуйста, выберите изображение!');
-                return;
-            }
-            
             const reader = new FileReader();
             reader.onload = function(e) {
-                // Сохраняем аватар в переменную
                 currentAvatar = e.target.result;
-                
-                // Обновляем предпросмотр в форме
-                const avatarPreview = document.getElementById('avatarPreview');
-                avatarPreview.innerHTML = 
+                document.getElementById('avatarPreview').innerHTML = 
                     `<img src="${currentAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                avatarPreview.style.backgroundColor = 'transparent';
-                
-                console.log('📸 Аватар загружен, размер:', file.size, 'байт');
-            };
-            reader.onerror = function(error) {
-                console.error('❌ Ошибка загрузки аватара:', error);
-                alert('❌ Ошибка при загрузке изображения');
             };
             reader.readAsDataURL(file);
         }
@@ -1506,10 +1483,10 @@
     async function loadProfileToForm() {
         try {
             console.log('📥 Загрузка данных профиля в форму');
-            
+        
             // Пробуем получить данные из localStorage
             let userData = getLocalStorage(`user_${currentUserId}`);
-            
+        
             // Если нет данных, создаем из Telegram или используем демо
             if (!userData) {
                 const tg = window.Telegram?.WebApp;
@@ -1528,14 +1505,14 @@
                     userData = { ...demoUserData };
                 }
             }
-            
+        
             // Заполняем поля формы данными пользователя
             document.getElementById('editFirstName').value = userData.firstName || '';
             document.getElementById('editAge').value = userData.age || '';
             document.getElementById('editExperience').value = userData.experience || '';
             document.getElementById('editContact').value = userData.contact || '';
             document.getElementById('editBio').value = userData.bio || '';
-            
+        
             // Устанавливаем аватар
             if (userData.avatar) {
                 currentAvatar = userData.avatar;
@@ -1546,9 +1523,9 @@
                 document.getElementById('avatarPreview').innerHTML = '👤';
                 document.getElementById('avatarPreview').style.backgroundColor = '#667eea';
             }
-            
+        
             console.log('✅ Данные профиля загружены в форму');
-            
+        
         } catch (error) {
             console.error('❌ Ошибка загрузки профиля:', error);
             // Устанавливаем значения по умолчанию
@@ -1557,85 +1534,35 @@
         }
     }
 
-            // Функция сохранения профиля - ИСПРАВЛЕННАЯ ВЕРСИЯ
-            window.saveProfile = async function() {
-                try {
-                    console.log('💾 Начало сохранения профиля');
-            
-                    const firstName = document.getElementById('editFirstName').value;
-                    const age = document.getElementById('editAge').value;
-                    const experience = document.getElementById('editExperience').value;
-                    const contact = document.getElementById('editContact').value;
-                    const bio = document.getElementById('editBio').value;
-            
-                    if (!firstName.trim()) {
-                        alert('❌ Пожалуйста, укажите имя');
-                        return;
-                    }
-            
-                    if (!bio.trim()) {
-                        alert('❌ Пожалуйста, заполните поле "О себе"');
-                        return;
-                    }
+    // Функция сохранения профиля - ИСПРАВЛЕННАЯ ВЕРСИЯ
+    window.saveProfile = async function() {
+        try {
+            console.log('💾 Начало сохранения профиля');
+        
+            // Получаем значения из полей формы
+            const firstName = document.getElementById('editFirstName').value;
+            const age = document.getElementById('editAge').value;
+            const experience = document.getElementById('editExperience').value;
+            const contact = document.getElementById('editContact').value;
+            const bio = document.getElementById('editBio').value;
+        
+            // Проверяем обязательные поля
+            if (!firstName.trim()) {
+                alert('❌ Пожалуйста, укажите имя');
+                return;
+            }
+        
+            if (!bio.trim()) {
+                alert('❌ Пожалуйста, заполните поле "О себе"');
+                return;
+            }
 
-            // Получаем текущие данные пользователя
+            // Получаем текущие данные пользователя (если есть)
             let userData = getLocalStorage(`user_${currentUserId}`);
+        
+            // Если нет данных, создаем новый профиль
             if (!userData) {
                 userData = { ...demoUserData };
-            }
-            
-            // Сохраняем профиль с аватаром
-            const updatedProfile = {
-                ...userData,
-                firstName: firstName.trim(),
-                age: age ? parseInt(age) : null,
-                experience: experience.trim(),
-                contact: contact.trim(),
-                bio: bio.trim(),
-                // ВАЖНО: сохраняем текущий аватар
-                avatar: currentAvatar || userData.avatar,
-                telegramId: currentUserId,
-                updatedAt: new Date().toISOString()
-            };
-
-            // Сохраняем в localStorage
-            const isSaved = setLocalStorage(`user_${currentUserId}`, updatedProfile);
-            
-            if (isSaved) {
-                console.log('✅ Профиль сохранен, аватар:', updatedProfile.avatar ? 'есть' : 'нет');
-                alert('✅ Профиль успешно сохранен!');
-                
-                // ВАЖНО: Обновляем аватар в профиле сразу
-                updateAvatarInProfile(updatedProfile.avatar);
-                
-                // Возвращаемся в профиль
-                setTimeout(() => {
-                    showProfileSection();
-                }, 1000);
-            } else {
-                alert('❌ Ошибка при сохранении профиля');
-            }
-            
-        } catch (error) {
-            console.error('❌ Ошибка сохранения профиля:', error);
-            alert('❌ Произошла ошибка при сохранении профиля');
-        }
-    };
-
-            // Функция для обновления аватара в профиле
-            function updateAvatarInProfile(avatarUrl) {
-                const avatarElement = document.getElementById('userAvatar');
-                if (!avatarElement) return;
-        
-                if (avatarUrl) {
-                    avatarElement.innerHTML = 
-                        `<img src="${avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                    avatarElement.style.backgroundColor = 'transparent';
-                    console.log('🔄 Аватар обновлен в профиле');
-                } else {
-                    avatarElement.innerHTML = '👤';
-                    avatarElement.style.backgroundColor = '#667eea';
-                }
             }
         
             // Обновляем данные профиля
@@ -1672,96 +1599,52 @@
         }
     };
 
-           // Функция отображения профиля пользователя в личном кабинете
-            async function loadUserProfileDisplay() {
-                try {
-                    console.log('📱 Загрузка профиля для отображения');
-        
-            // Получаем данные пользователя
-            let userData = getLocalStorage(`user_${currentUserId}`);
-        
-            // Если нет данных, создаем демо профиль
-            if (!userData) {
-                const tg = window.Telegram?.WebApp;
-                if (tg && tg.initDataUnsafe?.user) {
-                    const tgUser = tg.initDataUnsafe.user;
-                    userData = {
-                        firstName: tgUser.first_name || 'Пользователь',
-                        age: null,
-                        experience: '',
-                        contact: '',
-                        bio: 'Расскажите о себе...',
-                        avatar: null,
-                        telegramId: tgUser.id,
-                        createdAt: new Date().toISOString()
-                    };
-                } else {
-                    userData = { ...demoUserData };
-                }
-                // Сохраняем новый профиль
-                setLocalStorage(`user_${currentUserId}`, userData);
-            }
-        
-            // Обновляем интерфейс
-            const userNameElement = document.getElementById('userName');
-            const userBioElement = document.getElementById('userBio');
+    // Функция отображения профиля пользователя
+    async function loadUserProfileDisplay() {
+        try {
+            console.log('📱 Загрузка профиля для отображения');
+            // Для демо - используем localStorage
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+            
+            document.getElementById('userName').textContent = 
+                userData.firstName || 'Пользователь';
+            
+            // Обновляем аватар в профиле
             const avatarElement = document.getElementById('userAvatar');
-        
-            if (userNameElement) {
-                userNameElement.textContent = userData.firstName || 'Пользователь';
-            }
-        
-            // Обновляем аватар
-            if (avatarElement) {
-                if (userData.avatar) {
-                    avatarElement.innerHTML = 
-                        `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                    avatarElement.style.backgroundColor = 'transparent';
-                } else {
-                    avatarElement.innerHTML = '👤';
-                    avatarElement.style.backgroundColor = '#667eea';
-                }
-            }
-        
-            // Формируем информацию о пользователе
-            if (userBioElement) {
-                let userInfo = userData.bio || 'Расскажите о себе...';
-            
-            // Добавляем дополнительную информацию если есть
-            const additionalInfo = [];
-            if (userData.age) additionalInfo.push(`🎂 Возраст: ${userData.age} лет`);
-            if (userData.experience) additionalInfo.push(`🎓 Опыт: ${userData.experience}`);
-            if (userData.contact) additionalInfo.push(`📞 Контакты: ${userData.contact}`);
-            
-            if (additionalInfo.length > 0) {
-                userInfo += '<br><br><div style="font-size: 14px;">' + 
-                           additionalInfo.join('<br>') + '</div>';
+            if (userData.avatar) {
+                avatarElement.innerHTML = 
+                    `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                avatarElement.style.backgroundColor = 'transparent';
+            } else {
+                avatarElement.innerHTML = '👤';
+                avatarElement.style.backgroundColor = '#667eea';
             }
             
-            userBioElement.innerHTML = userInfo;
-        }
-        
-        console.log('✅ Профиль загружен для отображения');
-        
-    } catch (error) {
-        console.error('❌ Ошибка загрузки профиля для отображения:', error);
-        // Показываем демо данные
-        if (document.getElementById('userName')) {
+            // Показываем дополнительную информацию если есть
+            let userInfo = userData.bio || 'Расскажите о себе...';
+            if (userData.age || userData.experience || userData.contact) {
+                userInfo += '<br><br>';
+                if (userData.age) userInfo += `🎂 Возраст: ${userData.age} лет<br>`;
+                if (userData.experience) userInfo += `🎓 Опыт: ${userData.experience}<br>`;
+                if (userData.contact) userInfo += `📞 Контакты: ${userData.contact}`;
+            }
+            
+            document.getElementById('userBio').innerHTML = userInfo;
+            console.log('✅ Профиль загружен для отображения');
+            
+        } catch (error) {
+            console.error('❌ Ошибка загрузки профиля для отображения:', error);
+            // Показываем демо данные
             document.getElementById('userName').textContent = 'Пользователь';
-        }
-        if (document.getElementById('userBio')) {
             document.getElementById('userBio').textContent = 'Расскажите о себе...';
         }
     }
-}
 
     // Функция показа секции редактирования профиля
     window.editProfile = function() {
-        console.log('🔄 Открытие формы редактирования профиля');
-        console.log('👤 Current User ID:', currentUserId);
         showSection('editProfileSection');
         loadProfileToForm(); // Загружаем данные в форму при открытии
-    };    
+    };
 
     // Функция отображения профиля пользователя
     async function loadUserProfileDisplay() {
@@ -2050,47 +1933,20 @@
     // Инициализация приложения
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Umeyka app loaded successfully!');
-    
+        showMainScreen();
+        
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
             tg.expand();
             console.log('✅ Telegram Web App initialized');
-        
+            
             if (tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
                 currentUserId = user.id;
-                console.log('👤 User ID from Telegram:', currentUserId);
-            
-                // Проверяем, есть ли профиль
-                if (!getLocalStorage(`user_${currentUserId}`)) {
-                    console.log('👤 Создание нового профиля для Telegram пользователя');
-                    const newUser = {
-                        firstName: user.first_name || 'Пользователь',
-                        username: user.username || '',
-                        telegramId: user.id,
-                        bio: 'Расскажите о себе...',
-                        avatar: null,
-                        age: null,
-                        experience: '',
-                        contact: '',
-                        createdAt: new Date().toISOString()
-                    };
-                    setLocalStorage(`user_${currentUserId}`, newUser);
-                }
-            } else {
-                // Если нет данных пользователя, используем демо ID
-                currentUserId = 123;
-                console.log('👤 Demo User ID:', currentUserId);
+                console.log('👤 User ID:', currentUserId);
             }
-        } else {
-            // Если не в Telegram, используем демо ID
-            currentUserId = 123;
-            console.log('👤 Demo User ID (not in Telegram):', currentUserId);
         }
-    
-        // Показываем главный экран
-        showMainScreen();
     });
 
     // Заглушки для отсутствующих функций
@@ -2547,213 +2403,6 @@
         const message = `📤 Чтобы отправить другу:\n\n1. Нажми "📋 Скопировать ссылку"\n2. Открой Telegram\n3. Выбери друга из списка контактов\n4. Отправь ему ссылку: https://t.me/umeyka_bot\n\nИли просто перешли это сообщение!`;
         alert(message);
     }
-
-   // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ КАРТЫ ==========
-    let map = null;
-    let userLocation = null;
-    let markers = [];
-
-   // ========== ФУНКЦИИ ДЛЯ КАРТЫ ==========
- 
-   // Работа с картой
-window.openMap = function() {
-    console.log('🗺️ Открытие карты');
-    const mapSection = document.querySelector('.map-section');
-    mapSection.classList.add('map-active');
-    
-    if (!map) {
-        initMap();
-    } else {
-        loadSkillsOnMap();
-    }
-};
-
-function initMap() {
-    if (map) return;
-    
-    console.log('🗺️ Инициализация карты');
-    
-    // Создаем карту
-    map = L.map('map', {
-        attributionControl: false
-    }).setView([55.7558, 37.6173], 10);
-    
-    // Добавляем слой карты
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        subdomains: 'abcd',
-        maxZoom: 20
-    }).addTo(map);
-
-    // Устанавливаем границы
-    map.setMaxBounds([
-        [30, 19],
-        [70, 180]
-    ]);
-
-    // Получаем местоположение пользователя
-    initializeUserLocation();
-}
-
-function initializeUserLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            position => {
-                const { latitude, longitude } = position.coords;
-                userLocation = { lat: latitude, lon: longitude };
-                console.log('📍 Местоположение пользователя:', userLocation);
-                map.setView([latitude, longitude], 13);
-                
-                // Добавляем маркер пользователя
-                L.marker([latitude, longitude], {
-                    icon: L.divIcon({
-                        className: 'user-marker',
-                        html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
-                        iconSize: [16, 16],
-                        iconAnchor: [8, 16]
-                    })
-                })
-                .addTo(map)
-                .bindPopup('📍 Ваше местоположение')
-                .openPopup();
-                    
-                // Загружаем умейки на карту
-                loadSkillsOnMap();
-            },
-            error => {
-                console.log('📍 Геолокация недоступна:', error);
-                userLocation = { lat: 55.7558, lon: 37.6173 };
-                console.log('📍 Используем Москву по умолчанию');
-                loadSkillsOnMap();
-            }
-        );
-    } else {
-        console.log('📍 Геолокация не поддерживается браузером');
-        userLocation = { lat: 55.7558, lon: 37.6173 };
-        loadSkillsOnMap();
-    }
-}
-
-async function loadSkillsOnMap() {
-    try {
-        console.log('🗺️ Загрузка умейок на карту');
-        
-        // Очищаем старые маркеры
-        if (markers.length > 0) {
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
-        }
-        
-        // Демо данные для карты
-        const demoSkills = [
-            {
-                _id: '1',
-                skill: 'Ремонт смартфонов',
-                experience: '5 лет опыта',
-                price: 1500,
-                rating: { average: 4.8 },
-                username: 'Алексей',
-                location: { lat: 55.7558, lon: 37.6176 },
-                isTopMaster: true
-            },
-            {
-                _id: '2', 
-                skill: 'Сантехник',
-                experience: '7 лет опыта',
-                price: 2000,
-                rating: { average: 4.9 },
-                username: 'Иван',
-                location: { lat: 55.7517, lon: 37.6178 },
-                isTopMaster: false
-            },
-            {
-                _id: '3',
-                skill: 'Электрик',
-                experience: '3 года опыта', 
-                price: 1200,
-                rating: { average: 4.5 },
-                username: 'Петр',
-                location: { lat: 55.7598, lon: 37.6172 },
-                isTopMaster: true
-            },
-            {
-                _id: '4',
-                skill: 'Мастер по ремонту компьютеров',
-                experience: '4 года опыта',
-                price: 1800,
-                rating: { average: 4.7 },
-                username: 'Сергей',
-                location: { lat: 55.7538, lon: 37.6200 },
-                isTopMaster: false
-            },
-            {
-                _id: '5',
-                skill: 'Клининг-услуги',
-                experience: '2 года опыта',
-                price: 1000,
-                rating: { average: 4.6 },
-                username: 'Мария',
-                location: { lat: 55.7578, lon: 37.6150 },
-                isTopMaster: true
-            }
-        ];
-        
-        // Добавляем маркеры на карту
-        demoSkills.forEach(skill => {
-            if (skill.location && skill.location.lat && skill.location.lon) {
-                const rating = skill.rating?.average || 0;
-                const color = getMarkerColor(rating);
-                
-                const marker = L.marker([skill.location.lat, skill.location.lon], {
-                    icon: L.divIcon({
-                        className: 'umeyka-marker',
-                        html: `<div style="color: ${color}; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Y</div>`,
-                        iconSize: [24, 24],
-                        iconAnchor: [12, 12]
-                    })
-                })
-                .addTo(map)
-                .bindPopup(`
-                    <div style="min-width: 250px;">
-                        <h3 style="margin: 0 0 10px 0; color: #2d3748;">${skill.skill}</h3>
-                        <p style="margin: 5px 0; color: #2d3748;">🎓 ${skill.experience}</p>
-                        <p style="margin: 5px 0; color: #2d3748;">💰 ${skill.price} руб.</p>
-                        <p style="margin: 5px 0; color: #2d3748;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '0'}/5</p>
-                        <p style="margin: 5px 0; color: #2d3748;">👤 ${skill.username}</p>
-                        ${skill.isTopMaster ? '<p style="margin: 5px 0; color: #667eea; font-weight: bold;">🏆 Топ-мастер</p>' : ''}
-                        <button onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')" 
-                                style="width: 100%; padding: 8px; background: #667eea; color: white; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">
-                            💬 Написать
-                        </button>
-                        <button onclick="showSkillDetails('${skill._id}')" 
-                                style="width: 100%; padding: 8px; background: #48bb78; color: white; border: none; border-radius: 5px; margin-top: 5px; cursor: pointer;">
-                            👁️ Подробнее
-                        </button>
-                    </div>
-                `);
-                
-                markers.push(marker);
-            }
-        });
-        
-        console.log('✅ Умейки загружены на карту:', demoSkills.length, 'маркеров');
-        
-    } catch (error) {
-        console.error('❌ Ошибка загрузки карты:', error);
-    }
-}
-
-// Получение цвета маркера по рейтингу
-function getMarkerColor(rating) {
-    if (rating >= 4.5) return '#22c55e'; // Зеленый
-    if (rating >= 4.0) return '#8b5cf6'; // Фиолетовый  
-    if (rating >= 3.5) return '#eab308'; // Желтый
-    return '#6b7280'; // Серый
-}
-
-// Показать детали умейки
-window.showSkillDetails = function(skillId) {
-    alert('📊 Детальная информация об умейке\n\nЗдесь будут:\n• Подробные рейтинги по категориям\n• Отзывы клиентов\n• Фотографии работ\n• Статистика мастера\n\nФункция в разработке!');
-};     
 
 </script>
 </body>
