@@ -1539,14 +1539,12 @@
         try {
             console.log('💾 Начало сохранения профиля');
         
-            // Получаем значения из полей формы
             const firstName = document.getElementById('editFirstName').value;
             const age = document.getElementById('editAge').value;
             const experience = document.getElementById('editExperience').value;
             const contact = document.getElementById('editContact').value;
             const bio = document.getElementById('editBio').value;
         
-            // Проверяем обязательные поля
             if (!firstName.trim()) {
                 alert('❌ Пожалуйста, укажите имя');
                 return;
@@ -1557,15 +1555,13 @@
                 return;
             }
 
-            // Получаем текущие данные пользователя (если есть)
+            // Получаем текущие данные пользователя
             let userData = getLocalStorage(`user_${currentUserId}`);
-        
-            // Если нет данных, создаем новый профиль
             if (!userData) {
                 userData = { ...demoUserData };
             }
         
-            // Обновляем данные профиля
+            // Сохраняем профиль с аватаром
             const updatedProfile = {
                 ...userData,
                 firstName: firstName.trim(),
@@ -1573,6 +1569,7 @@
                 experience: experience.trim(),
                 contact: contact.trim(),
                 bio: bio.trim(),
+                // ВАЖНО: сохраняем текущий аватар
                 avatar: currentAvatar || userData.avatar,
                 telegramId: currentUserId,
                 updatedAt: new Date().toISOString()
@@ -1582,10 +1579,13 @@
             const isSaved = setLocalStorage(`user_${currentUserId}`, updatedProfile);
         
             if (isSaved) {
-                console.log('✅ Профиль успешно сохранен:', updatedProfile);
+                console.log('✅ Профиль сохранен, аватар:', updatedProfile.avatar ? 'есть' : 'нет');
                 alert('✅ Профиль успешно сохранен!');
             
-                // Возвращаемся в профиль через 1 секунду
+                // ВАЖНО: Обновляем аватар в профиле сразу
+                updateAvatarInProfile(updatedProfile.avatar);
+            
+                // Возвращаемся в профиль
                 setTimeout(() => {
                     showProfileSection();
                 }, 1000);
@@ -1599,26 +1599,21 @@
         }
     };
 
-    // Функция отображения профиля пользователя
-    async function loadUserProfileDisplay() {
-        try {
-            console.log('📱 Загрузка профиля для отображения');
-            // Для демо - используем localStorage
-            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-            
-            document.getElementById('userName').textContent = 
-                userData.firstName || 'Пользователь';
-            
-            // Обновляем аватар в профиле
-            const avatarElement = document.getElementById('userAvatar');
-            if (userData.avatar) {
-                avatarElement.innerHTML = 
-                    `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                avatarElement.style.backgroundColor = 'transparent';
-            } else {
-                avatarElement.innerHTML = '👤';
-                avatarElement.style.backgroundColor = '#667eea';
-            }
+    // Функция для обновления аватара в профиле
+    function updateAvatarInProfile(avatarUrl) {
+        const avatarElement = document.getElementById('userAvatar');
+        if (!avatarElement) return;
+    
+        if (avatarUrl) {
+            avatarElement.innerHTML = 
+                `<img src="${avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            avatarElement.style.backgroundColor = 'transparent';
+            console.log('🔄 Аватар обновлен в профиле');
+        } else {
+            avatarElement.innerHTML = '👤';
+            avatarElement.style.backgroundColor = '#667eea';
+        }
+    }
             
             // Показываем дополнительную информацию если есть
             let userInfo = userData.bio || 'Расскажите о себе...';
