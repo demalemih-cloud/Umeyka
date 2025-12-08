@@ -1773,33 +1773,41 @@
                 return;
             }
 
+            // Создаем умейку
             const skillData = {
-                skillName: skillName.trim(),
+                _id: Date.now().toString(),
+                skill: skillName.trim(),
                 experience: skillExperience.trim(),
-                price: parseInt(skillPrice)
+                price: parseInt(skillPrice),
+                userId: currentUserId,
+                username: 'Вы',
+                rating: { average: 5.0 },
+                isTopMaster: false,
+                location: userLocation || { lat: 55.7558, lon: 37.6173 },
+                createdAt: new Date().toISOString()
             };
 
-            const response = await fetch(`/api/skills/${currentUserId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(skillData)
-            });
+            // Сохраняем в localStorage
+            const currentSkills = getLocalStorage('all_skills') || [];
+            currentSkills.push(skillData);
+            setLocalStorage('all_skills', currentSkills);
+            
+            // Сохраняем в профиль пользователя
+            const userSkills = getLocalStorage(`user_${currentUserId}_skills`) || [];
+            userSkills.push(skillData._id);
+            setLocalStorage(`user_${currentUserId}_skills`, userSkills);
 
-            const data = await response.json();
-
-            if (data.success) {
-                alert('✅ Умейка успешно добавлена!');
-                // Очищаем поля
-                document.getElementById('skillName').value = '';
-                document.getElementById('skillExperience').value = '';
-                document.getElementById('skillPrice').value = '';
-                loadMySkills(); // Обновляем список
-            } else {
-                alert('❌ Ошибка добавления умейки: ' + data.error);
-            }
-
+            alert('✅ Умейка успешно добавлена!');
+            
+            // Очищаем поля
+            document.getElementById('skillName').value = '';
+            document.getElementById('skillExperience').value = '';
+            document.getElementById('skillPrice').value = '';
+            
+            // Обновляем списки
+            loadMySkills();
+            loadProfileSkills();
+            
         } catch (error) {
             console.error('Ошибка добавления умейки:', error);
             alert('❌ Ошибка добавления умейки');
@@ -1809,20 +1817,29 @@
     // Загрузка моих умейок
     async function loadMySkills() {
         try {
-            const response = await fetch(`/api/skills/${currentUserId}`);
-            const data = await response.json();
+            // Получаем ID умейок пользователя
+            const userSkillIds = getLocalStorage(`user_${currentUserId}_skills`) || [];
+            
+            // Получаем все умейки
+            const allSkills = getLocalStorage('all_skills') || [];
+            
+            // Фильтруем умейки пользователя
+            const mySkills = allSkills.filter(skill => 
+                userSkillIds.includes(skill._id) || skill.userId === currentUserId
+            );
             
             const skillsList = document.getElementById('mySkillsList');
             
-            if (data.success && data.skills && data.skills.length > 0) {
-                skillsList.innerHTML = data.skills.map(skill => `
+            if (mySkills.length > 0) {
+                skillsList.innerHTML = mySkills.map(skill => `
                     <div class="skill-card">
                         <div class="skill-header">
-                            <div class="skill-title">${skill.skillName}</div>
+                            <div class="skill-title">${skill.skill}</div>
                             <div class="skill-rating">${'⭐'.repeat(5)}</div>
                         </div>
                         <div class="skill-price">${skill.price} ₽</div>
                         <div class="skill-distance">🎓 ${skill.experience}</div>
+                        <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
                         <button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #4299e1; margin-top: 10px;">
                             ✏️ Редактировать
                         </button>
@@ -1844,19 +1861,28 @@
     // Загрузка умейок в профиле
     async function loadProfileSkills() {
         try {
-            const response = await fetch(`/api/skills/${currentUserId}`);
-            const data = await response.json();
+            // Получаем ID умейок пользователя
+            const userSkillIds = getLocalStorage(`user_${currentUserId}_skills`) || [];
+            
+            // Получаем все умейки
+            const allSkills = getLocalStorage('all_skills') || [];
+            
+            // Фильтруем умейки пользователя
+            const mySkills = allSkills.filter(skill => 
+                userSkillIds.includes(skill._id) || skill.userId === currentUserId
+            );
             
             const skillsList = document.getElementById('profileSkillsList');
             
-            if (data.success && data.skills && data.skills.length > 0) {
-                skillsList.innerHTML = data.skills.map(skill => `
+            if (mySkills.length > 0) {
+                skillsList.innerHTML = mySkills.map(skill => `
                     <div class="profile-skill-card">
                         <div class="profile-skill-header">
-                            <div class="skill-title">${skill.skillName}</div>
+                            <div class="skill-title">${skill.skill}</div>
                             <div class="skill-price">${skill.price} ₽</div>
                         </div>
                         <div style="color: #666; margin: 8px 0;">🎓 ${skill.experience}</div>
+                        <div style="color: #666; margin: 8px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
                         <div class="skill-actions">
                             <button class="edit-button" onclick="editSkill('${skill._id}')" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
                                 ✏️
@@ -1877,16 +1903,35 @@
         }
     }
 
-    // Заглушки для редактирования и удаления умейок
+    // Редактирование умейки
     window.editSkill = function(skillId) {
-        alert('Редактирование умейки в разработке!');
+        alert('✏️ Редактирование умейки\n\nФункция в разработке! Скоро будет доступна.');
     };
 
+    // Удаление умейки
     window.deleteSkill = function(skillId) {
-        if (confirm('Удалить эту умейку?')) {
-            alert('Умейка удалена! (функция в разработке)');
-            loadMySkills();
-            loadProfileSkills();
+        if (confirm('❌ Удалить эту умейку?')) {
+            try {
+                // Удаляем из всех умейок
+                const allSkills = getLocalStorage('all_skills') || [];
+                const updatedAllSkills = allSkills.filter(skill => skill._id !== skillId);
+                setLocalStorage('all_skills', updatedAllSkills);
+                
+                // Удаляем из профиля пользователя
+                const userSkills = getLocalStorage(`user_${currentUserId}_skills`) || [];
+                const updatedUserSkills = userSkills.filter(id => id !== skillId);
+                setLocalStorage(`user_${currentUserId}_skills`, updatedUserSkills);
+                
+                alert('✅ Умейка удалена!');
+                
+                // Обновляем списки
+                loadMySkills();
+                loadProfileSkills();
+                
+            } catch (error) {
+                console.error('Ошибка удаления умейки:', error);
+                alert('❌ Ошибка удаления умейки');
+            }
         }
     };
 
