@@ -2021,69 +2021,94 @@
         const query = document.getElementById('searchInput').value.toLowerCase();
         console.log('🔍 Поиск умейок по запросу:', query);
         
-        // Получаем все умейки
-        const allSkills = getLocalStorage('all_skills') || [];
+        // Получаем ВСЕ умейки из общего рынка
+        const marketSkills = getLocalStorage('market_skills') || [];
         
-        // Демо умейки (если нет сохраненных)
-        const demoSkills = [
-            {
-                _id: '1',
-                skill: 'Ремонт смартфонов',
-                experience: '5 лет опыта',
-                price: 1500,
-                rating: { average: 4.8 },
-                username: 'Алексей',
-                location: { lat: 55.7558, lon: 37.6176 },
-                isTopMaster: true
-            },
-            {
-                _id: '2', 
-                skill: 'Сантехник',
-                experience: '7 лет опыта',
-                price: 2000,
-                rating: { average: 4.9 },
-                username: 'Иван',
-                location: { lat: 55.7517, lon: 37.6178 },
-                isTopMaster: false
-            }
-        ];
+        // Демо умейки (если на рынке пусто)
+        let allSkillsToShow = marketSkills;
+        if (marketSkills.length === 0) {
+            allSkillsToShow = [
+                {
+                    _id: 'demo1',
+                    skill: 'Ремонт смартфонов',
+                    experience: '5 лет опыта',
+                    price: 1500,
+                    username: 'Алексей',
+                    rating: { average: 4.8 },
+                    isTopMaster: true
+                },
+                {
+                    _id: 'demo2', 
+                    skill: 'Сантехник',
+                    experience: '7 лет опыта',
+                    price: 2000,
+                    username: 'Иван',
+                    rating: { average: 4.9 },
+                    isTopMaster: false
+                }
+            ];
+        }
         
-        // Объединяем сохраненные и демо умейки
-        const allSkillsToShow = allSkills.length > 0 ? allSkills : demoSkills;
+        // Фильтруем активные умейки
+        const activeSkills = allSkillsToShow.filter(skill => skill.isActive !== false);
         
         // Фильтруем по запросу
         const filteredSkills = query ? 
-            allSkillsToShow.filter(skill => 
+            activeSkills.filter(skill => 
                 skill.skill.toLowerCase().includes(query) || 
                 skill.experience.toLowerCase().includes(query) ||
-                skill.username.toLowerCase().includes(query)
+                (skill.username && skill.username.toLowerCase().includes(query)) ||
+                (skill.category && skill.category.toLowerCase().includes(query))
             ) : 
-            allSkillsToShow;
+            activeSkills;
         
         const resultsContainer = document.getElementById('searchResults');
         
         if (filteredSkills.length > 0) {
-            resultsContainer.innerHTML = filteredSkills.map(skill => `
-                <div class="skill-card">
-                    <div class="skill-header">
-                        <div class="skill-title">${skill.skill}</div>
-                        <div class="skill-rating">${'⭐'.repeat(Math.floor(skill.rating?.average || 5))}</div>
+            resultsContainer.innerHTML = filteredSkills.map(skill => {
+                const isUserSkill = skill.userId === currentUserId;
+                
+                return `
+                    <div class="skill-card ${isUserSkill ? 'gold-card' : ''}">
+                        <div class="skill-header">
+                            <div class="skill-title">${skill.skill}</div>
+                            <div class="skill-rating">${'⭐'.repeat(Math.floor(skill.rating?.average || 5))}</div>
+                        </div>
+                        <div class="skill-price">${skill.price} ₽</div>
+                        <div class="skill-distance">🎓 ${skill.experience}</div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+                            <div style="width: 30px; height: 30px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">
+                                ${skill.avatar ? '🖼️' : '👤'}
+                            </div>
+                            <div>
+                                <div style="font-weight: bold; color: #2d3748;">${skill.username} ${isUserSkill ? '(Ваша)' : ''}</div>
+                                <div style="font-size: 12px; color: #666;">⭐ ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
+                            </div>
+                        </div>
+                        ${skill.isTopMaster ? 
+                            '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; text-align: center; margin: 10px 0;">🏆 Топ-мастер</div>' : 
+                            ''
+                        }
+                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')">
+                            💬 Написать мастеру
+                        </button>
+                        ${isUserSkill ? 
+                            `<button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #ed8936; margin-top: 8px;">
+                                ✏️ Редактировать
+                            </button>` : 
+                            ''
+                        }
                     </div>
-                    <div class="skill-price">${skill.price} ₽</div>
-                    <div class="skill-distance">🎓 ${skill.experience}</div>
-                    <div style="color: #666; margin-bottom: 15px;">
-                        👤 ${skill.username} • ⭐ ${skill.rating?.average?.toFixed(1) || '5.0'}/5
-                    </div>
-                    <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')">
-                        💬 Написать мастеру
-                    </button>
-                    <button class="chat-button" onclick="showMasterReviews('${skill._id}')" style="background: #48bb78; margin-top: 8px;">
-                        ⭐ Посмотреть отзывы
-                    </button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         } else {
-            resultsContainer.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">Ничего не найдено</div>';
+            resultsContainer.innerHTML = `
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                    <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
+                    <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
+                    <div style="font-size: 14px; opacity: 0.8;">Попробуйте изменить запрос или станьте первым мастером!</div>
+                </div>
+            `;
         }
     };
 
@@ -2609,45 +2634,65 @@
         try {
             console.log('🗺️ Загрузка умейок на карту');
             
-            // Получаем все сохраненные умейки
-            const allSkills = getLocalStorage('all_skills') || [];
+            // Получаем ВСЕ умейки из общего рынка
+            const marketSkills = getLocalStorage('market_skills') || [];
             
-            // Демо умейки (если нет сохраненных)
-            const demoSkills = [
-                {
-                    _id: '1',
-                    skill: 'Ремонт смартфонов',
-                    experience: '5 лет опыта',
-                    price: 1500,
-                    rating: { average: 4.8 },
-                    username: 'Алексей',
-                    location: { lat: 55.7558, lon: 37.6176 },
-                    isTopMaster: true
-                },
-                {
-                    _id: '2', 
-                    skill: 'Сантехник',
-                    experience: '7 лет опыта',
-                    price: 2000,
-                    rating: { average: 4.9 },
-                    username: 'Иван',
-                    location: { lat: 55.7517, lon: 37.6178 },
-                    isTopMaster: false
-                },
-                {
-                    _id: '3',
-                    skill: 'Электрик',
-                    experience: '3 года опыта', 
-                    price: 1200,
-                    rating: { average: 4.5 },
-                    username: 'Петр',
-                    location: { lat: 55.7598, lon: 37.6172 },
-                    isTopMaster: true
-                }
-            ];
+            // Получаем данные текущего пользователя
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
             
-            // Объединяем сохраненные и демо умейки
-            const skillsToShow = allSkills.length > 0 ? allSkills : demoSkills;
+            // Если на рынке мало умейок, добавляем демо
+            let skillsToShow = marketSkills;
+            if (marketSkills.length < 3) {
+                const demoSkills = [
+                    {
+                        _id: 'demo1',
+                        skill: 'Ремонт смартфонов',
+                        experience: '5 лет опыта',
+                        price: 1500,
+                        userId: 'demo_user_1',
+                        username: 'Алексей',
+                        rating: { average: 4.8, reviews: [] },
+                        isTopMaster: true,
+                        location: { lat: 55.7558, lon: 37.6176 },
+                        isActive: true
+                    },
+                    {
+                        _id: 'demo2', 
+                        skill: 'Сантехник',
+                        experience: '7 лет опыта',
+                        price: 2000,
+                        userId: 'demo_user_2',
+                        username: 'Иван',
+                        rating: { average: 4.9, reviews: [] },
+                        isTopMaster: false,
+                        location: { lat: 55.7517, lon: 37.6178 },
+                        isActive: true
+                    },
+                    {
+                        _id: 'demo3',
+                        skill: 'Электрик',
+                        experience: '3 года опыта', 
+                        price: 1200,
+                        userId: 'demo_user_3',
+                        username: 'Петр',
+                        rating: { average: 4.5, reviews: [] },
+                        isTopMaster: true,
+                        location: { lat: 55.7598, lon: 37.6172 },
+                        isActive: true
+                    }
+                ];
+                
+                // Объединяем, исключая дубли
+                const demoSkillsToAdd = demoSkills.filter(demo => 
+                    !marketSkills.some(market => market._id === demo._id)
+                );
+                skillsToShow = [...marketSkills, ...demoSkillsToAdd];
+            }
+            
+            // Фильтруем только активные умейки
+            skillsToShow = skillsToShow.filter(skill => skill.isActive !== false);
+            
+            console.log('📊 Всего умейок на рынке:', skillsToShow.length);
             
             // Очищаем старые маркеры
             if (markers.length > 0) {
@@ -2655,11 +2700,8 @@
                 markers = [];
             }
             
-            // Добавляем маркеры пользователя если есть его умейки
-            const userSkills = skillsToShow.filter(skill => skill.userId === currentUserId);
-            
-            if (userSkills.length > 0 && userLocation) {
-                // Добавляем специальный маркер для пользователя
+            // Добавляем маркер пользователя если есть геолокация
+            if (userLocation) {
                 const userMarker = L.marker([userLocation.lat, userLocation.lon], {
                     icon: L.divIcon({
                         className: 'user-marker',
@@ -2669,18 +2711,64 @@
                     })
                 })
                 .addTo(map)
-                .bindPopup('📍 Ваше местоположение<br>У вас ' + userSkills.length + ' умейк(и)')
+                .bindPopup(`📍 <b>${userData.firstName || 'Вы'}</b><br>Ваше местоположение`)
                 .openPopup();
                 
                 markers.push(userMarker);
             }
             
-            // Добавляем маркеры умейок на карту
+            // Добавляем маркеры всех умейок
             skillsToShow.forEach(skill => {
                 if (skill.location && skill.location.lat && skill.location.lon) {
                     const rating = skill.rating?.average || 5.0;
                     const color = getMarkerColor(rating);
                     const isUserSkill = skill.userId === currentUserId;
+                    const hasAvatar = skill.avatar ? '✅' : '👤';
+                    
+                    // Создаем красивый попап
+                    const popupContent = `
+                        <div style="min-width: 250px;">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                ${skill.avatar ? 
+                                    `<img src="${skill.avatar}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">` : 
+                                    '<div style="width: 40px; height: 40px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white;">👤</div>'
+                                }
+                                <div>
+                                    <h3 style="margin: 0; color: #2d3748;">${skill.skill}</h3>
+                                    <p style="margin: 2px 0; color: #666; font-size: 14px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
+                                </div>
+                            </div>
+                            
+                            <div style="background: #f7fafc; padding: 10px; border-radius: 8px; margin: 10px 0;">
+                                <p style="margin: 5px 0; color: #2d3748;">🎓 ${skill.experience}</p>
+                                <p style="margin: 5px 0; color: #2d3748;">💰 <strong>${skill.price} руб.</strong></p>
+                                <p style="margin: 5px 0; color: #2d3748;">⭐ Рейтинг: <strong>${skill.rating?.average?.toFixed(1) || '5.0'}/5</strong></p>
+                            </div>
+                            
+                            ${skill.isTopMaster ? 
+                                '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; text-align: center; margin: 10px 0;">🏆 Топ-мастер</div>' : 
+                                ''
+                            }
+                            
+                            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                                <button onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')" 
+                                        style="width: 100%; padding: 10px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                    💬 Написать мастеру
+                                </button>
+                                <button onclick="showSkillDetails('${skill._id}')" 
+                                        style="width: 100%; padding: 10px; background: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                    👁️ Подробнее
+                                </button>
+                                ${isUserSkill ? 
+                                    `<button onclick="editSkill('${skill._id}')" 
+                                            style="width: 100%; padding: 10px; background: #ed8936; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                        ✏️ Редактировать
+                                    </button>` : 
+                                    ''
+                                }
+                            </div>
+                        </div>
+                    `;
                     
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
                         icon: L.divIcon({
@@ -2691,24 +2779,7 @@
                         })
                     })
                     .addTo(map)
-                    .bindPopup(`
-                        <div style="min-width: 250px;">
-                            <h3 style="margin: 0 0 10px 0; color: #2d3748;">${skill.skill}</h3>
-                            <p style="margin: 5px 0; color: #2d3748;">🎓 ${skill.experience}</p>
-                            <p style="margin: 5px 0; color: #2d3748;">💰 ${skill.price} руб.</p>
-                            <p style="margin: 5px 0; color: #2d3748;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</p>
-                            <p style="margin: 5px 0; color: #2d3748;">👤 ${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
-                            ${skill.isTopMaster ? '<p style="margin: 5px 0; color: #667eea; font-weight: bold;">🏆 Топ-мастер</p>' : ''}
-                            <button onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')" 
-                                    style="width: 100%; padding: 8px; background: #667eea; color: white; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">
-                                💬 Написать
-                            </button>
-                            <button onclick="showSkillDetails('${skill._id}')" 
-                                    style="width: 100%; padding: 8px; background: #48bb78; color: white; border: none; border-radius: 5px; margin-top: 5px; cursor: pointer;">
-                                👁️ Подробнее
-                            </button>
-                        </div>
-                    `);
+                    .bindPopup(popupContent);
                     
                     markers.push(marker);
                 }
