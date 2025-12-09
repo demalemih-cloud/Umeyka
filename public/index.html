@@ -1761,7 +1761,7 @@
 
     // ========== ФУНКЦИИ ДЛЯ УМЕЕК ==========
 
-    // Добавление умейки
+    // Добавление умейки в общий рынок
     window.addSkill = async function() {
         try {
             const skillName = document.getElementById('skillName').value;
@@ -1773,31 +1773,53 @@
                 return;
             }
 
-            // Создаем умейку
+            // Получаем данные пользователя для отображения
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+            
+            // Создаем умейку для общего рынка
             const skillData = {
                 _id: Date.now().toString(),
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
                 userId: currentUserId,
-                username: 'Вы',
-                rating: { average: 5.0 },
+                username: userData.firstName || 'Аноним',
+                rating: { average: 5.0, reviews: [] },
                 isTopMaster: false,
                 location: userLocation || { lat: 55.7558, lon: 37.6173 },
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                isActive: true,
+                category: 'другое',
+                contact: userData.contact || '',
+                avatar: userData.avatar || null
             };
 
-            // Сохраняем в localStorage
-            const currentSkills = getLocalStorage('all_skills') || [];
-            currentSkills.push(skillData);
-            setLocalStorage('all_skills', currentSkills);
+            // Сохраняем в ОБЩИЙ рынок умейок
+            const marketSkills = getLocalStorage('market_skills') || [];
+            marketSkills.push(skillData);
+            setLocalStorage('market_skills', marketSkills);
             
-            // Сохраняем в профиль пользователя
+            // Также сохраняем в профиль пользователя (для быстрого доступа)
             const userSkills = getLocalStorage(`user_${currentUserId}_skills`) || [];
             userSkills.push(skillData._id);
             setLocalStorage(`user_${currentUserId}_skills`, userSkills);
 
-            alert('✅ Умейка успешно добавлена!');
+            // Создаем профиль мастера если его нет
+            if (!getLocalStorage(`master_${currentUserId}`)) {
+                const masterProfile = {
+                    userId: currentUserId,
+                    username: userData.firstName || 'Аноним',
+                    avatar: userData.avatar,
+                    rating: 5.0,
+                    totalReviews: 0,
+                    completedDeals: 0,
+                    isVerified: false,
+                    createdAt: new Date().toISOString()
+                };
+                setLocalStorage(`master_${currentUserId}`, masterProfile);
+            }
+
+            alert('✅ Умейка успешно опубликована! Теперь её видят все пользователи!');
             
             // Очищаем поля
             document.getElementById('skillName').value = '';
