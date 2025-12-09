@@ -2805,6 +2805,67 @@
         alert('📊 Детальная информация об умейке\n\nЗдесь будут:\n• Подробные рейтинги по категориям\n• Отзывы клиентов\n• Фотографии работ\n• Статистика мастера\n\nФункция в разработке!');
     };    
 
+         // Функция для тестирования - создает демо пользователей
+    window.createDemoMarket = function() {
+        if (confirm('Создать демо-рынок с умейками других пользователей?')) {
+            const demoSkills = [
+                {
+                    _id: 'market_1',
+                    skill: 'Малярные работы',
+                    experience: '4 года опыта',
+                    price: 1200,
+                    userId: 'user_12345',
+                    username: 'Сергей',
+                    rating: { average: 4.7, reviews: [] },
+                    isTopMaster: false,
+                    location: { lat: 55.7538, lon: 37.6200 },
+                    createdAt: new Date().toISOString(),
+                    isActive: true,
+                    category: 'ремонт'
+                },
+                {
+                    _id: 'market_2',
+                    skill: 'Установка окон',
+                    experience: '6 лет опыта',
+                    price: 3000,
+                    userId: 'user_67890',
+                    username: 'Михаил',
+                    rating: { average: 4.9, reviews: [] },
+                    isTopMaster: true,
+                    location: { lat: 55.7578, lon: 37.6150 },
+                    createdAt: new Date().toISOString(),
+                    isActive: true,
+                    category: 'ремонт'
+                },
+                {
+                    _id: 'market_3',
+                    skill: 'Репетитор по математике',
+                    experience: '8 лет опыта',
+                    price: 800,
+                    userId: 'user_11111',
+                    username: 'Ольга',
+                    rating: { average: 5.0, reviews: [] },
+                    isTopMaster: true,
+                    location: { lat: 55.7510, lon: 37.6190 },
+                    createdAt: new Date().toISOString(),
+                    isActive: true,
+                    category: 'обучение'
+                }
+            ];
+            
+            // Добавляем в рынок
+            const marketSkills = getLocalStorage('market_skills') || [];
+            // Удаляем старые демо, чтобы не дублировать
+            const filteredMarket = marketSkills.filter(skill => !skill._id.startsWith('market_'));
+            const newMarket = [...filteredMarket, ...demoSkills];
+            setLocalStorage('market_skills', newMarket);
+            
+            alert('✅ Демо-рынок создан! Теперь на карте и в поиске появятся умейки других пользователей.');
+            
+            // Обновляем карту и поиск
+            if (map) loadSkillsOnMap();
+        }
+    };   
 </script>
 </body>
 </html>
