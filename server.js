@@ -784,6 +784,16 @@ app.get('/keep-alive', (req, res) => {
   });
 });
 
+// Для админ-панели
+app.get('/api/admin/stats', (req, res) => {
+    res.json({
+        users: Object.keys(database.users).length,
+        activeSkills: database.skills.filter(s => s.isActive).length,
+        totalDeals: database.deals.length,
+        revenue: database.deals.reduce((sum, deal) => sum + (deal.commission || 0), 0)
+    });
+});
+
 // Запуск сервера
 app.listen(port, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${port}`);
