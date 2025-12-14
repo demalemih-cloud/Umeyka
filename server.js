@@ -2,15 +2,29 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
-const { Telegraf } = require('telegraf');
-const path = require('path');
+// КОММЕНТИРУЕМ или УДАЛЯЕМ Telegraf
+// const { Telegraf } = require('telegraf'); 
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
+
+// Подключаемся к MongoDB (но не обязательно)
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (MONGODB_URI) {
+  mongoose.connect(MONGODB_URI)
+    .then(() => console.log('✅ Connected to MongoDB'))
+    .catch(err => {
+      console.error('❌ MongoDB connection error:', err);
+      console.log('⚠️ Using JSON database as fallback');
+    });
+} else {
+  console.log('⚠️ No MongoDB URI provided, using JSON fallback');
+}
 
 // ========== ПОДКЛЮЧЕНИЕ К MONGODB ==========
 
