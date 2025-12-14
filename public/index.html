@@ -1759,66 +1759,50 @@
         }
     };
 
-    // ========== ФУНКЦИИ ДЛЯ УМЕЕК ==========
+// ========== ФУНКЦИИ ДЛЯ УМЕЕК С ИСПОЛЬЗОВАНИЕМ API ==========
 
-    // Добавление умейки в общий рынок
-    window.addSkill = async function() {
-        try {
-            const skillName = document.getElementById('skillName').value;
-            const skillExperience = document.getElementById('skillExperience').value;
-            const skillPrice = document.getElementById('skillPrice').value;
-            
-            if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
-                alert('❌ Заполните все поля');
-                return;
-            }
+// Добавление умейки через API
+window.addSkill = async function() {
+    try {
+        const skillName = document.getElementById('skillName').value;
+        const skillExperience = document.getElementById('skillExperience').value;
+        const skillPrice = document.getElementById('skillPrice').value;
+        
+        if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
+            alert('❌ Заполните все поля');
+            return;
+        }
 
-            // Получаем данные пользователя для отображения
-            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-            
-            // Создаем умейку для общего рынка
-            const skillData = {
-                _id: Date.now().toString(),
+        // Получаем данные пользователя для отображения
+        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+        
+        // Получаем местоположение
+        const location = userLocation || { lat: 55.7558, lon: 37.6173 };
+
+        // Отправляем на сервер
+        const response = await fetch(`${API_URL}/api/skills`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
                 userId: currentUserId,
                 username: userData.firstName || 'Аноним',
-                rating: { average: 5.0, reviews: [] },
                 isTopMaster: false,
-                location: userLocation || { lat: 55.7558, lon: 37.6173 },
-                createdAt: new Date().toISOString(),
-                isActive: true,
+                location: location,
                 category: 'другое',
                 contact: userData.contact || '',
-                avatar: userData.avatar || null
-            };
+                avatar: userData.avatar || null,
+                description: ''
+            })
+        });
 
-            // Сохраняем в ОБЩИЙ рынок умейок
-            const marketSkills = getLocalStorage('market_skills') || [];
-            marketSkills.push(skillData);
-            setLocalStorage('market_skills', marketSkills);
-            
-            // Также сохраняем в профиль пользователя (для быстрого доступа)
-            const userSkills = getLocalStorage(`user_${currentUserId}_skills`) || [];
-            userSkills.push(skillData._id);
-            setLocalStorage(`user_${currentUserId}_skills`, userSkills);
-
-            // Создаем профиль мастера если его нет
-            if (!getLocalStorage(`master_${currentUserId}`)) {
-                const masterProfile = {
-                    userId: currentUserId,
-                    username: userData.firstName || 'Аноним',
-                    avatar: userData.avatar,
-                    rating: 5.0,
-                    totalReviews: 0,
-                    completedDeals: 0,
-                    isVerified: false,
-                    createdAt: new Date().toISOString()
-                };
-                setLocalStorage(`master_${currentUserId}`, masterProfile);
-            }
-
+        const result = await response.json();
+        
+        if (result.success) {
             alert('✅ Умейка успешно опубликована! Теперь её видят все пользователи!');
             
             // Очищаем поля
@@ -1830,132 +1814,213 @@
             loadMySkills();
             loadProfileSkills();
             
-        } catch (error) {
-            console.error('Ошибка добавления умейки:', error);
-            alert('❌ Ошибка добавления умейки');
-        }
-    };
-
-    // Загрузка моих умейок
-    async function loadMySkills() {
-        try {
-            // Получаем ID умейок пользователя
-            const userSkillIds = getLocalStorage(`user_${currentUserId}_skills`) || [];
-            
-            // Получаем все умейки
-            const allSkills = getLocalStorage('all_skills') || [];
-            
-            // Фильтруем умейки пользователя
-            const mySkills = allSkills.filter(skill => 
-                userSkillIds.includes(skill._id) || skill.userId === currentUserId
-            );
-            
-            const skillsList = document.getElementById('mySkillsList');
-            
-            if (mySkills.length > 0) {
-                skillsList.innerHTML = mySkills.map(skill => `
-                    <div class="skill-card">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                        </div>
-                        <div class="skill-price">${skill.price} ₽</div>
-                        <div class="skill-distance">🎓 ${skill.experience}</div>
-                        <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
-                        <button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #4299e1; margin-top: 10px;">
-                            ✏️ Редактировать
-                        </button>
-                        <button class="chat-button" onclick="deleteSkill('${skill._id}')" style="background: #f56565; margin-top: 5px;">
-                            🗑️ Удалить
-                        </button>
-                    </div>
-                `).join('');
-            } else {
-                skillsList.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7); padding: 20px;">У вас пока нет добавленных умейок</div>';
+            // Обновляем карту если она открыта
+            if (map) {
+                loadSkillsOnMap();
             }
-            
-        } catch (error) {
-            console.error('Ошибка загрузки умейок:', error);
-            showError('mySkillsList', 'Ошибка загрузки умейок');
+        } else {
+            alert('❌ Ошибка: ' + (result.error || 'Неизвестная ошибка'));
         }
+        
+    } catch (error) {
+        console.error('Ошибка добавления умейки:', error);
+        alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету.');
     }
+};
 
-    // Загрузка умейок в профиле
-    async function loadProfileSkills() {
-        try {
-            // Получаем ID умейок пользователя
-            const userSkillIds = getLocalStorage(`user_${currentUserId}_skills`) || [];
-            
-            // Получаем все умейки
-            const allSkills = getLocalStorage('all_skills') || [];
-            
-            // Фильтруем умейки пользователя
-            const mySkills = allSkills.filter(skill => 
-                userSkillIds.includes(skill._id) || skill.userId === currentUserId
-            );
-            
-            const skillsList = document.getElementById('profileSkillsList');
-            
-            if (mySkills.length > 0) {
-                skillsList.innerHTML = mySkills.map(skill => `
-                    <div class="profile-skill-card">
-                        <div class="profile-skill-header">
-                            <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-price">${skill.price} ₽</div>
-                        </div>
-                        <div style="color: #666; margin: 8px 0;">🎓 ${skill.experience}</div>
-                        <div style="color: #666; margin: 8px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
-                        <div class="skill-actions">
-                            <button class="edit-button" onclick="editSkill('${skill._id}')" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
-                                ✏️
-                            </button>
-                            <button class="delete-button" onclick="deleteSkill('${skill._id}')" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
-                                🗑️
-                            </button>
-                        </div>
+// Загрузка всех умейок с сервера (для карты и поиска)
+async function loadAllSkillsFromServer() {
+    try {
+        console.log('📡 Загрузка умейок с сервера...');
+        
+        const response = await fetch(`${API_URL}/api/skills`);
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log(`✅ Загружено ${result.skills.length} умейок`);
+            return result.skills;
+        } else {
+            console.error('❌ Ошибка загрузки умейок:', result.error);
+            return [];
+        }
+    } catch (error) {
+        console.error('❌ Ошибка соединения с сервером:', error);
+        // Возвращаем пустой массив, чтобы приложение не падало
+        return [];
+    }
+}
+
+// Загрузка моих умейок с сервера
+async function loadMySkills() {
+    try {
+        if (!currentUserId) {
+            console.log('👤 Пользователь не определен');
+            return;
+        }
+
+        console.log('📡 Загрузка моих умейок...');
+        
+        const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
+        const result = await response.json();
+        
+        const skillsList = document.getElementById('mySkillsList');
+        
+        if (result.success && result.skills.length > 0) {
+            skillsList.innerHTML = result.skills.map(skill => `
+                <div class="skill-card">
+                    <div class="skill-header">
+                        <div class="skill-title">${skill.skill}</div>
+                        <div class="skill-rating">${'⭐'.repeat(5)}</div>
                     </div>
-                `).join('');
-            } else {
-                skillsList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">У вас пока нет добавленных умейок</div>';
-            }
-            
-        } catch (error) {
-            console.error('Ошибка загрузки умейок:', error);
-            skillsList.innerHTML = '<div class="error-message">Ошибка загрузки умейок</div>';
+                    <div class="skill-price">${skill.price} ₽</div>
+                    <div class="skill-distance">🎓 ${skill.experience}</div>
+                    <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
+                    <div style="color: #48bb78; font-size: 14px; margin-bottom: 10px;">
+                        👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
+                    </div>
+                    <button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #4299e1; margin-top: 10px;">
+                        ✏️ Редактировать
+                    </button>
+                    <button class="chat-button" onclick="deleteSkill('${skill._id}')" style="background: #f56565; margin-top: 5px;">
+                        🗑️ Удалить
+                    </button>
+                </div>
+            `).join('');
+        } else {
+            skillsList.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7); padding: 20px;">У вас пока нет добавленных умейок</div>';
         }
+        
+    } catch (error) {
+        console.error('Ошибка загрузки умейок:', error);
+        skillsList.innerHTML = '<div class="error-message">Ошибка загрузки умейок. Проверьте подключение.</div>';
     }
+}
 
-    // Редактирование умейки
-    window.editSkill = function(skillId) {
-        alert('✏️ Редактирование умейки\n\nФункция в разработке! Скоро будет доступна.');
-    };
-
-    // Удаление умейки
-    window.deleteSkill = function(skillId) {
-        if (confirm('❌ Удалить эту умейку?')) {
-            try {
-                // Удаляем из всех умейок
-                const allSkills = getLocalStorage('all_skills') || [];
-                const updatedAllSkills = allSkills.filter(skill => skill._id !== skillId);
-                setLocalStorage('all_skills', updatedAllSkills);
-                
-                // Удаляем из профиля пользователя
-                const userSkills = getLocalStorage(`user_${currentUserId}_skills`) || [];
-                const updatedUserSkills = userSkills.filter(id => id !== skillId);
-                setLocalStorage(`user_${currentUserId}_skills`, updatedUserSkills);
-                
+// Удаление умейки через API
+window.deleteSkill = async function(skillId) {
+    if (confirm('❌ Удалить эту умейку?')) {
+        try {
+            const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                method: 'DELETE'
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
                 alert('✅ Умейка удалена!');
                 
                 // Обновляем списки
                 loadMySkills();
                 loadProfileSkills();
                 
-            } catch (error) {
-                console.error('Ошибка удаления умейки:', error);
-                alert('❌ Ошибка удаления умейки');
+                // Обновляем карту если она открыта
+                if (map) {
+                    loadSkillsOnMap();
+                }
+            } else {
+                alert('❌ Ошибка удаления: ' + (result.error || 'Неизвестная ошибка'));
             }
+            
+        } catch (error) {
+            console.error('Ошибка удаления умейки:', error);
+            alert('❌ Ошибка удаления умейки');
         }
-    };
+    }
+};
+
+// Поиск умейок через API
+window.searchSkills = async function() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    console.log('🔍 Поиск умейок по запросу:', query);
+    
+    if (!query.trim()) {
+        alert('🔍 Введите запрос для поиска');
+        return;
+    }
+    
+    try {
+        // Показываем загрузку
+        document.getElementById('searchResults').innerHTML = 
+            '<div class="loading">🔍 Поиск умейок...</div>';
+        
+        const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(query)}`);
+        const result = await response.json();
+        
+        displaySearchResults(result.skills || [], query);
+        
+    } catch (error) {
+        console.error('❌ Ошибка поиска:', error);
+        document.getElementById('searchResults').innerHTML = 
+            '<div class="error-message">Ошибка поиска. Проверьте подключение к интернету.</div>';
+    }
+};
+
+// Отображение результатов поиска
+function displaySearchResults(skills, query) {
+    const resultsContainer = document.getElementById('searchResults');
+    
+    if (skills.length > 0) {
+        resultsContainer.innerHTML = skills.map(skill => {
+            const isUserSkill = skill.userId === currentUserId;
+            const rating = skill.rating?.average || 5.0;
+            
+            return `
+                <div class="skill-card ${isUserSkill ? 'gold-card' : ''}">
+                    <div class="skill-header">
+                        <div class="skill-title">${highlightText(skill.skill, query)}</div>
+                        <div class="skill-rating">${'⭐'.repeat(Math.floor(rating))}</div>
+                    </div>
+                    <div class="skill-price">${skill.price} ₽</div>
+                    <div class="skill-distance">🎓 ${highlightText(skill.experience, query)}</div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+                        <div style="width: 30px; height: 30px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">
+                            ${skill.avatar ? '🖼️' : '👤'}
+                        </div>
+                        <div>
+                            <div style="font-weight: bold; color: #2d3748;">${skill.username} ${isUserSkill ? '(Ваша)' : ''}</div>
+                            <div style="font-size: 12px; color: #666;">⭐ ${rating.toFixed(1)}/5</div>
+                        </div>
+                    </div>
+                    ${skill.isTopMaster ? 
+                        '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; text-align: center; margin: 10px 0;">🏆 Топ-мастер</div>' : 
+                        ''
+                    }
+                    <div style="color: #48bb78; font-size: 14px; margin: 10px 0;">
+                        👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
+                    </div>
+                    <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')">
+                        💬 Написать мастеру
+                    </button>
+                    ${isUserSkill ? 
+                        `<button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #ed8936; margin-top: 8px;">
+                            ✏️ Редактировать
+                        </button>` : 
+                        ''
+                    }
+                </div>
+            `;
+        }).join('');
+    } else {
+        resultsContainer.innerHTML = `
+            <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
+                <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено по запросу: "${query}"</div>
+                <div style="font-size: 14px; opacity: 0.8;">Попробуйте изменить запрос или станьте первым мастером!</div>
+                <button class="main-button" onclick="showSection('masterSection')" style="margin-top: 20px; padding: 15px;">
+                    ✨ Стать первым мастером
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Подсветка найденного текста
+function highlightText(text, query) {
+    if (!query) return text;
+    
+    const regex = new RegExp(`(${query})`, 'gi');
+    return text.replace(regex, '<mark style="background: #FFD700; padding: 2px; border-radius: 3px;">$1</mark>');
+}
 
     // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
 
