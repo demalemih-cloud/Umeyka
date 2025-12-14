@@ -45,6 +45,111 @@ function writeDB(data) {
     }
 }
 
+// Создание демо данных
+function createDemoData() {
+    const dbData = readDB();
+    if (!dbData || dbData.skills.length > 0) return;
+
+    console.log('🔄 Создание демо-данных...');
+    
+    const demoSkills = [
+        {
+            _id: 'demo_' + Date.now() + '_1',
+            skill: 'Ремонт смартфонов',
+            experience: '5 лет опыта, ремонтирую все модели',
+            price: 1500,
+            userId: 'demo_user_1',
+            username: 'Алексей',
+            rating: { 
+                average: 4.8, 
+                reviews: [
+                    { rating: 5, comment: 'Отличный мастер!', userId: 'client_1', createdAt: new Date().toISOString() },
+                    { rating: 4, comment: 'Быстро и качественно', userId: 'client_2', createdAt: new Date().toISOString() }
+                ]
+            },
+            isTopMaster: true,
+            location: { lat: 55.7538, lon: 37.6206 },
+            createdAt: new Date().toISOString(),
+            isActive: true,
+            category: 'ремонт электроники',
+            description: 'Профессиональный ремонт iPhone, Samsung, Xiaomi. Диагностика бесплатно.',
+            views: 42,
+            contacts: 8
+        },
+        {
+            _id: 'demo_' + Date.now() + '_2',
+            skill: 'Сантехник',
+            experience: '7 лет опыта, все виды работ',
+            price: 2000,
+            userId: 'demo_user_2',
+            username: 'Иван',
+            rating: { 
+                average: 4.9, 
+                reviews: [
+                    { rating: 5, comment: 'Спас от потопа!', userId: 'client_3', createdAt: new Date().toISOString() }
+                ]
+            },
+            isTopMaster: false,
+            location: { lat: 55.7578, lon: 37.6150 },
+            createdAt: new Date().toISOString(),
+            isActive: true,
+            category: 'сантехника',
+            description: 'Установка, замена, ремонт сантехники. Гарантия на работы.',
+            views: 38,
+            contacts: 5
+        },
+        {
+            _id: 'demo_' + Date.now() + '_3',
+            skill: 'Электрик',
+            experience: '3 года опыта, сертифицированный специалист',
+            price: 1200,
+            userId: 'demo_user_3',
+            username: 'Петр',
+            rating: { average: 4.5, reviews: [] },
+            isTopMaster: true,
+            location: { lat: 55.7510, lon: 37.6190 },
+            createdAt: new Date().toISOString(),
+            isActive: true,
+            category: 'электрика',
+            description: 'Монтаж проводки, установка розеток, люстр, электрощитов.',
+            views: 25,
+            contacts: 3
+        },
+        {
+            _id: 'demo_' + Date.now() + '_4',
+            skill: 'Репетитор по математике',
+            experience: '8 лет преподавания, кандидат наук',
+            price: 800,
+            userId: 'demo_user_4',
+            username: 'Ольга',
+            rating: { 
+                average: 5.0, 
+                reviews: [
+                    { rating: 5, comment: 'Дочь сдала ЕГЭ на 92 балла!', userId: 'client_4', createdAt: new Date().toISOString() }
+                ]
+            },
+            isTopMaster: true,
+            location: { lat: 55.7590, lon: 37.6175 },
+            createdAt: new Date().toISOString(),
+            isActive: true,
+            category: 'обучение',
+            description: 'Подготовка к ЕГЭ, ОГЭ, помощь студентам. Индивидуальный подход.',
+            views: 31,
+            contacts: 6
+        }
+    ];
+
+    dbData.skills = demoSkills;
+    
+    if (writeDB(dbData)) {
+        console.log('✅ Демо-данные созданы:', demoSkills.length, 'умейок');
+        return true;
+    } else {
+        console.error('❌ Ошибка создания демо-данных');
+        return false;
+    }
+}
+
 // Функции для работы с умейками
 const db = {
     // Получить все активные умейки
@@ -72,7 +177,8 @@ const db = {
             createdAt: new Date().toISOString(),
             isActive: true,
             views: 0,
-            contacts: 0
+            contacts: 0,
+            rating: skillData.rating || { average: 5.0, reviews: [] }
         };
 
         dbData.skills.push(newSkill);
@@ -154,104 +260,34 @@ const db = {
 
             return matchesText && matchesPrice && matchesRating;
         });
+    },
+
+    // Получить статистику
+    getStats() {
+        const skills = this.getAllSkills();
+        
+        return {
+            total: skills.length,
+            active: skills.filter(s => s.isActive === true).length,
+            totalViews: skills.reduce((sum, s) => sum + (s.views || 0), 0),
+            totalContacts: skills.reduce((sum, s) => sum + (s.contacts || 0), 0),
+            avgPrice: skills.length > 0 ? 
+                Math.round(skills.reduce((sum, s) => sum + (s.price || 0), 0) / skills.length) : 0,
+            avgRating: skills.length > 0 ?
+                Math.round((skills.reduce((sum, s) => sum + (s.rating?.average || 0), 0) / skills.length) * 10) / 10 : 0,
+            byCategory: {}
+        };
+    },
+
+    // Инициализация базы данных (публичный метод)
+    initialize() {
+        initDB();
+        createDemoData();
+        return this;
     }
 };
 
-// Инициализируем базу при запуске
-initDB();
+// Автоматическая инициализация при импорте
+db.initialize();
 
 module.exports = db;
-
-// В database.js, после initDB() добавляем:
-function createDemoData() {
-    const dbData = readDB();
-    if (!dbData || dbData.skills.length > 0) return;
-
-    console.log('🔄 Создание демо-данных...');
-    
-    const demoSkills = [
-        {
-            _id: 'demo_' + Date.now() + '_1',
-            skill: 'Ремонт смартфонов',
-            experience: '5 лет опыта, ремонтирую все модели',
-            price: 1500,
-            userId: 'demo_user_1',
-            username: 'Алексей',
-            rating: { average: 4.8, reviews: [
-                { rating: 5, comment: 'Отличный мастер!', userId: 'client_1' },
-                { rating: 4, comment: 'Быстро и качественно', userId: 'client_2' }
-            ]},
-            isTopMaster: true,
-            location: { lat: 55.7538, lon: 37.6206 },
-            createdAt: new Date().toISOString(),
-            isActive: true,
-            category: 'ремонт электроники',
-            description: 'Профессиональный ремонт iPhone, Samsung, Xiaomi. Диагностика бесплатно.',
-            views: 42,
-            contacts: 8
-        },
-        {
-            _id: 'demo_' + Date.now() + '_2',
-            skill: 'Сантехник',
-            experience: '7 лет опыта, все виды работ',
-            price: 2000,
-            userId: 'demo_user_2',
-            username: 'Иван',
-            rating: { average: 4.9, reviews: [
-                { rating: 5, comment: 'Спас от потопа!', userId: 'client_3' }
-            ]},
-            isTopMaster: false,
-            location: { lat: 55.7578, lon: 37.6150 },
-            createdAt: new Date().toISOString(),
-            isActive: true,
-            category: 'сантехника',
-            description: 'Установка, замена, ремонт сантехники. Гарантия на работы.',
-            views: 38,
-            contacts: 5
-        },
-        {
-            _id: 'demo_' + Date.now() + '_3',
-            skill: 'Электрик',
-            experience: '3 года опыта, сертифицированный специалист',
-            price: 1200,
-            userId: 'demo_user_3',
-            username: 'Петр',
-            rating: { average: 4.5, reviews: [] },
-            isTopMaster: true,
-            location: { lat: 55.7510, lon: 37.6190 },
-            createdAt: new Date().toISOString(),
-            isActive: true,
-            category: 'электрика',
-            description: 'Монтаж проводки, установка розеток, люстр, электрощитов.',
-            views: 25,
-            contacts: 3
-        },
-        {
-            _id: 'demo_' + Date.now() + '_4',
-            skill: 'Репетитор по математике',
-            experience: '8 лет преподавания, кандидат наук',
-            price: 800,
-            userId: 'demo_user_4',
-            username: 'Ольга',
-            rating: { average: 5.0, reviews: [
-                { rating: 5, comment: 'Дочь сдала ЕГЭ на 92 балла!', userId: 'client_4' }
-            ]},
-            isTopMaster: true,
-            location: { lat: 55.7590, lon: 37.6175 },
-            createdAt: new Date().toISOString(),
-            isActive: true,
-            category: 'обучение',
-            description: 'Подготовка к ЕГЭ, ОГЭ, помощь студентам. Индивидуальный подход.',
-            views: 31,
-            contacts: 6
-        }
-    ];
-
-    dbData.skills = demoSkills;
-    writeDB(dbData);
-    console.log('✅ Демо-данные созданы:', demoSkills.length, 'умейок');
-}
-
-// Вызываем после initDB()
-initDB();
-createDemoData();
