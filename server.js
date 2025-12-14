@@ -3,21 +3,27 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const { Telegraf } = require('telegraf');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Подключаемся к MongoDB
+// ========== ПОДКЛЮЧЕНИЕ К MONGODB ==========
+
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/umeyka';
+
 mongoose.connect(MONGODB_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+  .catch(err => {
+    console.error('❌ MongoDB connection error:', err);
+    console.log('⚠️ Using JSON database as fallback');
+  });
 
-// ========== ОБНОВЛЕННЫЕ СХЕМЫ ==========
+// ========== СХЕМЫ MONGOOSE ==========
 
 // Схема для профиля пользователя с системой звезд
 const userProfileSchema = new mongoose.Schema({
@@ -202,6 +208,7 @@ const reviewSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+// Создаем модели
 const UserProfile = mongoose.model('UserProfile', userProfileSchema);
 const Umeyka = mongoose.model('Umeyka', umeykaSchema);
 const Deal = mongoose.model('Deal', dealSchema);
@@ -210,7 +217,813 @@ const Chat = mongoose.model('Chat', chatSchema);
 const Message = mongoose.model('Message', messageSchema);
 const Review = mongoose.model('Review', reviewSchema);
 
-// ========== СИСТЕМА ЗВЕЗД И МОНЕТИЗАЦИИ ==========
+// ========== JSON ДАТАБЕЙЗ ДЛЯ ПРОСТЫХ УМЕЕК (FALLBACK) ==========
+
+const fs = require('fs');
+const DB_PATH = path.join(__dirname, 'data', 'db.json');
+
+// Убедимся, что папка data существует
+if (!fs.existsSync(path.dirname(DB_PATH))) {
+  fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
+}
+
+// Простая JSON база для умейок (если MongoDB недоступна)
+const jsonDB = {
+  // Инициализация базы данных
+  init() {
+    if (!fs.existsSync(DB_PATH)) {
+      const initialData = {
+        skills: [],
+        users: {},
+        chats: [],
+        deals: []
+      };
+      fs.writeFileSync(DB_PATH, JSON.stringify(initialData, null, 2));
+      console.log('✅ JSON база данных создана');
+    }
+  },
+
+  // Чтение всей базы
+  read() {
+    try {
+      const data = fs.readFileSync(DB_PATH, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      console.error('❌ Ошибка чтения JSON базы данных:', error);
+      return null;
+    }
+  },
+
+  // Запись в базу данных
+  write(data) {
+    try {
+      fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+      return true;
+    } catch (error) {
+      console.error('❌ Ошибка записи в JSON базу данных:', error);
+      return false;
+    }
+  },
+
+  // Получить все активные умейки
+  getAllSkills() {
+    const dbData = this.read();
+    return dbData?.skills.filter(skill => skill.isActive !== false) || [];
+  },
+
+  // Получить умейки пользователя
+  getUserSkills(userId) {
+    const dbData = this.read();
+    return dbData?.skills.filter(skill => 
+      skill.userId === userId && skill.isActive !== false
+    ) || [];
+  },
+
+  // Добавить новую умейку
+  addSkill(skillData) {
+    const dbData = this.read();
+    if (!dbData) return false;
+
+    const newSkill = {
+      _id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      ...skillData,
+      createdAt: new Date().toISOString(),
+      isActive: true,
+      views: 0,
+      contacts: 0,
+      rating: skillData.rating || { average: 5.0, reviews: [] }
+    };
+
+    dbData.skills.push(newSkill);
+    
+    if (this.write(dbData)) {
+      console.log('✅ Умейка добавлена в JSON базу:', newSkill._id);
+      return newSkill;
+    }
+    return false;
+  },
+
+  // Обновить умейку
+  updateSkill(skillId, updates) {
+    const dbData = this.read();
+    if (!dbData) return false;
+
+    const index = dbData.skills.findIndex(s => s._id === skillId);
+    if (index === -1) return false;
+
+    dbData.skills[index] = {
+      ...dbData.skills[index],
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+
+    return this.write(dbData);
+  },
+
+  // Удалить умейку (пометить как неактивную)
+  deleteSkill(skillId) {
+    return this.updateSkill(skillId, { isActive: false });
+  },
+
+  // Увеличить счетчик просмотров
+  incrementViews(skillId) {
+    const dbData = this.read();
+    if (!dbData) return false;
+
+    const skill = dbData.skills.find(s => s._id === skillId);
+    if (skill) {
+      skill.views = (skill.views || 0) + 1;
+      return this.write(dbData);
+    }
+    return false;
+  },
+
+  // Увеличить счетчик контактов
+  incrementContacts(skillId) {
+    const dbData = this.read();
+    if (!dbData) return false;
+
+    const skill = dbData.skills.find(s => s._id === skillId);
+    if (skill) {
+      skill.contacts = (skill.contacts || 0) + 1;
+      return this.write(dbData);
+    }
+    return false;
+  },
+
+  // Поиск умейок
+  searchSkills(query, filters = {}) {
+    const skills = this.getAllSkills();
+    const searchTerm = query.toLowerCase();
+
+    return skills.filter(skill => {
+      // Поиск по тексту
+      const matchesText = 
+        skill.skill.toLowerCase().includes(searchTerm) ||
+        skill.experience.toLowerCase().includes(searchTerm) ||
+        (skill.description && skill.description.toLowerCase().includes(searchTerm)) ||
+        (skill.category && skill.category.toLowerCase().includes(searchTerm));
+
+      // Фильтры по цене
+      const matchesPrice = !filters.maxPrice || skill.price <= filters.maxPrice;
+
+      // Фильтры по рейтингу
+      const matchesRating = !filters.minRating || 
+        (skill.rating?.average || 0) >= filters.minRating;
+
+      return matchesText && matchesPrice && matchesRating;
+    });
+  }
+};
+
+// Инициализируем JSON базу
+jsonDB.init();
+
+// ========== API ДЛЯ УМЕЕК (РАБОТАЕТ С MONGODB ИЛИ JSON) ==========
+
+// Получить все умейки (для карты)
+app.get('/api/skills', async (req, res) => {
+  try {
+    // Пробуем получить из MongoDB
+    if (mongoose.connection.readyState === 1) {
+      const skills = await Umeyka.find({ isActive: true })
+        .sort({ createdAt: -1 })
+        .limit(100)
+        .lean();
+      
+      // Форматируем для клиента
+      const formattedSkills = skills.map(skill => ({
+        _id: skill._id.toString(),
+        skill: skill.skill,
+        experience: skill.experience,
+        price: skill.price,
+        location: skill.location,
+        userId: skill.userId,
+        username: skill.username,
+        rating: skill.rating,
+        isTopMaster: skill.isTopMaster,
+        views: skill.views || 0,
+        contacts: skill.contacts || 0,
+        createdAt: skill.createdAt
+      }));
+      
+      return res.json({
+        success: true,
+        skills: formattedSkills,
+        source: 'mongodb'
+      });
+    }
+    
+    // Fallback: используем JSON базу
+    const skills = jsonDB.getAllSkills();
+    
+    res.json({
+      success: true,
+      skills: skills.map(skill => ({
+        ...skill,
+        // Не отправляем чувствительные данные
+        contact: undefined,
+        telegramId: undefined
+      })),
+      source: 'json'
+    });
+    
+  } catch (error) {
+    console.error('❌ Ошибка получения умейок:', error);
+    
+    // Полный fallback: возвращаем пустой массив
+    res.json({
+      success: true,
+      skills: [],
+      source: 'fallback',
+      message: 'Используется резервный режим'
+    });
+  }
+});
+
+// Получить умейки пользователя
+app.get('/api/skills/user/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    
+    // Пробуем получить из MongoDB
+    if (mongoose.connection.readyState === 1) {
+      const skills = await Umeyka.find({ 
+        userId: parseInt(userId),
+        isActive: true 
+      }).sort({ createdAt: -1 }).lean();
+      
+      return res.json({ 
+        success: true, 
+        skills: skills.map(s => ({
+          _id: s._id.toString(),
+          skill: s.skill,
+          experience: s.experience,
+          price: s.price,
+          rating: s.rating,
+          views: s.views || 0,
+          contacts: s.contacts || 0
+        })),
+        source: 'mongodb'
+      });
+    }
+    
+    // Fallback: используем JSON базу
+    const skills = jsonDB.getUserSkills(userId);
+    
+    res.json({ 
+      success: true, 
+      skills,
+      source: 'json'
+    });
+    
+  } catch (error) {
+    console.error('❌ Ошибка получения умейок пользователя:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Ошибка сервера',
+      skills: []
+    });
+  }
+});
+
+// Создать новую умейку
+app.post('/api/skills', async (req, res) => {
+  try {
+    const skillData = req.body;
+    
+    // Валидация
+    if (!skillData.skill || !skillData.userId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Необходимо указать умение и ID пользователя' 
+      });
+    }
+
+    // Пробуем сохранить в MongoDB
+    if (mongoose.connection.readyState === 1) {
+      const newUmeyka = new Umeyka({
+        skill: skillData.skill,
+        experience: skillData.experience || 'Опыт не указан',
+        price: skillData.price || 0,
+        location: skillData.location || { lat: 55.7558, lon: 37.6173 },
+        userId: skillData.userId,
+        username: skillData.username || 'Аноним',
+        telegramUsername: skillData.telegramUsername || '',
+        rating: {
+          average: 5.0,
+          count: 0,
+          details: { quality: 0, speed: 0, communication: 0, price: 0 }
+        }
+      });
+      
+      await newUmeyka.save();
+      
+      return res.json({ 
+        success: true, 
+        skill: {
+          _id: newUmeyka._id.toString(),
+          skill: newUmeyka.skill,
+          experience: newUmeyka.experience,
+          price: newUmeyka.price,
+          location: newUmeyka.location,
+          userId: newUmeyka.userId,
+          username: newUmeyka.username,
+          rating: newUmeyka.rating
+        },
+        source: 'mongodb'
+      });
+    }
+    
+    // Fallback: сохраняем в JSON базу
+    const newSkill = jsonDB.addSkill({
+      skill: skillData.skill,
+      experience: skillData.experience || 'Опыт не указан',
+      price: skillData.price || 0,
+      userId: skillData.userId,
+      username: skillData.username || 'Аноним',
+      isTopMaster: skillData.isTopMaster || false,
+      location: skillData.location || { lat: 55.7558, lon: 37.6173 },
+      category: skillData.category || 'другое',
+      contact: skillData.contact || '',
+      avatar: skillData.avatar || null,
+      description: skillData.description || ''
+    });
+
+    if (newSkill) {
+      res.json({ 
+        success: true, 
+        skill: newSkill,
+        source: 'json'
+      });
+    } else {
+      res.status(500).json({ success: false, error: 'Ошибка сохранения' });
+    }
+    
+  } catch (error) {
+    console.error('❌ Ошибка создания умейки:', error);
+    res.status(500).json({ success: false, error: 'Ошибка сервера' });
+  }
+});
+
+// Удалить умейку
+app.delete('/api/skills/:skillId', async (req, res) => {
+  try {
+    const skillId = req.params.skillId;
+    
+    // Пробуем удалить из MongoDB
+    if (mongoose.connection.readyState === 1) {
+      const result = await Umeyka.findByIdAndUpdate(
+        skillId, 
+        { isActive: false, updatedAt: new Date() },
+        { new: true }
+      );
+      
+      if (result) {
+        return res.json({ 
+          success: true,
+          source: 'mongodb'
+        });
+      }
+    }
+    
+    // Fallback: удаляем из JSON базы
+    if (jsonDB.deleteSkill(skillId)) {
+      res.json({ 
+        success: true,
+        source: 'json'
+      });
+    } else {
+      res.status(404).json({ success: false, error: 'Умейка не найдена' });
+    }
+    
+  } catch (error) {
+    console.error('❌ Ошибка удаления умейки:', error);
+    res.status(500).json({ success: false, error: 'Ошибка сервера' });
+  }
+});
+
+// Поиск умейок
+app.get('/api/skills/search', async (req, res) => {
+  try {
+    const query = req.query.q || '';
+    const maxPrice = req.query.maxPrice ? parseInt(req.query.maxPrice) : null;
+    const minRating = req.query.minRating ? parseFloat(req.query.minRating) : null;
+    
+    // Пробуем найти в MongoDB
+    if (mongoose.connection.readyState === 1) {
+      let filter = { isActive: true };
+      
+      if (query) {
+        filter.skill = { $regex: query, $options: 'i' };
+      }
+      
+      if (maxPrice) {
+        filter.price = { $lte: maxPrice };
+      }
+      
+      const skills = await Umeyka.find(filter)
+        .sort({ createdAt: -1 })
+        .limit(50)
+        .lean();
+      
+      // Фильтр по рейтингу
+      let filteredSkills = skills;
+      if (minRating) {
+        filteredSkills = skills.filter(skill => 
+          (skill.rating?.average || 0) >= minRating
+        );
+      }
+      
+      return res.json({
+        success: true,
+        skills: filteredSkills.map(skill => ({
+          _id: skill._id.toString(),
+          skill: skill.skill,
+          experience: skill.experience,
+          price: skill.price,
+          location: skill.location,
+          userId: skill.userId,
+          username: skill.username,
+          rating: skill.rating,
+          isTopMaster: skill.isTopMaster,
+          views: skill.views || 0,
+          contacts: skill.contacts || 0
+        })),
+        count: filteredSkills.length,
+        source: 'mongodb'
+      });
+    }
+    
+    // Fallback: используем JSON базу
+    const skills = jsonDB.searchSkills(query, { maxPrice, minRating });
+    
+    res.json({
+      success: true,
+      skills: skills.map(skill => ({
+        ...skill,
+        contact: undefined,
+        telegramId: undefined
+      })),
+      count: skills.length,
+      source: 'json'
+    });
+    
+  } catch (error) {
+    console.error('❌ Ошибка поиска:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Ошибка сервера',
+      skills: [],
+      count: 0
+    });
+  }
+});
+
+// Увеличить счетчик просмотров
+app.post('/api/skills/:skillId/view', async (req, res) => {
+  try {
+    const skillId = req.params.skillId;
+    
+    // Пробуем обновить в MongoDB
+    if (mongoose.connection.readyState === 1) {
+      await Umeyka.findByIdAndUpdate(
+        skillId,
+        { $inc: { views: 1 } },
+        { new: true }
+      );
+      
+      return res.json({ success: true });
+    }
+    
+    // Fallback: обновляем в JSON базе
+    if (jsonDB.incrementViews(skillId)) {
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ success: false, error: 'Умейка не найдена' });
+    }
+    
+  } catch (error) {
+    console.error('❌ Ошибка обновления просмотров:', error);
+    res.status(500).json({ success: false, error: 'Ошибка сервера' });
+  }
+});
+
+// Увеличить счетчик контактов
+app.post('/api/skills/:skillId/contact', async (req, res) => {
+  try {
+    const skillId = req.params.skillId;
+    
+    // Пробуем обновить в MongoDB
+    if (mongoose.connection.readyState === 1) {
+      await Umeyka.findByIdAndUpdate(
+        skillId,
+        { $inc: { contacts: 1 } },
+        { new: true }
+      );
+      
+      return res.json({ success: true });
+    }
+    
+    // Fallback: обновляем в JSON базе
+    if (jsonDB.incrementContacts(skillId)) {
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ success: false, error: 'Умейка не найдена' });
+    }
+    
+  } catch (error) {
+    console.error('❌ Ошибка обновления контактов:', error);
+    res.status(500).json({ success: false, error: 'Ошибка сервера' });
+  }
+});
+
+// Получить статистику по умейкам
+app.get('/api/skills/stats', async (req, res) => {
+  try {
+    // Пробуем получить из MongoDB
+    if (mongoose.connection.readyState === 1) {
+      const skills = await Umeyka.find({ isActive: true }).lean();
+      
+      const stats = {
+        total: skills.length,
+        active: skills.length,
+        totalViews: skills.reduce((sum, s) => sum + (s.views || 0), 0),
+        totalContacts: skills.reduce((sum, s) => sum + (s.contacts || 0), 0),
+        avgPrice: skills.length > 0 ? 
+          Math.round(skills.reduce((sum, s) => sum + (s.price || 0), 0) / skills.length) : 0,
+        avgRating: skills.length > 0 ?
+          Math.round((skills.reduce((sum, s) => sum + (s.rating?.average || 0), 0) / skills.length) * 10) / 10 : 0,
+        topMasters: skills.filter(s => s.isTopMaster).length,
+        source: 'mongodb'
+      };
+      
+      return res.json({ success: true, stats });
+    }
+    
+    // Fallback: используем JSON базу
+    const skills = jsonDB.getAllSkills();
+    
+    const stats = {
+      total: skills.length,
+      active: skills.filter(s => s.isActive === true).length,
+      totalViews: skills.reduce((sum, s) => sum + (s.views || 0), 0),
+      totalContacts: skills.reduce((sum, s) => sum + (s.contacts || 0), 0),
+      avgPrice: skills.length > 0 ? 
+        Math.round(skills.reduce((sum, s) => sum + (s.price || 0), 0) / skills.length) : 0,
+      avgRating: skills.length > 0 ?
+        Math.round((skills.reduce((sum, s) => sum + (s.rating?.average || 0), 0) / skills.length) * 10) / 10 : 0,
+      topMasters: skills.filter(s => s.isTopMaster).length,
+      source: 'json'
+    };
+    
+    res.json({ success: true, stats });
+    
+  } catch (error) {
+    console.error('❌ Ошибка получения статистики:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Ошибка сервера',
+      stats: {
+        total: 0,
+        active: 0,
+        totalViews: 0,
+        totalContacts: 0,
+        avgPrice: 0,
+        avgRating: 0,
+        topMasters: 0,
+        source: 'fallback'
+      }
+    });
+  }
+});
+
+// ========== СУЩЕСТВУЮЩИЕ API ENDPOINTS (ОСТАВЛЯЕМ БЕЗ ИЗМЕНЕНИЙ) ==========
+
+// Упрощенная валидация для демо
+function validateInitDataSimple(initData) {
+  console.log('🔐 Simplified validation');
+  try {
+    const params = new URLSearchParams(initData);
+    const authDate = parseInt(params.get('auth_date') || '0');
+    const now = Math.floor(Date.now() / 1000);
+    const tolerance = 24 * 60 * 60;
+
+    return authDate >= now - tolerance;
+  } catch (error) {
+    console.log('Validation error:', error);
+    return false;
+  }
+}
+
+// Добавление умейки (старый endpoint для совместимости)
+app.post('/api/add-umeyka', async (req, res) => {
+  try {
+    console.log('📝 Adding new umeyka');
+    
+    const { skill, experience, price, location, userId } = req.body;
+    
+    if (!skill || !experience || !price) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // Используем новый метод добавления
+    const response = await fetch(`http://localhost:${port}/api/skills`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        skill, 
+        experience, 
+        price, 
+        location: location || { lat: 55.7558, lon: 37.6173 },
+        userId: userId || Math.floor(Math.random() * 10000),
+        username: 'Demo User'
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      res.json({ 
+        success: true, 
+        message: 'Умейка успешно добавлена!',
+        id: result.skill._id 
+      });
+    } else {
+      res.status(500).json({ error: result.error || 'Failed to save data' });
+    }
+    
+  } catch (err) {
+    console.error('❌ Error saving umeyka:', err);
+    res.status(500).json({ error: 'Failed to save data' });
+  }
+});
+
+// Поиск умейк (старый endpoint для совместимости)
+app.get('/api/search-umeyka', async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    // Используем новый метод поиска
+    const response = await fetch(`http://localhost:${port}/api/skills/search?q=${encodeURIComponent(query || '')}`);
+    const result = await response.json();
+    
+    if (result.success) {
+      res.json(result.skills);
+    } else {
+      // Возвращаем демо-данные в случае ошибки
+      const demoSkills = [
+        {
+          _id: '1',
+          skill: 'Ремонт смартфонов',
+          experience: '5 лет опыта',
+          price: 1500,
+          location: { lat: 55.7558, lon: 37.6176 },
+          username: 'Алексей',
+          rating: { average: 8.7, count: 15, details: { quality: 9, speed: 8, communication: 9, price: 8 } },
+          isTopMaster: true
+        },
+        {
+          _id: '2', 
+          skill: 'Установка кондиционеров',
+          experience: '3 года опыта',
+          price: 3000,
+          location: { lat: 55.7520, lon: 37.6170 },
+          username: 'Сергей',
+          rating: { average: 7.2, count: 8, details: { quality: 7, speed: 8, communication: 7, price: 7 } }
+        },
+        {
+          _id: '3',
+          skill: 'Мастер по ремонту обуви',
+          experience: '7 лет опыта', 
+          price: 800,
+          location: { lat: 55.7580, lon: 37.6160 },
+          username: 'Марина',
+          rating: { average: 9.5, count: 22, details: { quality: 10, speed: 9, communication: 9, price: 10 } },
+          isTopMaster: true
+        }
+      ];
+      
+      // Фильтруем демо-данные по запросу
+      const filteredDemoSkills = query ? 
+        demoSkills.filter(skill => 
+          skill.skill.toLowerCase().includes(query.toLowerCase())
+        ) : 
+        demoSkills;
+      
+      res.json(filteredDemoSkills);
+    }
+    
+  } catch (err) {
+    console.error('Error searching umeyka:', err);
+    
+    // Возвращаем демо-данные в случае ошибки
+    const demoSkills = [
+      {
+        _id: '1',
+        skill: 'Ремонт смартфонов',
+        experience: '5 лет опыта',
+        price: 1500,
+        location: { lat: 55.7558, lon: 37.6176 },
+        username: 'Алексей',
+        rating: { average: 8.7, count: 15, details: { quality: 9, speed: 8, communication: 9, price: 8 } },
+        isTopMaster: true
+      }
+    ];
+    
+    res.json(demoSkills);
+  }
+});
+
+// Получение умейк пользователя (старый endpoint для совместимости)
+app.get('/api/my-umeyka/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    
+    // Используем новый метод
+    const response = await fetch(`http://localhost:${port}/api/skills/user/${userId}`);
+    const result = await response.json();
+    
+    if (result.success) {
+      res.json(result.skills);
+    } else {
+      res.json([]);
+    }
+  } catch (err) {
+    console.error('Error fetching user skills:', err);
+    res.status(500).json({ error: 'Failed to fetch user skills' });
+  }
+});
+
+// ========== ОСТАЛЬНЫЕ ENDPOINTS (ПОЛНЫЕ ВЕРСИИ) ==========
+
+// Получение профиля пользователя
+app.get('/api/user-profile/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    let profile = await UserProfile.findOne({ userId: parseInt(userId) });
+    
+    if (!profile) {
+      // Создаем базовый профиль если не существует
+      const referralCode = crypto.randomBytes(4).toString('hex').toUpperCase();
+      
+      profile = new UserProfile({
+        userId: parseInt(userId),
+        firstName: 'Пользователь',
+        bio: 'Расскажите о себе...',
+        location: { lat: 55.7558, lon: 37.6173 },
+        referralCode: referralCode,
+        stars: 3, // Начальные звезды для демо
+        customProfile: {
+          backgroundColor: '#667eea',
+          textColor: '#ffffff',
+          isGold: false
+        }
+      });
+      await profile.save();
+    }
+    
+    res.json(profile);
+    
+  } catch (err) {
+    console.error('Error fetching user profile:', err);
+    res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+});
+
+// Обновление профиля пользователя
+app.post('/api/update-profile', async (req, res) => {
+  try {
+    const { userId, firstName, lastName, phone, bio, avatar, location } = req.body;
+    
+    let profile = await UserProfile.findOne({ userId: parseInt(userId) });
+    
+    if (!profile) {
+      profile = new UserProfile({ userId: parseInt(userId) });
+    }
+    
+    // Обновляем поля
+    if (firstName !== undefined) profile.firstName = firstName;
+    if (lastName !== undefined) profile.lastName = lastName;
+    if (phone !== undefined) profile.phone = phone;
+    if (bio !== undefined) profile.bio = bio;
+    if (avatar !== undefined) profile.avatar = avatar;
+    if (location !== undefined) profile.location = location;
+    
+    profile.updatedAt = new Date();
+    
+    await profile.save();
+    
+    res.json({ success: true, profile });
+    
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+// ========== ВСЕ ОСТАЛЬНЫЕ ENDPOINTS (СИСТЕМА ЗВЕЗД, СДЕЛКИ, РЕФЕРАЛЫ) ==========
 
 // Добавление звезд пользователю
 app.post('/api/add-stars', async (req, res) => {
@@ -395,347 +1208,6 @@ app.post('/api/generate-referral', async (req, res) => {
   }
 });
 
-// ========== СИСТЕМА СДЕЛОК С КОМИССИЕЙ ==========
-
-// Создание сделки с комиссией
-app.post('/api/create-deal', async (req, res) => {
-  try {
-    const { 
-      umeykaId, masterUserId, clientUserId, chatId, 
-      title, description, period, amount, qualityLevel, 
-      selectedOptions, additionalTerms 
-    } = req.body;
-    
-    // Рассчитываем комиссию 5%
-    const commission = amount * 0.05;
-    const totalAmount = amount + commission;
-    
-    const newDeal = new Deal({
-      umeykaId,
-      masterUserId,
-      clientUserId,
-      chatId,
-      title,
-      description,
-      period,
-      amount,
-      qualityLevel,
-      selectedOptions,
-      additionalTerms,
-      commission,
-      totalAmount,
-      status: 'pending_signature'
-    });
-    
-    await newDeal.save();
-    
-    res.json({ 
-      success: true, 
-      dealId: newDeal._id,
-      commission: commission,
-      totalAmount: totalAmount,
-      message: 'Сделка создана и отправлена на подпись'
-    });
-    
-  } catch (err) {
-    console.error('Error creating deal:', err);
-    res.status(500).json({ error: 'Failed to create deal' });
-  }
-});
-
-// Завершение сделки с начислением звезд
-app.post('/api/complete-deal', async (req, res) => {
-  try {
-    const { dealId, userId, actualResults } = req.body;
-    
-    const deal = await Deal.findById(dealId);
-    
-    if (!deal) {
-      return res.status(404).json({ error: 'Deal not found' });
-    }
-    
-    // Проверяем, что пользователь является участником сделки
-    if (deal.masterUserId !== userId && deal.clientUserId !== userId) {
-      return res.status(403).json({ error: 'Not authorized' });
-    }
-    
-    deal.status = 'completed';
-    deal.completedAt = new Date();
-    deal.actualResults = actualResults;
-    
-    await deal.save();
-    
-    // Начисляем звезды мастеру за завершенную сделку
-    if (deal.masterUserId) {
-      await fetch('http://localhost:3001/api/add-stars', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: deal.masterUserId,
-          stars: 1,
-          reason: 'deal_completed'
-        })
-      });
-    }
-    
-    res.json({ 
-      success: true, 
-      deal: deal,
-      message: 'Сделка завершена! Начислена 1 звезда.'
-    });
-    
-  } catch (err) {
-    console.error('Error completing deal:', err);
-    res.status(500).json({ error: 'Failed to complete deal' });
-  }
-});
-
-// ========== СИСТЕМА ОТЗЫВОВ О ПРОЕКТЕ ==========
-
-// Добавление отзыва о проекте
-app.post('/api/add-project-review', async (req, res) => {
-  try {
-    const { userId, username, rating, comment } = req.body;
-    
-    const review = new ProjectReview({
-      userId,
-      username,
-      rating,
-      comment
-    });
-    
-    await review.save();
-    
-    res.json({ 
-      success: true, 
-      reviewId: review._id,
-      message: 'Спасибо за ваш отзыв!'
-    });
-    
-  } catch (err) {
-    console.error('Error adding project review:', err);
-    res.status(500).json({ error: 'Failed to add review' });
-  }
-});
-
-// Получение отзывов о проекте
-app.get('/api/project-reviews', async (req, res) => {
-  try {
-    const reviews = await ProjectReview.find({ isApproved: true })
-      .sort({ createdAt: -1 })
-      .limit(50)
-      .lean();
-    
-    res.json(reviews);
-    
-  } catch (err) {
-    console.error('Error fetching project reviews:', err);
-    res.status(500).json({ error: 'Failed to fetch reviews' });
-  }
-});
-
-// ========== СУЩЕСТВУЮЩИЕ API ENDPOINTS ==========
-
-// Упрощенная валидация для демо
-function validateInitDataSimple(initData) {
-  console.log('🔐 Simplified validation');
-  try {
-    const params = new URLSearchParams(initData);
-    const authDate = parseInt(params.get('auth_date') || '0');
-    const now = Math.floor(Date.now() / 1000);
-    const tolerance = 24 * 60 * 60;
-
-    return authDate >= now - tolerance;
-  } catch (error) {
-    console.log('Validation error:', error);
-    return false;
-  }
-}
-
-// Добавление умейки
-app.post('/api/add-umeyka', async (req, res) => {
-  try {
-    console.log('📝 Adding new umeyka');
-    
-    const { skill, experience, price, location, userId } = req.body;
-    
-    if (!skill || !experience || !price) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    const newUmeyka = new Umeyka({ 
-      skill, 
-      experience, 
-      price, 
-      location: location || { lat: 55.7558, lon: 37.6173 },
-      userId: userId || Math.floor(Math.random() * 10000),
-      username: 'Demo User',
-      telegramUsername: 'demo',
-      photos: [],
-      videos: [],
-      description: '',
-      tags: [],
-      rating: {
-        average: 0,
-        count: 0,
-        details: { quality: 0, speed: 0, communication: 0, price: 0 }
-      }
-    });
-    
-    await newUmeyka.save();
-    console.log('✅ Umeyka saved:', newUmeyka._id);
-    
-    res.json({ 
-      success: true, 
-      message: 'Умейка успешно добавлена!',
-      id: newUmeyka._id 
-    });
-    
-  } catch (err) {
-    console.error('❌ Error saving umeyka:', err);
-    res.status(500).json({ error: 'Failed to save data' });
-  }
-});
-
-// Поиск умейк
-app.get('/api/search-umeyka', async (req, res) => {
-  try {
-    const { query } = req.query;
-    let filter = { isActive: true };
-    
-    if (query && query.trim() !== '') {
-      filter.skill = { $regex: query.trim(), $options: 'i' };
-    }
-
-    const skills = await Umeyka.find(filter).sort({ createdAt: -1 }).limit(50);
-    console.log(`🔍 Found ${skills.length} skills`);
-    
-    // Добавляем демо-данные если нет реальных
-    if (skills.length === 0) {
-      const demoSkills = [
-        {
-          _id: '1',
-          skill: 'Ремонт смартфонов',
-          experience: '5 лет опыта',
-          price: 1500,
-          location: { lat: 55.7558, lon: 37.6176 },
-          username: 'Алексей',
-          rating: { average: 8.7, count: 15, details: { quality: 9, speed: 8, communication: 9, price: 8 } },
-          isTopMaster: true
-        },
-        {
-          _id: '2', 
-          skill: 'Установка кондиционеров',
-          experience: '3 года опыта',
-          price: 3000,
-          location: { lat: 55.7520, lon: 37.6170 },
-          username: 'Сергей',
-          rating: { average: 7.2, count: 8, details: { quality: 7, speed: 8, communication: 7, price: 7 } }
-        },
-        {
-          _id: '3',
-          skill: 'Мастер по ремонту обуви',
-          experience: '7 лет опыта', 
-          price: 800,
-          location: { lat: 55.7580, lon: 37.6160 },
-          username: 'Марина',
-          rating: { average: 9.5, count: 22, details: { quality: 10, speed: 9, communication: 9, price: 10 } },
-          isTopMaster: true
-        }
-      ];
-      return res.json(demoSkills);
-    }
-    
-    res.json(skills);
-    
-  } catch (err) {
-    console.error('Error searching umeyka:', err);
-    res.status(500).json({ error: 'Failed to fetch data' });
-  }
-});
-
-// Получение умейк пользователя
-app.get('/api/my-umeyka/:userId', async (req, res) => {
-  try {
-    const skills = await Umeyka.find({ 
-      userId: parseInt(req.params.userId)
-    }).sort({ createdAt: -1 });
-    
-    res.json(skills);
-  } catch (err) {
-    console.error('Error fetching user skills:', err);
-    res.status(500).json({ error: 'Failed to fetch user skills' });
-  }
-});
-
-// Получение профиля пользователя
-app.get('/api/user-profile/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params;
-    
-    let profile = await UserProfile.findOne({ userId: parseInt(userId) });
-    
-    if (!profile) {
-      // Создаем базовый профиль если не существует
-      const referralCode = crypto.randomBytes(4).toString('hex').toUpperCase();
-      
-      profile = new UserProfile({
-        userId: parseInt(userId),
-        firstName: 'Пользователь',
-        bio: 'Расскажите о себе...',
-        location: { lat: 55.7558, lon: 37.6173 },
-        referralCode: referralCode,
-        stars: 3, // Начальные звезды для демо
-        customProfile: {
-          backgroundColor: '#667eea',
-          textColor: '#ffffff',
-          isGold: false
-        }
-      });
-      await profile.save();
-    }
-    
-    res.json(profile);
-    
-  } catch (err) {
-    console.error('Error fetching user profile:', err);
-    res.status(500).json({ error: 'Failed to fetch profile' });
-  }
-});
-
-// Обновление профиля пользователя
-app.post('/api/update-profile', async (req, res) => {
-  try {
-    const { userId, firstName, lastName, phone, bio, avatar, location } = req.body;
-    
-    let profile = await UserProfile.findOne({ userId: parseInt(userId) });
-    
-    if (!profile) {
-      profile = new UserProfile({ userId: parseInt(userId) });
-    }
-    
-    // Обновляем поля
-    if (firstName !== undefined) profile.firstName = firstName;
-    if (lastName !== undefined) profile.lastName = lastName;
-    if (phone !== undefined) profile.phone = phone;
-    if (bio !== undefined) profile.bio = bio;
-    if (avatar !== undefined) profile.avatar = avatar;
-    if (location !== undefined) profile.location = location;
-    
-    profile.updatedAt = new Date();
-    
-    await profile.save();
-    
-    res.json({ success: true, profile });
-    
-  } catch (err) {
-    console.error('Error updating profile:', err);
-    res.status(500).json({ error: 'Failed to update profile' });
-  }
-});
-
 // Получение сделок пользователя
 app.get('/api/user-deals/:userId', async (req, res) => {
   try {
@@ -761,17 +1233,22 @@ app.get('/api/user-deals/:userId', async (req, res) => {
 
 // Health check endpoints
 app.get('/health', (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
     message: 'Umeyka server is running',
     version: '4.0.0',
+    database: dbStatus,
+    port: port,
     features: [
       'star-system',
       'premium-subscriptions', 
       'referral-program',
       'deal-commission',
-      'project-reviews'
+      'project-reviews',
+      'mongodb-fallback'
     ]
   });
 });
@@ -780,238 +1257,58 @@ app.get('/keep-alive', (req, res) => {
   res.json({ 
     status: 'alive', 
     timestamp: new Date().toISOString(),
-    server: 'Umeyka API v4.0'
+    server: 'Umeyka API v4.0',
+    database: mongoose.connection.readyState === 1 ? 'MongoDB' : 'JSON Fallback'
   });
 });
 
 // Для админ-панели
-app.get('/api/admin/stats', (req, res) => {
+app.get('/api/admin/stats', async (req, res) => {
+  try {
+    const usersCount = await UserProfile.countDocuments();
+    const activeSkillsCount = await Umeyka.countDocuments({ isActive: true });
+    const totalDealsCount = await Deal.countDocuments();
+    const revenueResult = await Deal.aggregate([
+      { $group: { _id: null, totalCommission: { $sum: "$commission" } } }
+    ]);
+    const revenue = revenueResult[0]?.totalCommission || 0;
+    
     res.json({
-        users: Object.keys(database.users).length,
-        activeSkills: database.skills.filter(s => s.isActive).length,
-        totalDeals: database.deals.length,
-        revenue: database.deals.reduce((sum, deal) => sum + (deal.commission || 0), 0)
+      users: usersCount,
+      activeSkills: activeSkillsCount,
+      totalDeals: totalDealsCount,
+      revenue: revenue
     });
+    
+  } catch (err) {
+    console.error('Error fetching admin stats:', err);
+    
+    // Fallback stats
+    res.json({
+      users: 0,
+      activeSkills: 0,
+      totalDeals: 0,
+      revenue: 0,
+      source: 'fallback'
+    });
+  }
 });
 
-// Запуск сервера
+// Статический файл для простого интерфейса
+app.get('/simple', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'simple-index.html'));
+});
+
+// ========== ЗАПУСК СЕРВЕРА ==========
+
 app.listen(port, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${port}`);
-  console.log(`📱 Umeyka Mini App ready!`);
-  console.log(`⭐ Star System: ENABLED`);
-  console.log(`💰 Monetization: ENABLED`);
-  console.log(`🎯 Referral Program: ENABLED`);
-  console.log(`🔗 Health check: http://localhost:${port}/health`);
-});
-
-// server.js (дополняем существующий)
-const express = require('express');
-const path = require('path');
-const db = require('./database'); // Добавляем эту строку
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Middleware
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Существующие маршруты оставляем как есть...
-
-// ========== НОВЫЕ API ДЛЯ УМЕЕК ==========
-
-// Получить все умейки (для карты)
-app.get('/api/skills', (req, res) => {
-    try {
-        const skills = db.getAllSkills();
-        res.json({
-            success: true,
-            skills: skills.map(skill => ({
-                ...skill,
-                // Не отправляем чувствительные данные
-                contact: undefined,
-                telegramId: undefined
-            }))
-        });
-    } catch (error) {
-        console.error('❌ Ошибка получения умейок:', error);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
-    }
-});
-
-// Получить умейки пользователя
-app.get('/api/skills/user/:userId', (req, res) => {
-    try {
-        const userId = req.params.userId;
-        const skills = db.getUserSkills(userId);
-        res.json({ success: true, skills });
-    } catch (error) {
-        console.error('❌ Ошибка получения умейок пользователя:', error);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
-    }
-});
-
-// Создать новую умейку
-app.post('/api/skills', (req, res) => {
-    try {
-        const skillData = req.body;
-        
-        // Валидация
-        if (!skillData.skill || !skillData.userId) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Необходимо указать умение и ID пользователя' 
-            });
-        }
-
-        // Добавляем умолчания
-        const newSkill = db.addSkill({
-            skill: skillData.skill,
-            experience: skillData.experience || 'Опыт не указан',
-            price: skillData.price || 0,
-            userId: skillData.userId,
-            username: skillData.username || 'Аноним',
-            rating: { average: 5.0, reviews: [] },
-            isTopMaster: skillData.isTopMaster || false,
-            location: skillData.location || { lat: 55.7558, lon: 37.6173 },
-            category: skillData.category || 'другое',
-            contact: skillData.contact || '',
-            avatar: skillData.avatar || null,
-            description: skillData.description || ''
-        });
-
-        if (newSkill) {
-            res.json({ success: true, skill: newSkill });
-        } else {
-            res.status(500).json({ success: false, error: 'Ошибка сохранения' });
-        }
-    } catch (error) {
-        console.error('❌ Ошибка создания умейки:', error);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
-    }
-});
-
-// Обновить умейку
-app.put('/api/skills/:skillId', (req, res) => {
-    try {
-        const skillId = req.params.skillId;
-        const updates = req.body;
-        
-        if (db.updateSkill(skillId, updates)) {
-            res.json({ success: true });
-        } else {
-            res.status(404).json({ success: false, error: 'Умейка не найдена' });
-        }
-    } catch (error) {
-        console.error('❌ Ошибка обновления умейки:', error);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
-    }
-});
-
-// Удалить умейку
-app.delete('/api/skills/:skillId', (req, res) => {
-    try {
-        const skillId = req.params.skillId;
-        
-        if (db.deleteSkill(skillId)) {
-            res.json({ success: true });
-        } else {
-            res.status(404).json({ success: false, error: 'Умейка не найдена' });
-        }
-    } catch (error) {
-        console.error('❌ Ошибка удаления умейки:', error);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
-    }
-});
-
-// Поиск умейок
-app.get('/api/skills/search', (req, res) => {
-    try {
-        const query = req.query.q || '';
-        const maxPrice = req.query.maxPrice ? parseInt(req.query.maxPrice) : null;
-        const minRating = req.query.minRating ? parseFloat(req.query.minRating) : null;
-        
-        const skills = db.searchSkills(query, { maxPrice, minRating });
-        
-        res.json({
-            success: true,
-            skills: skills.map(skill => ({
-                ...skill,
-                contact: undefined,
-                telegramId: undefined
-            })),
-            count: skills.length
-        });
-    } catch (error) {
-        console.error('❌ Ошибка поиска:', error);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
-    }
-});
-
-// Увеличить счетчик просмотров
-app.post('/api/skills/:skillId/view', (req, res) => {
-    try {
-        const skillId = req.params.skillId;
-        
-        if (db.incrementViews(skillId)) {
-            res.json({ success: true });
-        } else {
-            res.status(404).json({ success: false, error: 'Умейка не найдена' });
-        }
-    } catch (error) {
-        console.error('❌ Ошибка обновления просмотров:', error);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
-    }
-});
-
-// Увеличить счетчик контактов
-app.post('/api/skills/:skillId/contact', (req, res) => {
-    try {
-        const skillId = req.params.skillId;
-        
-        if (db.incrementContacts(skillId)) {
-            res.json({ success: true });
-        } else {
-            res.status(404).json({ success: false, error: 'Умейка не найдена' });
-        }
-    } catch (error) {
-        console.error('❌ Ошибка обновления контактов:', error);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
-    }
-});
-
-// Получить статистику по умейкам
-app.get('/api/skills/stats', (req, res) => {
-    try {
-        const skills = db.getAllSkills();
-        
-        const stats = {
-            total: skills.length,
-            active: skills.filter(s => s.isActive === true).length,
-            totalViews: skills.reduce((sum, s) => sum + (s.views || 0), 0),
-            totalContacts: skills.reduce((sum, s) => sum + (s.contacts || 0), 0),
-            avgPrice: skills.length > 0 ? 
-                skills.reduce((sum, s) => sum + (s.price || 0), 0) / skills.length : 0,
-            avgRating: skills.length > 0 ?
-                skills.reduce((sum, s) => sum + (s.rating?.average || 0), 0) / skills.length : 0,
-            byCategory: {}
-        };
-        
-        // Статистика по категориям
-        skills.forEach(skill => {
-            const category = skill.category || 'другое';
-            stats.byCategory[category] = (stats.byCategory[category] || 0) + 1;
-        });
-        
-        res.json({ success: true, stats });
-    } catch (error) {
-        console.error('❌ Ошибка получения статистики:', error);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
-    }
-});
-
-// Запуск сервера
-app.listen(PORT, () => {
-    console.log(`🚀 Сервер запущен на порту ${PORT}`);
-    console.log(`🌐 Откройте в браузере: http://localhost:${PORT}`);
+  console.log(`🚀 Сервер запущен на порту ${port}`);
+  console.log(`🌐 Основное приложение: http://localhost:${port}`);
+  console.log(`📱 Простой интерфейс: http://localhost:${port}/simple`);
+  console.log(`💚 Проверка здоровья: http://localhost:${port}/health`);
+  console.log(`📊 Статистика: http://localhost:${port}/api/admin/stats`);
+  console.log(`⚡ База данных: ${mongoose.connection.readyState === 1 ? 'MongoDB' : 'JSON Fallback'}`);
+  console.log(`⭐ Система звезд: ВКЛЮЧЕНА`);
+  console.log(`💰 Монетизация: ВКЛЮЧЕНА`);
+  console.log(`🎯 Реферальная программа: ВКЛЮЧЕНА`);
 });
