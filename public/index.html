@@ -1399,6 +1399,17 @@
     const API_URL = 'https://umeyka-oocn.onrender.com';
     let currentUserId = null;
     let currentAvatar = null;
+    let selectedQuality = '';
+    let selectedOptions = [];
+    let currentProfileTab = 'stats';
+    let currentDealTab = 'pending';
+    let projectRating = 0;
+    
+    // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ КАРТЫ ==========
+    let map = null;
+    let userLocation = null;
+    let markers = [];
+    let mapRefreshInterval = null;
 
     // ========== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ==========
 
@@ -1646,48 +1657,12 @@
         loadProfileToForm(); // Загружаем данные в форму при открытии
     };
 
-    // Функция отображения профиля пользователя
-    async function loadUserProfileDisplay() {
-        try {
-            const response = await fetch(`/api/user-profile/${currentUserId}`);
-            const profile = await response.json();
-            
-            if (profile.success) {
-                const user = profile.user;
-                
-                document.getElementById('userName').textContent = 
-                    user.firstName || 'Пользователь';
-                
-                // Обновляем аватар в профиле
-                const avatarElement = document.getElementById('userAvatar');
-                if (user.avatar) {
-                    avatarElement.innerHTML = 
-                        `<img src="${user.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                } else {
-                    avatarElement.innerHTML = '👤';
-                    avatarElement.style.backgroundColor = '#667eea';
-                }
-                
-                // Показываем дополнительную информацию если есть
-                let userInfo = user.bio || 'Расскажите о себе...';
-                if (user.age || user.experience || user.contact) {
-                    userInfo += '<br><br>';
-                    if (user.age) userInfo += `🎂 Возраст: ${user.age} лет<br>`;
-                    if (user.experience) userInfo += `🎓 Опыт: ${user.experience}<br>`;
-                    if (user.contact) userInfo += `📞 Контакты: ${user.contact}`;
-                }
-                
-                document.getElementById('userBio').innerHTML = userInfo;
-            }
-        } catch (error) {
-            console.error('Ошибка загрузки профиля:', error);
-            showError('userProfile', 'Ошибка загрузки профиля');
-        }
-    }
-
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
 
     window.showMainScreen = function() {
+        // Останавливаем автообновление карты
+        stopMapAutoRefresh();
+        
         document.getElementById('mainScreen').style.display = 'block';
         document.getElementById('masterSection').style.display = 'none';
         document.getElementById('clientSection').style.display = 'none';
@@ -1700,6 +1675,11 @@
     };
     
     window.showSection = function(sectionId) {
+        // Останавливаем автообновление карты если уходим с карты
+        if (!document.querySelector('.map-active') && mapRefreshInterval) {
+            stopMapAutoRefresh();
+        }
+        
         document.getElementById('mainScreen').style.display = 'none';
         document.getElementById('masterSection').style.display = 'none';
         document.getElementById('clientSection').style.display = 'none';
@@ -1759,155 +1739,56 @@
         }
     };
 
-// ========== ФУНКЦИИ ДЛЯ УМЕЕК С ИСПОЛЬЗОВАНИЕМ API ==========
+    // ========== ФУНКЦИИ ДЛЯ УМЕЕК С ИСПОЛЬЗОВАНИЕМ API ==========
 
-// Добавление умейки через API
-window.addSkill = async function() {
-    try {
-        const skillName = document.getElementById('skillName').value;
-        const skillExperience = document.getElementById('skillExperience').value;
-        const skillPrice = document.getElementById('skillPrice').value;
-        
-        if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
-            alert('❌ Заполните все поля');
-            return;
-        }
-
-        // Получаем данные пользователя для отображения
-        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-        
-        // Получаем местоположение
-        const location = userLocation || { lat: 55.7558, lon: 37.6173 };
-
-        // Отправляем на сервер
-        const response = await fetch(`${API_URL}/api/skills`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                skill: skillName.trim(),
-                experience: skillExperience.trim(),
-                price: parseInt(skillPrice),
-                userId: currentUserId,
-                username: userData.firstName || 'Аноним',
-                isTopMaster: false,
-                location: location,
-                category: 'другое',
-                contact: userData.contact || '',
-                avatar: userData.avatar || null,
-                description: ''
-            })
-        });
-
-        const result = await response.json();
-        
-        if (result.success) {
-            alert('✅ Умейка успешно опубликована! Теперь её видят все пользователи!');
-            
-            // Очищаем поля
-            document.getElementById('skillName').value = '';
-            document.getElementById('skillExperience').value = '';
-            document.getElementById('skillPrice').value = '';
-            
-            // Обновляем списки
-            loadMySkills();
-            loadProfileSkills();
-            
-            // Обновляем карту если она открыта
-            if (map) {
-                loadSkillsOnMap();
-            }
-        } else {
-            alert('❌ Ошибка: ' + (result.error || 'Неизвестная ошибка'));
-        }
-        
-    } catch (error) {
-        console.error('Ошибка добавления умейки:', error);
-        alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету.');
-    }
-};
-
-// Загрузка всех умейок с сервера (для карты и поиска)
-async function loadAllSkillsFromServer() {
-    try {
-        console.log('📡 Загрузка умейок с сервера...');
-        
-        const response = await fetch(`${API_URL}/api/skills`);
-        const result = await response.json();
-        
-        if (result.success) {
-            console.log(`✅ Загружено ${result.skills.length} умейок`);
-            return result.skills;
-        } else {
-            console.error('❌ Ошибка загрузки умейок:', result.error);
-            return [];
-        }
-    } catch (error) {
-        console.error('❌ Ошибка соединения с сервером:', error);
-        // Возвращаем пустой массив, чтобы приложение не падало
-        return [];
-    }
-}
-
-// Загрузка моих умейок с сервера
-async function loadMySkills() {
-    try {
-        if (!currentUserId) {
-            console.log('👤 Пользователь не определен');
-            return;
-        }
-
-        console.log('📡 Загрузка моих умейок...');
-        
-        const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
-        const result = await response.json();
-        
-        const skillsList = document.getElementById('mySkillsList');
-        
-        if (result.success && result.skills.length > 0) {
-            skillsList.innerHTML = result.skills.map(skill => `
-                <div class="skill-card">
-                    <div class="skill-header">
-                        <div class="skill-title">${skill.skill}</div>
-                        <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                    </div>
-                    <div class="skill-price">${skill.price} ₽</div>
-                    <div class="skill-distance">🎓 ${skill.experience}</div>
-                    <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
-                    <div style="color: #48bb78; font-size: 14px; margin-bottom: 10px;">
-                        👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
-                    </div>
-                    <button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #4299e1; margin-top: 10px;">
-                        ✏️ Редактировать
-                    </button>
-                    <button class="chat-button" onclick="deleteSkill('${skill._id}')" style="background: #f56565; margin-top: 5px;">
-                        🗑️ Удалить
-                    </button>
-                </div>
-            `).join('');
-        } else {
-            skillsList.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7); padding: 20px;">У вас пока нет добавленных умейок</div>';
-        }
-        
-    } catch (error) {
-        console.error('Ошибка загрузки умейок:', error);
-        skillsList.innerHTML = '<div class="error-message">Ошибка загрузки умейок. Проверьте подключение.</div>';
-    }
-}
-
-// Удаление умейки через API
-window.deleteSkill = async function(skillId) {
-    if (confirm('❌ Удалить эту умейку?')) {
+    // Добавление умейки через API
+    window.addSkill = async function() {
         try {
-            const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
-                method: 'DELETE'
-            });
+            const skillName = document.getElementById('skillName').value;
+            const skillExperience = document.getElementById('skillExperience').value;
+            const skillPrice = document.getElementById('skillPrice').value;
             
+            if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
+                alert('❌ Заполните все поля');
+                return;
+            }
+
+            // Получаем данные пользователя для отображения
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+            
+            // Получаем местоположение
+            const location = userLocation || { lat: 55.7558, lon: 37.6173 };
+
+            // Отправляем на сервер
+            const response = await fetch(`${API_URL}/api/skills`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    skill: skillName.trim(),
+                    experience: skillExperience.trim(),
+                    price: parseInt(skillPrice),
+                    userId: currentUserId,
+                    username: userData.firstName || 'Аноним',
+                    isTopMaster: false,
+                    location: location,
+                    category: 'другое',
+                    contact: userData.contact || '',
+                    avatar: userData.avatar || null,
+                    description: ''
+                })
+            });
+
             const result = await response.json();
             
             if (result.success) {
-                alert('✅ Умейка удалена!');
+                alert('✅ Умейка успешно опубликована! Теперь её видят все пользователи!');
+                
+                // Очищаем поля
+                document.getElementById('skillName').value = '';
+                document.getElementById('skillExperience').value = '';
+                document.getElementById('skillPrice').value = '';
                 
                 // Обновляем списки
                 loadMySkills();
@@ -1918,109 +1799,255 @@ window.deleteSkill = async function(skillId) {
                     loadSkillsOnMap();
                 }
             } else {
-                alert('❌ Ошибка удаления: ' + (result.error || 'Неизвестная ошибка'));
+                alert('❌ Ошибка: ' + (result.error || 'Неизвестная ошибка'));
             }
             
         } catch (error) {
-            console.error('Ошибка удаления умейки:', error);
-            alert('❌ Ошибка удаления умейки');
+            console.error('Ошибка добавления умейки:', error);
+            alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету.');
+        }
+    };
+
+    // Загрузка всех умейок с сервера (для карты и поиска)
+    async function loadAllSkillsFromServer() {
+        try {
+            console.log('📡 Загрузка умейок с сервера...');
+            
+            const response = await fetch(`${API_URL}/api/skills`);
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log(`✅ Загружено ${result.skills.length} умейок`);
+                return result.skills;
+            } else {
+                console.error('❌ Ошибка загрузки умейок:', result.error);
+                return [];
+            }
+        } catch (error) {
+            console.error('❌ Ошибка соединения с сервером:', error);
+            // Возвращаем пустой массив, чтобы приложение не падало
+            return [];
         }
     }
-};
 
-// Поиск умейок через API
-window.searchSkills = async function() {
-    const query = document.getElementById('searchInput').value.toLowerCase();
-    console.log('🔍 Поиск умейок по запросу:', query);
-    
-    if (!query.trim()) {
-        alert('🔍 Введите запрос для поиска');
-        return;
-    }
-    
-    try {
-        // Показываем загрузку
-        document.getElementById('searchResults').innerHTML = 
-            '<div class="loading">🔍 Поиск умейок...</div>';
-        
-        const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(query)}`);
-        const result = await response.json();
-        
-        displaySearchResults(result.skills || [], query);
-        
-    } catch (error) {
-        console.error('❌ Ошибка поиска:', error);
-        document.getElementById('searchResults').innerHTML = 
-            '<div class="error-message">Ошибка поиска. Проверьте подключение к интернету.</div>';
-    }
-};
+    // Загрузка моих умейок с сервера
+    async function loadMySkills() {
+        try {
+            if (!currentUserId) {
+                console.log('👤 Пользователь не определен');
+                return;
+            }
 
-// Отображение результатов поиска
-function displaySearchResults(skills, query) {
-    const resultsContainer = document.getElementById('searchResults');
-    
-    if (skills.length > 0) {
-        resultsContainer.innerHTML = skills.map(skill => {
-            const isUserSkill = skill.userId === currentUserId;
-            const rating = skill.rating?.average || 5.0;
+            console.log('📡 Загрузка моих умейок...');
             
-            return `
-                <div class="skill-card ${isUserSkill ? 'gold-card' : ''}">
-                    <div class="skill-header">
-                        <div class="skill-title">${highlightText(skill.skill, query)}</div>
-                        <div class="skill-rating">${'⭐'.repeat(Math.floor(rating))}</div>
-                    </div>
-                    <div class="skill-price">${skill.price} ₽</div>
-                    <div class="skill-distance">🎓 ${highlightText(skill.experience, query)}</div>
-                    <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
-                        <div style="width: 30px; height: 30px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">
-                            ${skill.avatar ? '🖼️' : '👤'}
+            const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
+            const result = await response.json();
+            
+            const skillsList = document.getElementById('mySkillsList');
+            
+            if (result.success && result.skills.length > 0) {
+                skillsList.innerHTML = result.skills.map(skill => `
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-title">${skill.skill}</div>
+                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
                         </div>
-                        <div>
-                            <div style="font-weight: bold; color: #2d3748;">${skill.username} ${isUserSkill ? '(Ваша)' : ''}</div>
-                            <div style="font-size: 12px; color: #666;">⭐ ${rating.toFixed(1)}/5</div>
+                        <div class="skill-price">${skill.price} ₽</div>
+                        <div class="skill-distance">🎓 ${skill.experience}</div>
+                        <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
+                        <div style="color: #48bb78; font-size: 14px; margin-bottom: 10px;">
+                            👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
-                    </div>
-                    ${skill.isTopMaster ? 
-                        '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; text-align: center; margin: 10px 0;">🏆 Топ-мастер</div>' : 
-                        ''
-                    }
-                    <div style="color: #48bb78; font-size: 14px; margin: 10px 0;">
-                        👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
-                    </div>
-                    <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')">
-                        💬 Написать мастеру
-                    </button>
-                    ${isUserSkill ? 
-                        `<button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #ed8936; margin-top: 8px;">
+                        <button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #4299e1; margin-top: 10px;">
                             ✏️ Редактировать
-                        </button>` : 
-                        ''
+                        </button>
+                        <button class="chat-button" onclick="deleteSkill('${skill._id}')" style="background: #f56565; margin-top: 5px;">
+                            🗑️ Удалить
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                skillsList.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7); padding: 20px;">У вас пока нет добавленных умейок</div>';
+            }
+            
+        } catch (error) {
+            console.error('Ошибка загрузки умейок:', error);
+            skillsList.innerHTML = '<div class="error-message">Ошибка загрузки умейок. Проверьте подключение.</div>';
+        }
+    }
+
+    // Загрузка умейок в профиле
+    async function loadProfileSkills() {
+        try {
+            if (!currentUserId) {
+                console.log('👤 Пользователь не определен');
+                return;
+            }
+
+            console.log('📡 Загрузка моих умейок для профиля...');
+            
+            const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
+            const result = await response.json();
+            
+            const skillsList = document.getElementById('profileSkillsList');
+            
+            if (result.success && result.skills.length > 0) {
+                skillsList.innerHTML = result.skills.map(skill => `
+                    <div class="profile-skill-card">
+                        <div class="profile-skill-header">
+                            <div class="skill-title">${skill.skill}</div>
+                            <div class="skill-price">${skill.price} ₽</div>
+                        </div>
+                        <div style="color: #666; margin: 8px 0;">🎓 ${skill.experience}</div>
+                        <div style="color: #666; margin: 8px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
+                        <div style="color: #48bb78; font-size: 12px; margin: 8px 0;">
+                            👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
+                        </div>
+                        <div class="skill-actions">
+                            <button class="edit-button" onclick="editSkill('${skill._id}')" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
+                                ✏️
+                            </button>
+                            <button class="delete-button" onclick="deleteSkill('${skill._id}')" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                skillsList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">У вас пока нет добавленных умейок</div>';
+            }
+            
+        } catch (error) {
+            console.error('Ошибка загрузки умейок:', error);
+            skillsList.innerHTML = '<div class="error-message">Ошибка загрузки умейок</div>';
+        }
+    }
+
+    // Удаление умейки через API
+    window.deleteSkill = async function(skillId) {
+        if (confirm('❌ Удалить эту умейку?')) {
+            try {
+                const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Умейка удалена!');
+                    
+                    // Обновляем списки
+                    loadMySkills();
+                    loadProfileSkills();
+                    
+                    // Обновляем карту если она открыта
+                    if (map) {
+                        loadSkillsOnMap();
                     }
+                } else {
+                    alert('❌ Ошибка удаления: ' + (result.error || 'Неизвестная ошибка'));
+                }
+                
+            } catch (error) {
+                console.error('Ошибка удаления умейки:', error);
+                alert('❌ Ошибка удаления умейки');
+            }
+        }
+    };
+
+    // Поиск умейок через API
+    window.searchSkills = async function() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        console.log('🔍 Поиск умейок по запросу:', query);
+        
+        if (!query.trim()) {
+            alert('🔍 Введите запрос для поиска');
+            return;
+        }
+        
+        try {
+            // Показываем загрузку
+            document.getElementById('searchResults').innerHTML = 
+                '<div class="loading">🔍 Поиск умейок...</div>';
+            
+            const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(query)}`);
+            const result = await response.json();
+            
+            displaySearchResults(result.skills || [], query);
+            
+        } catch (error) {
+            console.error('❌ Ошибка поиска:', error);
+            document.getElementById('searchResults').innerHTML = 
+                '<div class="error-message">Ошибка поиска. Проверьте подключение к интернету.</div>';
+        }
+    };
+
+    // Отображение результатов поиска
+    function displaySearchResults(skills, query) {
+        const resultsContainer = document.getElementById('searchResults');
+        
+        if (skills.length > 0) {
+            resultsContainer.innerHTML = skills.map(skill => {
+                const isUserSkill = skill.userId === currentUserId;
+                const rating = skill.rating?.average || 5.0;
+                
+                return `
+                    <div class="skill-card ${isUserSkill ? 'gold-card' : ''}">
+                        <div class="skill-header">
+                            <div class="skill-title">${highlightText(skill.skill, query)}</div>
+                            <div class="skill-rating">${'⭐'.repeat(Math.floor(rating))}</div>
+                        </div>
+                        <div class="skill-price">${skill.price} ₽</div>
+                        <div class="skill-distance">🎓 ${highlightText(skill.experience, query)}</div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+                            <div style="width: 30px; height: 30px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">
+                                ${skill.avatar ? '🖼️' : '👤'}
+                            </div>
+                            <div>
+                                <div style="font-weight: bold; color: #2d3748;">${skill.username} ${isUserSkill ? '(Ваша)' : ''}</div>
+                                <div style="font-size: 12px; color: #666;">⭐ ${rating.toFixed(1)}/5</div>
+                            </div>
+                        </div>
+                        ${skill.isTopMaster ? 
+                            '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; text-align: center; margin: 10px 0;">🏆 Топ-мастер</div>' : 
+                            ''
+                        }
+                        <div style="color: #48bb78; font-size: 14px; margin: 10px 0;">
+                            👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
+                        </div>
+                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')">
+                            💬 Написать мастеру
+                        </button>
+                        ${isUserSkill ? 
+                            `<button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #ed8936; margin-top: 8px;">
+                                ✏️ Редактировать
+                            </button>` : 
+                            ''
+                        }
+                    </div>
+                `;
+            }).join('');
+        } else {
+            resultsContainer.innerHTML = `
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                    <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
+                    <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено по запросу: "${query}"</div>
+                    <div style="font-size: 14px; opacity: 0.8;">Попробуйте изменить запрос или станьте первым мастером!</div>
+                    <button class="main-button" onclick="showSection('masterSection')" style="margin-top: 20px; padding: 15px;">
+                        ✨ Стать первым мастером
+                    </button>
                 </div>
             `;
-        }).join('');
-    } else {
-        resultsContainer.innerHTML = `
-            <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
-                <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено по запросу: "${query}"</div>
-                <div style="font-size: 14px; opacity: 0.8;">Попробуйте изменить запрос или станьте первым мастером!</div>
-                <button class="main-button" onclick="showSection('masterSection')" style="margin-top: 20px; padding: 15px;">
-                    ✨ Стать первым мастером
-                </button>
-            </div>
-        `;
+        }
     }
-}
 
-// Подсветка найденного текста
-function highlightText(text, query) {
-    if (!query) return text;
-    
-    const regex = new RegExp(`(${query})`, 'gi');
-    return text.replace(regex, '<mark style="background: #FFD700; padding: 2px; border-radius: 3px;">$1</mark>');
-}
+    // Подсветка найденного текста
+    function highlightText(text, query) {
+        if (!query) return text;
+        
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<mark style="background: #FFD700; padding: 2px; border-radius: 3px;">$1</mark>');
+    }
 
     // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
 
@@ -2081,123 +2108,28 @@ function highlightText(text, query) {
         }
     });
 
-    // Поиск умейок
-    window.searchSkills = function() { 
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        console.log('🔍 Поиск умейок по запросу:', query);
-        
-        // Получаем ВСЕ умейки из общего рынка
-        const marketSkills = getLocalStorage('market_skills') || [];
-        
-        // Демо умейки (если на рынке пусто)
-        let allSkillsToShow = marketSkills;
-        if (marketSkills.length === 0) {
-            allSkillsToShow = [
-                {
-                    _id: 'demo1',
-                    skill: 'Ремонт смартфонов',
-                    experience: '5 лет опыта',
-                    price: 1500,
-                    username: 'Алексей',
-                    rating: { average: 4.8 },
-                    isTopMaster: true
-                },
-                {
-                    _id: 'demo2', 
-                    skill: 'Сантехник',
-                    experience: '7 лет опыта',
-                    price: 2000,
-                    username: 'Иван',
-                    rating: { average: 4.9 },
-                    isTopMaster: false
-                }
-            ];
-        }
-        
-        // Фильтруем активные умейки
-        const activeSkills = allSkillsToShow.filter(skill => skill.isActive !== false);
-        
-        // Фильтруем по запросу
-        const filteredSkills = query ? 
-            activeSkills.filter(skill => 
-                skill.skill.toLowerCase().includes(query) || 
-                skill.experience.toLowerCase().includes(query) ||
-                (skill.username && skill.username.toLowerCase().includes(query)) ||
-                (skill.category && skill.category.toLowerCase().includes(query))
-            ) : 
-            activeSkills;
-        
-        const resultsContainer = document.getElementById('searchResults');
-        
-        if (filteredSkills.length > 0) {
-            resultsContainer.innerHTML = filteredSkills.map(skill => {
-                const isUserSkill = skill.userId === currentUserId;
-                
-                return `
-                    <div class="skill-card ${isUserSkill ? 'gold-card' : ''}">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">${'⭐'.repeat(Math.floor(skill.rating?.average || 5))}</div>
-                        </div>
-                        <div class="skill-price">${skill.price} ₽</div>
-                        <div class="skill-distance">🎓 ${skill.experience}</div>
-                        <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
-                            <div style="width: 30px; height: 30px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">
-                                ${skill.avatar ? '🖼️' : '👤'}
-                            </div>
-                            <div>
-                                <div style="font-weight: bold; color: #2d3748;">${skill.username} ${isUserSkill ? '(Ваша)' : ''}</div>
-                                <div style="font-size: 12px; color: #666;">⭐ ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
-                            </div>
-                        </div>
-                        ${skill.isTopMaster ? 
-                            '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; text-align: center; margin: 10px 0;">🏆 Топ-мастер</div>' : 
-                            ''
-                        }
-                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')">
-                            💬 Написать мастеру
-                        </button>
-                        ${isUserSkill ? 
-                            `<button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #ed8936; margin-top: 8px;">
-                                ✏️ Редактировать
-                            </button>` : 
-                            ''
-                        }
-                    </div>
-                `;
-            }).join('');
-        } else {
-            resultsContainer.innerHTML = `
-                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                    <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
-                    <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
-                    <div style="font-size: 14px; opacity: 0.8;">Попробуйте изменить запрос или станьте первым мастером!</div>
-                </div>
-            `;
-        }
-    };
-
     // ========== СИСТЕМА ЗВЕЗД И КАСТОМИЗАЦИИ ==========
 
     // Загрузка звездной системы
     async function loadStarsSystem() {
         try {
-            const response = await fetch(`/api/user-profile/${currentUserId}`);
-            const profile = await response.json();
+            // Для демо - используем localStorage
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
             
             // Обновляем звезды если есть элементы на странице
             if (document.getElementById('starsCount')) {
-                document.getElementById('starsCount').textContent = profile.stars;
+                document.getElementById('starsCount').textContent = userData.rating || 0;
             }
             
             // Отображаем звезды если есть контейнер
             if (document.getElementById('starsIcons')) {
-                const starsIcons = '⭐'.repeat(Math.min(profile.stars, 10));
-                document.getElementById('starsIcons').textContent = starsIcons + (profile.stars > 10 ? `+${profile.stars - 10}` : '');
+                const stars = userData.rating || 0;
+                const starsIcons = '⭐'.repeat(Math.min(stars, 10));
+                document.getElementById('starsIcons').textContent = starsIcons + (stars > 10 ? `+${stars - 10}` : '');
             }
             
             // Обновляем бейджи
-            updateUserBadges(profile);
+            updateUserBadges(userData);
             
         } catch (error) {
             console.error('Ошибка загрузки звездной системы:', error);
@@ -2211,16 +2143,12 @@ function highlightText(text, query) {
         
         let badgesHtml = '';
         
-        if (profile.stars >= 10) {
+        if (profile.rating >= 10) {
             badgesHtml += '<div class="top-master-badge">🏆 Топ-мастер</div> ';
         }
         
-        if (profile.stars >= 1000) {
+        if (profile.rating >= 1000) {
             badgesHtml += '<div class="premium-badge">🥇 Золотая карточка</div> ';
-        }
-        
-        if (profile.premium?.isActive) {
-            badgesHtml += '<div class="premium-badge">⭐ Премиум</div>';
         }
         
         badgesContainer.innerHTML = badgesHtml;
@@ -2610,11 +2538,6 @@ function highlightText(text, query) {
         alert(message);
     }
 
-        // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ КАРТЫ ==========
-    let map = null;
-    let userLocation = null;
-    let markers = [];
-
     // ========== ФУНКЦИИ ДЛЯ КАРТЫ ==========
 
     // Работа с картой
@@ -2628,6 +2551,9 @@ function highlightText(text, query) {
         } else {
             loadSkillsOnMap();
         }
+        
+        // Запускаем автообновление
+        startMapAutoRefresh();
     };
 
     function initMap() {
@@ -2695,224 +2621,266 @@ function highlightText(text, query) {
         }
     }
 
-// Обновляем функцию loadSkillsOnMap
-async function loadSkillsOnMap() {
-    try {
-        console.log('🗺️ Загрузка умейок с сервера для карты');
-        
-        // Загружаем умейки с сервера
-        const skills = await loadAllSkillsFromServer();
-        
-        console.log('📊 Получено умейок с сервера:', skills.length);
-        
-        // Получаем данные текущего пользователя
-        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-        
-        // Очищаем старые маркеры
-        if (markers.length > 0) {
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
-        }
-        
-        // Добавляем маркер пользователя если есть геолокация
-        if (userLocation) {
-            const userMarker = L.marker([userLocation.lat, userLocation.lon], {
-                icon: L.divIcon({
-                    className: 'user-marker',
-                    html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
-                    iconSize: [16, 16],
-                    iconAnchor: [8, 16]
-                })
-            })
-            .addTo(map)
-            .bindPopup(`📍 <b>${userData.firstName || 'Вы'}</b><br>Ваше местоположение`)
-            .openPopup();
+    // Загрузка умейок на карту
+    async function loadSkillsOnMap() {
+        try {
+            console.log('🗺️ Загрузка умейок с сервера для карты');
             
-            markers.push(userMarker);
-        }
-        
-        // Добавляем маркеры всех умейок
-        skills.forEach(skill => {
-            if (skill.location && skill.location.lat && skill.location.lon) {
-                const rating = skill.rating?.average || 5.0;
-                const color = getMarkerColor(rating);
-                const isUserSkill = skill.userId === currentUserId;
-                
-                // Создаем красивый попап
-                const popupContent = createSkillPopupContent(skill, isUserSkill);
-                
-                const marker = L.marker([skill.location.lat, skill.location.lon], {
+            // Загружаем умейки с сервера
+            const skills = await loadAllSkillsFromServer();
+            
+            console.log('📊 Получено умейок с сервера:', skills.length);
+            
+            // Получаем данные текущего пользователя
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+            
+            // Очищаем старые маркеры
+            if (markers.length > 0) {
+                markers.forEach(marker => map.removeLayer(marker));
+                markers = [];
+            }
+            
+            // Добавляем маркер пользователя если есть геолокация
+            if (userLocation) {
+                const userMarker = L.marker([userLocation.lat, userLocation.lon], {
                     icon: L.divIcon({
-                        className: 'umeyka-marker',
-                        html: `<div style="color: ${color}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
-                        iconSize: [30, 30],
-                        iconAnchor: [15, 30]
+                        className: 'user-marker',
+                        html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
+                        iconSize: [16, 16],
+                        iconAnchor: [8, 16]
                     })
                 })
                 .addTo(map)
-                .bindPopup(popupContent);
+                .bindPopup(`📍 <b>${userData.firstName || 'Вы'}</b><br>Ваше местоположение`)
+                .openPopup();
                 
-                // При открытии попапа увеличиваем счетчик просмотров
-                marker.on('popupopen', async () => {
-                    try {
-                        await fetch(`${API_URL}/api/skills/${skill._id}/view`, {
-                            method: 'POST'
-                        });
-                    } catch (error) {
-                        console.error('❌ Ошибка обновления просмотров:', error);
-                    }
-                });
-                
-                markers.push(marker);
+                markers.push(userMarker);
             }
-        });
-        
-        console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров');
-        
-        // Показываем статистику
-        if (skills.length > 0) {
-            showMapStats(skills);
-        }
-        
-    } catch (error) {
-        console.error('❌ Ошибка загрузки карты:', error);
-        
-        // Показываем сообщение об ошибке
-        if (map) {
-            L.popup()
-                .setLatLng([55.7558, 37.6173])
-                .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
-                .openOn(map);
+            
+            // Добавляем маркеры всех умейок
+            skills.forEach(skill => {
+                if (skill.location && skill.location.lat && skill.location.lon) {
+                    const rating = skill.rating?.average || 5.0;
+                    const color = getMarkerColor(rating);
+                    const isUserSkill = skill.userId === currentUserId;
+                    
+                    // Создаем красивый попап
+                    const popupContent = createSkillPopupContent(skill, isUserSkill);
+                    
+                    const marker = L.marker([skill.location.lat, skill.location.lon], {
+                        icon: L.divIcon({
+                            className: 'umeyka-marker',
+                            html: `<div style="color: ${color}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 30]
+                        })
+                    })
+                    .addTo(map)
+                    .bindPopup(popupContent);
+                    
+                    // При открытии попапа увеличиваем счетчик просмотров
+                    marker.on('popupopen', async () => {
+                        try {
+                            await fetch(`${API_URL}/api/skills/${skill._id}/view`, {
+                                method: 'POST'
+                            });
+                        } catch (error) {
+                            console.error('❌ Ошибка обновления просмотров:', error);
+                        }
+                    });
+                    
+                    markers.push(marker);
+                }
+            });
+            
+            console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров');
+            
+            // Показываем статистику
+            if (skills.length > 0) {
+                showMapStats(skills);
+            }
+            
+        } catch (error) {
+            console.error('❌ Ошибка загрузки карты:', error);
+            
+            // Показываем сообщение об ошибке
+            if (map) {
+                L.popup()
+                    .setLatLng([55.7558, 37.6173])
+                    .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
+                    .openOn(map);
+            }
         }
     }
-}
 
-// Функция создания контента для попапа
-function createSkillPopupContent(skill, isUserSkill) {
-    const rating = skill.rating?.average || 5.0;
-    
-    return `
-        <div style="min-width: 280px;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                ${skill.avatar ? 
-                    `<img src="${skill.avatar}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">` : 
-                    '<div style="width: 50px; height: 50px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">👤</div>'
-                }
-                <div>
-                    <h3 style="margin: 0; color: #2d3748; font-size: 18px;">${skill.skill}</h3>
-                    <p style="margin: 2px 0; color: #666; font-size: 14px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
+    // Получение цвета маркера по рейтингу
+    function getMarkerColor(rating) {
+        if (rating >= 4.5) return '#22c55e'; // Зеленый
+        if (rating >= 4.0) return '#8b5cf6'; // Фиолетовый  
+        if (rating >= 3.5) return '#eab308'; // Желтый
+        return '#6b7280'; // Серый
+    }
+
+    // Функция создания контента для попапа
+    function createSkillPopupContent(skill, isUserSkill) {
+        const rating = skill.rating?.average || 5.0;
+        
+        return `
+            <div style="min-width: 280px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    ${skill.avatar ? 
+                        `<img src="${skill.avatar}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">` : 
+                        '<div style="width: 50px; height: 50px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">👤</div>'
+                    }
+                    <div>
+                        <h3 style="margin: 0; color: #2d3748; font-size: 18px;">${skill.skill}</h3>
+                        <p style="margin: 2px 0; color: #666; font-size: 14px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
+                    </div>
                 </div>
-            </div>
-            
-            <div style="background: #f7fafc; padding: 12px; border-radius: 8px; margin: 10px 0;">
-                <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #667eea;">🎓</span>
-                    <span>${skill.experience}</span>
-                </p>
-                <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #667eea;">💰</span>
-                    <span><strong>${skill.price} руб.</strong></span>
-                </p>
-                <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #667eea;">⭐</span>
-                    <span>Рейтинг: <strong>${rating.toFixed(1)}/5</strong></span>
-                </p>
-                ${skill.category && skill.category !== 'другое' ? 
-                    `<p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
-                        <span style="color: #667eea;">🏷️</span>
-                        <span>${skill.category}</span>
-                    </p>` : ''
-                }
-            </div>
-            
-            <div style="display: flex; gap: 8px; margin: 10px 0; font-size: 12px; color: #666;">
-                <span>👁️ ${skill.views || 0} просмотров</span>
-                <span>•</span>
-                <span>💬 ${skill.contacts || 0} контактов</span>
-            </div>
-            
-            ${skill.isTopMaster ? 
-                '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px; border-radius: 15px; font-size: 12px; font-weight: bold; text-align: center; margin: 10px 0;">🏆 Топ-мастер</div>' : 
-                ''
-            }
-            
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-                <button onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')" 
-                        style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
-                    💬 Написать мастеру
-                </button>
-                <button onclick="showSkillDetails('${skill._id}')" 
-                        style="width: 100%; padding: 12px; background: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
-                    👁️ Подробнее
-                </button>
-                ${isUserSkill ? 
-                    `<button onclick="editSkill('${skill._id}')" 
-                            style="width: 100%; padding: 12px; background: #ed8936; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
-                        ✏️ Редактировать
-                    </button>` : 
+                
+                <div style="background: #f7fafc; padding: 12px; border-radius: 8px; margin: 10px 0;">
+                    <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #667eea;">🎓</span>
+                        <span>${skill.experience}</span>
+                    </p>
+                    <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #667eea;">💰</span>
+                        <span><strong>${skill.price} руб.</strong></span>
+                    </p>
+                    <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #667eea;">⭐</span>
+                        <span>Рейтинг: <strong>${rating.toFixed(1)}/5</strong></span>
+                    </p>
+                    ${skill.category && skill.category !== 'другое' ? 
+                        `<p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: #667eea;">🏷️</span>
+                            <span>${skill.category}</span>
+                        </p>` : ''
+                    }
+                </div>
+                
+                <div style="display: flex; gap: 8px; margin: 10px 0; font-size: 12px; color: #666;">
+                    <span>👁️ ${skill.views || 0} просмотров</span>
+                    <span>•</span>
+                    <span>💬 ${skill.contacts || 0} контактов</span>
+                </div>
+                
+                ${skill.isTopMaster ? 
+                    '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px; border-radius: 15px; font-size: 12px; font-weight: bold; text-align: center; margin: 10px 0;">🏆 Топ-мастер</div>' : 
                     ''
                 }
+                
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                    <button onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')" 
+                            style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
+                        💬 Написать мастеру
+                    </button>
+                    <button onclick="showSkillDetails('${skill._id}')" 
+                            style="width: 100%; padding: 12px; background: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
+                        👁️ Подробнее
+                    </button>
+                    ${isUserSkill ? 
+                        `<button onclick="editSkill('${skill._id}')" 
+                                style="width: 100%; padding: 12px; background: #ed8936; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
+                            ✏️ Редактировать
+                        </button>` : 
+                        ''
+                    }
+                </div>
             </div>
-        </div>
-    `;
-}
+        `;
+    }
 
-// Показать статистику на карте
-function showMapStats(skills) {
-    const total = skills.length;
-    const avgPrice = Math.round(skills.reduce((sum, s) => sum + (s.price || 0), 0) / total);
-    const topMasters = skills.filter(s => s.isTopMaster).length;
-    
-    const statsHtml = `
-        <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 250px;">
-            <h4 style="margin: 0 0 10px 0; color: #667eea;">📊 Статистика карты</h4>
-            <p style="margin: 5px 0; font-size: 14px;">🔧 Умейек на карте: <strong>${total}</strong></p>
-            <p style="margin: 5px 0; font-size: 14px;">💰 Средняя цена: <strong>${avgPrice} ₽</strong></p>
-            <p style="margin: 5px 0; font-size: 14px;">🏆 Топ-мастеров: <strong>${topMasters}</strong></p>
-            <button onclick="refreshMap()" 
-                    style="margin-top: 10px; padding: 8px 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%;">
-                🔄 Обновить карту
-            </button>
-        </div>
-    `;
-    
-    // Добавляем статистику на карту
-    const statsControl = L.control({ position: 'topright' });
-    statsControl.onAdd = function(map) {
-        this._div = L.DomUtil.create('div', 'map-stats');
-        this._div.innerHTML = statsHtml;
-        return this._div;
+    // Показать статистику на карте
+    function showMapStats(skills) {
+        const total = skills.length;
+        const avgPrice = Math.round(skills.reduce((sum, s) => sum + (s.price || 0), 0) / total);
+        const topMasters = skills.filter(s => s.isTopMaster).length;
+        
+        const statsHtml = `
+            <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 250px;">
+                <h4 style="margin: 0 0 10px 0; color: #667eea;">📊 Статистика карты</h4>
+                <p style="margin: 5px 0; font-size: 14px;">🔧 Умейек на карте: <strong>${total}</strong></p>
+                <p style="margin: 5px 0; font-size: 14px;">💰 Средняя цена: <strong>${avgPrice} ₽</strong></p>
+                <p style="margin: 5px 0; font-size: 14px;">🏆 Топ-мастеров: <strong>${topMasters}</strong></p>
+                <button onclick="refreshMap()" 
+                        style="margin-top: 10px; padding: 8px 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%;">
+                    🔄 Обновить карту
+                </button>
+            </div>
+        `;
+        
+        // Добавляем статистику на карту
+        const statsControl = L.control({ position: 'topright' });
+        statsControl.onAdd = function(map) {
+            this._div = L.DomUtil.create('div', 'map-stats');
+            this._div.innerHTML = statsHtml;
+            return this._div;
+        };
+        statsControl.addTo(map);
+    }
+
+    // Функция обновления карты
+    window.refreshMap = function() {
+        if (map) {
+            loadSkillsOnMap();
+            showNotification('🗺️ Карта обновлена!');
+        }
     };
-    statsControl.addTo(map);
-}
 
-// Функция обновления карты
-window.refreshMap = function() {
-    if (map) {
-        loadSkillsOnMap();
-        showNotification('🗺️ Карта обновлена!');
-    }
-};
+    // Контакт с мастером (увеличиваем счетчик контактов)
+    window.contactMaster = async function(skillId, skillName, masterName) {
+        try {
+            // Увеличиваем счетчик контактов на сервере
+            await fetch(`${API_URL}/api/skills/${skillId}/contact`, {
+                method: 'POST'
+            });
+            
+            // Показываем сообщение
+            const message = `💬 Контакт с мастером:\n\nМастер: ${masterName}\nУслуга: ${skillName}\n\nОткройте Telegram и напишите мастеру напрямую!\n\nPS: Мастер получил уведомление о вашем интересе.`;
+            alert(message);
+            
+        } catch (error) {
+            console.error('❌ Ошибка контакта:', error);
+            alert(`💬 Напишите мастеру ${masterName} в Telegram о услуге: ${skillName}`);
+        }
+    };
 
-// Контакт с мастером (увеличиваем счетчик контактов)
-window.contactMaster = async function(skillId, skillName, masterName) {
-    try {
-        // Увеличиваем счетчик контактов на сервере
-        await fetch(`${API_URL}/api/skills/${skillId}/contact`, {
-            method: 'POST'
-        });
+    // Показать детали умейки
+    window.showSkillDetails = function(skillId) {
+        alert('📊 Детальная информация об умейке\n\nЗдесь будут:\n• Подробные рейтинги по категориям\n• Отзывы клиентов\n• Фотографии работ\n• Статистика мастера\n\nФункция в разработке!');
+    };
+
+    // Редактирование умейки
+    window.editSkill = function(skillId) {
+        alert('✏️ Редактирование умейки\n\nФункция в разработке! Скоро будет доступна.');
+    };
+
+    // ========== АВТООБНОВЛЕНИЕ КАРТЫ ==========
+
+    function startMapAutoRefresh() {
+        if (mapRefreshInterval) {
+            clearInterval(mapRefreshInterval);
+        }
         
-        // Показываем сообщение
-        const message = `💬 Контакт с мастером:\n\nМастер: ${masterName}\nУслуга: ${skillName}\n\nОткройте Telegram и напишите мастеру напрямую!\n\nPS: Мастер получил уведомление о вашем интересе.`;
-        alert(message);
-        
-    } catch (error) {
-        console.error('❌ Ошибка контакта:', error);
-        alert(`💬 Напишите мастеру ${masterName} в Telegram о услуге: ${skillName}`);
+        mapRefreshInterval = setInterval(() => {
+            if (map && document.querySelector('.map-active')) {
+                console.log('🔄 Автоматическое обновление карты...');
+                loadSkillsOnMap();
+            }
+        }, 30000); // 30 секунд
     }
-};    
 
-         // Функция для тестирования - создает демо пользователей
+    function stopMapAutoRefresh() {
+        if (mapRefreshInterval) {
+            clearInterval(mapRefreshInterval);
+            mapRefreshInterval = null;
+        }
+    }
+
+    // ========== ДЕМО ДАННЫЕ ==========
+
+    // Функция для тестирования - создает демо пользователей
     window.createDemoMarket = function() {
         if (confirm('Создать демо-рынок с умейками других пользователей?')) {
             const demoSkills = [
@@ -2973,62 +2941,6 @@ window.contactMaster = async function(skillId, skillName, masterName) {
             if (map) loadSkillsOnMap();
         }
     };
-
-    // Добавляем в конец скрипта (перед закрывающим </script>)
-// Автоматическое обновление карты каждые 30 секунд
-let mapRefreshInterval = null;
-
-function startMapAutoRefresh() {
-    if (mapRefreshInterval) {
-        clearInterval(mapRefreshInterval);
-    }
-    
-    mapRefreshInterval = setInterval(() => {
-        if (map && document.querySelector('.map-active')) {
-            console.log('🔄 Автоматическое обновление карты...');
-            loadSkillsOnMap();
-        }
-    }, 30000); // 30 секунд
-}
-
-function stopMapAutoRefresh() {
-    if (mapRefreshInterval) {
-        clearInterval(mapRefreshInterval);
-        mapRefreshInterval = null;
-    }
-}
-
-// Обновляем функцию openMap для включения автообновления
-window.openMap = function() {
-    console.log('🗺️ Открытие карты');
-    const mapSection = document.querySelector('.map-section');
-    mapSection.classList.add('map-active');
-    
-    if (!map) {
-        initMap();
-    } else {
-        loadSkillsOnMap();
-    }
-    
-    // Запускаем автообновление
-    startMapAutoRefresh();
-};
-
-// Обновляем showMainScreen для остановки автообновления
-window.showMainScreen = function() {
-    // Останавливаем автообновление карты
-    stopMapAutoRefresh();
-    
-    document.getElementById('mainScreen').style.display = 'block';
-    document.getElementById('masterSection').style.display = 'none';
-    document.getElementById('clientSection').style.display = 'none';
-    document.getElementById('profileSection').style.display = 'none';
-    document.getElementById('editProfileSection').style.display = 'none';
-    document.getElementById('createDealSection').style.display = 'none';
-    document.getElementById('aboutSection').style.display = 'none';
-    document.getElementById('chatWindow').style.display = 'none';
-    document.querySelector('.map-section').classList.remove('map-active');
-};    
-</script>
+    </script>
 </body>
 </html>
