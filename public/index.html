@@ -2695,180 +2695,222 @@ function highlightText(text, query) {
         }
     }
 
-    async function loadSkillsOnMap() {
-        try {
-            console.log('🗺️ Загрузка умейок на карту');
+// Обновляем функцию loadSkillsOnMap
+async function loadSkillsOnMap() {
+    try {
+        console.log('🗺️ Загрузка умейок с сервера для карты');
+        
+        // Загружаем умейки с сервера
+        const skills = await loadAllSkillsFromServer();
+        
+        console.log('📊 Получено умейок с сервера:', skills.length);
+        
+        // Получаем данные текущего пользователя
+        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+        
+        // Очищаем старые маркеры
+        if (markers.length > 0) {
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+        }
+        
+        // Добавляем маркер пользователя если есть геолокация
+        if (userLocation) {
+            const userMarker = L.marker([userLocation.lat, userLocation.lon], {
+                icon: L.divIcon({
+                    className: 'user-marker',
+                    html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 16]
+                })
+            })
+            .addTo(map)
+            .bindPopup(`📍 <b>${userData.firstName || 'Вы'}</b><br>Ваше местоположение`)
+            .openPopup();
             
-            // Получаем ВСЕ умейки из общего рынка
-            const marketSkills = getLocalStorage('market_skills') || [];
-            
-            // Получаем данные текущего пользователя
-            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-            
-            // Если на рынке мало умейок, добавляем демо
-            let skillsToShow = marketSkills;
-            if (marketSkills.length < 3) {
-                const demoSkills = [
-                    {
-                        _id: 'demo1',
-                        skill: 'Ремонт смартфонов',
-                        experience: '5 лет опыта',
-                        price: 1500,
-                        userId: 'demo_user_1',
-                        username: 'Алексей',
-                        rating: { average: 4.8, reviews: [] },
-                        isTopMaster: true,
-                        location: { lat: 55.7558, lon: 37.6176 },
-                        isActive: true
-                    },
-                    {
-                        _id: 'demo2', 
-                        skill: 'Сантехник',
-                        experience: '7 лет опыта',
-                        price: 2000,
-                        userId: 'demo_user_2',
-                        username: 'Иван',
-                        rating: { average: 4.9, reviews: [] },
-                        isTopMaster: false,
-                        location: { lat: 55.7517, lon: 37.6178 },
-                        isActive: true
-                    },
-                    {
-                        _id: 'demo3',
-                        skill: 'Электрик',
-                        experience: '3 года опыта', 
-                        price: 1200,
-                        userId: 'demo_user_3',
-                        username: 'Петр',
-                        rating: { average: 4.5, reviews: [] },
-                        isTopMaster: true,
-                        location: { lat: 55.7598, lon: 37.6172 },
-                        isActive: true
-                    }
-                ];
+            markers.push(userMarker);
+        }
+        
+        // Добавляем маркеры всех умейок
+        skills.forEach(skill => {
+            if (skill.location && skill.location.lat && skill.location.lon) {
+                const rating = skill.rating?.average || 5.0;
+                const color = getMarkerColor(rating);
+                const isUserSkill = skill.userId === currentUserId;
                 
-                // Объединяем, исключая дубли
-                const demoSkillsToAdd = demoSkills.filter(demo => 
-                    !marketSkills.some(market => market._id === demo._id)
-                );
-                skillsToShow = [...marketSkills, ...demoSkillsToAdd];
-            }
-            
-            // Фильтруем только активные умейки
-            skillsToShow = skillsToShow.filter(skill => skill.isActive !== false);
-            
-            console.log('📊 Всего умейок на рынке:', skillsToShow.length);
-            
-            // Очищаем старые маркеры
-            if (markers.length > 0) {
-                markers.forEach(marker => map.removeLayer(marker));
-                markers = [];
-            }
-            
-            // Добавляем маркер пользователя если есть геолокация
-            if (userLocation) {
-                const userMarker = L.marker([userLocation.lat, userLocation.lon], {
+                // Создаем красивый попап
+                const popupContent = createSkillPopupContent(skill, isUserSkill);
+                
+                const marker = L.marker([skill.location.lat, skill.location.lon], {
                     icon: L.divIcon({
-                        className: 'user-marker',
-                        html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
-                        iconSize: [16, 16],
-                        iconAnchor: [8, 16]
+                        className: 'umeyka-marker',
+                        html: `<div style="color: ${color}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 30]
                     })
                 })
                 .addTo(map)
-                .bindPopup(`📍 <b>${userData.firstName || 'Вы'}</b><br>Ваше местоположение`)
-                .openPopup();
+                .bindPopup(popupContent);
                 
-                markers.push(userMarker);
+                // При открытии попапа увеличиваем счетчик просмотров
+                marker.on('popupopen', async () => {
+                    try {
+                        await fetch(`${API_URL}/api/skills/${skill._id}/view`, {
+                            method: 'POST'
+                        });
+                    } catch (error) {
+                        console.error('❌ Ошибка обновления просмотров:', error);
+                    }
+                });
+                
+                markers.push(marker);
             }
-            
-            // Добавляем маркеры всех умейок
-            skillsToShow.forEach(skill => {
-                if (skill.location && skill.location.lat && skill.location.lon) {
-                    const rating = skill.rating?.average || 5.0;
-                    const color = getMarkerColor(rating);
-                    const isUserSkill = skill.userId === currentUserId;
-                    const hasAvatar = skill.avatar ? '✅' : '👤';
-                    
-                    // Создаем красивый попап
-                    const popupContent = `
-                        <div style="min-width: 250px;">
-                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                ${skill.avatar ? 
-                                    `<img src="${skill.avatar}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">` : 
-                                    '<div style="width: 40px; height: 40px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white;">👤</div>'
-                                }
-                                <div>
-                                    <h3 style="margin: 0; color: #2d3748;">${skill.skill}</h3>
-                                    <p style="margin: 2px 0; color: #666; font-size: 14px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
-                                </div>
-                            </div>
-                            
-                            <div style="background: #f7fafc; padding: 10px; border-radius: 8px; margin: 10px 0;">
-                                <p style="margin: 5px 0; color: #2d3748;">🎓 ${skill.experience}</p>
-                                <p style="margin: 5px 0; color: #2d3748;">💰 <strong>${skill.price} руб.</strong></p>
-                                <p style="margin: 5px 0; color: #2d3748;">⭐ Рейтинг: <strong>${skill.rating?.average?.toFixed(1) || '5.0'}/5</strong></p>
-                            </div>
-                            
-                            ${skill.isTopMaster ? 
-                                '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; text-align: center; margin: 10px 0;">🏆 Топ-мастер</div>' : 
-                                ''
-                            }
-                            
-                            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
-                                <button onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')" 
-                                        style="width: 100%; padding: 10px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                                    💬 Написать мастеру
-                                </button>
-                                <button onclick="showSkillDetails('${skill._id}')" 
-                                        style="width: 100%; padding: 10px; background: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                                    👁️ Подробнее
-                                </button>
-                                ${isUserSkill ? 
-                                    `<button onclick="editSkill('${skill._id}')" 
-                                            style="width: 100%; padding: 10px; background: #ed8936; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
-                                        ✏️ Редактировать
-                                    </button>` : 
-                                    ''
-                                }
-                            </div>
-                        </div>
-                    `;
-                    
-                    const marker = L.marker([skill.location.lat, skill.location.lon], {
-                        icon: L.divIcon({
-                            className: 'umeyka-marker',
-                            html: `<div style="color: ${color}; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : 'Y'}</div>`,
-                            iconSize: [24, 24],
-                            iconAnchor: [12, 12]
-                        })
-                    })
-                    .addTo(map)
-                    .bindPopup(popupContent);
-                    
-                    markers.push(marker);
-                }
-            });
-            
-            console.log('✅ Умейки загружены на карту:', skillsToShow.length, 'маркеров');
-            
-        } catch (error) {
-            console.error('❌ Ошибка загрузки карты:', error);
+        });
+        
+        console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров');
+        
+        // Показываем статистику
+        if (skills.length > 0) {
+            showMapStats(skills);
+        }
+        
+    } catch (error) {
+        console.error('❌ Ошибка загрузки карты:', error);
+        
+        // Показываем сообщение об ошибке
+        if (map) {
+            L.popup()
+                .setLatLng([55.7558, 37.6173])
+                .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
+                .openOn(map);
         }
     }
+}
 
-    // Получение цвета маркера по рейтингу
-    function getMarkerColor(rating) {
-        if (rating >= 4.5) return '#22c55e'; // Зеленый
-        if (rating >= 4.0) return '#8b5cf6'; // Фиолетовый  
-        if (rating >= 3.5) return '#eab308'; // Желтый
-        return '#6b7280'; // Серый
+// Функция создания контента для попапа
+function createSkillPopupContent(skill, isUserSkill) {
+    const rating = skill.rating?.average || 5.0;
+    
+    return `
+        <div style="min-width: 280px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                ${skill.avatar ? 
+                    `<img src="${skill.avatar}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">` : 
+                    '<div style="width: 50px; height: 50px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">👤</div>'
+                }
+                <div>
+                    <h3 style="margin: 0; color: #2d3748; font-size: 18px;">${skill.skill}</h3>
+                    <p style="margin: 2px 0; color: #666; font-size: 14px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
+                </div>
+            </div>
+            
+            <div style="background: #f7fafc; padding: 12px; border-radius: 8px; margin: 10px 0;">
+                <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #667eea;">🎓</span>
+                    <span>${skill.experience}</span>
+                </p>
+                <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #667eea;">💰</span>
+                    <span><strong>${skill.price} руб.</strong></span>
+                </p>
+                <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
+                    <span style="color: #667eea;">⭐</span>
+                    <span>Рейтинг: <strong>${rating.toFixed(1)}/5</strong></span>
+                </p>
+                ${skill.category && skill.category !== 'другое' ? 
+                    `<p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #667eea;">🏷️</span>
+                        <span>${skill.category}</span>
+                    </p>` : ''
+                }
+            </div>
+            
+            <div style="display: flex; gap: 8px; margin: 10px 0; font-size: 12px; color: #666;">
+                <span>👁️ ${skill.views || 0} просмотров</span>
+                <span>•</span>
+                <span>💬 ${skill.contacts || 0} контактов</span>
+            </div>
+            
+            ${skill.isTopMaster ? 
+                '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px; border-radius: 15px; font-size: 12px; font-weight: bold; text-align: center; margin: 10px 0;">🏆 Топ-мастер</div>' : 
+                ''
+            }
+            
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+                <button onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')" 
+                        style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
+                    💬 Написать мастеру
+                </button>
+                <button onclick="showSkillDetails('${skill._id}')" 
+                        style="width: 100%; padding: 12px; background: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
+                    👁️ Подробнее
+                </button>
+                ${isUserSkill ? 
+                    `<button onclick="editSkill('${skill._id}')" 
+                            style="width: 100%; padding: 12px; background: #ed8936; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
+                        ✏️ Редактировать
+                    </button>` : 
+                    ''
+                }
+            </div>
+        </div>
+    `;
+}
+
+// Показать статистику на карте
+function showMapStats(skills) {
+    const total = skills.length;
+    const avgPrice = Math.round(skills.reduce((sum, s) => sum + (s.price || 0), 0) / total);
+    const topMasters = skills.filter(s => s.isTopMaster).length;
+    
+    const statsHtml = `
+        <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 250px;">
+            <h4 style="margin: 0 0 10px 0; color: #667eea;">📊 Статистика карты</h4>
+            <p style="margin: 5px 0; font-size: 14px;">🔧 Умейек на карте: <strong>${total}</strong></p>
+            <p style="margin: 5px 0; font-size: 14px;">💰 Средняя цена: <strong>${avgPrice} ₽</strong></p>
+            <p style="margin: 5px 0; font-size: 14px;">🏆 Топ-мастеров: <strong>${topMasters}</strong></p>
+            <button onclick="refreshMap()" 
+                    style="margin-top: 10px; padding: 8px 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%;">
+                🔄 Обновить карту
+            </button>
+        </div>
+    `;
+    
+    // Добавляем статистику на карту
+    const statsControl = L.control({ position: 'topright' });
+    statsControl.onAdd = function(map) {
+        this._div = L.DomUtil.create('div', 'map-stats');
+        this._div.innerHTML = statsHtml;
+        return this._div;
+    };
+    statsControl.addTo(map);
+}
+
+// Функция обновления карты
+window.refreshMap = function() {
+    if (map) {
+        loadSkillsOnMap();
+        showNotification('🗺️ Карта обновлена!');
     }
+};
 
-    // Показать детали умейки
-    window.showSkillDetails = function(skillId) {
-        alert('📊 Детальная информация об умейке\n\nЗдесь будут:\n• Подробные рейтинги по категориям\n• Отзывы клиентов\n• Фотографии работ\n• Статистика мастера\n\nФункция в разработке!');
-    };    
+// Контакт с мастером (увеличиваем счетчик контактов)
+window.contactMaster = async function(skillId, skillName, masterName) {
+    try {
+        // Увеличиваем счетчик контактов на сервере
+        await fetch(`${API_URL}/api/skills/${skillId}/contact`, {
+            method: 'POST'
+        });
+        
+        // Показываем сообщение
+        const message = `💬 Контакт с мастером:\n\nМастер: ${masterName}\nУслуга: ${skillName}\n\nОткройте Telegram и напишите мастеру напрямую!\n\nPS: Мастер получил уведомление о вашем интересе.`;
+        alert(message);
+        
+    } catch (error) {
+        console.error('❌ Ошибка контакта:', error);
+        alert(`💬 Напишите мастеру ${masterName} в Telegram о услуге: ${skillName}`);
+    }
+};    
 
          // Функция для тестирования - создает демо пользователей
     window.createDemoMarket = function() {
@@ -2930,7 +2972,63 @@ function highlightText(text, query) {
             // Обновляем карту и поиск
             if (map) loadSkillsOnMap();
         }
-    };   
+    };
+
+    // Добавляем в конец скрипта (перед закрывающим </script>)
+// Автоматическое обновление карты каждые 30 секунд
+let mapRefreshInterval = null;
+
+function startMapAutoRefresh() {
+    if (mapRefreshInterval) {
+        clearInterval(mapRefreshInterval);
+    }
+    
+    mapRefreshInterval = setInterval(() => {
+        if (map && document.querySelector('.map-active')) {
+            console.log('🔄 Автоматическое обновление карты...');
+            loadSkillsOnMap();
+        }
+    }, 30000); // 30 секунд
+}
+
+function stopMapAutoRefresh() {
+    if (mapRefreshInterval) {
+        clearInterval(mapRefreshInterval);
+        mapRefreshInterval = null;
+    }
+}
+
+// Обновляем функцию openMap для включения автообновления
+window.openMap = function() {
+    console.log('🗺️ Открытие карты');
+    const mapSection = document.querySelector('.map-section');
+    mapSection.classList.add('map-active');
+    
+    if (!map) {
+        initMap();
+    } else {
+        loadSkillsOnMap();
+    }
+    
+    // Запускаем автообновление
+    startMapAutoRefresh();
+};
+
+// Обновляем showMainScreen для остановки автообновления
+window.showMainScreen = function() {
+    // Останавливаем автообновление карты
+    stopMapAutoRefresh();
+    
+    document.getElementById('mainScreen').style.display = 'block';
+    document.getElementById('masterSection').style.display = 'none';
+    document.getElementById('clientSection').style.display = 'none';
+    document.getElementById('profileSection').style.display = 'none';
+    document.getElementById('editProfileSection').style.display = 'none';
+    document.getElementById('createDealSection').style.display = 'none';
+    document.getElementById('aboutSection').style.display = 'none';
+    document.getElementById('chatWindow').style.display = 'none';
+    document.querySelector('.map-section').classList.remove('map-active');
+};    
 </script>
 </body>
 </html>
