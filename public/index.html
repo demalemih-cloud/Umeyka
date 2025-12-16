@@ -1399,9 +1399,6 @@
 const API_URL = 'https://umeyka-oocn.onrender.com';
 let currentUserId = null;
 let currentAvatar = null;
-let selectedQuality = '';
-let selectedOptions = [];
-let projectRating = 0;
 
 // Карта
 let map = null;
@@ -1409,21 +1406,34 @@ let userLocation = null;
 let markers = [];
 let mapRefreshInterval = null;
 
-// LocalStorage helpers
+// LocalStorage
 function getLocalStorage(key) {
-    try { return localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)) : null; }
-    catch { return null; }
+    try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+    } catch {
+        return null;
+    }
 }
 function setLocalStorage(key, value) {
-    try { localStorage.setItem(key, JSON.stringify(value)); return true; }
-    catch { return false; }
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 const demoUserData = {
-    firstName: 'Пользователь', age: null, experience: '', contact: '', bio: 'Расскажите о себе...', avatar: null
+    firstName: 'Пользователь',
+    bio: 'Расскажите о себе...',
+    age: null,
+    experience: '',
+    contact: '',
+    avatar: null
 };
 
-// Улучшенный API request
+// ========== API ==========
 async function apiRequest(endpoint, options = {}) {
     try {
         console.log('API →', API_URL + endpoint);
@@ -1437,7 +1447,7 @@ async function apiRequest(endpoint, options = {}) {
         return data;
     } catch (err) {
         console.error('API error:', err);
-        alert(`Ошибка связи: ${err.message}. Сервер может "просыпаться" до 50 сек.`);
+        alert('Ошибка связи с сервером. Подождите — сервер может "просыпаться" до 50 секунд.');
         return { success: false, error: err.message };
     }
 }
@@ -1447,27 +1457,19 @@ window.changeAvatar = () => document.getElementById('avatarInput').click();
 
 window.handleAvatarUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            currentAvatar = ev.target.result;
-            document.getElementById('avatarPreview').innerHTML = `<img src="${currentAvatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-        };
-        reader.readAsDataURL(file);
-    }
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        currentAvatar = ev.target.result;
+        const preview = document.getElementById('avatarPreview');
+        preview.innerHTML = `<img src="${currentAvatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        preview.style.background = 'transparent';
+    };
+    reader.readAsDataURL(file);
 };
 
 async function loadProfileToForm() {
-    let userData = getLocalStorage(`user_${currentUserId}`);
-    if (!userData) {
-        const tg = window.Telegram?.WebApp;
-        if (tg?.initDataUnsafe?.user) {
-            const u = tg.initDataUnsafe.user;
-            userData = { firstName: u.first_name || 'Пользователь', bio: 'Расскажите о себе...', avatar: null };
-        } else {
-            userData = { ...demoUserData };
-        }
-    }
+    let userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
     document.getElementById('editFirstName').value = userData.firstName || '';
     document.getElementById('editAge').value = userData.age || '';
     document.getElementById('editExperience').value = userData.experience || '';
@@ -1477,7 +1479,7 @@ async function loadProfileToForm() {
     const preview = document.getElementById('avatarPreview');
     if (userData.avatar) {
         currentAvatar = userData.avatar;
-        preview.innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        preview.innerHTML = `<img src="${currentAvatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
         preview.style.background = 'transparent';
     } else {
         preview.innerHTML = '👤';
@@ -1485,31 +1487,37 @@ async function loadProfileToForm() {
     }
 }
 
-window.saveProfile = async () => {
+window.saveProfile = () => {
     const firstName = document.getElementById('editFirstName').value.trim();
     const bio = document.getElementById('editBio').value.trim();
-    if (!firstName || !bio) return alert('Заполните имя и "О себе"');
+    if (!firstName || !bio) {
+        alert('Заполните имя и "О себе"');
+        return;
+    }
 
     let userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
     const updated = {
         ...userData,
         firstName,
+        bio,
         age: document.getElementById('editAge').value ? parseInt(document.getElementById('editAge').value) : null,
         experience: document.getElementById('editExperience').value.trim(),
         contact: document.getElementById('editContact').value.trim(),
-        bio,
-        avatar: currentAvatar || userData.avatar,
-        updatedAt: new Date().toISOString()
+        avatar: currentAvatar || userData.avatar
     };
+
     if (setLocalStorage(`user_${currentUserId}`, updated)) {
         alert('Профиль сохранён!');
-        setTimeout(showProfileSection, 800);
+        setTimeout(() => showProfileSection(), 800);
+    } else {
+        alert('Ошибка сохранения');
     }
 };
 
-async function loadUserProfileDisplay() {
+function loadUserProfileDisplay() {
     const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
     document.getElementById('userName').textContent = userData.firstName || 'Пользователь';
+
     const avatar = document.getElementById('userAvatar');
     if (userData.avatar) {
         avatar.innerHTML = `<img src="${userData.avatar}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
@@ -1518,6 +1526,7 @@ async function loadUserProfileDisplay() {
         avatar.innerHTML = '👤';
         avatar.style.background = '#667eea';
     }
+
     let info = userData.bio || 'Расскажите о себе...';
     if (userData.age || userData.experience || userData.contact) {
         info += '<br><br>';
@@ -1528,18 +1537,29 @@ async function loadUserProfileDisplay() {
     document.getElementById('userBio').innerHTML = info;
 }
 
-window.editProfile = () => { showSection('editProfileSection'); loadProfileToForm(); };
+window.editProfile = () => {
+    showSection('editProfileSection');
+    loadProfileToForm();
+};
 
 // ========== НАВИГАЦИЯ ==========
 function hideAllSections() {
-    ['mainScreen','masterSection','clientSection','profileSection','editProfileSection','createDealSection','aboutSection','chatWindow'].forEach(id => {
-        document.getElementById(id).style.display = 'none';
+    const sections = ['mainScreen','masterSection','clientSection','profileSection','editProfileSection','createDealSection','aboutSection','chatWindow'];
+    sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
     });
-    document.querySelector('.map-section').classList.remove('map-active');
-    stopMapAutoRefresh();
+    document.querySelector('.map-section')?.classList.remove('map-active');
+    if (mapRefreshInterval) {
+        clearInterval(mapRefreshInterval);
+        mapRefreshInterval = null;
+    }
 }
 
-window.showMainScreen = () => { hideAllSections(); document.getElementById('mainScreen').style.display = 'block'; };
+window.showMainScreen = () => {
+    hideAllSections();
+    document.getElementById('mainScreen').style.display = 'block';
+};
 
 window.showSection = (id) => {
     hideAllSections();
@@ -1548,29 +1568,48 @@ window.showSection = (id) => {
 };
 
 window.showAboutSection = () => showSection('aboutSection');
+
 window.showProfileSection = () => {
     showSection('profileSection');
     loadUserProfileDisplay();
-    loadUserStats();
+    loadUserStats(); // можно оставить пустую или демо
     loadProfileSkills();
-    loadUserChats();
 };
+
+// Демка статистики (пока нет реальной)
+function loadUserStats() {
+    document.getElementById('userStats').innerHTML = `
+        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Умейки</div></div>
+        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Чаты</div></div>
+        <div class="stat-card"><div class="stat-value">0</div><div class="stat-label">Сделки</div></div>
+        <div class="stat-card"><div class="stat-value">5.0</div><div class="stat-label">Рейтинг</div></div>
+    `;
+}
 
 // ========== УМЕЙКИ ==========
 window.addSkill = async () => {
     const name = document.getElementById('skillName').value.trim();
     const exp = document.getElementById('skillExperience').value.trim();
-    const price = parseInt(document.getElementById('skillPrice').value);
+    const priceStr = document.getElementById('skillPrice').value;
+    const price = parseInt(priceStr);
 
-    if (!name || !exp || isNaN(price) || price < 100) {
-        return alert('Заполните все поля. Цена — минимум 100 ₽');
+    if (!name || !exp || !priceStr || isNaN(price) || price < 100) {
+        alert('Заполните все поля правильно. Цена — минимум 100 ₽');
+        return;
     }
 
+    // Получаем геолокацию
     if (!userLocation) {
         await new Promise(resolve => {
             navigator.geolocation.getCurrentPosition(
-                pos => { userLocation = { lat: pos.coords.latitude, lon: pos.coords.longitude }; resolve(); },
-                () => { userLocation = { lat: 55.7558, lon: 37.6173 }; resolve(); }
+                pos => {
+                    userLocation = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+                    resolve();
+                },
+                () => {
+                    userLocation = { lat: 55.7558, lon: 37.6173 }; // Москва по умолчанию
+                    resolve();
+                }
             );
         });
     }
@@ -1583,7 +1622,7 @@ window.addSkill = async () => {
             skill: name,
             experience: exp,
             price,
-            userId: currentUserId,
+            userId: currentUserId || 'unknown',
             username: userData.firstName || 'Аноним',
             location: userLocation,
             category: 'другое',
@@ -1593,58 +1632,79 @@ window.addSkill = async () => {
     });
 
     if (result.success) {
-        alert('Умейка добавлена!');
+        alert('Умейка успешно добавлена!');
         document.getElementById('skillName').value = '';
         document.getElementById('skillExperience').value = '';
         document.getElementById('skillPrice').value = '';
         loadMySkills();
         loadProfileSkills();
-        if (map) loadSkillsOnMap();
     } else {
-        alert('Ошибка: ' + (result.error || 'неизвестная'));
+        alert('Ошибка добавления: ' + (result.error || 'неизвестно'));
     }
 };
 
 async function loadMySkills() {
-    if (!currentUserId) return;
+    if (!currentUserId) {
+        document.getElementById('mySkillsList').innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.7);padding:20px;">Войдите в Telegram для добавления умейок</div>';
+        return;
+    }
+
     const list = document.getElementById('mySkillsList');
     const res = await apiRequest(`/api/skills/user/${currentUserId}`);
-    if (res.success && res.skills?.length > 0) {
+
+    if (res.success && res.skills && res.skills.length > 0) {
         list.innerHTML = res.skills.map(s => `
             <div class="skill-card">
-                <div class="skill-header"><div class="skill-title">${s.skill}</div><div class="skill-rating">★★★★★</div></div>
+                <div class="skill-header">
+                    <div class="skill-title">${s.skill}</div>
+                    <div class="skill-rating">★★★★★</div>
+                </div>
                 <div class="skill-price">${s.price} ₽</div>
                 <div class="skill-distance">Опыт: ${s.experience}</div>
-                <div style="color:#666;margin-bottom:15px;">${s.username}</div>
-                <div style="color:#48bb78;font-size:14px;margin-bottom:10px;">Просмотров: ${s.views||0} • Контактов: ${s.contacts||0}</div>
-                <button class="chat-button" onclick="editSkill('${s._id}')" style="background:#4299e1;margin-top:10px;">Редактировать</button>
-                <button class="chat-button" onclick="deleteSkill('${s._id}')" style="background:#f56565;margin-top:5px;">Удалить</button>
+                <div style="color:#666;margin:15px 0;">${s.username || 'Вы'}</div>
+                <div style="color:#48bb78;font-size:14px;">Просмотров: ${s.views || 0} • Контактов: ${s.contacts || 0}</div>
             </div>
         `).join('');
     } else {
-        list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.7);padding:20px;">Нет умейок</div>';
+        list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.7);padding:20px;">У вас пока нет умейок. Добавьте первую!</div>';
     }
-};
-
-async function loadProfileSkills() {
-    // аналогично loadMySkills, но для profileSkillsList — можешь скопировать и изменить id
-    // (в полной версии они почти одинаковые)
 }
 
-// Остальные функции (поиск, карта, сделки и т.д.) оставь как в моей предыдущей версии
+async function loadProfileSkills() {
+    // Копируем логику loadMySkills, но для другого контейнера
+    const list = document.getElementById('profileSkillsList');
+    if (!list) return;
+    await loadMySkills(); // временно — потом сделаем отдельно
+    list.innerHTML = document.getElementById('mySkillsList').innerHTML;
+}
 
-// Инициализация
+// Заглушки для остальных функций (чтобы не падало)
+window.showProfileTab = () => {};
+window.openMap = () => alert('Карта в разработке');
+window.searchSkills = () => alert('Поиск в разработке');
+window.loadUserChats = () => { /* демо */ };
+
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Umeyka запущена');
-    showMainScreen();
+    console.log('Umeyka загружается...');
 
+    // Telegram WebApp
     const tg = window.Telegram?.WebApp;
     if (tg) {
         tg.ready();
         tg.expand();
-        if (tg.initDataUnsafe?.user) currentUserId = tg.initDataUnsafe.user.id;
+        if (tg.initDataUnsafe?.user) {
+            currentUserId = tg.initDataUnsafe.user.id;
+            console.log('User ID:', currentUserId);
+        }
     }
-    if (!currentUserId) currentUserId = 'demo_user'; // для теста
+
+    if (!currentUserId) {
+        currentUserId = 'demo_' + Date.now();
+        console.log('Демо-режим, userId:', currentUserId);
+    }
+
+    showMainScreen();
 });
 </script>
 </body>
