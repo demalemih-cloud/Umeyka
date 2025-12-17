@@ -1825,19 +1825,30 @@
     // Загрузка моих умейок с сервера
     async function loadMySkills() {
         try {
-            if (!currentUserId) {
-                console.log('👤 Пользователь не определен');
-                return;
-            }
-
             console.log('📡 Загрузка моих умейок...');
-        
-            const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
-            const result = await response.json();
+            console.log('👤 Current User ID:', currentUserId);
         
             const skillsList = document.getElementById('mySkillsList');
+            skillsList.innerHTML = '<div class="loading">⏳ Загрузка ваших умейок...</div>';
         
-            if (result.success && result.skills.length > 0) {
+            // Если нет userId, используем демо ID
+            const userId = currentUserId || 'demo-user';
+            console.log('🆔 Используем User ID:', userId);
+        
+            // Загружаем ВСЕ умейки для дебага
+            const allResponse = await fetch(`${API_URL}/api/skills`);
+            const allResult = await allResponse.json();
+            console.log('📊 Все умейки на сервере:', allResult.skills?.length || 0);
+        
+            // Теперь загружаем мои умейки
+            const response = await fetch(`${API_URL}/api/skills/user/${userId}`);
+            const result = await response.json();
+        
+            console.log('📱 Ответ сервера для моих умейок:', result);
+        
+            if (result.success && result.skills && result.skills.length > 0) {
+                console.log(`✅ Найдено ${result.skills.length} моих умейок`);
+            
                 skillsList.innerHTML = result.skills.map(skill => `
                     <div class="skill-card">
                         <div class="skill-header">
@@ -1859,12 +1870,30 @@
                     </div>
                 `).join('');
             } else {
-                skillsList.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7); padding: 20px;">У вас пока нет добавленных умейок</div>';
+                console.log('⚠️ Нет моих умейок или ошибка сервера');
+                skillsList.innerHTML = `
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
+                        <div style="font-size: 14px; opacity: 0.8; margin-bottom: 20px;">
+                            Добавьте первую умейку и она появится здесь!
+                        </div>
+                        <button class="main-button" onclick="showSection('masterSection')" style="padding: 15px;">
+                            ✨ Добавить умейку
+                        </button>
+                    </div>
+                `;
             }
         
         } catch (error) {
-            console.error('Ошибка загрузки умейок:', error);
-            skillsList.innerHTML = '<div class="error-message">Ошибка загрузки умейок. Проверьте подключение.</div>';
+            console.error('❌ Ошибка загрузки умейок:', error);
+            const skillsList = document.getElementById('mySkillsList');
+            skillsList.innerHTML = `
+                <div class="error-message">
+                    ❌ Ошибка загрузки умейок<br>
+                    <small>Проверьте подключение к интернету</small>
+                </div>
+            `;
         }
     }
 
