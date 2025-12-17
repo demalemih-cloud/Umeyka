@@ -1831,12 +1831,12 @@
             }
 
             console.log('📡 Загрузка моих умейок...');
-            
+        
             const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
             const result = await response.json();
-            
+        
             const skillsList = document.getElementById('mySkillsList');
-            
+        
             if (result.success && result.skills.length > 0) {
                 skillsList.innerHTML = result.skills.map(skill => `
                     <div class="skill-card">
@@ -1861,7 +1861,7 @@
             } else {
                 skillsList.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7); padding: 20px;">У вас пока нет добавленных умейок</div>';
             }
-            
+        
         } catch (error) {
             console.error('Ошибка загрузки умейок:', error);
             skillsList.innerHTML = '<div class="error-message">Ошибка загрузки умейок. Проверьте подключение.</div>';
