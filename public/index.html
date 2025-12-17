@@ -1051,6 +1051,20 @@
                 <button class="submit-button" onclick="addSkill()">✅ Опубликовать умейку</button>
                 
                 <div id="mySkillsList" style="margin-top: 20px;"></div>
+                
+               <!-- Кнопки отладки -->
+               <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button onclick="checkAllSkills()" 
+                            style="flex: 1; padding: 12px; background: #9f7aea; color: white; border: none; border-r
+               adius: 8px; cursor: pointer; font-size: 14px;">
+                       🔍 Проверить сервер
+                    </button>
+                    <button onclick="forceLoadMySkills()" 
+                            style="flex: 1; padding: 12px; background: #48bb78; color: white; border: none; border-r
+               adius: 8px; cursor: pointer; font-size: 14px;">
+                        🔄 Обновить список
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -2962,6 +2976,35 @@
             if (map) loadSkillsOnMap();
         }
     };
+   
+    // ========== ОТЛАДКА ==========
+
+    // Функция для отладки - проверяет все умейки на сервере
+    window.checkAllSkills = async function() {
+        try {
+            console.log('🔍 Проверка всех умейок на сервере...');
+        
+            const response = await fetch(`${API_URL}/api/skills`);
+            const result = await response.json();
+        
+            if (result.success) {
+                console.log(`📊 Всего умейок: ${result.skills.length}`);
+                console.log('📋 Список всех умейок:', result.skills);
+            
+                alert(`✅ Всего умейок на сервере: ${result.skills.length}\n\nПосмотри консоль (F12) для деталей`);
+            }
+        } catch (error) {
+            console.error('❌ Ошибка проверки:', error);
+            alert('❌ Ошибка подключения к серверу');
+        }
+    };
+
+    // Функция для принудительной загрузки моих умейок
+    window.forceLoadMySkills = async function() {
+        console.log('🔄 Принудительная загрузка моих умейок...');
+        await loadMySkills();
+    };
+
     </script>
-</body>
-</html>
+    </body>
+    </html>
