@@ -1747,18 +1747,15 @@
             const skillName = document.getElementById('skillName').value;
             const skillExperience = document.getElementById('skillExperience').value;
             const skillPrice = document.getElementById('skillPrice').value;
-            
+        
             if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
                 alert('❌ Заполните все поля');
                 return;
             }
 
-            // Получаем данные пользователя для отображения
+            // Получаем данные пользователя
             const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-            
-            // Получаем местоположение
-            const location = userLocation || { lat: 55.7558, lon: 37.6173 };
-
+        
             // Отправляем на сервер
             const response = await fetch(`${API_URL}/api/skills`, {
                 method: 'POST',
@@ -1769,31 +1766,26 @@
                     skill: skillName.trim(),
                     experience: skillExperience.trim(),
                     price: parseInt(skillPrice),
-                    userId: currentUserId,
+                    userId: currentUserId || 'demo-user',
                     username: userData.firstName || 'Аноним',
-                    isTopMaster: false,
-                    location: location,
-                    category: 'другое',
-                    contact: userData.contact || '',
-                    avatar: userData.avatar || null,
-                    description: ''
+                    location: userLocation || { lat: 55.7558, lon: 37.6173 }
                 })
             });
 
             const result = await response.json();
-            
+        
             if (result.success) {
-                alert('✅ Умейка успешно опубликована! Теперь её видят все пользователи!');
-                
+                alert('✅ Умейка успешно опубликована!');
+            
                 // Очищаем поля
                 document.getElementById('skillName').value = '';
                 document.getElementById('skillExperience').value = '';
                 document.getElementById('skillPrice').value = '';
-                
+            
                 // Обновляем списки
                 loadMySkills();
                 loadProfileSkills();
-                
+            
                 // Обновляем карту если она открыта
                 if (map) {
                     loadSkillsOnMap();
@@ -1801,7 +1793,7 @@
             } else {
                 alert('❌ Ошибка: ' + (result.error || 'Неизвестная ошибка'));
             }
-            
+        
         } catch (error) {
             console.error('Ошибка добавления умейки:', error);
             alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету.');
