@@ -1855,58 +1855,96 @@
     async function loadMySkills() {
         try {
             console.log('📡 Загрузка моих умейок...');
-        
+            
             const skillsList = document.getElementById('mySkillsList');
+            if (!skillsList) {
+                console.error('❌ Элемент mySkillsList не найден');
+                return;
+            }
+            
             skillsList.innerHTML = '<div class="loading">⏳ Загрузка ваших умейок...</div>';
-        
+            
             // Для отладки: показываем текущий userId
             console.log('👤 Current User ID для запроса:', currentUserId);
-        
+            
             // Если userId не установлен, используем демо
             const userId = currentUserId || 'demo-user';
             console.log('🆔 Используем User ID:', userId);
-        
+            
             // Сначала проверяем, отвечает ли сервер
             console.log('🔍 Проверяем подключение к серверу...');
-            const testResponse = await fetch(`${API_URL}/health`);
-            if (!testResponse.ok) {
-                throw new Error('Сервер не отвечает');
+            try {
+                const testResponse = await fetch(`${API_URL}/health`);
+                if (!testResponse.ok) {
+                    throw new Error('Сервер не отвечает');
+                }
+                console.log('✅ Сервер работает');
+            } catch (testError) {
+                console.error('❌ Сервер не отвечает:', testError);
+                skillsList.innerHTML = `
+                    <div class="error-message">
+                        ❌ Сервер не отвечает<br>
+                        <small>Проверьте подключение к интернету</small>
+                    </div>
+                `;
+                return;
             }
-            console.log('✅ Сервер работает');
-        
+            
             // Загружаем ВСЕ умейки для отладки
             console.log('📥 Загружаем все умейки для отладки...');
-            const allResponse = await fetch(`${API_URL}/api/skills`);
-            const allResult = await allResponse.json();
-            console.log(`📊 Все умейок на сервере: ${allResult.skills?.length || 0}`);
-        
-            if (allResult.skills && allResult.skills.length > 0) {
-                console.log('📋 Список всех умейок:');
-                allResult.skills.forEach(skill => {
-                    console.log(`   - "${skill.skill}" (ID: ${skill.userId}) для пользователя: ${skill.userId}`);
-                });
+            let allSkills = [];
+            try {
+                const allResponse = await fetch(`${API_URL}/api/skills`);
+                const allResult = await allResponse.json();
+                allSkills = allResult.skills || [];
+                console.log(`📊 Всего умейок на сервере: ${allSkills.length}`);
+                
+                if (allSkills.length > 0) {
+                    console.log('📋 Список всех умейок:');
+                    allSkills.forEach(skill => {
+                        console.log(`   - "${skill.skill}" (ID: ${skill._id}) для пользователя: ${skill.userId}`);
+                    });
+                }
+            } catch (allError) {
+                console.error('❌ Ошибка загрузки всех умейок:', allError);
             }
-        
+            
             // Теперь загружаем мои умейки
             console.log(`📥 Загружаем умейки пользователя ${userId}...`);
-            const response = await fetch(`${API_URL}/api/skills/user/${userId}`);
-        
-            if (!response.ok) {
-                console.error(`❌ Ошибка HTTP: ${response.status} ${response.statusText}`);
-                throw new Error(`Ошибка сервера: ${response.status}`);
+            let response, result;
+            
+            try {
+                response = await fetch(`${API_URL}/api/skills/user/${userId}`);
+                
+                if (!response.ok) {
+                    console.error(`❌ Ошибка HTTP: ${response.status} ${response.statusText}`);
+                    throw new Error(`Ошибка сервера: ${response.status}`);
+                }
+                
+                result = await response.json();
+                console.log('📱 Ответ сервера:', result);
+            } catch (fetchError) {
+                console.error('❌ Ошибка загрузки моих умейок:', fetchError);
+                skillsList.innerHTML = `
+                    <div class="error-message">
+                        ❌ Ошибка загрузки данных<br>
+                        <small>${fetchError.message}</small><br>
+                        <button onclick="loadMySkills()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            Повторить попытку
+                        </button>
+                    </div>
+                `;
+                return;
             }
-        
-            const result = await response.json();
-            console.log('📱 Ответ сервера:', result);
-        
+            
             if (result.success && result.skills && result.skills.length > 0) {
                 console.log(`✅ Найдено ${result.skills.length} моих умейок`);
-            
+                
                 // Показываем детали каждой умейки
                 result.skills.forEach(skill => {
-                   console.log(`   - "${skill.skill}" (${skill.price} руб.)`);
+                    console.log(`   - "${skill.skill}" (${skill.price} руб.) ID: ${skill._id}`);
                 });
-            
+                
                 // Отображаем умейки в интерфейсе
                 skillsList.innerHTML = result.skills.map(skill => `
                     <div class="skill-card">
@@ -1930,33 +1968,55 @@
                 `).join('');
             } else {
                 console.log('⚠️ Нет моих умейок или ошибка сервера');
+                console.log('🔍 Проверяем совпадение User ID:');
+                console.log('   - Мой User ID:', userId);
+                console.log('   - User ID всех умейок на сервере:');
+                allSkills.forEach(skill => {
+                    console.log(`     - "${skill.skill}": ${skill.userId} (${skill.userId === userId ? 'СОВПАДАЕТ' : 'не совпадает'})`);
+                });
+                
                 skillsList.innerHTML = `
                     <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
                         <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
                         <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
                         <div style="font-size: 14px; opacity: 0.8; margin-bottom: 20px;">
-                            Сервер нашел ${allResult.skills?.length || 0} умейок в общей базе,<br>
-                            но для пользователя ${userId} не найдено умейок.
+                            На сервере ${allSkills.length} умейок<br>
+                            Ваш User ID: <strong>${userId}</strong><br>
+                            <small>Посмотрите консоль (F12) для детальной информации</small>
                         </div>
-                        <button class="main-button" onclick="showSection('masterSection')" style="padding: 15px;">
+                        <div style="margin: 20px 0; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 16px; margin-bottom: 10px;">📝 Инструкция:</div>
+                            <div style="text-align: left; font-size: 14px;">
+                                1. Откройте консоль (F12 → Console)<br>
+                                2. Добавьте умейку<br>
+                                3. Посмотрите какой User ID отправляется на сервер<br>
+                                4. Сравните с User ID в этом сообщении
+                            </div>
+                        </div>
+                        <button class="main-button" onclick="showSection('masterSection')" style="padding: 15px; margin-top: 10px;">
                             ✨ Добавить первую умейку
+                        </button>
+                        <button onclick="checkAllSkills()" style="padding: 10px 20px; background: #9f7aea; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px;">
+                            🔍 Проверить сервер
                         </button>
                     </div>
                 `;
             }
-        
+            
         } catch (error) {
-            console.error('❌ Ошибка загрузки умейок:', error);
+            console.error('❌ Неожиданная ошибка загрузки умейок:', error);
             const skillsList = document.getElementById('mySkillsList');
-            skillsList.innerHTML = `
-                <div class="error-message">
-                    ❌ Ошибка загрузки умейок<br>
-                    <small>${error.message}</small><br>
-                    <button onclick="loadMySkills()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                        Повторить попытку
-                    </button>
-                </div>
-            `;
+            if (skillsList) {
+                skillsList.innerHTML = `
+                    <div class="error-message">
+                        ❌ Неожиданная ошибка<br>
+                        <small>${error.message}</small><br>
+                        <button onclick="loadMySkills()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            Повторить попытку
+                        </button>
+                    </div>
+                `;
+            }
         }
     }
 
@@ -2178,6 +2238,9 @@
         console.log('🚀 Umeyka app loaded successfully!');
         showMainScreen();
         
+        // Проверяем и устанавливаем User ID
+        currentUserId = checkAndSetUserId();
+        
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -2186,8 +2249,8 @@
             
             if (tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
-                currentUserId = user.id;
-                console.log('👤 User ID:', currentUserId);
+                console.log('👤 User ID from Telegram:', user.id);
+                console.log('👤 User data:', user);
             }
         }
     });
@@ -3053,7 +3116,36 @@
         console.log('🔄 Принудительная загрузка моих умейок...');
         await loadMySkills();
     };
-
+        
+    // Функция для проверки и установки User ID
+    window.checkAndSetUserId = function() {
+        console.log('🔍 Проверка User ID...');
+        
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.initDataUnsafe?.user) {
+            const user = tg.initDataUnsafe.user;
+            currentUserId = user.id.toString();
+            console.log('✅ User ID из Telegram:', currentUserId);
+            console.log('👤 Данные пользователя Telegram:', user);
+        } else {
+            // Если нет Telegram, создаем случайный ID
+            if (!currentUserId || currentUserId === 'null' || currentUserId === 'undefined') {
+                currentUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+                console.log('🆔 Создан новый User ID:', currentUserId);
+            } else {
+                console.log('📌 Используем существующий User ID:', currentUserId);
+            }
+        }
+        
+        // Сохраняем в localStorage
+        if (currentUserId) {
+            localStorage.setItem('umeyka_user_id', currentUserId);
+            console.log('💾 User ID сохранен в localStorage:', currentUserId);
+        }
+        
+        return currentUserId;
+    };
+        
     </script>
     </body>
     </html>
