@@ -1790,6 +1790,7 @@
         loadUserProfileDisplay(); // Используем исправленную функцию
         loadUserStats();
         loadProfileSkills();
+        loadUserChatsList();
         loadUserChats();
         loadStarsSystem();
         loadReferralInfo();
@@ -3044,23 +3045,237 @@
         }
     };
 
-    // Контакт с мастером (увеличиваем счетчик контактов)
+    // Функция для начала чата с мастером
     window.contactMaster = async function(skillId, skillName, masterName) {
         try {
-            // Увеличиваем счетчик контактов на сервере
+            console.log('💬 Начинаем чат с мастером:', { skillId, skillName, masterName });
+            
+            // 1. Увеличиваем счетчик контактов
             await fetch(`${API_URL}/api/skills/${skillId}/contact`, {
                 method: 'POST'
             });
             
-            // Показываем сообщение
-            const message = `💬 Контакт с мастером:\n\nМастер: ${masterName}\nУслуга: ${skillName}\n\nОткройте Telegram и напишите мастеру напрямую!\n\nPS: Мастер получил уведомление о вашем интересе.`;
-            alert(message);
+            // 2. Создаем чат в базе данных
+            const chatResponse = await fetch(`${API_URL}/api/chats`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    umeykaId: skillId,
+                    masterUserId: 'master_' + skillId, // Временно, пока нет реальных пользователей
+                    clientUserId: currentUserId,
+                    clientName: getLocalStorage(`user_${currentUserId}`)?.firstName || 'Клиент',
+                    masterName: masterName
+                })
+            });
+            
+            const chatResult = await chatResponse.json();
+            
+            if (chatResult.success) {
+                // 3. Показываем окно чата
+                openChatWindow(chatResult.chatId, masterName, skillName);
+                
+                // 4. Уведомление
+                showNotification(`💬 Чат с ${masterName} открыт!`);
+            } else {
+                alert('❌ Ошибка создания чата: ' + chatResult.error);
+            }
             
         } catch (error) {
-            console.error('❌ Ошибка контакта:', error);
-            alert(`💬 Напишите мастеру ${masterName} в Telegram о услуге: ${skillName}`);
+            console.error('❌ Ошибка создания чата:', error);
+            alert('❌ Ошибка создания чата. Проверьте подключение к интернету.');
         }
     };
+
+    // Открыть окно чата
+    async function openChatWindow(chatId, masterName, skillName) {
+        try {
+            // Загружаем сообщения чата
+            const response = await fetch(`${API_URL}/api/chats/${chatId}/messages?userId=${currentUserId}`);
+            const result = await response.json();
+            
+            if (!result.success) {
+                alert('Ошибка загрузки чата: ' + result.error);
+                return;
+            }
+            
+            // Устанавливаем заголовок
+            document.getElementById('chatTitle').textContent = `💬 ${masterName} - ${skillName}`;
+            
+            // Очищаем сообщения
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            // Показываем сообщения
+            if (result.messages && result.messages.length > 0) {
+                result.messages.forEach(message => {
+                    const isMyMessage = message.senderUserId === currentUserId;
+                    const senderName = isMyMessage ? 'Вы' : masterName;
+                    
+                    const messageElement = document.createElement('div');
+                    messageElement.className = `chat-message ${isMyMessage ? 'my-message' : ''}`;
+                    messageElement.innerHTML = `
+                        <div class="chat-message-sender">${senderName}</div>
+                        <div style="background: ${isMyMessage ? '#667eea' : '#f1f5f9'}; 
+                                    color: ${isMyMessage ? 'white' : '#2d3748'}; 
+                                    padding: 10px 15px; 
+                                    border-radius: ${isMyMessage ? '15px 15px 0 15px' : '15px 15px 15px 0'}; 
+                                    display: inline-block; 
+                                    max-width: 80%; 
+                                    margin-bottom: 5px;">
+                            ${message.text}
+                        </div>
+                        <div style="font-size: 12px; color: #999; ${isMyMessage ? 'text-align: right;' : ''}">
+                            ${formatTime(message.createdAt)}
+                        </div>
+                    `;
+                    chatMessages.appendChild(messageElement);
+                });
+            } else {
+                // Нет сообщений
+                chatMessages.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">💬</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Начните общение с мастером!</div>
+                        <div style="font-size: 14px; opacity: 0.8;">
+                            Напишите сообщение, мастер увидит его когда зайдет в приложение
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Сохраняем ID чата
+            document.getElementById('chatWindow').dataset.chatId = chatId;
+            document.getElementById('chatWindow').dataset.masterName = masterName;
+            
+            // Показываем окно чата
+            showSection('chatWindow');
+            
+            // Прокручиваем вниз
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 100);
+            
+        } catch (error) {
+            console.error('❌ Ошибка открытия чата:', error);
+            alert('Ошибка загрузки чата');
+        }
+    }
+
+    // Отправить сообщение в чат
+    window.sendChatMessage = async function() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+        const chatId = document.getElementById('chatWindow').dataset.chatId;
+        const masterName = document.getElementById('chatWindow').dataset.masterName;
+        
+        if (!message) {
+            alert('Введите сообщение');
+            return;
+        }
+        
+        if (!chatId) {
+            alert('Ошибка: чат не найден');
+            return;
+        }
+        
+        try {
+            // Отправляем сообщение на сервер
+            const response = await fetch(`${API_URL}/api/chats/${chatId}/messages`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    senderUserId: currentUserId,
+                    text: message
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Добавляем сообщение в интерфейс
+                const chatMessages = document.getElementById('chatMessages');
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = 'chat-message my-message';
+                messageElement.innerHTML = `
+                    <div class="chat-message-sender">Вы</div>
+                    <div style="background: #667eea; color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; display: inline-block; max-width: 80%; margin-bottom: 5px;">
+                        ${message}
+                    </div>
+                    <div style="font-size: 12px; color: #999; text-align: right;">Только что</div>
+                `;
+                chatMessages.appendChild(messageElement);
+                
+                // Очищаем поле ввода
+                messageInput.value = '';
+                messageInput.focus();
+                
+                // Прокручиваем вниз
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Показываем уведомление
+                showNotification('📨 Сообщение отправлено!');
+                
+            } else {
+                alert('Ошибка отправки: ' + result.error);
+            }
+            
+        } catch (error) {
+            console.error('❌ Ошибка отправки сообщения:', error);
+            alert('Ошибка отправки сообщения. Проверьте подключение.');
+        }
+    };
+
+    // Функция форматирования времени
+    function formatTime(timestamp) {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diff = now - date;
+        
+        if (diff < 60000) return 'Только что';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)} мин назад`;
+        if (diff < 86400000) return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleDateString('ru-RU');
+    }
+
+    // Функция загрузки списка чатов пользователя
+    async function loadUserChatsList() {
+        try {
+            const chatsList = document.getElementById('userChatsList');
+            if (!chatsList) return;
+            
+            const response = await fetch(`${API_URL}/api/users/${currentUserId}/chats`);
+            const result = await response.json();
+            
+            if (result.success && result.chats.length > 0) {
+                chatsList.innerHTML = result.chats.map(chat => {
+                    const isClient = chat.clientUserId === currentUserId;
+                    const partnerName = isClient ? chat.masterName : chat.clientName;
+                    const lastMessage = chat.lastMessage?.text || 'Нет сообщений';
+                    
+                    return `
+                        <div class="chat-item" onclick="openChatWindow('${chat._id}', '${partnerName}', '')">
+                            <div class="chat-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div class="chat-partner">${partnerName}</div>
+                                ${chat.unreadCount > 0 ? `<div class="unread-badge">${chat.unreadCount}</div>` : ''}
+                            </div>
+                            <div class="chat-preview">${lastMessage.substring(0, 50)}${lastMessage.length > 50 ? '...' : ''}</div>
+                            <div class="chat-time">${formatTime(chat.updatedAt)}</div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                chatsList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">У вас пока нет активных чатов</div>';
+            }
+            
+        } catch (error) {
+            console.error('❌ Ошибка загрузки чатов:', error);
+        }
+    }
 
     // Показать детали умейки
     window.showSkillDetails = function(skillId) {
