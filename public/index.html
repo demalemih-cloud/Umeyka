@@ -997,6 +997,75 @@
             border: 2px solid rgba(255,255,255,0.5);
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
         }
+
+                /* Стили для сообщений чата */
+        .chat-message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .my-message {
+            text-align: right;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        #chatMessages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        #messageInput:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Кнопка отправки сообщения */
+        #chatWindow .submit-button {
+            width: auto;
+            padding: 15px 25px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #chatWindow .submit-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+        
+        /* Заголовок чата */
+        #chatTitle {
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -3145,6 +3214,212 @@
         
         return currentUserId;
     };
+
+        // ========== ЧАТ С МАСТЕРОМ ==========
+
+    // Функция для начала чата с мастером
+    window.contactMaster = async function(skillId, skillName, masterName) {
+        try {
+            console.log('💬 Начинаем чат с мастером:', { skillId, skillName, masterName });
+            
+            // 1. Увеличиваем счетчик контактов
+            await fetch(`${API_URL}/api/skills/${skillId}/contact`, {
+                method: 'POST'
+            });
+            
+            // 2. Создаем чат в базе данных
+            const chatResponse = await fetch(`${API_URL}/api/create-chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    umeykaId: skillId,
+                    masterUserId: 'master_' + skillId, // Временный ID мастера
+                    clientUserId: currentUserId,
+                    clientName: getLocalStorage(`user_${currentUserId}`)?.firstName || 'Клиент',
+                    masterName: masterName
+                })
+            });
+            
+            const chatResult = await chatResponse.json();
+            
+            if (chatResult.success) {
+                // 3. Показываем окно чата
+                showChatWindow(chatResult.chatId, masterName, skillName);
+                
+                // 4. Уведомление
+                showNotification(`💬 Чат с ${masterName} открыт!`);
+            } else {
+                // Если API не работает, показываем демо-чат
+                showDemoChat(masterName, skillName);
+            }
+            
+        } catch (error) {
+            console.error('❌ Ошибка создания чата:', error);
+            // Показываем демо-чат если API не работает
+            showDemoChat(masterName, skillName);
+        }
+    };
+
+    // Показать окно чата
+    function showChatWindow(chatId, masterName, skillName) {
+        document.getElementById('chatTitle').textContent = `💬 ${masterName} - ${skillName}`;
+        document.getElementById('chatMessages').innerHTML = `
+            <div style="text-align: center; padding: 20px; color: #666;">
+                Начните общение с мастером!
+            </div>
+        `;
+        document.getElementById('messageInput').value = '';
+        
+        // Сохраняем ID чата в data-атрибут
+        document.getElementById('chatWindow').dataset.chatId = chatId;
+        document.getElementById('chatWindow').dataset.masterName = masterName;
+        
+        showSection('chatWindow');
+    }
+
+    // Демо-чат (если API не работает)
+    function showDemoChat(masterName, skillName) {
+        console.log('📱 Показываем демо-чат');
+        
+        document.getElementById('chatTitle').textContent = `💬 ${masterName} - ${skillName}`;
+        
+        // Демо сообщения
+        document.getElementById('chatMessages').innerHTML = `
+            <div class="chat-message my-message">
+                <div class="chat-message-sender">Вы</div>
+                <div style="background: #667eea; color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; display: inline-block; max-width: 80%; margin-bottom: 5px;">
+                    Здравствуйте! Меня интересует ваша услуга: ${skillName}
+                </div>
+                <div style="font-size: 12px; color: #999; text-align: right;">Только что</div>
+            </div>
+            <div class="chat-message">
+                <div class="chat-message-sender">${masterName}</div>
+                <div style="background: #f1f5f9; color: #2d3748; padding: 10px 15px; border-radius: 15px 15px 15px 0; display: inline-block; max-width: 80%; margin-bottom: 5px;">
+                    Добрый день! Рад, что вы обратились. Расскажите подробнее, что нужно сделать?
+                </div>
+                <div style="font-size: 12px; color: #999;">Только что</div>
+            </div>
+        `;
+        
+        document.getElementById('messageInput').value = '';
+        document.getElementById('chatWindow').dataset.chatId = 'demo-chat';
+        document.getElementById('chatWindow').dataset.masterName = masterName;
+        
+        showSection('chatWindow');
+    }
+
+    // Отправить сообщение в чат
+    window.sendChatMessage = async function() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+        const chatId = document.getElementById('chatWindow').dataset.chatId;
+        const masterName = document.getElementById('chatWindow').dataset.masterName;
+        
+        if (!message) {
+            alert('Введите сообщение');
+            return;
+        }
+        
+        // Добавляем сообщение в чат
+        const chatMessages = document.getElementById('chatMessages');
+        
+        // Сообщение от пользователя
+        const myMessage = document.createElement('div');
+        myMessage.className = 'chat-message my-message';
+        myMessage.innerHTML = `
+            <div class="chat-message-sender">Вы</div>
+            <div style="background: #667eea; color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; display: inline-block; max-width: 80%; margin-bottom: 5px;">
+                ${message}
+            </div>
+            <div style="font-size: 12px; color: #999; text-align: right;">Только что</div>
+        `;
+        chatMessages.appendChild(myMessage);
+        
+        // Очищаем поле ввода
+        messageInput.value = '';
+        
+        // Прокручиваем вниз
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Если не демо-чат, отправляем на сервер
+        if (chatId !== 'demo-chat') {
+            try {
+                await fetch(`${API_URL}/api/send-message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chatId: chatId,
+                        text: message
+                    })
+                });
+            } catch (error) {
+                console.error('❌ Ошибка отправки сообщения:', error);
+            }
+        }
+        
+        // Через 1 секунду имитируем ответ мастера
+        setTimeout(() => {
+            const responses = [
+                "Понял вас. Могу взяться за работу на следующей неделе.",
+                "Отлично! Цена остаётся такой же, как указано в объявлении?",
+                "Могу приехать завтра в первой половине дня, вам подойдет?",
+                "Спасибо за обращение! Нужны ли дополнительные материалы?",
+                "Уточните, пожалуйста, точный адрес для выезда."
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            
+            const masterMessage = document.createElement('div');
+            masterMessage.className = 'chat-message';
+            masterMessage.innerHTML = `
+                <div class="chat-message-sender">${masterName}</div>
+                <div style="background: #f1f5f9; color: #2d3748; padding: 10px 15px; border-radius: 15px 15px 15px 0; display: inline-block; max-width: 80%; margin-bottom: 5px;">
+                    ${randomResponse}
+                </div>
+                <div style="font-size: 12px; color: #999;">Только что</div>
+            `;
+            chatMessages.appendChild(masterMessage);
+            
+            // Прокручиваем вниз
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+        }, 1000);
+    };
+
+    // Закрытие чата
+    window.closeChat = function() {
+        showProfileSection();
+    };
+
+    // Функция для красивых уведомлений
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 2000);
+    }    
         
     </script>
     </body>
