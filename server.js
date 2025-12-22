@@ -1,3 +1,15 @@
+const { Telegraf } = require('telegraf');
+    
+// Создаем бота
+const BOT_TOKEN = process.env.BOT_TOKEN || 8200421586:AAEo0V7Vkp7A3w0br0Wlx157UEGW7iKmr8o;
+const bot = new Telegraf(BOT_TOKEN);
+    
+// Запускаем бота
+bot.launch().then(() => {
+    console.log('🤖 Telegram бот запущен');
+}).catch(err => {
+    console.error('❌ Ошибка запуска бота:', err);
+});
 const express = require('express');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
@@ -497,132 +509,133 @@ app.post('/api/chats', (req, res) => {
 });
 
 // Отправка сообщения с уведомлением в Telegram
-    app.post('/api/chats/:chatId/messages', (req, res) => {
-        try {
-            const chatId = req.params.chatId;
-            const { senderUserId, text } = req.body;
+app.post('/api/chats/:chatId/messages', (req, res) => {
+    try {
+        const chatId = req.params.chatId;
+        const { senderUserId, text } = req.body;
             
-            console.log('📨 Отправка сообщения в чат:', { chatId, senderUserId });
+        console.log('📨 Отправка сообщения в чат:', { chatId, senderUserId });
             
-            if (!senderUserId || !text || !text.trim()) {
-                return res.status(400).json({ 
-                    success: false, 
-                    error: 'Необходимо указать senderUserId и текст сообщения' 
-                });
-            }
-
-            const dbData = db.read();
-            if (!dbData) {
-                return res.status(500).json({ success: false, error: 'Ошибка базы данных' });
-            }
-
-            const chat = dbData.chats.find(c => c._id === chatId && c.isActive !== false);
-            if (!chat) {
-                return res.status(404).json({ success: false, error: 'Чат не найден' });
-            }
-
-            // Проверяем, является ли пользователь участником чата
-            if (senderUserId !== chat.clientUserId && senderUserId !== chat.masterUserId) {
-                return res.status(403).json({ success: false, error: 'Нет доступа к чату' });
-            }
-
-            // Создаем сообщение
-            const newMessage = {
-                _id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-                senderUserId,
-                text: text.trim(),
-                createdAt: new Date().toISOString(),
-                isRead: false
-            };
-
-            chat.messages.push(newMessage);
-            chat.updatedAt = new Date().toISOString();
-            
-            // Увеличиваем счетчик непрочитанных для другого участника
-            const recipientUserId = senderUserId === chat.clientUserId ? chat.masterUserId : chat.clientUserId;
-            chat.unreadCount = (chat.unreadCount || 0) + 1;
-
-            if (db.write(dbData)) {
-                console.log('✅ Сообщение отправлено:', newMessage._id);
-                
-                // ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ В TELEGRAM
-                sendTelegramNotification(recipientUserId, chat, newMessage, senderUserId);
-                
-                return res.json({ 
-                    success: true, 
-                    messageId: newMessage._id 
-                });
-            } else {
-                return res.status(500).json({ success: false, error: 'Ошибка сохранения сообщения' });
-            }
-
-        } catch (error) {
-            console.error('❌ Ошибка отправки сообщения:', error);
-            res.status(500).json({ success: false, error: 'Ошибка сервера' });
+        if (!senderUserId || !text || !text.trim()) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Необходимо указать senderUserId и текст сообщения' 
+            });
         }
-    });
+
+        const dbData = db.read();
+        if (!dbData) {
+            return res.status(500).json({ success: false, error: 'Ошибка базы данных' });
+        }
+
+        const chat = dbData.chats.find(c => c._id === chatId && c.isActive !== false);
+        if (!chat) {
+            return res.status(404).json({ success: false, error: 'Чат не найден' });
+        }
+
+        // Проверяем, является ли пользователь участником чата
+        if (senderUserId !== chat.clientUserId && senderUserId !== chat.masterUserId) {
+            return res.status(403).json({ success: false, error: 'Нет доступа к чату' });
+        }
+
+        // Создаем сообщение
+        const newMessage = {
+            _id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+            senderUserId,
+            text: text.trim(),
+            createdAt: new Date().toISOString(),
+            isRead: false
+        };
+
+        chat.messages.push(newMessage);
+        chat.updatedAt = new Date().toISOString();
+            
+        // Увеличиваем счетчик непрочитанных для другого участника
+        const recipientUserId = senderUserId === chat.clientUserId ? chat.masterUserId : chat.clientUserId;
+        chat.unreadCount = (chat.unreadCount || 0) + 1;
+
+        if (db.write(dbData)) {
+           console.log('✅ Сообщение отправлено:', newMessage._id);
+                
+            // ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ В TELEGRAM
+            sendTelegramNotification(recipientUserId, chat, newMessage, senderUserId);
+                
+            return res.json({ 
+                success: true, 
+                messageId: newMessage._id 
+            });
+        } else {
+            return res.status(500).json({ success: false, error: 'Ошибка сохранения сообщения'
+});                                         
+        }
+
+    } catch (error) {
+        console.error('❌ Ошибка отправки сообщения:', error);
+        res.status(500).json({ success: false, error: 'Ошибка сервера' });
+    }
+});
 
 // Функция отправки уведомления в Telegram
-    async function sendTelegramNotification(recipientUserId, chat, message, senderUserId) {
-        try {
-            // Получаем информацию об отправителе
-            const dbData = db.read();
-            const senderName = senderUserId === chat.clientUserId ? chat.clientName : chat.masterName;
-            const recipientName = senderUserId === chat.clientUserId ? chat.masterName : chat.clientName;
+async function sendTelegramNotification(recipientUserId, chat, message, senderUserId) {
+    try {
+        // Получаем информацию об отправителе
+        const dbData = db.read();
+        const senderName = senderUserId === chat.clientUserId ? chat.clientName : chat.masterName;
+        const recipientName = senderUserId === chat.clientUserId ? chat.masterName : chat.clientName;
             
-            // Получаем информацию об умейке
-            const skill = dbData.skills.find(s => s._id === chat.umeykaId);
-            const skillName = skill ? skill.skill : 'Услуга';
+        // Получаем информацию об умейке
+        const skill = dbData.skills.find(s => s._id === chat.umeykaId);
+        const skillName = skill ? skill.skill : 'Услуга';
             
-            // Создаем текст уведомления
-            const notificationText = `🤝 *Умейка | Новое сообщение*\n\n` +
-                                   `📝 *Услуга:* ${skillName}\n` +
-                                   `👤 *От:* ${senderName}\n\n` +
-                                   `💬 *Сообщение:*\n${message.text}\n\n` +
-                                   `📱 *Ответить:* /reply_${chat._id}`;
+        // Создаем текст уведомления
+        const notificationText = `🤝 *Умейка | Новое сообщение*\n\n` +
+                               `📝 *Услуга:* ${skillName}\n` +
+                               `👤 *От:* ${senderName}\n\n` +
+                               `💬 *Сообщение:*\n${message.text}\n\n` +
+                               `📱 *Ответить:* /reply_${chat._id}`;
             
-            // Пытаемся отправить сообщение
-            // Если recipientUserId это Telegram ID (число), отправляем напрямую
-            if (!isNaN(recipientUserId) && recipientUserId.length < 20) {
-                // Это похоже на Telegram ID
-                await bot.telegram.sendMessage(recipientUserId, notificationText, {
-                    parse_mode: 'Markdown',
-                    reply_markup: {
-                        inline_keyboard: [[
-                            {
-                                text: '💬 Ответить в Umeyka',
-                                url: `https://umeyka-oocn.onrender.com#chat=${chat._id}`
-                            }
-                        ]]
-                    }
-                });
-                console.log('📨 Уведомление отправлено в Telegram пользователю:', recipientUserId);
-            } else {
-                console.log('⚠️ Не Telegram ID, уведомление не отправлено:', recipientUserId);
-            }
-            
-        } catch (error) {
-            console.error('❌ Ошибка отправки уведомления в Telegram:', error);
-            // Не прерываем выполнение, если не удалось отправить в Telegram
+        // Пытаемся отправить сообщение
+        // Если recipientUserId это Telegram ID (число), отправляем напрямую
+        if (!isNaN(recipientUserId) && recipientUserId.length < 20) {
+            // Это похоже на Telegram ID
+            await bot.telegram.sendMessage(recipientUserId, notificationText, {
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: [[
+                        {
+                            text: '💬 Ответить в Umeyka',
+                            url: `https://umeyka-oocn.onrender.com#chat=${chat._id}`
+                        }
+                    ]]
+                }
+            });
+            console.log('📨 Уведомление отправлено в Telegram пользователю:', recipientUserId);
+        } else {
+            console.log('⚠️ Не Telegram ID, уведомление не отправлено:', recipientUserId);
         }
+            
+    } catch (error) {
+        console.error('❌ Ошибка отправки уведомления в Telegram:', error);
+        // Не прерываем выполнение, если не удалось отправить в Telegram
     }
+}
 
 // Команда /start для бота
-    bot.command('start', (ctx) => {
-        const userId = ctx.from.id;
-        const username = ctx.from.username || ctx.from.first_name;
+bot.command('start', (ctx) => {
+    const userId = ctx.from.id;
+    const username = ctx.from.username || ctx.from.first_name;
         
-        console.log('👤 Пользователь запустил бота:', userId, username);
+    console.log('👤 Пользователь запустил бота:', userId, username);
         
-        ctx.reply(
-            `🤝 *Добро пожаловать в Umeyka!*\n\n` +
-            `Я буду отправлять вам уведомления о новых сообщениях в чатах с мастерами и клиентами.\n\n` +
-            `📱 *Ваш ID:* ${userId}\n` +
-            `👤 *Имя:* ${username}\n\n` +
-            `Чтобы получать уведомления, укажите этот ID в настройках профиля в приложении Umeyka.`,
-            { parse_mode: 'Markdown' }
-        );
-    });
+    ctx.reply(
+        `🤝 *Добро пожаловать в Umeyka!*\n\n` +
+        `Я буду отправлять вам уведомления о новых сообщениях в чатах с мастерами и клиентами.\n\n` +
+        `📱 *Ваш ID:* ${userId}\n` +
+        `👤 *Имя:* ${username}\n\n` +
+        `Чтобы получать уведомления, укажите этот ID в настройках профиля в приложении Umeyka.`,
+        { parse_mode: 'Markdown' }
+    );
+});
 
 // Получение списка чатов пользователя
 app.get('/api/users/:userId/chats', (req, res) => {
