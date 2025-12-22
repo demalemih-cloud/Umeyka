@@ -562,6 +562,51 @@ app.post('/api/chats', (req, res) => {
         }
     });
 
+// Функция отправки уведомления в Telegram
+    async function sendTelegramNotification(recipientUserId, chat, message, senderUserId) {
+        try {
+            // Получаем информацию об отправителе
+            const dbData = db.read();
+            const senderName = senderUserId === chat.clientUserId ? chat.clientName : chat.masterName;
+            const recipientName = senderUserId === chat.clientUserId ? chat.masterName : chat.clientName;
+            
+            // Получаем информацию об умейке
+            const skill = dbData.skills.find(s => s._id === chat.umeykaId);
+            const skillName = skill ? skill.skill : 'Услуга';
+            
+            // Создаем текст уведомления
+            const notificationText = `🤝 *Умейка | Новое сообщение*\n\n` +
+                                   `📝 *Услуга:* ${skillName}\n` +
+                                   `👤 *От:* ${senderName}\n\n` +
+                                   `💬 *Сообщение:*\n${message.text}\n\n` +
+                                   `📱 *Ответить:* /reply_${chat._id}`;
+            
+            // Пытаемся отправить сообщение
+            // Если recipientUserId это Telegram ID (число), отправляем напрямую
+            if (!isNaN(recipientUserId) && recipientUserId.length < 20) {
+                // Это похоже на Telegram ID
+                await bot.telegram.sendMessage(recipientUserId, notificationText, {
+                    parse_mode: 'Markdown',
+                    reply_markup: {
+                        inline_keyboard: [[
+                            {
+                                text: '💬 Ответить в Umeyka',
+                                url: `https://umeyka-oocn.onrender.com#chat=${chat._id}`
+                            }
+                        ]]
+                    }
+                });
+                console.log('📨 Уведомление отправлено в Telegram пользователю:', recipientUserId);
+            } else {
+                console.log('⚠️ Не Telegram ID, уведомление не отправлено:', recipientUserId);
+            }
+            
+        } catch (error) {
+            console.error('❌ Ошибка отправки уведомления в Telegram:', error);
+            // Не прерываем выполнение, если не удалось отправить в Telegram
+        }
+    }
+
 // Получение списка чатов пользователя
 app.get('/api/users/:userId/chats', (req, res) => {
     try {
