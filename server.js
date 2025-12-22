@@ -496,126 +496,71 @@ app.post('/api/chats', (req, res) => {
     }
 });
 
-// Отправка сообщения
-app.post('/api/chats/:chatId/messages', (req, res) => {
-    try {
-        const chatId = req.params.chatId;
-        const { senderUserId, text } = req.body;
-        
-        console.log('📨 Отправка сообщения в чат:', { chatId, senderUserId });
-        
-        if (!senderUserId || !text || !text.trim()) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Необходимо указать senderUserId и текст сообщения' 
-            });
-        }
-
-        const dbData = db.read();
-        if (!dbData) {
-            return res.status(500).json({ success: false, error: 'Ошибка базы данных' });
-        }
-
-        const chat = dbData.chats.find(c => c._id === chatId && c.isActive !== false);
-        if (!chat) {
-            return res.status(404).json({ success: false, error: 'Чат не найден' });
-        }
-
-        // Проверяем, является ли пользователь участником чата
-        if (senderUserId !== chat.clientUserId && senderUserId !== chat.masterUserId) {
-            return res.status(403).json({ success: false, error: 'Нет доступа к чату' });
-        }
-
-        // Создаем сообщение
-        const newMessage = {
-            _id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-            senderUserId,
-            text: text.trim(),
-            createdAt: new Date().toISOString(),
-            isRead: false
-        };
-
-        chat.messages.push(newMessage);
-        chat.updatedAt = new Date().toISOString();
-        
-        // Увеличиваем счетчик непрочитанных для другого участника
-        const recipientUserId = senderUserId === chat.clientUserId ? chat.masterUserId : chat.clientUserId;
-        chat.unreadCount = (chat.unreadCount || 0) + 1;
-
-        if (db.write(dbData)) {
-            console.log('✅ Сообщение отправлено:', newMessage._id);
+// Отправка сообщения с уведомлением в Telegram
+    app.post('/api/chats/:chatId/messages', (req, res) => {
+        try {
+            const chatId = req.params.chatId;
+            const { senderUserId, text } = req.body;
             
-            // Здесь можно добавить отправку уведомлений в Telegram
-            // notifyTelegram(recipientUserId, `Новое сообщение в чате: ${text.substring(0, 50)}...`);
+            console.log('📨 Отправка сообщения в чат:', { chatId, senderUserId });
             
-            return res.json({ 
-                success: true, 
-                messageId: newMessage._id 
-            });
-        } else {
-            return res.status(500).json({ success: false, error: 'Ошибка сохранения сообщения' });
-        }
-
-    } catch (error) {
-        console.error('❌ Ошибка отправки сообщения:', error);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
-    }
-});
-
-// Получение сообщений чата
-app.get('/api/chats/:chatId/messages', (req, res) => {
-    try {
-        const chatId = req.params.chatId;
-        const userId = req.query.userId;
-        
-        console.log('📥 Загрузка сообщений чата:', { chatId, userId });
-        
-        if (!userId) {
-            return res.status(400).json({ 
-                success: false, 
-                error: 'Необходимо указать userId' 
-            });
-        }
-
-        const dbData = db.read();
-        if (!dbData) {
-            return res.status(500).json({ success: false, error: 'Ошибка базы данных' });
-        }
-
-        const chat = dbData.chats.find(c => c._id === chatId && c.isActive !== false);
-        if (!chat) {
-            return res.status(404).json({ success: false, error: 'Чат не найден' });
-        }
-
-        // Проверяем, является ли пользователь участником чата
-        if (userId !== chat.clientUserId && userId !== chat.masterUserId) {
-            return res.status(403).json({ success: false, error: 'Нет доступа к чату' });
-        }
-
-        // Помечаем сообщения как прочитанные при загрузке
-        chat.messages.forEach(msg => {
-            if (msg.senderUserId !== userId) {
-                msg.isRead = true;
+            if (!senderUserId || !text || !text.trim()) {
+                return res.status(400).json({ 
+                    success: false, 
+                    error: 'Необходимо указать senderUserId и текст сообщения' 
+                });
             }
-        });
-        chat.unreadCount = 0;
-        db.write(dbData);
 
-        return res.json({ 
-            success: true, 
-            messages: chat.messages,
-            chatInfo: {
-                clientName: chat.clientName,
-                masterName: chat.masterName,
-                umeykaId: chat.umeykaId
+            const dbData = db.read();
+            if (!dbData) {
+                return res.status(500).json({ success: false, error: 'Ошибка базы данных' });
             }
-        });
 
-    } catch (error) {
-        console.error('❌ Ошибка загрузки сообщений:', error);
-        res.status(500).json({ success: false, error: 'Ошибка сервера' });
-    }
-});
+            const chat = dbData.chats.find(c => c._id === chatId && c.isActive !== false);
+            if (!chat) {
+                return res.status(404).json({ success: false, error: 'Чат не найден' });
+            }
+
+            // Проверяем, является ли пользователь участником чата
+            if (senderUserId !== chat.clientUserId && senderUserId !== chat.masterUserId) {
+                return res.status(403).json({ success: false, error: 'Нет доступа к чату' });
+            }
+
+            // Создаем сообщение
+            const newMessage = {
+                _id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+                senderUserId,
+                text: text.trim(),
+                createdAt: new Date().toISOString(),
+                isRead: false
+            };
+
+            chat.messages.push(newMessage);
+            chat.updatedAt = new Date().toISOString();
+            
+            // Увеличиваем счетчик непрочитанных для другого участника
+            const recipientUserId = senderUserId === chat.clientUserId ? chat.masterUserId : chat.clientUserId;
+            chat.unreadCount = (chat.unreadCount || 0) + 1;
+
+            if (db.write(dbData)) {
+                console.log('✅ Сообщение отправлено:', newMessage._id);
+                
+                // ОТПРАВЛЯЕМ УВЕДОМЛЕНИЕ В TELEGRAM
+                sendTelegramNotification(recipientUserId, chat, newMessage, senderUserId);
+                
+                return res.json({ 
+                    success: true, 
+                    messageId: newMessage._id 
+                });
+            } else {
+                return res.status(500).json({ success: false, error: 'Ошибка сохранения сообщения' });
+            }
+
+        } catch (error) {
+            console.error('❌ Ошибка отправки сообщения:', error);
+            res.status(500).json({ success: false, error: 'Ошибка сервера' });
+        }
+    });
 
 // Получение списка чатов пользователя
 app.get('/api/users/:userId/chats', (req, res) => {
