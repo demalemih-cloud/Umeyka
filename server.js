@@ -6,11 +6,11 @@ require('dotenv').config();
 const { Telegraf } = require('telegraf');
 
 // Создаем бота (токен должен быть в переменных окружения!)
-const BOT_TOKEN = process.env.BOT_TOKEN 
+const BOT_TOKEN = process.env.BOT_TOKEN || '';
 const bot = new Telegraf(BOT_TOKEN);
 
 // Запускаем бота
-if (BOT_TOKEN && BOT_TOKEN !== 'ВАШ_ТОКЕН_ЗДЕСЬ') {
+if (BOT_TOKEN && BOT_TOKEN.trim() !== '') {
     bot.launch().then(() => {
         console.log('🤖 Telegram бот запущен');
     }).catch(err => {
