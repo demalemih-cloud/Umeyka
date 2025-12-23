@@ -1492,6 +1492,8 @@
     let currentProfileTab = 'stats';
     let currentDealTab = 'pending';
     let projectRating = 0;
+    let chatPollingInterval = null;
+    let activeChatId = null;
     
     // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ КАРТЫ ==========
     let map = null;
@@ -1750,8 +1752,9 @@
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
 
     window.showMainScreen = function() {
-        // Останавливаем автообновление карты
+        // Останавливаем автообновление карты и чатов
         stopMapAutoRefresh();
+        stopChatPolling();
         
         document.getElementById('mainScreen').style.display = 'block';
         document.getElementById('masterSection').style.display = 'none';
@@ -1770,6 +1773,11 @@
             stopMapAutoRefresh();
         }
         
+        // Останавливаем пулинг чатов если уходим с чата
+        if (sectionId !== 'chatWindow' && chatPollingInterval) {
+            stopChatPolling();
+        }
+        
         document.getElementById('mainScreen').style.display = 'none';
         document.getElementById('masterSection').style.display = 'none';
         document.getElementById('clientSection').style.display = 'none';
@@ -1782,6 +1790,11 @@
         
         if (sectionId === 'masterSection') {
             loadMySkills();
+        }
+        
+        // Запускаем пулинг чатов если открываем окно чата
+        if (sectionId === 'chatWindow') {
+            startChatPolling();
         }
     };
 
@@ -1963,7 +1976,7 @@
             console.log('🆔 Используем User ID:', userId);
             
             // Сначала проверяем, отвечает ли сервер
-            console.log('🔍 Проверяем подключение к серверу...');
+            console.log('🔍 Проверяем подключение к сервера...');
             try {
                 const testResponse = await fetch(`${API_URL}/health`);
                 if (!testResponse.ok) {
@@ -2739,6 +2752,9 @@
                             </div>
                         `;
                     }).join('');
+                    
+                    // Сохраняем список чатов для быстрого обновления
+                    window.userChatsCache = result.chats;
                 } else {
                     chatsList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">У вас пока нет активных чатов</div>';
                 }
@@ -2808,17 +2824,41 @@
                 return;
             }
             
+            activeChatId = chatId;
+            
+            // Устанавливаем заголовок
+            document.getElementById('chatTitle').textContent = `💬 ${masterName} - ${skillName}`;
+            
             // Загружаем сообщения чата
+            await loadChatMessages(chatId, masterName);
+            
+            // Сохраняем данные чата
+            document.getElementById('chatWindow').dataset.chatId = chatId;
+            document.getElementById('chatWindow').dataset.masterName = masterName;
+            document.getElementById('chatWindow').dataset.skillName = skillName;
+            
+            // Показываем окно чата
+            showSection('chatWindow');
+            
+            // Запускаем пулинг для этого чата
+            startChatPolling();
+            
+        } catch (error) {
+            console.error('❌ Ошибка открытия чата:', error);
+            alert('Ошибка загрузки чата');
+        }
+    }
+
+    // Загрузка сообщений чата
+    async function loadChatMessages(chatId, masterName) {
+        try {
             const response = await fetch(`${API_URL}/api/chats/${chatId}/messages?userId=${currentUserId}`);
             const result = await response.json();
             
             if (!result.success) {
-                alert('Ошибка загрузки чата: ' + result.error);
+                console.error('❌ Ошибка загрузки сообщений:', result.error);
                 return;
             }
-            
-            // Устанавливаем заголовок
-            document.getElementById('chatTitle').textContent = `💬 ${masterName} - ${skillName}`;
             
             // Очищаем сообщения
             const chatMessages = document.getElementById('chatMessages');
@@ -2849,6 +2889,11 @@
                     `;
                     chatMessages.appendChild(messageElement);
                 });
+                
+                // Прокручиваем вниз
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 100);
             } else {
                 // Нет сообщений
                 chatMessages.innerHTML = `
@@ -2862,22 +2907,8 @@
                 `;
             }
             
-            // Сохраняем ID чата
-            document.getElementById('chatWindow').dataset.chatId = chatId;
-            document.getElementById('chatWindow').dataset.masterName = masterName;
-            document.getElementById('chatWindow').dataset.skillName = skillName;
-            
-            // Показываем окно чата
-            showSection('chatWindow');
-            
-            // Прокручиваем вниз
-            setTimeout(() => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 100);
-            
         } catch (error) {
-            console.error('❌ Ошибка открытия чата:', error);
-            alert('Ошибка загрузки чата');
+            console.error('❌ Ошибка загрузки сообщений чата:', error);
         }
     }
 
@@ -2914,29 +2945,18 @@
             const result = await response.json();
             
             if (result.success) {
-                // Добавляем сообщение в интерфейс
-                const chatMessages = document.getElementById('chatMessages');
-                
-                const messageElement = document.createElement('div');
-                messageElement.className = 'chat-message my-message';
-                messageElement.innerHTML = `
-                    <div class="chat-message-sender">Вы</div>
-                    <div style="background: #667eea; color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; display: inline-block; max-width: 80%; margin-bottom: 5px;">
-                        ${message}
-                    </div>
-                    <div style="font-size: 12px; color: #999; text-align: right;">Только что</div>
-                `;
-                chatMessages.appendChild(messageElement);
-                
                 // Очищаем поле ввода
                 messageInput.value = '';
                 messageInput.focus();
                 
-                // Прокручиваем вниз
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                // Перезагружаем сообщения чата, чтобы увидеть отправленное сообщение
+                await loadChatMessages(chatId, masterName);
                 
                 // Показываем уведомление
                 showNotification('📨 Сообщение отправлено!');
+                
+                // Обновляем список чатов
+                loadUserChatsList();
                 
             } else {
                 alert('Ошибка отправки: ' + result.error);
@@ -2969,8 +2989,41 @@
 
     // Закрытие чата
     window.closeChat = function() {
+        activeChatId = null;
+        stopChatPolling();
         showProfileSection();
     };
+
+    // Запуск пулинга чатов (проверка новых сообщений)
+    function startChatPolling() {
+        if (chatPollingInterval) {
+            clearInterval(chatPollingInterval);
+        }
+        
+        // Проверяем новые сообщения каждые 3 секунды
+        chatPollingInterval = setInterval(async () => {
+            try {
+                // Если есть активный чат, обновляем его сообщения
+                if (activeChatId) {
+                    const masterName = document.getElementById('chatWindow').dataset.masterName;
+                    await loadChatMessages(activeChatId, masterName);
+                }
+                
+                // Обновляем список чатов (для счетчика непрочитанных)
+                loadUserChatsList();
+            } catch (error) {
+                console.error('❌ Ошибка пулинга чатов:', error);
+            }
+        }, 3000); // 3 секунды
+    }
+
+    // Остановка пулинга чатов
+    function stopChatPolling() {
+        if (chatPollingInterval) {
+            clearInterval(chatPollingInterval);
+            chatPollingInterval = null;
+        }
+    }
 
     // Функция форматирования времени
     function formatTime(timestamp) {
