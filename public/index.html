@@ -1066,6 +1066,146 @@
             padding-bottom: 15px;
             border-bottom: 2px solid rgba(102, 126, 234, 0.2);
         }
+
+        /* Стили для загрузки фото */
+        .avatar-upload-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            cursor: pointer;
+        }
+
+        .avatar-preview {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-upload-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px;
+            font-size: 12px;
+            text-align: center;
+            border-radius: 0 0 50% 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+        }
+
+        .photo-upload-section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .photo-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .photo-add-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-add-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .upload-progress {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -1158,12 +1298,29 @@
                 <!-- Профиль пользователя -->
                 <div id="userProfile">
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">
-                            👤
+                        <div id="userAvatar" class="avatar-upload-container">
+                            <div id="avatarPreview" class="avatar-preview">
+                                <!-- Аватар будет загружен здесь -->
+                            </div>
+                            <div class="avatar-upload-overlay" onclick="editProfile()">
+                                <span>✏️</span>
+                                <span>Изменить</span>
+                            </div>
                         </div>
                         <h3 id="userName">Пользователь</h3>
                         <p id="userBio" style="opacity: 0.8; margin: 10px 0;">Расскажите о себе...</p>
                         <div id="userBadges" style="margin: 10px 0;"></div>
+                    </div>
+                    
+                    <!-- Галерея фото профиля -->
+                    <div class="photo-upload-section">
+                        <h4 style="margin-bottom: 15px; text-align: center;">📸 Фотографии моих работ</h4>
+                        <div id="profilePhotosGrid" class="photo-grid">
+                            <!-- Фотографии будут добавлены здесь -->
+                        </div>
+                        <button class="main-button" onclick="showPhotoUploadSection()" style="margin-top: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            📁 Добавить фотографии
+                        </button>
                     </div>
                     
                     <button class="main-button" onclick="editProfile()" style="margin-bottom: 15px;">
@@ -1293,11 +1450,19 @@
         
                 <!-- Аватар -->
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <div id="avatarPreview" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; cursor: pointer;" onclick="changeAvatar()">
-                        👤
+                    <div id="editAvatarPreview" class="avatar-upload-container">
+                        <div id="editAvatarImage" class="avatar-preview">
+                            <!-- Аватар будет загружен здесь -->
+                        </div>
+                        <div class="avatar-upload-overlay" onclick="document.getElementById('avatarInput').click()">
+                            <span>📁</span>
+                            <span>Загрузить фото</span>
+                        </div>
                     </div>
-                    <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Нажмите на аватар для выбора</div>
                     <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                    <div style="color: rgba(255,255,255,0.8); font-size: 14px; margin-top: 10px;">
+                        Рекомендуемый размер: 400x400px, формат JPG или PNG
+                    </div>
                 </div>
         
                 <!-- Основная информация -->
@@ -1308,6 +1473,54 @@
                 <textarea id="editBio" class="input-field" placeholder="О себе (расскажите о ваших навыках и опыте) *" style="height: 120px; resize: vertical;" required></textarea>
         
                 <button class="submit-button" onclick="saveProfile()">💾 Сохранить профиль</button>
+            </div>
+        </div>
+
+        <!-- СЕКЦИЯ ЗАГРУЗКИ ФОТО -->
+        <div id="photoUploadSection" class="section">
+            <button class="back-button" onclick="showProfileSection()">← Назад</button>
+            
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">📸 Загрузка фотографий</h2>
+                
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <p style="margin-bottom: 15px; opacity: 0.9;">
+                        Загрузите фотографии своих работ, чтобы привлечь больше клиентов!
+                    </p>
+                    
+                    <div id="uploadProgress" class="upload-progress" style="display: none;">
+                        <div>Загрузка...</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                        </div>
+                        <div id="progressText">0%</div>
+                    </div>
+                </div>
+                
+                <!-- Загрузка фото -->
+                <div style="text-align: center; margin: 20px 0;">
+                    <div id="dropZone" style="border: 2px dashed rgba(255,255,255,0.3); border-radius: 15px; padding: 40px 20px; cursor: pointer; transition: all 0.3s ease;"
+                         ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <div style="font-size: 50px; margin-bottom: 15px;">📁</div>
+                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">
+                            Перетащите фото сюда или нажмите для выбора
+                        </div>
+                        <div style="opacity: 0.8; font-size: 14px; margin-bottom: 20px;">
+                            Поддерживаются JPG, PNG, GIF. Максимальный размер: 5MB
+                        </div>
+                        <button id="selectPhotosBtn" class="main-button" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 30px;">
+                            Выбрать фото
+                        </button>
+                    </div>
+                    <input type="file" id="photoInput" multiple accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                </div>
+                
+                <!-- Превью загруженных фото -->
+                <div id="uploadedPhotos" class="photo-grid" style="margin-top: 30px;"></div>
+                
+                <button class="submit-button" onclick="saveProfilePhotos()" style="margin-top: 30px;">
+                    💾 Сохранить фотографии
+                </button>
             </div>
         </div>
 
@@ -1485,6 +1698,10 @@
     let currentDealTab = 'pending';
     let projectRating = 0;
     
+    // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ ФОТО ==========
+    let userPhotos = [];
+    let photosToUpload = [];
+    
     // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ КАРТЫ ==========
     let map = null;
     let userLocation = null;
@@ -1522,6 +1739,7 @@
         contact: '',
         bio: 'Расскажите о себе...',
         avatar: null,
+        photos: [],
         skills: [],
         rating: 0,
         completedDeals: 0
@@ -1560,11 +1778,36 @@
     window.handleAvatarUpload = function(event) {
         const file = event.target.files[0];
         if (file) {
+            // Проверяем размер файла (максимум 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('❌ Файл слишком большой. Максимальный размер: 5MB');
+                return;
+            }
+            
+            // Проверяем тип файла
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                alert('❌ Неподдерживаемый формат файла. Используйте JPG, PNG или GIF');
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onload = function(e) {
                 currentAvatar = e.target.result;
-                document.getElementById('avatarPreview').innerHTML = 
-                    `<img src="${currentAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                
+                // Обновляем превью в форме редактирования
+                const editAvatarImage = document.getElementById('editAvatarImage');
+                editAvatarImage.innerHTML = `<img src="${currentAvatar}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                editAvatarImage.style.backgroundColor = 'transparent';
+                
+                // Обновляем превью в профиле
+                const profileAvatar = document.getElementById('avatarPreview');
+                if (profileAvatar) {
+                    profileAvatar.innerHTML = `<img src="${currentAvatar}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                    profileAvatar.style.backgroundColor = 'transparent';
+                }
+                
+                console.log('✅ Аватар успешно загружен');
             };
             reader.readAsDataURL(file);
         }
@@ -1590,6 +1833,7 @@
                         contact: '',
                         bio: 'Расскажите о себе...',
                         avatar: null,
+                        photos: [],
                         telegramId: tgUser.id
                     };
                 } else {
@@ -1605,14 +1849,15 @@
             document.getElementById('editBio').value = userData.bio || '';
         
             // Устанавливаем аватар
+            const editAvatarImage = document.getElementById('editAvatarImage');
             if (userData.avatar) {
                 currentAvatar = userData.avatar;
-                document.getElementById('avatarPreview').innerHTML = 
+                editAvatarImage.innerHTML = 
                     `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                document.getElementById('avatarPreview').style.backgroundColor = 'transparent';
+                editAvatarImage.style.backgroundColor = 'transparent';
             } else {
-                document.getElementById('avatarPreview').innerHTML = '👤';
-                document.getElementById('avatarPreview').style.backgroundColor = '#667eea';
+                editAvatarImage.innerHTML = '<div class="avatar-placeholder">👤</div>';
+                editAvatarImage.style.backgroundColor = '#667eea';
             }
         
             console.log('✅ Данные профиля загружены в форму');
@@ -1665,6 +1910,7 @@
                 contact: contact.trim(),
                 bio: bio.trim(),
                 avatar: currentAvatar || userData.avatar,
+                photos: userData.photos || [],
                 telegramId: currentUserId,
                 updatedAt: new Date().toISOString()
             };
@@ -1676,6 +1922,10 @@
                 console.log('✅ Профиль успешно сохранен:', updatedProfile);
                 alert('✅ Профиль успешно сохранен!');
             
+                // Обновляем отображение профиля
+                loadUserProfileDisplay();
+                loadProfilePhotos();
+                
                 // Возвращаемся в профиль через 1 секунду
                 setTimeout(() => {
                     showProfileSection();
@@ -1701,13 +1951,13 @@
                 userData.firstName || 'Пользователь';
             
             // Обновляем аватар в профиле
-            const avatarElement = document.getElementById('userAvatar');
+            const avatarElement = document.getElementById('avatarPreview');
             if (userData.avatar) {
                 avatarElement.innerHTML = 
                     `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
                 avatarElement.style.backgroundColor = 'transparent';
             } else {
-                avatarElement.innerHTML = '👤';
+                avatarElement.innerHTML = '<div class="avatar-placeholder">👤</div>';
                 avatarElement.style.backgroundColor = '#667eea';
             }
             
@@ -1737,6 +1987,240 @@
         loadProfileToForm(); // Загружаем данные в форму при открытии
     };
 
+    // ========== ФУНКЦИИ ДЛЯ ЗАГРУЗКИ ФОТО ==========
+
+    // Показать секцию загрузки фото
+    window.showPhotoUploadSection = function() {
+        showSection('photoUploadSection');
+        loadPhotosToUpload();
+        
+        // Настраиваем кнопку выбора фото
+        document.getElementById('selectPhotosBtn').addEventListener('click', function() {
+            document.getElementById('photoInput').click();
+        });
+    };
+
+    // Загрузка фото для отображения в профиле
+    function loadProfilePhotos() {
+        try {
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+            userPhotos = userData.photos || [];
+            
+            const photosGrid = document.getElementById('profilePhotosGrid');
+            if (!photosGrid) return;
+            
+            if (userPhotos.length > 0) {
+                photosGrid.innerHTML = userPhotos.map((photo, index) => `
+                    <div class="photo-item">
+                        <img src="${photo}" alt="Фото работы ${index + 1}">
+                        <button class="photo-remove" onclick="removePhoto(${index})">×</button>
+                    </div>
+                `).join('');
+                
+                // Добавляем кнопку для добавления новых фото
+                photosGrid.innerHTML += `
+                    <div class="photo-item photo-add-btn" onclick="showPhotoUploadSection()">
+                        +
+                    </div>
+                `;
+            } else {
+                photosGrid.innerHTML = `
+                    <div class="photo-item photo-add-btn" onclick="showPhotoUploadSection()" style="grid-column: span 3;">
+                        +<br>
+                        <span style="font-size: 14px;">Добавить фото работ</span>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('❌ Ошибка загрузки фото:', error);
+        }
+    }
+
+    // Загрузка фото для секции загрузки
+    function loadPhotosToUpload() {
+        const uploadedPhotosContainer = document.getElementById('uploadedPhotos');
+        if (!uploadedPhotosContainer) return;
+        
+        if (photosToUpload.length > 0) {
+            uploadedPhotosContainer.innerHTML = photosToUpload.map((photo, index) => `
+                <div class="photo-item">
+                    <img src="${photo.url}" alt="Фото для загрузки ${index + 1}">
+                    <button class="photo-remove" onclick="removePhotoFromUpload(${index})">×</button>
+                </div>
+            `).join('');
+        } else {
+            uploadedPhotosContainer.innerHTML = '<div style="grid-column: span 3; text-align: center; padding: 30px; color: rgba(255,255,255,0.7);">Фотографии для загрузки появятся здесь</div>';
+        }
+    }
+
+    // Обработка загрузки фото
+    window.handlePhotoUpload = function(event) {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+        
+        // Ограничиваем количество фото (максимум 9)
+        const maxPhotos = 9 - photosToUpload.length;
+        if (files.length > maxPhotos) {
+            alert(`❌ Вы можете загрузить максимум ${maxPhotos} фотографий. У вас уже есть ${photosToUpload.length} фото.`);
+            return;
+        }
+        
+        for (let i = 0; i < Math.min(files.length, maxPhotos); i++) {
+            const file = files[i];
+            
+            // Проверяем размер файла (максимум 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert(`❌ Файл "${file.name}" слишком большой. Максимальный размер: 5MB`);
+                continue;
+            }
+            
+            // Проверяем тип файла
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                alert(`❌ Файл "${file.name}" имеет неподдерживаемый формат. Используйте JPG, PNG или GIF`);
+                continue;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                photosToUpload.push({
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    url: e.target.result,
+                    file: file
+                });
+                
+                loadPhotosToUpload();
+                console.log(`✅ Фото добавлено: ${file.name}`);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Сбрасываем значение input, чтобы можно было загружать те же файлы снова
+        event.target.value = '';
+    };
+
+    // Удаление фото из списка загрузки
+    window.removePhotoFromUpload = function(index) {
+        if (confirm('❌ Удалить эту фотографию из списка загрузки?')) {
+            photosToUpload.splice(index, 1);
+            loadPhotosToUpload();
+        }
+    };
+
+    // Удаление фото из профиля
+    window.removePhoto = function(index) {
+        if (confirm('❌ Удалить эту фотографию из профиля?')) {
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+            userData.photos.splice(index, 1);
+            setLocalStorage(`user_${currentUserId}`, userData);
+            loadProfilePhotos();
+            alert('✅ Фотография удалена!');
+        }
+    };
+
+    // Сохранение фото профиля
+    window.saveProfilePhotos = async function() {
+        try {
+            if (photosToUpload.length === 0) {
+                alert('❌ Нет фотографий для загрузки');
+                return;
+            }
+            
+            console.log(`📸 Начинаем загрузку ${photosToUpload.length} фотографий`);
+            
+            // Показываем прогресс
+            const progressDiv = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            progressDiv.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressText.textContent = '0%';
+            
+            // Получаем текущие данные пользователя
+            let userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+            userData.photos = userData.photos || [];
+            
+            // Имитируем загрузку на сервер
+            for (let i = 0; i < photosToUpload.length; i++) {
+                const photo = photosToUpload[i];
+                
+                // Обновляем прогресс
+                const progress = ((i + 1) / photosToUpload.length) * 100;
+                progressFill.style.width = `${progress}%`;
+                progressText.textContent = `${Math.round(progress)}%`;
+                
+                // Добавляем фото в профиль пользователя
+                userData.photos.push(photo.url);
+                
+                // Имитируем задержку для реалистичности
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                console.log(`✅ Фото загружено: ${photo.name} (${i + 1}/${photosToUpload.length})`);
+            }
+            
+            // Сохраняем обновленные данные
+            setLocalStorage(`user_${currentUserId}`, userData);
+            
+            // Очищаем список загрузки
+            photosToUpload = [];
+            
+            // Скрываем прогресс
+            setTimeout(() => {
+                progressDiv.style.display = 'none';
+            }, 1000);
+            
+            // Показываем уведомление об успехе
+            showNotification('✅ Фотографии успешно загружены!');
+            
+            // Возвращаемся в профиль
+            setTimeout(() => {
+                showProfileSection();
+            }, 1500);
+            
+        } catch (error) {
+            console.error('❌ Ошибка загрузки фото:', error);
+            alert('❌ Произошла ошибка при загрузке фотографий');
+        }
+    };
+
+    // Обработка drag and drop
+    function handleDragOver(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.dataTransfer.dropEffect = 'copy';
+        event.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+        event.currentTarget.style.borderColor = '#667eea';
+    }
+
+    function handleDragLeave(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.currentTarget.style.background = '';
+        event.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
+    }
+
+    function handleDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        event.currentTarget.style.background = '';
+        event.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
+        
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+            // Создаем искусственное событие для обработки файлов
+            const input = document.getElementById('photoInput');
+            input.files = files;
+            
+            // Триггерим событие change
+            const changeEvent = new Event('change', { bubbles: true });
+            input.dispatchEvent(changeEvent);
+        }
+    }
+
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
 
     window.showMainScreen = function() {
@@ -1748,6 +2232,7 @@
         document.getElementById('clientSection').style.display = 'none';
         document.getElementById('profileSection').style.display = 'none';
         document.getElementById('editProfileSection').style.display = 'none';
+        document.getElementById('photoUploadSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
         document.getElementById('chatWindow').style.display = 'none';
@@ -1765,6 +2250,7 @@
         document.getElementById('clientSection').style.display = 'none';
         document.getElementById('profileSection').style.display = 'none';
         document.getElementById('editProfileSection').style.display = 'none';
+        document.getElementById('photoUploadSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
         document.getElementById('chatWindow').style.display = 'none';
@@ -1785,6 +2271,7 @@
     window.showProfileSection = function() {
         showSection('profileSection');
         loadUserProfileDisplay(); // Используем исправленную функцию
+        loadProfilePhotos(); // Загружаем фото профиля
         loadUserStats();
         loadProfileSkills();
         loadUserChats();
@@ -2319,6 +2806,9 @@
                 console.log('👤 User data:', user);
             }
         }
+        
+        // Загружаем фото профиля при загрузке
+        loadProfilePhotos();
     });
 
     // ========== СИСТЕМА ЗВЕЗД И КАСТОМИЗАЦИИ ==========
