@@ -1067,144 +1067,80 @@
             border-bottom: 2px solid rgba(102, 126, 234, 0.2);
         }
 
-        /* Стили для загрузки фото */
-        .avatar-upload-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
-            cursor: pointer;
-        }
-
-        .avatar-preview {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            position: relative;
-        }
-
-        .avatar-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .avatar-upload-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 8px;
-            font-size: 12px;
-            text-align: center;
-            border-radius: 0 0 50% 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .avatar-placeholder {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 40px;
-        }
-
+        /* Стили для загрузки фото профиля */
         .photo-upload-section {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.9);
             padding: 20px;
             border-radius: 15px;
             margin: 20px 0;
+            color: #2d3748;
         }
 
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .photo-item {
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: 10px;
+        .photo-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
             overflow: hidden;
-            cursor: pointer;
+            border: 4px solid #667eea;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .photo-item img {
+        .photo-preview img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .photo-remove {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(255,0,0,0.7);
-            color: white;
+        .upload-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .photo-add-btn {
-            background: rgba(255,255,255,0.2);
-            border: 2px dashed rgba(255,255,255,0.3);
+            padding: 15px 30px;
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
             color: white;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 0 auto;
         }
 
-        .photo-add-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.05);
+        .upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
-        .upload-progress {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
+        .photo-status {
             text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
         }
 
-        .progress-bar {
-            height: 8px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 4px;
+        /* Стили для фото в карточке на карте */
+        .skill-photo-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
             overflow: hidden;
-            margin: 10px 0;
+            border: 3px solid #667eea;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .progress-fill {
+        .skill-photo-preview img {
+            width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border-radius: 4px;
-            transition: width 0.3s ease;
+            object-fit: cover;
         }
     </style>
 </head>
@@ -1257,6 +1193,22 @@
                 <input type="text" id="skillExperience" class="input-field" placeholder="Мой опыт (например: 3 года)">
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях">
                 
+                <!-- Загрузка фото для умейки -->
+                <div class="photo-upload-section" style="margin: 20px 0;">
+                    <h3 style="margin-bottom: 15px; text-align: center;">📸 Фото для вашей карточки</h3>
+                    <div class="photo-preview" id="skillPhotoPreview">
+                        <div style="text-align: center; color: #666;">
+                            <div style="font-size: 40px; margin-bottom: 10px;">📷</div>
+                            <div>Фото не загружено</div>
+                        </div>
+                    </div>
+                    <input type="file" id="skillPhotoInput" accept="image/*" style="display: none;" onchange="handleSkillPhotoUpload(event)">
+                    <button class="upload-button" onclick="document.getElementById('skillPhotoInput').click()">
+                        📁 Выбрать фото
+                    </button>
+                    <div class="photo-status" id="skillPhotoStatus"></div>
+                </div>
+                
                 <button class="submit-button" onclick="addSkill()">✅ Опубликовать умейку</button>
                 
                 <div id="mySkillsList" style="margin-top: 20px;"></div>
@@ -1298,29 +1250,12 @@
                 <!-- Профиль пользователя -->
                 <div id="userProfile">
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <div id="userAvatar" class="avatar-upload-container">
-                            <div id="avatarPreview" class="avatar-preview">
-                                <!-- Аватар будет загружен здесь -->
-                            </div>
-                            <div class="avatar-upload-overlay" onclick="editProfile()">
-                                <span>✏️</span>
-                                <span>Изменить</span>
-                            </div>
+                        <div id="userAvatar" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white;">
+                            👤
                         </div>
                         <h3 id="userName">Пользователь</h3>
                         <p id="userBio" style="opacity: 0.8; margin: 10px 0;">Расскажите о себе...</p>
                         <div id="userBadges" style="margin: 10px 0;"></div>
-                    </div>
-                    
-                    <!-- Галерея фото профиля -->
-                    <div class="photo-upload-section">
-                        <h4 style="margin-bottom: 15px; text-align: center;">📸 Фотографии моих работ</h4>
-                        <div id="profilePhotosGrid" class="photo-grid">
-                            <!-- Фотографии будут добавлены здесь -->
-                        </div>
-                        <button class="main-button" onclick="showPhotoUploadSection()" style="margin-top: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            📁 Добавить фотографии
-                        </button>
                     </div>
                     
                     <button class="main-button" onclick="editProfile()" style="margin-bottom: 15px;">
@@ -1450,19 +1385,11 @@
         
                 <!-- Аватар -->
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <div id="editAvatarPreview" class="avatar-upload-container">
-                        <div id="editAvatarImage" class="avatar-preview">
-                            <!-- Аватар будет загружен здесь -->
-                        </div>
-                        <div class="avatar-upload-overlay" onclick="document.getElementById('avatarInput').click()">
-                            <span>📁</span>
-                            <span>Загрузить фото</span>
-                        </div>
+                    <div id="avatarPreview" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; cursor: pointer;" onclick="changeAvatar()">
+                        👤
                     </div>
+                    <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Нажмите на аватар для выбора</div>
                     <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
-                    <div style="color: rgba(255,255,255,0.8); font-size: 14px; margin-top: 10px;">
-                        Рекомендуемый размер: 400x400px, формат JPG или PNG
-                    </div>
                 </div>
         
                 <!-- Основная информация -->
@@ -1473,54 +1400,6 @@
                 <textarea id="editBio" class="input-field" placeholder="О себе (расскажите о ваших навыках и опыте) *" style="height: 120px; resize: vertical;" required></textarea>
         
                 <button class="submit-button" onclick="saveProfile()">💾 Сохранить профиль</button>
-            </div>
-        </div>
-
-        <!-- СЕКЦИЯ ЗАГРУЗКИ ФОТО -->
-        <div id="photoUploadSection" class="section">
-            <button class="back-button" onclick="showProfileSection()">← Назад</button>
-            
-            <div class="form-section">
-                <h2 style="margin-bottom: 20px; text-align: center;">📸 Загрузка фотографий</h2>
-                
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <p style="margin-bottom: 15px; opacity: 0.9;">
-                        Загрузите фотографии своих работ, чтобы привлечь больше клиентов!
-                    </p>
-                    
-                    <div id="uploadProgress" class="upload-progress" style="display: none;">
-                        <div>Загрузка...</div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-                        </div>
-                        <div id="progressText">0%</div>
-                    </div>
-                </div>
-                
-                <!-- Загрузка фото -->
-                <div style="text-align: center; margin: 20px 0;">
-                    <div id="dropZone" style="border: 2px dashed rgba(255,255,255,0.3); border-radius: 15px; padding: 40px 20px; cursor: pointer; transition: all 0.3s ease;"
-                         ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-                        <div style="font-size: 50px; margin-bottom: 15px;">📁</div>
-                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">
-                            Перетащите фото сюда или нажмите для выбора
-                        </div>
-                        <div style="opacity: 0.8; font-size: 14px; margin-bottom: 20px;">
-                            Поддерживаются JPG, PNG, GIF. Максимальный размер: 5MB
-                        </div>
-                        <button id="selectPhotosBtn" class="main-button" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 30px;">
-                            Выбрать фото
-                        </button>
-                    </div>
-                    <input type="file" id="photoInput" multiple accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
-                </div>
-                
-                <!-- Превью загруженных фото -->
-                <div id="uploadedPhotos" class="photo-grid" style="margin-top: 30px;"></div>
-                
-                <button class="submit-button" onclick="saveProfilePhotos()" style="margin-top: 30px;">
-                    💾 Сохранить фотографии
-                </button>
             </div>
         </div>
 
@@ -1681,7 +1560,7 @@
                 
                 <div style="display: flex; gap: 10px;">
                     <input type="text" id="messageInput" class="input-field" placeholder="Введите сообщение..." style="flex: 1;">
-                    <button class="submit-button" onclick="sendChatMessage()" style="width: auto; padding: 15px 20px;">📤</button>
+                    <button class="submit-button" onclick="sendTelegramMessage()" style="width: auto; padding: 15px 20px;">📤</button>
                 </div>
             </div>
         </div>
@@ -1692,15 +1571,15 @@
     const API_URL = 'https://umeyka-oocn.onrender.com';
     let currentUserId = null;
     let currentAvatar = null;
+    let currentSkillPhoto = null;
     let selectedQuality = '';
     let selectedOptions = [];
     let currentProfileTab = 'stats';
     let currentDealTab = 'pending';
     let projectRating = 0;
-    
-    // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ ФОТО ==========
-    let userPhotos = [];
-    let photosToUpload = [];
+    let currentChatMasterId = null;
+    let currentChatMasterName = null;
+    let currentChatSkillName = null;
     
     // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ КАРТЫ ==========
     let map = null;
@@ -1739,7 +1618,7 @@
         contact: '',
         bio: 'Расскажите о себе...',
         avatar: null,
-        photos: [],
+        skillPhoto: null,
         skills: [],
         rating: 0,
         completedDeals: 0
@@ -1778,36 +1657,38 @@
     window.handleAvatarUpload = function(event) {
         const file = event.target.files[0];
         if (file) {
-            // Проверяем размер файла (максимум 5MB)
-            if (file.size > 5 * 1024 * 1024) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
                 alert('❌ Файл слишком большой. Максимальный размер: 5MB');
-                return;
-            }
-            
-            // Проверяем тип файла
-            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            if (!validTypes.includes(file.type)) {
-                alert('❌ Неподдерживаемый формат файла. Используйте JPG, PNG или GIF');
                 return;
             }
             
             const reader = new FileReader();
             reader.onload = function(e) {
                 currentAvatar = e.target.result;
-                
-                // Обновляем превью в форме редактирования
-                const editAvatarImage = document.getElementById('editAvatarImage');
-                editAvatarImage.innerHTML = `<img src="${currentAvatar}" style="width: 100%; height: 100%; object-fit: cover;">`;
-                editAvatarImage.style.backgroundColor = 'transparent';
-                
-                // Обновляем превью в профиле
-                const profileAvatar = document.getElementById('avatarPreview');
-                if (profileAvatar) {
-                    profileAvatar.innerHTML = `<img src="${currentAvatar}" style="width: 100%; height: 100%; object-fit: cover;">`;
-                    profileAvatar.style.backgroundColor = 'transparent';
-                }
-                
-                console.log('✅ Аватар успешно загружен');
+                document.getElementById('avatarPreview').innerHTML = 
+                    `<img src="${currentAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                document.getElementById('avatarPreview').style.backgroundColor = 'transparent';
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Обработка загрузки фото для умейки
+    window.handleSkillPhotoUpload = function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                alert('❌ Файл слишком большой. Максимальный размер: 5MB');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentSkillPhoto = e.target.result;
+                document.getElementById('skillPhotoPreview').innerHTML = 
+                    `<img src="${currentSkillPhoto}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                document.getElementById('skillPhotoStatus').textContent = '✅ Фото загружено';
+                document.getElementById('skillPhotoStatus').style.color = '#48bb78';
             };
             reader.readAsDataURL(file);
         }
@@ -1833,7 +1714,7 @@
                         contact: '',
                         bio: 'Расскажите о себе...',
                         avatar: null,
-                        photos: [],
+                        skillPhoto: null,
                         telegramId: tgUser.id
                     };
                 } else {
@@ -1849,15 +1730,14 @@
             document.getElementById('editBio').value = userData.bio || '';
         
             // Устанавливаем аватар
-            const editAvatarImage = document.getElementById('editAvatarImage');
             if (userData.avatar) {
                 currentAvatar = userData.avatar;
-                editAvatarImage.innerHTML = 
+                document.getElementById('avatarPreview').innerHTML = 
                     `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                editAvatarImage.style.backgroundColor = 'transparent';
+                document.getElementById('avatarPreview').style.backgroundColor = 'transparent';
             } else {
-                editAvatarImage.innerHTML = '<div class="avatar-placeholder">👤</div>';
-                editAvatarImage.style.backgroundColor = '#667eea';
+                document.getElementById('avatarPreview').innerHTML = '👤';
+                document.getElementById('avatarPreview').style.backgroundColor = '#667eea';
             }
         
             console.log('✅ Данные профиля загружены в форму');
@@ -1910,7 +1790,7 @@
                 contact: contact.trim(),
                 bio: bio.trim(),
                 avatar: currentAvatar || userData.avatar,
-                photos: userData.photos || [],
+                skillPhoto: currentSkillPhoto || userData.skillPhoto,
                 telegramId: currentUserId,
                 updatedAt: new Date().toISOString()
             };
@@ -1922,10 +1802,11 @@
                 console.log('✅ Профиль успешно сохранен:', updatedProfile);
                 alert('✅ Профиль успешно сохранен!');
             
-                // Обновляем отображение профиля
-                loadUserProfileDisplay();
-                loadProfilePhotos();
-                
+                // Обновляем фото умейки на сервере если есть
+                if (currentSkillPhoto) {
+                    await updateSkillsPhotoOnServer(currentSkillPhoto);
+                }
+            
                 // Возвращаемся в профиль через 1 секунду
                 setTimeout(() => {
                     showProfileSection();
@@ -1940,6 +1821,38 @@
         }
     };
 
+    // Обновление фото на сервере для всех умейок пользователя
+    async function updateSkillsPhotoOnServer(photoBase64) {
+        try {
+            if (!currentUserId) return;
+            
+            console.log('📡 Обновление фото умейок на сервере...');
+            
+            const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}/update-photo`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    photo: photoBase64
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log('✅ Фото обновлено на сервере');
+                // Обновляем карту если она открыта
+                if (map) {
+                    setTimeout(() => loadSkillsOnMap(), 1000);
+                }
+            }
+            
+        } catch (error) {
+            console.error('❌ Ошибка обновления фото на сервере:', error);
+        }
+    }
+
     // Функция отображения профиля пользователя
     async function loadUserProfileDisplay() {
         try {
@@ -1951,13 +1864,13 @@
                 userData.firstName || 'Пользователь';
             
             // Обновляем аватар в профиле
-            const avatarElement = document.getElementById('avatarPreview');
+            const avatarElement = document.getElementById('userAvatar');
             if (userData.avatar) {
                 avatarElement.innerHTML = 
                     `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
                 avatarElement.style.backgroundColor = 'transparent';
             } else {
-                avatarElement.innerHTML = '<div class="avatar-placeholder">👤</div>';
+                avatarElement.innerHTML = '👤';
                 avatarElement.style.backgroundColor = '#667eea';
             }
             
@@ -1987,240 +1900,6 @@
         loadProfileToForm(); // Загружаем данные в форму при открытии
     };
 
-    // ========== ФУНКЦИИ ДЛЯ ЗАГРУЗКИ ФОТО ==========
-
-    // Показать секцию загрузки фото
-    window.showPhotoUploadSection = function() {
-        showSection('photoUploadSection');
-        loadPhotosToUpload();
-        
-        // Настраиваем кнопку выбора фото
-        document.getElementById('selectPhotosBtn').addEventListener('click', function() {
-            document.getElementById('photoInput').click();
-        });
-    };
-
-    // Загрузка фото для отображения в профиле
-    function loadProfilePhotos() {
-        try {
-            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-            userPhotos = userData.photos || [];
-            
-            const photosGrid = document.getElementById('profilePhotosGrid');
-            if (!photosGrid) return;
-            
-            if (userPhotos.length > 0) {
-                photosGrid.innerHTML = userPhotos.map((photo, index) => `
-                    <div class="photo-item">
-                        <img src="${photo}" alt="Фото работы ${index + 1}">
-                        <button class="photo-remove" onclick="removePhoto(${index})">×</button>
-                    </div>
-                `).join('');
-                
-                // Добавляем кнопку для добавления новых фото
-                photosGrid.innerHTML += `
-                    <div class="photo-item photo-add-btn" onclick="showPhotoUploadSection()">
-                        +
-                    </div>
-                `;
-            } else {
-                photosGrid.innerHTML = `
-                    <div class="photo-item photo-add-btn" onclick="showPhotoUploadSection()" style="grid-column: span 3;">
-                        +<br>
-                        <span style="font-size: 14px;">Добавить фото работ</span>
-                    </div>
-                `;
-            }
-        } catch (error) {
-            console.error('❌ Ошибка загрузки фото:', error);
-        }
-    }
-
-    // Загрузка фото для секции загрузки
-    function loadPhotosToUpload() {
-        const uploadedPhotosContainer = document.getElementById('uploadedPhotos');
-        if (!uploadedPhotosContainer) return;
-        
-        if (photosToUpload.length > 0) {
-            uploadedPhotosContainer.innerHTML = photosToUpload.map((photo, index) => `
-                <div class="photo-item">
-                    <img src="${photo.url}" alt="Фото для загрузки ${index + 1}">
-                    <button class="photo-remove" onclick="removePhotoFromUpload(${index})">×</button>
-                </div>
-            `).join('');
-        } else {
-            uploadedPhotosContainer.innerHTML = '<div style="grid-column: span 3; text-align: center; padding: 30px; color: rgba(255,255,255,0.7);">Фотографии для загрузки появятся здесь</div>';
-        }
-    }
-
-    // Обработка загрузки фото
-    window.handlePhotoUpload = function(event) {
-        const files = event.target.files;
-        if (!files || files.length === 0) return;
-        
-        // Ограничиваем количество фото (максимум 9)
-        const maxPhotos = 9 - photosToUpload.length;
-        if (files.length > maxPhotos) {
-            alert(`❌ Вы можете загрузить максимум ${maxPhotos} фотографий. У вас уже есть ${photosToUpload.length} фото.`);
-            return;
-        }
-        
-        for (let i = 0; i < Math.min(files.length, maxPhotos); i++) {
-            const file = files[i];
-            
-            // Проверяем размер файла (максимум 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert(`❌ Файл "${file.name}" слишком большой. Максимальный размер: 5MB`);
-                continue;
-            }
-            
-            // Проверяем тип файла
-            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            if (!validTypes.includes(file.type)) {
-                alert(`❌ Файл "${file.name}" имеет неподдерживаемый формат. Используйте JPG, PNG или GIF`);
-                continue;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                photosToUpload.push({
-                    name: file.name,
-                    type: file.type,
-                    size: file.size,
-                    url: e.target.result,
-                    file: file
-                });
-                
-                loadPhotosToUpload();
-                console.log(`✅ Фото добавлено: ${file.name}`);
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        // Сбрасываем значение input, чтобы можно было загружать те же файлы снова
-        event.target.value = '';
-    };
-
-    // Удаление фото из списка загрузки
-    window.removePhotoFromUpload = function(index) {
-        if (confirm('❌ Удалить эту фотографию из списка загрузки?')) {
-            photosToUpload.splice(index, 1);
-            loadPhotosToUpload();
-        }
-    };
-
-    // Удаление фото из профиля
-    window.removePhoto = function(index) {
-        if (confirm('❌ Удалить эту фотографию из профиля?')) {
-            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-            userData.photos.splice(index, 1);
-            setLocalStorage(`user_${currentUserId}`, userData);
-            loadProfilePhotos();
-            alert('✅ Фотография удалена!');
-        }
-    };
-
-    // Сохранение фото профиля
-    window.saveProfilePhotos = async function() {
-        try {
-            if (photosToUpload.length === 0) {
-                alert('❌ Нет фотографий для загрузки');
-                return;
-            }
-            
-            console.log(`📸 Начинаем загрузку ${photosToUpload.length} фотографий`);
-            
-            // Показываем прогресс
-            const progressDiv = document.getElementById('uploadProgress');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            
-            progressDiv.style.display = 'block';
-            progressFill.style.width = '0%';
-            progressText.textContent = '0%';
-            
-            // Получаем текущие данные пользователя
-            let userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-            userData.photos = userData.photos || [];
-            
-            // Имитируем загрузку на сервер
-            for (let i = 0; i < photosToUpload.length; i++) {
-                const photo = photosToUpload[i];
-                
-                // Обновляем прогресс
-                const progress = ((i + 1) / photosToUpload.length) * 100;
-                progressFill.style.width = `${progress}%`;
-                progressText.textContent = `${Math.round(progress)}%`;
-                
-                // Добавляем фото в профиль пользователя
-                userData.photos.push(photo.url);
-                
-                // Имитируем задержку для реалистичности
-                await new Promise(resolve => setTimeout(resolve, 300));
-                
-                console.log(`✅ Фото загружено: ${photo.name} (${i + 1}/${photosToUpload.length})`);
-            }
-            
-            // Сохраняем обновленные данные
-            setLocalStorage(`user_${currentUserId}`, userData);
-            
-            // Очищаем список загрузки
-            photosToUpload = [];
-            
-            // Скрываем прогресс
-            setTimeout(() => {
-                progressDiv.style.display = 'none';
-            }, 1000);
-            
-            // Показываем уведомление об успехе
-            showNotification('✅ Фотографии успешно загружены!');
-            
-            // Возвращаемся в профиль
-            setTimeout(() => {
-                showProfileSection();
-            }, 1500);
-            
-        } catch (error) {
-            console.error('❌ Ошибка загрузки фото:', error);
-            alert('❌ Произошла ошибка при загрузке фотографий');
-        }
-    };
-
-    // Обработка drag and drop
-    function handleDragOver(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        event.dataTransfer.dropEffect = 'copy';
-        event.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-        event.currentTarget.style.borderColor = '#667eea';
-    }
-
-    function handleDragLeave(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        event.currentTarget.style.background = '';
-        event.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
-    }
-
-    function handleDrop(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        event.currentTarget.style.background = '';
-        event.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
-        
-        const files = event.dataTransfer.files;
-        if (files.length > 0) {
-            // Создаем искусственное событие для обработки файлов
-            const input = document.getElementById('photoInput');
-            input.files = files;
-            
-            // Триггерим событие change
-            const changeEvent = new Event('change', { bubbles: true });
-            input.dispatchEvent(changeEvent);
-        }
-    }
-
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
 
     window.showMainScreen = function() {
@@ -2232,7 +1911,6 @@
         document.getElementById('clientSection').style.display = 'none';
         document.getElementById('profileSection').style.display = 'none';
         document.getElementById('editProfileSection').style.display = 'none';
-        document.getElementById('photoUploadSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
         document.getElementById('chatWindow').style.display = 'none';
@@ -2250,7 +1928,6 @@
         document.getElementById('clientSection').style.display = 'none';
         document.getElementById('profileSection').style.display = 'none';
         document.getElementById('editProfileSection').style.display = 'none';
-        document.getElementById('photoUploadSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
         document.getElementById('chatWindow').style.display = 'none';
@@ -2271,7 +1948,6 @@
     window.showProfileSection = function() {
         showSection('profileSection');
         loadUserProfileDisplay(); // Используем исправленную функцию
-        loadProfilePhotos(); // Загружаем фото профиля
         loadUserStats();
         loadProfileSkills();
         loadUserChats();
@@ -2335,7 +2011,7 @@
             // Получаем местоположение
             const location = userLocation || { lat: 55.7558, lon: 37.6173 };
 
-            // Отправляем на сервер
+            // Отправляем на сервер с фото
             const response = await fetch(`${API_URL}/api/skills`, {
                 method: 'POST',
                 headers: {
@@ -2345,8 +2021,9 @@
                     skill: skillName.trim(),
                     experience: skillExperience.trim(),
                     price: parseInt(skillPrice),
-                    userId: userId, // Убедись что здесь userId, а не currentUserId
+                    userId: userId,
                     username: userData.firstName || 'Аноним',
+                    photo: currentSkillPhoto, // Добавляем фото
                     location: location
                 })
             });
@@ -2361,6 +2038,14 @@
                 document.getElementById('skillName').value = '';
                 document.getElementById('skillExperience').value = '';
                 document.getElementById('skillPrice').value = '';
+                document.getElementById('skillPhotoPreview').innerHTML = `
+                    <div style="text-align: center; color: #666;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">📷</div>
+                        <div>Фото не загружено</div>
+                    </div>
+                `;
+                document.getElementById('skillPhotoStatus').textContent = '';
+                currentSkillPhoto = null;
             
                 // Обновляем списки
                 setTimeout(() => {
@@ -2398,7 +2083,7 @@
                 return [];
             }
         } catch (error) {
-            console.error('❌ Ошибка соединения с сервером:', error);
+            console.error('❌ Ошибка соединения с сервере:', error);
             // Возвращаем пустой массив, чтобы приложение не падало
             return [];
         }
@@ -2508,6 +2193,12 @@
                         <div class="skill-price">${skill.price} ₽</div>
                         <div class="skill-distance">🎓 ${skill.experience}</div>
                         <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
+                        ${skill.photo ? 
+                            `<div style="margin: 10px 0;">
+                                <img src="${skill.photo}" style="width: 100%; max-height: 200px; border-radius: 10px; object-fit: cover;">
+                            </div>` : 
+                            ''
+                        }
                         <div style="color: #48bb78; font-size: 14px; margin-bottom: 10px;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
@@ -2597,6 +2288,12 @@
                         </div>
                         <div style="color: #666; margin: 8px 0;">🎓 ${skill.experience}</div>
                         <div style="color: #666; margin: 8px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
+                        ${skill.photo ? 
+                            `<div style="margin: 10px 0;">
+                                <img src="${skill.photo}" style="width: 100%; max-height: 150px; border-radius: 10px; object-fit: cover;">
+                            </div>` : 
+                            ''
+                        }
                         <div style="color: #48bb78; font-size: 12px; margin: 8px 0;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
@@ -2697,8 +2394,11 @@
                         <div class="skill-price">${skill.price} ₽</div>
                         <div class="skill-distance">🎓 ${highlightText(skill.experience, query)}</div>
                         <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
-                            <div style="width: 30px; height: 30px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">
-                                ${skill.avatar ? '🖼️' : '👤'}
+                            <div class="skill-photo-preview">
+                                ${skill.photo ? 
+                                    `<img src="${skill.photo}" alt="${skill.username}">` : 
+                                    '<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 20px; color: #667eea;">👤</div>'
+                                }
                             </div>
                             <div>
                                 <div style="font-weight: bold; color: #2d3748;">${skill.username} ${isUserSkill ? '(Ваша)' : ''}</div>
@@ -2712,8 +2412,8 @@
                         <div style="color: #48bb78; font-size: 14px; margin: 10px 0;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
-                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')">
-                            💬 Написать мастеру
+                        <button class="chat-button" onclick="startTelegramChat('${skill._id}', '${skill.skill}', '${skill.username}', '${skill.userId}')">
+                            💬 Написать мастеру в Telegram
                         </button>
                         ${isUserSkill ? 
                             `<button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #ed8936; margin-top: 8px;">
@@ -2806,9 +2506,6 @@
                 console.log('👤 User data:', user);
             }
         }
-        
-        // Загружаем фото профиля при загрузке
-        loadProfilePhotos();
     });
 
     // ========== СИСТЕМА ЗВЕЗД И КАСТОМИЗАЦИИ ==========
@@ -3170,112 +2867,176 @@
         }
     };
 
-    // ========== ЧАТЫ И СООБЩЕНИЯ ==========
+    // ========== ТЕЛЕГРАМ ЧАТ С МАСТЕРОМ ==========
 
-    // Загрузка чатов пользователя
-    async function loadUserChats() {
+    // Функция для начала чата с мастером через Telegram
+    window.startTelegramChat = function(skillId, skillName, masterName, masterUserId) {
         try {
-            const chatsList = document.getElementById('userChatsList');
-            if (!chatsList) return;
+            console.log('💬 Начинаем чат с мастером через Telegram:', { skillId, skillName, masterName, masterUserId });
             
-            // Для демо - пустой список чатов
-            chatsList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">У вас пока нет активных чатов</div>';
+            // Сохраняем данные для чата
+            currentChatMasterId = masterUserId;
+            currentChatMasterName = masterName;
+            currentChatSkillName = skillName;
+            
+            // Увеличиваем счетчик контактов
+            fetch(`${API_URL}/api/skills/${skillId}/contact`, {
+                method: 'POST'
+            }).catch(error => console.error('❌ Ошибка обновления контактов:', error));
+            
+            // Показываем окно чата
+            showTelegramChatWindow(masterName, skillName);
             
         } catch (error) {
-            console.error('Ошибка загрузки чатов:', error);
+            console.error('❌ Ошибка начала чата:', error);
+            alert('❌ Ошибка начала чата');
         }
-    }
-
-    // Закрытие чата
-    window.closeChat = function() {
-        showProfileSection();
     };
 
-    // ========== КРИТИЧЕСКОЕ ОБНОВЛЕНИЕ: ЧАТ С МАСТЕРОМ ЧЕРЕЗ TELEGRAM ==========
+    // Показать окно Telegram чата
+    function showTelegramChatWindow(masterName, skillName) {
+        document.getElementById('chatTitle').textContent = `💬 ${masterName} - ${skillName}`;
+        
+        // Очищаем сообщения
+        document.getElementById('chatMessages').innerHTML = `
+            <div style="text-align: center; padding: 20px; color: #666;">
+                <div style="font-size: 50px; margin-bottom: 15px;">💬</div>
+                <div style="font-size: 18px; margin-bottom: 10px;">Чат с ${masterName}</div>
+                <div style="font-size: 14px; color: #888;">
+                    Сообщения будут отправляться в Telegram
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('messageInput').value = '';
+        document.getElementById('messageInput').placeholder = `Напишите сообщение для ${masterName}...`;
+        
+        showSection('chatWindow');
+    }
 
-    // Функция для начала чата с мастером - ОСНОВНОЕ ИЗМЕНЕНИЕ!
-    window.contactMaster = async function(skillId, skillName, masterName) {
+    // Отправка сообщения в Telegram
+    window.sendTelegramMessage = async function() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+        
+        if (!message) {
+            alert('Введите сообщение');
+            return;
+        }
+        
+        if (!currentChatMasterId || !currentChatMasterName) {
+            alert('❌ Не удалось определить получателя');
+            return;
+        }
+        
         try {
-            console.log('💬 Начинаем чат с мастером через Telegram:', { skillId, skillName, masterName });
+            // Получаем данные текущего пользователя
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+            const userName = userData.firstName || 'Клиент';
             
-            // 1. Увеличиваем счетчик контактов
-            await fetch(`${API_URL}/api/skills/${skillId}/contact`, {
-                method: 'POST'
-            });
+            // Формируем сообщение для Telegram
+            const telegramMessage = 
+                `📨 Новое сообщение от ${userName} через Umeyka:\n\n` +
+                `💬 Сообщение: ${message}\n\n` +
+                `📋 Услуга: ${currentChatSkillName}\n` +
+                `👤 От: ${userName}\n` +
+                `📞 Контакты: ${userData.contact || 'Не указаны'}`;
             
-            // 2. Получаем информацию о мастерском скилле для получения telegramId мастера
-            const skillResponse = await fetch(`${API_URL}/api/skills/${skillId}`);
-            const skillData = await skillResponse.json();
+            // Создаем URL для отправки в Telegram
+            // Если у мастера есть telegramId, используем его, иначе отправляем в общий чат
+            const telegramUrl = currentChatMasterId.startsWith('user_') 
+                ? `https://t.me/umeyka_support` // Общий чат поддержки
+                : `https://t.me/${currentChatMasterId}`; // Прямой чат
             
-            if (skillData.success && skillData.skill) {
-                const masterUserId = skillData.skill.userId;
-                console.log('👨‍🔧 Telegram ID мастера:', masterUserId);
-                
-                // 3. Создаем ссылку для чата в Telegram
-                const telegramChatUrl = `https://t.me/${masterUserId}`;
-                
-                // 4. Открываем чат в Telegram или показываем инструкцию
-                openTelegramChat(telegramChatUrl, masterName, skillName);
-                
+            // Открываем Telegram с предзаполненным сообщением
+            const encodedMessage = encodeURIComponent(telegramMessage);
+            const finalUrl = `${telegramUrl}?text=${encodedMessage}`;
+            
+            // Открываем Telegram
+            const telegramWindow = window.open(finalUrl, '_blank');
+            
+            if (!telegramWindow || telegramWindow.closed || typeof telegramWindow.closed == 'undefined') {
+                // Если не удалось открыть окно, показываем инструкцию
+                showTelegramSendInstructions(telegramMessage, currentChatMasterName);
             } else {
-                // Если не можем получить telegramId, открываем общий чат
-                openTelegramChat('https://t.me/umeyka_support', masterName, skillName);
+                // Показываем уведомление
+                showNotification(`📤 Сообщение отправлено ${currentChatMasterName}!`);
+                
+                // Добавляем сообщение в историю чата
+                const chatMessages = document.getElementById('chatMessages');
+                const myMessage = document.createElement('div');
+                myMessage.className = 'chat-message my-message';
+                myMessage.innerHTML = `
+                    <div class="chat-message-sender">Вы</div>
+                    <div style="background: #667eea; color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; display: inline-block; max-width: 80%; margin-bottom: 5px;">
+                        ${message}
+                    </div>
+                    <div style="font-size: 12px; color: #999; text-align: right;">Только что</div>
+                `;
+                chatMessages.appendChild(myMessage);
+                
+                // Прокручиваем вниз
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Очищаем поле ввода
+                messageInput.value = '';
+                
+                // Через 2 секунды добавляем ответ мастера
+                setTimeout(() => {
+                    const masterResponse = document.createElement('div');
+                    masterResponse.className = 'chat-message';
+                    masterResponse.innerHTML = `
+                        <div class="chat-message-sender">${currentChatMasterName}</div>
+                        <div style="background: #f1f5f9; color: #2d3748; padding: 10px 15px; border-radius: 15px 15px 15px 0; display: inline-block; max-width: 80%; margin-bottom: 5px;">
+                            Спасибо за сообщение! Я отвечу вам в Telegram в ближайшее время. ✨
+                        </div>
+                        <div style="font-size: 12px; color: #999;">Только что</div>
+                    `;
+                    chatMessages.appendChild(masterResponse);
+                    
+                    // Прокручиваем вниз
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 2000);
             }
             
         } catch (error) {
-            console.error('❌ Ошибка создания чата:', error);
-            // В случае ошибки открываем общий чат
-            openTelegramChat('https://t.me/umeyka_support', masterName, skillName);
+            console.error('❌ Ошибка отправки сообщения:', error);
+            alert('❌ Ошибка отправки сообщения. Попробуйте снова.');
         }
     };
 
-    // Открытие чата в Telegram
-    function openTelegramChat(telegramUrl, masterName, skillName) {
-        const message = `💬 Чат с мастером ${masterName}\n\nУслуга: ${skillName}\n\nЧтобы начать общение:\n\n1. Нажмите кнопку ниже для открытия Telegram\n2. Или скопируйте ссылку: ${telegramUrl}\n3. Или найдите в Telegram: @${masterName}`;
-        
-        const chatWindow = window.open(telegramUrl, '_blank');
-        
-        if (!chatWindow || chatWindow.closed || typeof chatWindow.closed == 'undefined') {
-            // Если не удалось открыть окно, показываем инструкцию
-            showTelegramChatInstructions(masterName, skillName, telegramUrl);
-        } else {
-            // Показываем уведомление об успешном открытии
-            showNotification(`💬 Чат с ${masterName} открывается в Telegram!`);
-        }
-    }
-
-    // Показать инструкцию по использованию Telegram чата
-    function showTelegramChatInstructions(masterName, skillName, telegramUrl) {
+    // Показать инструкцию по отправке сообщения в Telegram
+    function showTelegramSendInstructions(message, masterName) {
         const instructionHtml = `
             <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
                 <div style="background: white; border-radius: 20px; padding: 30px; max-width: 400px; width: 100%; color: #2d3748;">
-                    <h2 style="margin-bottom: 20px; color: #667eea; text-align: center;">💬 Начать чат с мастером</h2>
+                    <h2 style="margin-bottom: 20px; color: #667eea; text-align: center;">📤 Отправка сообщения</h2>
                     
                     <div style="margin-bottom: 20px;">
-                        <p><strong>Мастер:</strong> ${masterName}</p>
-                        <p><strong>Услуга:</strong> ${skillName}</p>
+                        <p><strong>Получатель:</strong> ${masterName}</p>
+                        <p><strong>Ваше сообщение:</strong></p>
+                        <div style="background: #f7fafc; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px;">
+                            ${message}
+                        </div>
                     </div>
                     
-                    <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="background: #e2e8f0; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
                         <h4 style="margin-bottom: 10px;">📱 Инструкция:</h4>
                         <ol style="padding-left: 20px; margin-bottom: 10px;">
-                            <li>Откройте приложение Telegram</li>
-                            <li>Нажмите на кнопку ниже</li>
-                            <li>Или скопируйте ссылку и вставьте в Telegram</li>
+                            <li>Скопируйте сообщение выше</li>
+                            <li>Откройте Telegram</li>
+                            <li>Найдите контакт: <strong>${masterName}</strong></li>
+                            <li>Вставьте и отправьте сообщение</li>
                         </ol>
                         
-                        <div style="background: #e2e8f0; padding: 10px; border-radius: 8px; margin: 10px 0; font-family: monospace; word-break: break-all; font-size: 14px;">
-                            ${telegramUrl}
-                        </div>
-                        
-                        <button onclick="copyToClipboard('${telegramUrl}')" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px;">
-                            📋 Скопировать ссылку
+                        <button onclick="copyToClipboard('${message.replace(/'/g, "\\'")}')" style="width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px;">
+                            📋 Скопировать сообщение
                         </button>
                     </div>
                     
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="window.open('${telegramUrl}', '_blank')" style="flex: 1; padding: 15px; background: #48bb78; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold;">
-                            📱 Открыть в Telegram
+                        <button onclick="window.open('https://t.me', '_blank')" style="flex: 1; padding: 15px; background: #48bb78; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold;">
+                            📱 Открыть Telegram
                         </button>
                         <button onclick="closeInstructions()" style="flex: 1; padding: 15px; background: #e53e3e; color: white; border: none; border-radius: 10px; cursor: pointer;">
                             ❌ Закрыть
@@ -3300,7 +3061,7 @@
         document.execCommand('copy');
         document.body.removeChild(input);
         
-        showNotification('📋 Ссылка скопирована!');
+        showNotification('📋 Сообщение скопировано!');
     };
 
     // Закрытие инструкции
@@ -3309,6 +3070,11 @@
         if (instruction) {
             document.body.removeChild(instruction);
         }
+    };
+
+    // Закрытие чата
+    window.closeChat = function() {
+        showProfileSection();
     };
 
     // ========== ФУНКЦИЯ ОТПРАВКИ ДРУГУ ==========
@@ -3482,7 +3248,7 @@
                     const color = getMarkerColor(rating);
                     const isUserSkill = skill.userId === currentUserId;
                     
-                    // Создаем красивый попап с кнопкой для Telegram чата
+                    // Создаем красивый попап с фото
                     const popupContent = createSkillPopupContent(skill, isUserSkill);
                     
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
@@ -3539,17 +3305,19 @@
         return '#6b7280'; // Серый
     }
 
-    // Функция создания контента для попапа (ОБНОВЛЕНА для Telegram чата)
+    // Функция создания контента для попапа (ОБНОВЛЕНА с фото)
     function createSkillPopupContent(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
         
         return `
             <div style="min-width: 280px;">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                    ${skill.avatar ? 
-                        `<img src="${skill.avatar}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">` : 
-                        '<div style="width: 50px; height: 50px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">👤</div>'
-                    }
+                    <div class="skill-photo-preview">
+                        ${skill.photo ? 
+                            `<img src="${skill.photo}" alt="${skill.username}" style="width: 100%; height: 100%; object-fit: cover;">` : 
+                            '<div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 20px; color: #667eea;">👤</div>'
+                        }
+                    </div>
                     <div>
                         <h3 style="margin: 0; color: #2d3748; font-size: 18px;">${skill.skill}</h3>
                         <p style="margin: 2px 0; color: #666; font-size: 14px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
@@ -3589,7 +3357,7 @@
                 }
                 
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-                    <button onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')" 
+                    <button onclick="startTelegramChat('${skill._id}', '${skill.skill}', '${skill.username}', '${skill.userId}')" 
                             style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <span>💬</span>
                         <span>Написать в Telegram</span>
@@ -3799,32 +3567,6 @@
         
         return currentUserId;
     };
-
-    // Функция для красивых уведомлений
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 10000;
-        `;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 2000);
-    }    
         
     </script>
 </body>
