@@ -1067,49 +1067,112 @@
             border-bottom: 2px solid rgba(102, 126, 234, 0.2);
         }
 
-        /* Стили для загрузки фото работы */
+        /* Стили для фото работы */
         .work-photo-container {
             margin: 15px 0;
             text-align: center;
         }
-        
-        .work-photo-preview {
+
+        .work-photo {
             width: 100%;
-            max-width: 300px;
-            height: 200px;
-            object-fit: cover;
+            max-height: 200px;
             border-radius: 10px;
-            margin: 10px auto;
-            display: block;
+            object-fit: cover;
             border: 2px solid #667eea;
+            cursor: pointer;
+            transition: transform 0.3s ease;
         }
-        
-        .work-photo-upload {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+
+        .work-photo:hover {
+            transform: scale(1.02);
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            height: 150px;
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #718096;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-placeholder:hover {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        .photo-upload-button {
+            background: #4299e1;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 600;
-            margin: 10px 0;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
         }
-        
-        .work-photo-upload:hover {
+
+        .photo-upload-button:hover {
+            background: #3182ce;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
-        
-        .work-photo-label {
-            display: block;
-            margin-bottom: 10px;
+
+        /* Стили для увеличенного фото */
+        .photo-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .photo-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
             color: white;
-            font-weight: 600;
-            font-size: 16px;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Стили для оптимизации карты */
+        .cluster-icon {
+            background: #667eea;
+            border-radius: 50%;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -1164,29 +1227,23 @@
                 
                 <!-- Загрузка фото работы -->
                 <div class="work-photo-container">
-                    <label class="work-photo-label">📸 Фото вашей работы (опционально)</label>
+                    <div id="workPhotoPlaceholder" class="photo-placeholder" onclick="document.getElementById('workPhotoInput').click()">
+                        <div style="font-size: 40px; margin-bottom: 10px;">📷</div>
+                        <div>Нажмите для загрузки фото работы</div>
+                        <div style="font-size: 12px; margin-top: 5px;">Максимум 1 фото</div>
+                    </div>
+                    <div id="workPhotoPreview" style="display: none;">
+                        <img id="workPhotoImage" class="work-photo" onclick="showPhotoModal(this.src)">
+                        <button class="photo-upload-button" onclick="document.getElementById('workPhotoInput').click()">
+                            🗑️ Заменить фото
+                        </button>
+                    </div>
                     <input type="file" id="workPhotoInput" accept="image/*" style="display: none;" onchange="handleWorkPhotoUpload(event)">
-                    <button class="work-photo-upload" onclick="document.getElementById('workPhotoInput').click()">
-                        📤 Загрузить фото
-                    </button>
-                    <div id="workPhotoPreview" style="display: none;"></div>
                 </div>
                 
                 <button class="submit-button" onclick="addSkill()">✅ Опубликовать умейку</button>
                 
                 <div id="mySkillsList" style="margin-top: 20px;"></div>
-                
-               <!-- Кнопки отладки -->
-               <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button onclick="checkAllSkills()" 
-                            style="flex: 1; padding: 12px; background: #9f7aea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
-                       🔍 Проверить сервер
-                    </button>
-                    <button onclick="forceLoadMySkills()" 
-                            style="flex: 1; padding: 12px; background: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
-                        🔄 Обновить список
-                    </button>
-                </div>
             </div>
         </div>
 
@@ -1226,48 +1283,48 @@
                     </button>
                 </div>
                 
-<!-- Реферальная программа -->
-<div class="referral-section">
-    <div class="referral-title">
-        <span>👥</span>
-        <span>Пригласи друзей</span>
-    </div>
-    
-    <div class="referral-description">
-        Дари друзьям +1 звезду за регистрацию<br>и получай +1 звезду за каждого приглашенного!
-    </div>
-    
-    <div class="referral-benefits">
-        <div class="referral-benefit">🎁 Друг получает +1 звезду</div>
-        <div class="referral-benefit">⭐ Вы получаете +1 звезду</div>
-    </div>
-    
-    <div class="referral-buttons">
-        <button class="referral-button share-button" onclick="shareToFriend()">
-            📤 Отправить другу
-        </button>
-        
-        <button class="referral-button copy-button" onclick="copyReferralLink()">
-            📋 Скопировать ссылку
-        </button>
-    </div>
- </div>
+                <!-- Реферальная программа -->
+                <div class="referral-section">
+                    <div class="referral-title">
+                        <span>👥</span>
+                        <span>Пригласи друзей</span>
+                    </div>
+                    
+                    <div class="referral-description">
+                        Дари друзьям +1 звезду за регистрацию<br>и получай +1 звезду за каждого приглашенного!
+                    </div>
+                    
+                    <div class="referral-benefits">
+                        <div class="referral-benefit">🎁 Друг получает +1 звезду</div>
+                        <div class="referral-benefit">⭐ Вы получаете +1 звезду</div>
+                    </div>
+                    
+                    <div class="referral-buttons">
+                        <button class="referral-button share-button" onclick="shareToFriend()">
+                            📤 Отправить другу
+                        </button>
+                        
+                        <button class="referral-button copy-button" onclick="copyReferralLink()">
+                            📋 Скопировать ссылку
+                        </button>
+                    </div>
+                </div>
                 
                 <!-- Вкладки личного кабинета -->
-<div class="tab-buttons">
-    <button class="tab-button active" onclick="showProfileTab('stats')" id="statsTab">
-        📊 Статистика
-    </button>
-    <button class="tab-button" onclick="showProfileTab('skills')" id="skillsTab">
-        ✨ Мои умейки
-    </button>
-    <button class="tab-button" onclick="showProfileTab('deals')" id="dealsTab">
-        📝 Сделки
-    </button>
-    <button class="tab-button" onclick="showProfileTab('chats')" id="chatsTab">
-        💬 Чаты
-    </button>
-</div>
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="showProfileTab('stats')" id="statsTab">
+                        📊 Статистика
+                    </button>
+                    <button class="tab-button" onclick="showProfileTab('skills')" id="skillsTab">
+                        ✨ Мои умейки
+                    </button>
+                    <button class="tab-button" onclick="showProfileTab('deals')" id="dealsTab">
+                        📝 Сделки
+                    </button>
+                    <button class="tab-button" onclick="showProfileTab('chats')" id="chatsTab">
+                        💬 Чаты
+                    </button>
+                </div>
                 
                 <!-- Статистика -->
                 <div id="profileStats" class="profile-tab">
@@ -1290,17 +1347,17 @@
                     <h3 style="margin-bottom: 15px;">📝 Мои сделки</h3>
                     
                     <!-- Вкладки сделок -->
-                <div class="deals-tab-buttons">
-                    <button class="deals-tab-button active" onclick="showDealsTab('pending')" id="pendingDealsTab">
-                        ✍️ Ожидают подписи
-                    </button>
-                    <button class="deals-tab-button" onclick="showDealsTab('active')" id="activeDealsTab">
-                        ✅ Активные
-                    </button>
-                    <button class="deals-tab-button" onclick="showDealsTab('completed')" id="completedDealsTab">
-                        📋 Завершенные
-                    </button>
-                </div>
+                    <div class="deals-tab-buttons">
+                        <button class="deals-tab-button active" onclick="showDealsTab('pending')" id="pendingDealsTab">
+                            ✍️ Ожидают подписи
+                        </button>
+                        <button class="deals-tab-button" onclick="showDealsTab('active')" id="activeDealsTab">
+                            ✅ Активные
+                        </button>
+                        <button class="deals-tab-button" onclick="showDealsTab('completed')" id="completedDealsTab">
+                            📋 Завершенные
+                        </button>
+                    </div>
                     
                     <!-- Кнопка создания сделки -->
                     <button class="main-button" onclick="showCreateDealSection()" 
@@ -1510,22 +1567,10 @@
             </div>
         </div>
 
-        <!-- ОКНО ЧАТА -->
-        <div id="chatWindow" class="section">
-            <button class="back-button" onclick="closeChat()">← Назад к чатам</button>
-            
-            <div class="form-section">
-                <h2 id="chatTitle" style="margin-bottom: 20px; text-align: center;">💬 Чат</h2>
-                
-                <div id="chatMessages" style="height: 300px; overflow-y: auto; margin-bottom: 20px; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px;">
-                    <!-- Сообщения чата -->
-                </div>
-                
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="messageInput" class="input-field" placeholder="Введите сообщение..." style="flex: 1;">
-                    <button class="submit-button" onclick="sendChatMessage()" style="width: auto; padding: 15px 20px;">📤</button>
-                </div>
-            </div>
+        <!-- МОДАЛЬНОЕ ОКНО ДЛЯ ФОТО -->
+        <div id="photoModal" class="photo-modal">
+            <button class="close-modal" onclick="closePhotoModal()">×</button>
+            <img id="modalPhoto" class="photo-modal-content">
         </div>
     </div>
 
@@ -1534,18 +1579,19 @@
     const API_URL = 'https://umeyka-oocn.onrender.com';
     let currentUserId = null;
     let currentAvatar = null;
-    let currentWorkPhoto = null;
     let selectedQuality = '';
     let selectedOptions = [];
     let currentProfileTab = 'stats';
     let currentDealTab = 'pending';
     let projectRating = 0;
+    let workPhoto = null;
     
     // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ КАРТЫ ==========
     let map = null;
     let userLocation = null;
     let markers = [];
     let mapRefreshInterval = null;
+    let markerCluster = null;
 
     // ========== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ==========
 
@@ -1616,6 +1662,11 @@
     window.handleAvatarUpload = function(event) {
         const file = event.target.files[0];
         if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                alert('❌ Файл слишком большой. Максимальный размер: 5MB');
+                return;
+            }
+            
             const reader = new FileReader();
             reader.onload = function(e) {
                 currentAvatar = e.target.result;
@@ -1630,28 +1681,31 @@
     window.handleWorkPhotoUpload = function(event) {
         const file = event.target.files[0];
         if (file) {
-            // Проверяем размер файла (максимум 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert('❌ Фото слишком большое! Максимальный размер: 5MB');
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                alert('❌ Файл слишком большой. Максимальный размер: 5MB');
                 return;
             }
             
             const reader = new FileReader();
             reader.onload = function(e) {
-                currentWorkPhoto = e.target.result;
-                document.getElementById('workPhotoPreview').innerHTML = 
-                    `<img src="${currentWorkPhoto}" class="work-photo-preview" alt="Фото работы">`;
+                workPhoto = e.target.result;
+                document.getElementById('workPhotoPlaceholder').style.display = 'none';
                 document.getElementById('workPhotoPreview').style.display = 'block';
-                
-                // Сохраняем фото в localStorage для текущего пользователя
-                const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-                userData.workPhoto = currentWorkPhoto;
-                setLocalStorage(`user_${currentUserId}`, userData);
-                
-                showNotification('✅ Фото работы загружено!');
+                document.getElementById('workPhotoImage').src = workPhoto;
             };
             reader.readAsDataURL(file);
         }
+    };
+
+    // Показать фото в модальном окне
+    window.showPhotoModal = function(photoUrl) {
+        document.getElementById('modalPhoto').src = photoUrl;
+        document.getElementById('photoModal').style.display = 'flex';
+    };
+
+    // Закрыть модальное окно
+    window.closePhotoModal = function() {
+        document.getElementById('photoModal').style.display = 'none';
     };
 
     // Функция для загрузки существующего профиля в форму
@@ -1674,11 +1728,10 @@
                         contact: '',
                         bio: 'Расскажите о себе...',
                         avatar: null,
-                        telegramId: tgUser.id,
-                        workPhoto: null
+                        telegramId: tgUser.id
                     };
                 } else {
-                    userData = { ...demoUserData, workPhoto: null };
+                    userData = { ...demoUserData };
                 }
             }
         
@@ -1710,7 +1763,7 @@
         }
     }
 
-    // Функция сохранения профиля - ИСПРАВЛЕННАЯ ВЕРСИЯ
+    // Функция сохранения профиля
     window.saveProfile = async function() {
         try {
             console.log('💾 Начало сохранения профиля');
@@ -1940,9 +1993,13 @@
                 price: parseInt(skillPrice),
                 userId: userId,
                 username: userData.firstName || 'Аноним',
-                location: location,
-                workPhoto: currentWorkPhoto || null
+                location: location
             };
+
+            // Добавляем фото работы если есть
+            if (workPhoto) {
+                skillData.workPhoto = workPhoto;
+            }
 
             // Отправляем на сервер
             const response = await fetch(`${API_URL}/api/skills`, {
@@ -1957,17 +2014,17 @@
             console.log('📱 Ответ сервера при добавлении:', result);
         
             if (result.success) {
-                // Очищаем фото работы после успешной отправки
-                currentWorkPhoto = null;
-                document.getElementById('workPhotoPreview').innerHTML = '';
-                document.getElementById('workPhotoPreview').style.display = 'none';
-                
                 alert('✅ Умейка успешно опубликована!');
             
                 // Очищаем поля
                 document.getElementById('skillName').value = '';
                 document.getElementById('skillExperience').value = '';
                 document.getElementById('skillPrice').value = '';
+                
+                // Сбрасываем фото
+                workPhoto = null;
+                document.getElementById('workPhotoPlaceholder').style.display = 'block';
+                document.getElementById('workPhotoPreview').style.display = 'none';
             
                 // Обновляем списки
                 setTimeout(() => {
@@ -2109,11 +2166,13 @@
                         </div>
                         <div class="skill-price">${skill.price} ₽</div>
                         <div class="skill-distance">🎓 ${skill.experience}</div>
-                        ${skill.workPhoto ? 
-                            `<div style="margin: 10px 0;">
-                                <img src="${skill.workPhoto}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; border: 2px solid #667eea;">
-                            </div>` : ''
-                        }
+                        
+                        ${skill.workPhoto ? `
+                            <div class="work-photo-container">
+                                <img src="${skill.workPhoto}" class="work-photo" onclick="showPhotoModal('${skill.workPhoto}')">
+                            </div>
+                        ` : ''}
+                        
                         <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
                         <div style="color: #48bb78; font-size: 14px; margin-bottom: 10px;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
@@ -2133,6 +2192,10 @@
                     <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
                         <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
                         <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
+                        <div style="font-size: 14px; opacity: 0.8; margin-bottom: 20px;">
+                            На сервере ${allSkills.length} умейок<br>
+                            Ваш User ID: <strong>${userId}</strong>
+                        </div>
                         <button class="main-button" onclick="showSection('masterSection')" style="padding: 15px; margin-top: 10px;">
                             ✨ Добавить первую умейку
                         </button>
@@ -2180,12 +2243,14 @@
                             <div class="skill-price">${skill.price} ₽</div>
                         </div>
                         <div style="color: #666; margin: 8px 0;">🎓 ${skill.experience}</div>
-                        ${skill.workPhoto ? 
-                            `<div style="margin: 10px 0;">
-                                <img src="${skill.workPhoto}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; border: 2px solid #667eea;">
-                            </div>` : ''
-                        }
                         <div style="color: #666; margin: 8px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
+                        
+                        ${skill.workPhoto ? `
+                            <div class="work-photo-container">
+                                <img src="${skill.workPhoto}" class="work-photo" onclick="showPhotoModal('${skill.workPhoto}')" style="max-height: 100px;">
+                            </div>
+                        ` : ''}
+                        
                         <div style="color: #48bb78; font-size: 12px; margin: 8px 0;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
@@ -2285,11 +2350,13 @@
                         </div>
                         <div class="skill-price">${skill.price} ₽</div>
                         <div class="skill-distance">🎓 ${highlightText(skill.experience, query)}</div>
-                        ${skill.workPhoto ? 
-                            `<div style="margin: 10px 0;">
-                                <img src="${skill.workPhoto}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; border: 2px solid #667eea;">
-                            </div>` : ''
-                        }
+                        
+                        ${skill.workPhoto ? `
+                            <div class="work-photo-container">
+                                <img src="${skill.workPhoto}" class="work-photo" onclick="showPhotoModal('${skill.workPhoto}')" style="max-height: 150px;">
+                            </div>
+                        ` : ''}
+                        
                         <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
                             <div style="width: 30px; height: 30px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">
                                 ${skill.avatar ? '🖼️' : '👤'}
@@ -2306,7 +2373,7 @@
                         <div style="color: #48bb78; font-size: 14px; margin: 10px 0;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
-                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}', '${skill.contact || ''}')">
+                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')">
                             💬 Написать мастеру
                         </button>
                         ${isUserSkill ? 
@@ -2784,101 +2851,105 @@
 
     // ========== КРИТИЧЕСКОЕ ОБНОВЛЕНИЕ: ЧАТ С МАСТЕРОМ ЧЕРЕЗ TELEGRAM ==========
 
-    // Функция для начала чата с мастером - УЛУЧШЕННАЯ ВЕРСИЯ
-    window.contactMaster = async function(skillId, skillName, masterName, masterContact = '') {
+    // Функция для начала чата с мастером
+    window.contactMaster = async function(skillId, skillName, masterName) {
         try {
-            console.log('💬 Начинаем чат с мастером через Telegram:', { skillId, skillName, masterName, masterContact });
+            console.log('💬 Начинаем чат с мастером через Telegram:', { skillId, skillName, masterName });
             
             // 1. Увеличиваем счетчик контактов
             await fetch(`${API_URL}/api/skills/${skillId}/contact`, {
                 method: 'POST'
             });
             
-            // 2. Получаем информацию о мастерском скилле
+            // 2. Получаем информацию о мастерском скилле для получения telegramId мастера
             const skillResponse = await fetch(`${API_URL}/api/skills/${skillId}`);
             const skillData = await skillResponse.json();
             
-            let telegramContact = '';
+            let telegramUsername = '';
             
             if (skillData.success && skillData.skill) {
-                // Пробуем получить контакт из скилла
-                telegramContact = skillData.skill.contact || '';
-                console.log('👨‍🔧 Контакт мастера из скилла:', telegramContact);
-            }
-            
-            // 3. Если есть контактная информация, используем ее
-            if (masterContact) {
-                telegramContact = masterContact;
-            }
-            
-            // 4. Создаем ссылку для чата в Telegram
-            let telegramUrl = '';
-            
-            if (telegramContact && telegramContact.includes('@')) {
-                // Если контакт в формате @username
-                telegramUrl = `https://t.me/${telegramContact.replace('@', '')}`;
-            } else if (telegramContact && !isNaN(telegramContact)) {
-                // Если контакт в формате телефона
-                telegramUrl = `https://t.me/+${telegramContact}`;
-            } else if (telegramContact) {
-                // Другой формат контакта
-                telegramUrl = `https://t.me/${telegramContact}`;
+                const masterUserId = skillData.skill.userId;
+                console.log('👨‍🔧 Telegram ID мастера:', masterUserId);
+                
+                // Проверяем, есть ли контактная информация
+                if (skillData.skill.contactInfo) {
+                    telegramUsername = skillData.skill.contactInfo;
+                } else {
+                    // Пробуем извлечь username из userId
+                    telegramUsername = masterUserId.toString();
+                }
             } else {
-                // Если нет контакта, открываем общий чат поддержки
-                telegramUrl = 'https://t.me/umeyka_support';
+                telegramUsername = 'umeyka_support';
             }
             
-            // 5. Создаем сообщение для отправки
-            const currentUser = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-            const userName = currentUser.firstName || 'Клиент';
-            const userContact = currentUser.contact || '';
+            // 3. Создаем сообщение для Telegram
+            const message = `Привет! Я нашел вас в приложении Umeyka. Меня интересует услуга: "${skillName}"`;
             
-            const messageText = `Привет! Меня зовут ${userName}. Я нашел вашу услугу "${skillName}" в приложении Umeyka. Хотел бы обсудить детали.${userContact ? `\nМой контакт: ${userContact}` : ''}`;
+            // 4. Открываем чат в Telegram
+            const telegramUrl = `https://t.me/${telegramUsername}`;
+            const encodedMessage = encodeURIComponent(message);
+            const telegramChatUrl = `${telegramUrl}?text=${encodedMessage}`;
             
-            // 6. Кодируем сообщение для URL
-            const encodedMessage = encodeURIComponent(messageText);
+            openTelegramChat(telegramChatUrl, masterName, skillName);
             
-            // 7. Формируем финальную ссылку с сообщением
-            const finalUrl = `${telegramUrl}?text=${encodedMessage}`;
-            
-            // 8. Открываем чат в Telegram
-            openTelegramChat(finalUrl, masterName, skillName);
+            // 5. Сохраняем историю контактов
+            saveContactHistory(skillId, skillName, masterName, telegramUsername);
             
         } catch (error) {
             console.error('❌ Ошибка создания чата:', error);
-            // В случае ошибки открываем общий чат
-            const currentUser = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-            const userName = currentUser.firstName || 'Клиент';
-            const messageText = `Привет! Меня зовут ${userName}. Я нашел вашу услугу "${skillName}" в приложении Umeyka. Хотел бы обсудить детали.`;
-            const encodedMessage = encodeURIComponent(messageText);
-            const finalUrl = `https://t.me/umeyka_support?text=${encodedMessage}`;
-            
-            openTelegramChat(finalUrl, masterName, skillName);
+            // В случае ошибки открываем общий чат поддержки
+            openTelegramChat('https://t.me/umeyka_support', masterName, skillName);
         }
     };
 
+    // Сохраняем историю контактов в localStorage
+    function saveContactHistory(skillId, skillName, masterName, telegramUsername) {
+        try {
+            const contactHistory = getLocalStorage('contact_history') || [];
+            const newContact = {
+                id: Date.now(),
+                skillId: skillId,
+                skillName: skillName,
+                masterName: masterName,
+                telegramUsername: telegramUsername,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Добавляем новый контакт в начало массива
+            contactHistory.unshift(newContact);
+            
+            // Ограничиваем историю последними 50 контактами
+            if (contactHistory.length > 50) {
+                contactHistory.splice(50);
+            }
+            
+            setLocalStorage('contact_history', contactHistory);
+            console.log('📝 Контакт сохранен в историю:', newContact);
+        } catch (error) {
+            console.error('❌ Ошибка сохранения истории контактов:', error);
+        }
+    }
+
     // Открытие чата в Telegram
     function openTelegramChat(telegramUrl, masterName, skillName) {
-        console.log('📱 Открытие Telegram чата:', telegramUrl);
-        
-        // Показываем уведомление перед открытием
-        showNotification(`💬 Открываю чат с ${masterName}...`);
-        
-        // Открываем в новом окне
+        // Открываем Telegram
         const chatWindow = window.open(telegramUrl, '_blank');
         
-        if (!chatWindow || chatWindow.closed || typeof chatWindow.closed == 'undefined') {
-            // Если не удалось открыть окно, показываем инструкцию
-            setTimeout(() => {
+        // Создаем уведомление
+        showNotification(`💬 Открывается чат с ${masterName} в Telegram!`);
+        
+        // Показываем инструкцию через 2 секунды на случай если Telegram не открылся
+        setTimeout(() => {
+            if (!chatWindow || chatWindow.closed || typeof chatWindow.closed == 'undefined') {
                 showTelegramChatInstructions(masterName, skillName, telegramUrl);
-            }, 500);
-        }
+            }
+        }, 2000);
     }
 
     // Показать инструкцию по использованию Telegram чата
     function showTelegramChatInstructions(masterName, skillName, telegramUrl) {
         const instructionHtml = `
-            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+            <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px;">
                 <div style="background: white; border-radius: 20px; padding: 30px; max-width: 400px; width: 100%; color: #2d3748;">
                     <h2 style="margin-bottom: 20px; color: #667eea; text-align: center;">💬 Начать чат с мастером</h2>
                     
@@ -2905,7 +2976,7 @@
                     </div>
                     
                     <div style="display: flex; gap: 10px;">
-                        <button onclick="window.open('${telegramUrl}', '_blank')" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold;">
+                        <button onclick="window.open('${telegramUrl}', '_blank')" style="flex: 1; padding: 15px; background: #48bb78; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold;">
                             📱 Открыть в Telegram
                         </button>
                         <button onclick="closeInstructions()" style="flex: 1; padding: 15px; background: #e53e3e; color: white; border: none; border-radius: 10px; cursor: pointer;">
@@ -3010,15 +3081,20 @@
         
         console.log('🗺️ Инициализация карты');
         
-        // Создаем карту
+        // Создаем карту с оптимальными настройками для производительности
         map = L.map('map', {
-            attributionControl: false
+            attributionControl: false,
+            zoomControl: true,
+            preferCanvas: true, // Используем canvas для лучшей производительности
+            fadeAnimation: false,
+            markerZoomAnimation: false
         }).setView([55.7558, 37.6173], 10);
         
         // Добавляем слой карты
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             subdomains: 'abcd',
-            maxZoom: 20
+            maxZoom: 20,
+            detectRetina: false // Отключаем retina для производительности
         }).addTo(map);
 
         // Устанавливаем границы
@@ -3061,6 +3137,11 @@
                     userLocation = { lat: 55.7558, lon: 37.6173 };
                     console.log('📍 Используем Москву по умолчанию');
                     loadSkillsOnMap();
+                },
+                {
+                    enableHighAccuracy: false, // Отключаем высокую точность для скорости
+                    timeout: 10000,
+                    maximumAge: 60000
                 }
             );
         } else {
@@ -3070,12 +3151,20 @@
         }
     }
 
-    // Загрузка умейок на карту (ОБНОВЛЕНА - убрана статистика)
+    // Загрузка умейок на карту с оптимизацией для 1000+ пользователей
     async function loadSkillsOnMap() {
         try {
             console.log('🗺️ Загрузка умейок с сервера для карты');
             
-            // Загружаем умейки с сервера
+            // Показываем индикатор загрузки
+            if (map) {
+                L.popup()
+                    .setLatLng(map.getCenter())
+                    .setContent('<div style="padding: 20px; text-align: center;">⏳ Загрузка умейок...</div>')
+                    .openOn(map);
+            }
+            
+            // Загружаем умейки с сервера с пагинацией
             const skills = await loadAllSkillsFromServer();
             
             console.log('📊 Получено умейок с сервера:', skills.length);
@@ -3106,8 +3195,14 @@
                 markers.push(userMarker);
             }
             
-            // Добавляем маркеры всех умейок
-            skills.forEach(skill => {
+            // Ограничиваем количество маркеров для производительности
+            const maxMarkers = 1000;
+            const skillsToShow = skills.slice(0, maxMarkers);
+            
+            console.log(`🗺️ Показываем ${skillsToShow.length} из ${skills.length} умейок на карте`);
+            
+            // Добавляем маркеры умейок с группировкой
+            skillsToShow.forEach(skill => {
                 if (skill.location && skill.location.lat && skill.location.lon) {
                     const rating = skill.rating?.average || 5.0;
                     const color = getMarkerColor(rating);
@@ -3122,10 +3217,14 @@
                             html: `<div style="color: ${color}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
                             iconSize: [30, 30],
                             iconAnchor: [15, 30]
-                        })
+                        }),
+                        riseOnHover: false // Отключаем для производительности
                     })
                     .addTo(map)
-                    .bindPopup(popupContent);
+                    .bindPopup(popupContent, {
+                        maxWidth: 300,
+                        minWidth: 280
+                    });
                     
                     // При открытии попапа увеличиваем счетчик просмотров
                     marker.on('popupopen', async () => {
@@ -3142,22 +3241,54 @@
                 }
             });
             
-            console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров');
+            console.log('✅ Умейки загружены на карту:', skillsToShow.length, 'маркеров');
             
-            // УБРАНО: показ статистики на карте
-            // Теперь статистика не показывается на карте
+            // Закрываем индикатор загрузки
+            map.closePopup();
+            
+            // Показываем информацию о количестве умейок
+            if (skills.length > 0) {
+                showMapInfo(skills.length);
+            }
             
         } catch (error) {
             console.error('❌ Ошибка загрузки карты:', error);
             
             // Показываем сообщение об ошибке
             if (map) {
+                map.closePopup();
                 L.popup()
-                    .setLatLng([55.7558, 37.6173])
-                    .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
+                    .setLatLng(map.getCenter())
+                    .setContent('<div style="color: red; padding: 10px; text-align: center;">❌ Ошибка загрузки данных.<br>Проверьте подключение к интернету.</div>')
                     .openOn(map);
             }
         }
+    }
+
+    // Показать информацию о карте (без статистики)
+    function showMapInfo(totalSkills) {
+        const infoHtml = `
+            <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-width: 200px;">
+                <h4 style="margin: 0 0 10px 0; color: #667eea;">🗺️ Карта Umeyka</h4>
+                <p style="margin: 5px 0; font-size: 14px;">🔧 Умейек на карте: <strong>${totalSkills}</strong></p>
+                <button onclick="refreshMap()" 
+                        style="margin-top: 10px; padding: 8px 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%;">
+                    🔄 Обновить карту
+                </button>
+            </div>
+        `;
+        
+        // Удаляем старую информацию если есть
+        const oldInfo = document.querySelector('.map-info');
+        if (oldInfo) {
+            oldInfo.remove();
+        }
+        
+        // Добавляем новую информацию
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'map-info';
+        infoDiv.innerHTML = infoHtml;
+        document.getElementById('map').appendChild(infoDiv);
     }
 
     // Получение цвета маркера по рейтингу
@@ -3168,7 +3299,7 @@
         return '#6b7280'; // Серый
     }
 
-    // Функция создания контента для попапа (ОБНОВЛЕНА - добавлено фото работы)
+    // Функция создания контента для попапа (С ФОТО РАБОТЫ)
     function createSkillPopupContent(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
         
@@ -3180,17 +3311,23 @@
                         '<div style="width: 50px; height: 50px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">👤</div>'
                     }
                     <div>
-                        <h3 style="margin: 0; color: #2d3748; font-size: 18px; word-break: break-word;">${skill.skill}</h3>
+                        <h3 style="margin: 0; color: #2d3748; font-size: 18px;">${skill.skill}</h3>
                         <p style="margin: 2px 0; color: #666; font-size: 14px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
                     </div>
                 </div>
                 
-                ${skill.workPhoto ? 
-                    `<div style="margin: 10px 0;">
-                        <img src="${skill.workPhoto}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; border: 2px solid #667eea;">
-                        <div style="text-align: center; margin-top: 5px; font-size: 12px; color: #666;">Фото работы мастера</div>
-                    </div>` : ''
-                }
+                ${skill.workPhoto ? `
+                    <div class="work-photo-container" style="margin: 10px 0;">
+                        <img src="${skill.workPhoto}" 
+                             class="work-photo" 
+                             onclick="showPhotoModal('${skill.workPhoto}')"
+                             style="width: 100%; max-height: 150px; object-fit: cover; cursor: pointer;"
+                             alt="Фото работы">
+                        <div style="text-align: center; font-size: 12px; color: #666; margin-top: 5px;">
+                            Фото работы мастера
+                        </div>
+                    </div>
+                ` : ''}
                 
                 <div style="background: #f7fafc; padding: 12px; border-radius: 8px; margin: 10px 0;">
                     <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
@@ -3225,7 +3362,7 @@
                 }
                 
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-                    <button onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}', '${skill.contact || ''}')" 
+                    <button onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')" 
                             style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <span>💬</span>
                         <span>Написать в Telegram</span>
@@ -3271,12 +3408,13 @@
             clearInterval(mapRefreshInterval);
         }
         
+        // Обновляем карту каждые 60 секунд для экономии трафика
         mapRefreshInterval = setInterval(() => {
             if (map && document.querySelector('.map-active')) {
                 console.log('🔄 Автоматическое обновление карты...');
                 loadSkillsOnMap();
             }
-        }, 30000); // 30 секунд
+        }, 60000);
     }
 
     function stopMapAutoRefresh() {
@@ -3286,134 +3424,8 @@
         }
     }
 
-    // ========== ДЕМО ДАННЫЕ ==========
+    // ========== ФУНКЦИИ ДЛЯ КРАСИВЫХ УВЕДОМЛЕНИЙ ==========
 
-    // Функция для тестирования - создает демо пользователей
-    window.createDemoMarket = function() {
-        if (confirm('Создать демо-рынок с умейками других пользователей?')) {
-            const demoSkills = [
-                {
-                    _id: 'market_1',
-                    skill: 'Малярные работы',
-                    experience: '4 года опыта',
-                    price: 1200,
-                    userId: 'user_12345',
-                    username: 'Сергей',
-                    rating: { average: 4.7, reviews: [] },
-                    isTopMaster: false,
-                    location: { lat: 55.7538, lon: 37.6200 },
-                    createdAt: new Date().toISOString(),
-                    isActive: true,
-                    category: 'ремонт',
-                    contact: '@serg_painter',
-                    workPhoto: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80'
-                },
-                {
-                    _id: 'market_2',
-                    skill: 'Установка окон',
-                    experience: '6 лет опыта',
-                    price: 3000,
-                    userId: 'user_67890',
-                    username: 'Михаил',
-                    rating: { average: 4.9, reviews: [] },
-                    isTopMaster: true,
-                    location: { lat: 55.7578, lon: 37.6150 },
-                    createdAt: new Date().toISOString(),
-                    isActive: true,
-                    category: 'ремонт',
-                    contact: '79161234567',
-                    workPhoto: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80'
-                },
-                {
-                    _id: 'market_3',
-                    skill: 'Репетитор по математике',
-                    experience: '8 лет опыта',
-                    price: 800,
-                    userId: 'user_11111',
-                    username: 'Ольга',
-                    rating: { average: 5.0, reviews: [] },
-                    isTopMaster: true,
-                    location: { lat: 55.7510, lon: 37.6190 },
-                    createdAt: new Date().toISOString(),
-                    isActive: true,
-                    category: 'обучение',
-                    contact: '@olga_math',
-                    workPhoto: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w-300&q=80'
-                }
-            ];
-            
-            // Добавляем в рынок
-            const marketSkills = getLocalStorage('market_skills') || [];
-            // Удаляем старые демо, чтобы не дублировать
-            const filteredMarket = marketSkills.filter(skill => !skill._id.startsWith('market_'));
-            const newMarket = [...filteredMarket, ...demoSkills];
-            setLocalStorage('market_skills', newMarket);
-            
-            alert('✅ Демо-рынок создан! Теперь на карте и в поиске появятся умейки других пользователей.');
-            
-            // Обновляем карту и поиск
-            if (map) loadSkillsOnMap();
-        }
-    };
-   
-    // ========== ОТЛАДКА ==========
-
-    // Функция для отладки - проверяет все умейки на сервере
-    window.checkAllSkills = async function() {
-        try {
-            console.log('🔍 Проверка всех умейок на сервере...');
-        
-            const response = await fetch(`${API_URL}/api/skills`);
-            const result = await response.json();
-        
-            if (result.success) {
-                console.log(`📊 Всего умейок: ${result.skills.length}`);
-                console.log('📋 Список всех умейок:', result.skills);
-            
-                alert(`✅ Всего умейок на сервере: ${result.skills.length}\n\nПосмотри консоль (F12) для деталей`);
-            }
-        } catch (error) {
-            console.error('❌ Ошибка проверки:', error);
-            alert('❌ Ошибка подключения к серверу');
-        }
-    };
-
-    // Функция для принудительной загрузки моих умейок
-    window.forceLoadMySkills = async function() {
-        console.log('🔄 Принудительная загрузка моих умейок...');
-        await loadMySkills();
-    };
-        
-    // Функция для проверки и установки User ID
-    window.checkAndSetUserId = function() {
-        console.log('🔍 Проверка User ID...');
-        
-        const tg = window.Telegram?.WebApp;
-        if (tg && tg.initDataUnsafe?.user) {
-            const user = tg.initDataUnsafe.user;
-            currentUserId = user.id.toString();
-            console.log('✅ User ID из Telegram:', currentUserId);
-            console.log('👤 Данные пользователя Telegram:', user);
-        } else {
-            // Если нет Telegram, создаем случайный ID
-            if (!currentUserId || currentUserId === 'null' || currentUserId === 'undefined') {
-                currentUserId = 'user_' + Math.random().toString(36).substr(2, 9);
-                console.log('🆔 Создан новый User ID:', currentUserId);
-            } else {
-                console.log('📌 Используем существующий User ID:', currentUserId);
-            }
-        }
-        
-        // Сохраняем в localStorage
-        if (currentUserId) {
-            localStorage.setItem('umeyka_user_id', currentUserId);
-            console.log('💾 User ID сохранен в localStorage:', currentUserId);
-        }
-        
-        return currentUserId;
-    };
-
-    // Функция для красивых уведомлений
     function showNotification(message) {
         const notification = document.createElement('div');
         notification.style.cssText = `
@@ -3437,7 +3449,90 @@
         setTimeout(() => {
             document.body.removeChild(notification);
         }, 2000);
-    }    
+    }
+
+    // ========== ФУНКЦИЯ ДЛЯ ПРОВЕРКИ И УСТАНОВКИ USER ID ==========
+
+    window.checkAndSetUserId = function() {
+        console.log('🔍 Проверка User ID...');
+        
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.initDataUnsafe?.user) {
+            const user = tg.initDataUnsafe.user;
+            currentUserId = user.id.toString();
+            console.log('✅ User ID из Telegram:', currentUserId);
+            console.log('👤 Данные пользователя Telegram:', user);
+            
+            // Сохраняем username из Telegram
+            if (user.username) {
+                let userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+                userData.telegramUsername = user.username;
+                setLocalStorage(`user_${currentUserId}`, userData);
+            }
+        } else {
+            // Если нет Telegram, создаем случайный ID
+            if (!currentUserId || currentUserId === 'null' || currentUserId === 'undefined') {
+                currentUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+                console.log('🆔 Создан новый User ID:', currentUserId);
+            } else {
+                console.log('📌 Используем существующий User ID:', currentUserId);
+            }
+        }
+        
+        // Сохраняем в localStorage
+        if (currentUserId) {
+            localStorage.setItem('umeyka_user_id', currentUserId);
+            console.log('💾 User ID сохранен в localStorage:', currentUserId);
+        }
+        
+        return currentUserId;
+    };
+
+    // ========== ОПТИМИЗАЦИЯ ДЛЯ БОЛЬШОГО КОЛИЧЕСТВА ПОЛЬЗОВАТЕЛЕЙ ==========
+
+    // Очистка памяти при скрытии карты
+    function cleanupMap() {
+        if (map) {
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            
+            if (markerCluster) {
+                map.removeLayer(markerCluster);
+                markerCluster = null;
+            }
+        }
+    }
+
+    // Обработчик изменения видимости вкладки
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            // При скрытии вкладки останавливаем автообновление
+            stopMapAutoRefresh();
+        } else if (document.querySelector('.map-active')) {
+            // При возвращении на вкладку с картой запускаем автообновление
+            startMapAutoRefresh();
+        }
+    });
+
+    // Оптимизация для мобильных устройств
+    function optimizeForMobile() {
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile && map) {
+            // Отключаем некоторые анимации на мобильных устройствах
+            map.options.fadeAnimation = false;
+            map.options.zoomAnimation = false;
+            map.options.markerZoomAnimation = false;
+            
+            // Уменьшаем количество маркеров на мобильных устройствах
+            window.maxMarkersOnMobile = 500;
+        }
+    }
+
+    // Инициализация оптимизаций
+    document.addEventListener('DOMContentLoaded', function() {
+        optimizeForMobile();
+    });
         
     </script>
 </body>
