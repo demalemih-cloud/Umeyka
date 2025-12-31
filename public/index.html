@@ -1557,6 +1557,10 @@
     let currentProfileTab = 'stats';
     let currentDealTab = 'pending';
     let projectRating = 0;
+    let map = null;
+    let markers = [];
+    let userLocation = null;
+    let mapRefreshInterval = null;
 
     // ========== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ==========
 
@@ -2142,6 +2146,15 @@
         }
     };
 
+    window.showProfileSection = function() {
+        showSection('profileSection');
+        loadUserProfile();
+    };
+
+    window.showAboutSection = function() {
+        showSection('aboutSection');
+    };
+
     // ========== ФУНКЦИЯ ДЛЯ КРАСИВЫХ УВЕДОМЛЕНИЙ ==========
 
     function showNotification(message) {
@@ -2169,7 +2182,28 @@
         }, 2000);
     }
 
-    // ========== ФУНКЦИЯ ДЛЯ КАРТЫ ==========
+    // ========== ФУНКЦИИ ДЛЯ КАРТЫ ==========
+
+    // Функция для автоматического обновления карты
+    function startMapAutoRefresh() {
+        stopMapAutoRefresh(); // Останавливаем предыдущий интервал если есть
+        
+        mapRefreshInterval = setInterval(() => {
+            if (document.querySelector('.map-active') && map) {
+                console.log('🔄 Автоматическое обновление карты...');
+                loadSkillsOnMap();
+            }
+        }, 30000); // Обновление каждые 30 секунд
+    }
+
+    // Функция для остановки автоматического обновления
+    function stopMapAutoRefresh() {
+        if (mapRefreshInterval) {
+            clearInterval(mapRefreshInterval);
+            mapRefreshInterval = null;
+            console.log('⏹️ Автообновление карты остановлено');
+        }
+    }
 
     // Работа с картой
     window.openMap = function() {
@@ -2256,11 +2290,13 @@
             
             const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
             
+            // Очищаем предыдущие маркеры
             if (markers.length > 0) {
                 markers.forEach(marker => map.removeLayer(marker));
                 markers = [];
             }
             
+            // Добавляем маркер пользователя
             if (userLocation) {
                 const userMarker = L.marker([userLocation.lat, userLocation.lon], {
                     icon: L.divIcon({
@@ -2277,6 +2313,7 @@
                 markers.push(userMarker);
             }
             
+            // Добавляем маркеры умейок
             skills.forEach(skill => {
                 if (skill.location && skill.location.lat && skill.location.lon) {
                     const rating = skill.rating?.average || 5.0;
@@ -2486,9 +2523,459 @@
         }
     });
 
-    // Остальные функции остаются без изменений...
-    // (остальной код аналогичен предыдущей версии, но без дублирования функций)
-    
+    // Остальные функции...
+    window.showSkillDetails = function(skillId) {
+        // Реализация просмотра деталей умейки
+        console.log('Просмотр деталей умейки:', skillId);
+    };
+
+    window.contactMaster = function(skillId, skillName, username) {
+        const tg = window.Telegram?.WebApp;
+        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+        
+        const message = `👋 Привет! Я заинтересован(а) в вашей услуге "${skillName}" в Umeyka.\n\nМеня зовут: ${userData.firstName || 'Пользователь'}`;
+        
+        if (tg) {
+            // Если внутри Telegram, можно открыть чат
+            tg.openTelegramLink(`tg://msg?text=${encodeURIComponent(message)}`);
+        } else {
+            // Если в браузере, копируем сообщение
+            navigator.clipboard.writeText(message).then(() => {
+                alert('📋 Сообщение скопировано в буфер обмена. Отправьте его мастеру в Telegram: ' + username);
+            });
+        }
+    };
+
+    window.editSkill = function(skillId) {
+        // Реализация редактирования умейки
+        console.log('Редактирование умейки:', skillId);
+    };
+
+    window.checkAllSkills = function() {
+        // Проверка всех умейок
+        console.log('Проверка всех умейок');
+        loadAllSkillsFromServer().then(skills => {
+            alert(`На сервере найдено ${skills.length} умейок`);
+        });
+    };
+
+    window.forceLoadMySkills = function() {
+        loadMySkills();
+    };
+
+    // ========== ФУНКЦИИ ПРОФИЛЯ ==========
+
+    function loadUserProfile() {
+        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+        
+        document.getElementById('userName').textContent = userData.firstName || 'Пользователь';
+        document.getElementById('userBio').textContent = userData.bio || 'Расскажите о себе...';
+        
+        if (userData.avatar) {
+            document.getElementById('userAvatar').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        }
+        
+        // Обновление статистики
+        updateUserStats(userData);
+    }
+
+    function updateUserStats(userData) {
+        const statsGrid = document.getElementById('userStats');
+        if (!statsGrid) return;
+        
+        statsGrid.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-value">${userData.rating || 0}</div>
+                <div class="stat-label">⭐ Рейтинг</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${userData.completedDeals || 0}</div>
+                <div class="stat-label">✅ Сделок</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${userData.skills?.length || 0}</div>
+                <div class="stat-label">✨ Умейки</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${userData.views || 0}</div>
+                <div class="stat-label">👁️ Просмотры</div>
+            </div>
+        `;
+    }
+
+    window.editProfile = function() {
+        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+        
+        document.getElementById('editFirstName').value = userData.firstName || '';
+        document.getElementById('editAge').value = userData.age || '';
+        document.getElementById('editExperience').value = userData.experience || '';
+        document.getElementById('editContact').value = userData.contact || '';
+        document.getElementById('editBio').value = userData.bio || '';
+        
+        if (userData.avatar) {
+            document.getElementById('avatarPreview').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        }
+        
+        showSection('editProfileSection');
+    };
+
+    window.saveProfile = function() {
+        const firstName = document.getElementById('editFirstName').value.trim();
+        const bio = document.getElementById('editBio').value.trim();
+        
+        if (!firstName || !bio) {
+            alert('❌ Пожалуйста, заполните обязательные поля (Имя и О себе)');
+            return;
+        }
+        
+        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+        
+        userData.firstName = firstName;
+        userData.age = document.getElementById('editAge').value;
+        userData.experience = document.getElementById('editExperience').value;
+        userData.contact = document.getElementById('editContact').value;
+        userData.bio = bio;
+        
+        if (currentAvatar) {
+            userData.avatar = currentAvatar;
+        }
+        
+        setLocalStorage(`user_${currentUserId}`, userData);
+        
+        alert('✅ Профиль сохранен!');
+        showProfileSection();
+        loadUserProfile();
+    };
+
+    window.changeAvatar = function() {
+        document.getElementById('avatarInput').click();
+    };
+
+    window.handleAvatarUpload = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        if (!file.type.match('image.*')) {
+            alert('❌ Пожалуйста, выберите изображение');
+            return;
+        }
+        
+        if (file.size > 5 * 1024 * 1024) {
+            alert('❌ Файл слишком большой. Максимальный размер: 5MB');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            currentAvatar = e.target.result;
+            document.getElementById('avatarPreview').innerHTML = `
+                <img src="${currentAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+            `;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // ========== ФУНКЦИИ ДЛЯ ВКЛАДОК ==========
+
+    window.showProfileTab = function(tabName) {
+        currentProfileTab = tabName;
+        
+        // Скрываем все вкладки
+        document.getElementById('profileStats').style.display = 'none';
+        document.getElementById('profileSkills').style.display = 'none';
+        document.getElementById('profileDeals').style.display = 'none';
+        document.getElementById('profileChats').style.display = 'none';
+        
+        // Убираем активный класс со всех кнопок
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        
+        // Показываем выбранную вкладку
+        document.getElementById('profileStats').style.display = tabName === 'stats' ? 'block' : 'none';
+        document.getElementById('profileSkills').style.display = tabName === 'skills' ? 'block' : 'none';
+        document.getElementById('profileDeals').style.display = tabName === 'deals' ? 'block' : 'none';
+        document.getElementById('profileChats').style.display = tabName === 'chats' ? 'block' : 'none';
+        
+        // Добавляем активный класс к выбранной кнопке
+        document.getElementById(tabName + 'Tab').classList.add('active');
+        
+        // Загружаем данные для вкладки
+        if (tabName === 'skills') {
+            loadProfileSkills();
+        } else if (tabName === 'deals') {
+            loadDeals();
+        } else if (tabName === 'chats') {
+            loadChats();
+        }
+    };
+
+    window.showDealsTab = function(tabName) {
+        currentDealTab = tabName;
+        
+        // Убираем активный класс со всех кнопок
+        document.querySelectorAll('.deals-tab-button').forEach(btn => btn.classList.remove('active'));
+        
+        // Добавляем активный класс к выбранной кнопке
+        document.getElementById(tabName + 'DealsTab').classList.add('active');
+        
+        // Загружаем сделки для выбранной вкладки
+        loadDeals();
+    };
+
+    function loadDeals() {
+        // Заглушка для загрузки сделок
+        document.getElementById('dealsList').innerHTML = `
+            <div style="text-align: center; color: #666; padding: 40px;">
+                <div style="font-size: 50px; margin-bottom: 20px;">📄</div>
+                <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет сделок</div>
+                <div style="opacity: 0.7;">Создайте свою первую сделку</div>
+            </div>
+        `;
+    }
+
+    function loadChats() {
+        // Заглушка для загрузки чатов
+        document.getElementById('userChatsList').innerHTML = `
+            <div style="text-align: center; color: #666; padding: 40px;">
+                <div style="font-size: 50px; margin-bottom: 20px;">💬</div>
+                <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет активных чатов</div>
+            </div>
+        `;
+    }
+
+    window.showCreateDealSection = function() {
+        showSection('createDealSection');
+    };
+
+    // ========== ФУНКЦИИ ДЛЯ СДЕЛОК ==========
+
+    window.selectQuality = function(quality) {
+        selectedQuality = quality;
+        
+        document.querySelectorAll('.quality-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        document.getElementById('quality' + quality.charAt(0).toUpperCase() + quality.slice(1)).classList.add('selected');
+        
+        updateDealCommission();
+    };
+
+    window.toggleOption = function(option) {
+        const element = document.getElementById('option' + option.charAt(0).toUpperCase() + option.slice(1));
+        
+        if (element.classList.contains('selected')) {
+            element.classList.remove('selected');
+            selectedOptions = selectedOptions.filter(item => item !== option);
+        } else {
+            if (selectedOptions.length >= 2) {
+                alert('❌ Вы можете выбрать только 2 дополнительных условия');
+                return;
+            }
+            element.classList.add('selected');
+            selectedOptions.push(option);
+        }
+        
+        updateDealCommission();
+    };
+
+    function updateDealCommission() {
+        const dealAmount = document.getElementById('dealAmount').value || 0;
+        
+        if (dealAmount > 0) {
+            const commission = dealAmount * 0.05;
+            const total = parseInt(dealAmount) + commission;
+            
+            document.getElementById('dealAmountDisplay').textContent = dealAmount;
+            document.getElementById('commissionAmount').textContent = commission.toFixed(0);
+            document.getElementById('totalAmount').textContent = total.toFixed(0);
+            document.getElementById('dealCommission').style.display = 'block';
+        } else {
+            document.getElementById('dealCommission').style.display = 'none';
+        }
+    }
+
+    // Добавляем обработчик для поля суммы сделки
+    document.getElementById('dealAmount')?.addEventListener('input', updateDealCommission);
+
+    window.createDeal = function() {
+        const title = document.getElementById('dealTitle').value.trim();
+        const description = document.getElementById('dealDescription').value.trim();
+        const period = document.getElementById('dealPeriod').value.trim();
+        const amount = document.getElementById('dealAmount').value;
+        
+        if (!title || !description || !period || !amount) {
+            alert('❌ Заполните все поля');
+            return;
+        }
+        
+        if (!selectedQuality) {
+            alert('❌ Выберите уровень качества');
+            return;
+        }
+        
+        if (selectedOptions.length !== 2) {
+            alert('❌ Выберите 2 дополнительных условия');
+            return;
+        }
+        
+        const dealData = {
+            title: title,
+            description: description,
+            period: period,
+            amount: parseInt(amount),
+            quality: selectedQuality,
+            options: selectedOptions,
+            commission: amount * 0.05,
+            total: parseInt(amount) + (amount * 0.05)
+        };
+        
+        alert('✅ Сделка создана!');
+        console.log('Создана сделка:', dealData);
+        
+        // Возвращаемся в профиль
+        showProfileSection();
+    };
+
+    // ========== ФУНКЦИИ ДЛЯ РЕФЕРАЛЬНОЙ ПРОГРАММЫ ==========
+
+    window.shareToFriend = function() {
+        const referralLink = `https://t.me/share/url?url=${encodeURIComponent('https://umeyka.app')}&text=${encodeURIComponent('Привет! Я использую отличное приложение для поиска мастеров - Umeyka. Попробуй и ты! Получи +1 звезду за регистрацию! ✨')}`;
+        
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.openTelegramLink(referralLink);
+        } else {
+            window.open(referralLink, '_blank');
+        }
+    };
+
+    window.copyReferralLink = function() {
+        const referralLink = 'https://umeyka.app?ref=' + currentUserId;
+        navigator.clipboard.writeText(referralLink).then(() => {
+            alert('✅ Ссылка скопирована в буфер обмена! Отправьте её другу.');
+        }).catch(err => {
+            alert('❌ Не удалось скопировать ссылку');
+        });
+    };
+
+    // ========== ФУНКЦИИ ДЛЯ ЧАТА ==========
+
+    window.closeChat = function() {
+        showProfileSection();
+    };
+
+    window.sendChatMessage = function() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+        
+        if (!message) return;
+        
+        const chatMessages = document.getElementById('chatMessages');
+        const messageElement = document.createElement('div');
+        messageElement.className = 'chat-message my-message';
+        messageElement.innerHTML = `
+            <div class="chat-message-sender">Вы</div>
+            <div>${message}</div>
+            <div style="font-size: 12px; color: #999; text-align: right; margin-top: 5px;">Только что</div>
+        `;
+        
+        chatMessages.appendChild(messageElement);
+        messageInput.value = '';
+        
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    };
+
+    // ========== ФУНКЦИИ ДЛЯ ОТЗЫВОВ О ПРОЕКТЕ ==========
+
+    window.setProjectRating = function(rating) {
+        projectRating = rating;
+        const stars = document.getElementById('projectRatingStars');
+        stars.innerHTML = '';
+        
+        for (let i = 1; i <= 5; i++) {
+            stars.innerHTML += i <= rating ? 
+                '<span style="cursor: pointer; color: #FFD700;" onclick="setProjectRating(' + i + ')">★</span>' :
+                '<span style="cursor: pointer;" onclick="setProjectRating(' + i + ')">☆</span>';
+        }
+    };
+
+    window.submitProjectReview = function() {
+        const comment = document.getElementById('projectReviewComment').value.trim();
+        
+        if (projectRating === 0) {
+            alert('❌ Пожалуйста, поставьте оценку');
+            return;
+        }
+        
+        if (!comment) {
+            alert('❌ Пожалуйста, напишите отзыв');
+            return;
+        }
+        
+        alert('✅ Спасибо за ваш отзыв!');
+        console.log('Отзыв о проекте:', { rating: projectRating, comment: comment });
+        
+        // Очищаем форму
+        document.getElementById('projectReviewComment').value = '';
+        setProjectRating(0);
+    };
+
+    // ========== ФУНКЦИИ ПОИСКА ==========
+
+    window.searchSkills = async function() {
+        const searchQuery = document.getElementById('searchInput').value.trim();
+        const searchResults = document.getElementById('searchResults');
+        
+        if (!searchQuery) {
+            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос</div>';
+            return;
+        }
+        
+        searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
+        
+        try {
+            const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`);
+            const result = await response.json();
+            
+            if (result.success && result.skills.length > 0) {
+                searchResults.innerHTML = result.skills.map(skill => `
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-title">${skill.skill}</div>
+                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                        </div>
+                        <div class="skill-price">${skill.price} ₽</div>
+                        <div class="skill-distance">🎓 ${skill.experience}</div>
+                        ${skill.photo ? `
+                            <div class="skill-photo">
+                                <img src="${skill.photo}" alt="Фото работы">
+                            </div>
+                        ` : ''}
+                        <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
+                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')">
+                            💬 Связаться
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                searchResults.innerHTML = `
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
+                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос</div>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Ошибка поиска:', error);
+            searchResults.innerHTML = `
+                <div class="error-message">
+                    ❌ Ошибка поиска<br>
+                    <small>Проверьте подключение к интернету</small>
+                </div>
+            `;
+        }
+    };
+
     </script>
 </body>
 </html>
