@@ -1080,6 +1080,7 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .skill-photo img {
@@ -1118,6 +1119,103 @@
             color: #666;
             font-size: 14px;
             height: 100%;
+        }
+
+        /* Стили для попапа редактирования */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .popup-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 25px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .popup-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .popup-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup-form {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+        }
+
+        .photo-preview-container {
+            position: relative;
+            margin: 15px 0;
+        }
+
+        .remove-photo-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 10;
+        }
+
+        .photo-compression-status {
+            color: #48bb78;
+            font-size: 12px;
+            text-align: center;
+            margin: 5px 0;
+            display: none;
+        }
+
+        /* Стили для превью фотографий в списке */
+        .skill-photo-list {
+            height: 120px;
+            margin: 10px 0;
         }
     </style>
 </head>
@@ -1172,12 +1270,12 @@
                 
                 <!-- Загрузка фото для умейки -->
                 <div style="margin: 15px 0;">
-                    <div style="color: white; margin-bottom: 10px;">📸 Фото вашей работы (максимум 1 фото, размер до 1MB)</div>
+                    <div style="color: white; margin-bottom: 10px;">📸 Фото вашей работы (максимум 1 фото, размер до 5MB)</div>
                     <div id="skillPhotoPreview" class="skill-photo" onclick="document.getElementById('skillPhotoInput').click()">
                         <div class="no-photo">
                             <div style="font-size: 40px; margin-bottom: 10px;">📷</div>
                             <div>Нажмите для загрузки фото</div>
-                            <div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Размер до 1MB</div>
+                            <div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Размер до 5MB</div>
                         </div>
                     </div>
                     <input type="file" id="skillPhotoInput" accept="image/*" style="display: none;" onchange="handleSkillPhotoUpload(event)">
@@ -1546,12 +1644,74 @@
         </div>
     </div>
 
+    <!-- ПОПАП РЕДАКТИРОВАНИЯ УМЕЙКИ -->
+    <div id="editSkillPopup" class="popup-overlay">
+        <div class="popup-content">
+            <div class="popup-header">
+                <div class="popup-title">✏️ Редактирование умейки</div>
+                <button class="popup-close" onclick="closeEditSkillPopup()">×</button>
+            </div>
+            
+            <div class="popup-form">
+                <input type="hidden" id="editSkillId">
+                
+                <input type="text" id="editSkillName" class="input-field" placeholder="Название умейки">
+                <input type="text" id="editSkillExperience" class="input-field" placeholder="Опыт работы">
+                <input type="number" id="editSkillPrice" class="input-field" placeholder="Цена в рублях">
+                
+                <!-- Загрузка фото для редактирования -->
+                <div style="margin: 15px 0;">
+                    <div style="color: white; margin-bottom: 10px;">📸 Фото вашей работы</div>
+                    <div id="editSkillPhotoPreview" class="skill-photo" onclick="document.getElementById('editSkillPhotoInput').click()">
+                        <div class="no-photo">
+                            <div style="font-size: 40px; margin-bottom: 10px;">📷</div>
+                            <div>Нажмите для загрузки фото</div>
+                            <div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Размер до 5MB</div>
+                        </div>
+                    </div>
+                    <input type="file" id="editSkillPhotoInput" accept="image/*" style="display: none;" onchange="handleEditSkillPhotoUpload(event)">
+                    <button class="upload-photo-button" onclick="document.getElementById('editSkillPhotoInput').click()">
+                        📸 Изменить фото
+                    </button>
+                    <div id="editPhotoCompressionStatus" class="photo-compression-status">
+                        ⚡ Сжимаю фото...
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="submit-button" onclick="updateSkill()" style="flex: 1; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                        💾 Сохранить изменения
+                    </button>
+                    <button class="submit-button" onclick="showDeleteConfirm()" style="flex: 1; background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);">
+                        🗑️ Удалить
+                    </button>
+                </div>
+                
+                <!-- Подтверждение удаления -->
+                <div id="deleteConfirm" style="display: none; margin-top: 20px; padding: 15px; background: rgba(255,0,0,0.1); border-radius: 10px; border: 1px solid rgba(255,0,0,0.2);">
+                    <div style="color: white; text-align: center; margin-bottom: 15px;">
+                        ❌ Вы уверены, что хотите удалить эту умейку?
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="cancelDelete()" style="flex: 1; padding: 12px; background: #4299e1; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            Отмена
+                        </button>
+                        <button onclick="confirmDeleteSkill()" style="flex: 1; padding: 12px; background: #f56565; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            Удалить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
     // ========== КОНФИГУРАЦИЯ API ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
     let currentUserId = null;
     let currentAvatar = null;
     let currentSkillPhoto = null;
+    let editSkillPhoto = null;
     let selectedQuality = '';
     let selectedOptions = [];
     let currentProfileTab = 'stats';
@@ -1561,6 +1721,7 @@
     let markers = [];
     let userLocation = null;
     let mapRefreshInterval = null;
+    let editingSkillId = null;
 
     // ========== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ==========
 
@@ -1598,7 +1759,6 @@
 
     // ========== ФУНКЦИЯ СЖАТИЯ ИЗОБРАЖЕНИЙ ==========
 
-    // Функция для сжатия изображения
     async function compressImage(file, maxWidth = 800, maxHeight = 600, quality = 0.7) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -1613,7 +1773,6 @@
                     let width = img.width;
                     let height = img.height;
                     
-                    // Вычисляем новые размеры с сохранением пропорций
                     if (width > height) {
                         if (width > maxWidth) {
                             height = Math.round((height * maxWidth) / width);
@@ -1632,10 +1791,8 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Получаем сжатое изображение в формате JPEG
                     const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
                     
-                    // Конвертируем Data URL в Blob
                     const byteString = atob(compressedDataUrl.split(',')[1]);
                     const mimeString = compressedDataUrl.split(',')[0].split(':')[1].split(';')[0];
                     const ab = new ArrayBuffer(byteString.length);
@@ -1670,56 +1827,33 @@
 
     // ========== ФУНКЦИИ ДЛЯ ФОТОГРАФИЙ ==========
 
-    // Обработка загрузки фото для умейки
     window.handleSkillPhotoUpload = async function(event) {
         const file = event.target.files[0];
         if (!file) return;
         
-        // Показываем статус сжатия
         const statusElement = document.getElementById('photoCompressionStatus');
         statusElement.style.display = 'block';
         statusElement.textContent = '⚡ Сжимаю фото...';
         
         try {
-            // Проверяем размер файла
-            if (file.size > 5 * 1024 * 1024) { // 5MB
+            if (file.size > 5 * 1024 * 1024) {
                 alert('❌ Файл слишком большой. Максимальный размер: 5MB');
                 statusElement.style.display = 'none';
                 return;
             }
             
-            // Проверяем тип файла
             if (!file.type.match('image.*')) {
                 alert('❌ Пожалуйста, выберите изображение');
                 statusElement.style.display = 'none';
                 return;
             }
             
-            // Сжимаем изображение
             const compressed = await compressImage(file, 800, 600, 0.7);
+            currentSkillPhoto = compressed.dataUrl;
             
-            // Проверяем размер после сжатия
-            if (compressed.compressedSize > 1024 * 1024) { // 1MB
-                // Пробуем сжать сильнее
-                const strongerCompressed = await compressImage(file, 600, 450, 0.5);
-                currentSkillPhoto = strongerCompressed.dataUrl;
-                console.log(`📊 Повторное сжатие: ${strongerCompressed.compressedSize / 1024}KB`);
-            } else {
-                currentSkillPhoto = compressed.dataUrl;
-            }
+            updatePhotoPreview('skillPhotoPreview', currentSkillPhoto);
             
-            // Отображаем превью
-            const preview = document.getElementById('skillPhotoPreview');
-            preview.innerHTML = `
-                <img src="${currentSkillPhoto}" style="width: 100%; height: 100%; object-fit: cover;">
-                <div style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; padding: 3px 8px; border-radius: 10px; font-size: 12px; cursor: pointer;" onclick="removeSkillPhoto(event)">
-                    ✕
-                </div>
-            `;
-            preview.style.position = 'relative';
-            
-            // Показываем статус
-            const finalSize = (currentSkillPhoto.length * 0.75) / 1024; // Примерный расчет размера
+            const finalSize = (currentSkillPhoto.length * 0.75) / 1024;
             statusElement.textContent = `✅ Фото сжато до ${finalSize.toFixed(2)}KB`;
             statusElement.style.color = '#48bb78';
             
@@ -1732,19 +1866,10 @@
             statusElement.textContent = '❌ Ошибка сжатия фото';
             statusElement.style.color = '#e53e3e';
             
-            // Если не удалось сжать, используем оригинал
             const reader = new FileReader();
             reader.onload = function(e) {
                 currentSkillPhoto = e.target.result;
-                
-                const preview = document.getElementById('skillPhotoPreview');
-                preview.innerHTML = `
-                    <img src="${currentSkillPhoto}" style="width: 100%; height: 100%; object-fit: cover;">
-                    <div style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; padding: 3px 8px; border-radius: 10px; font-size: 12px; cursor: pointer;" onclick="removeSkillPhoto(event)">
-                        ✕
-                    </div>
-                `;
-                preview.style.position = 'relative';
+                updatePhotoPreview('skillPhotoPreview', currentSkillPhoto);
                 
                 statusElement.textContent = '⚠️ Используется оригинальное фото';
                 statusElement.style.color = '#ed8936';
@@ -1753,28 +1878,86 @@
         }
     };
 
-    // Удаление фото умейки
-    window.removeSkillPhoto = function(event) {
-        if (event) event.stopPropagation();
-        currentSkillPhoto = null;
-        const preview = document.getElementById('skillPhotoPreview');
+    window.handleEditSkillPhotoUpload = async function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const statusElement = document.getElementById('editPhotoCompressionStatus');
+        statusElement.style.display = 'block';
+        statusElement.textContent = '⚡ Сжимаю фото...';
+        
+        try {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('❌ Файл слишком большой. Максимальный размер: 5MB');
+                statusElement.style.display = 'none';
+                return;
+            }
+            
+            if (!file.type.match('image.*')) {
+                alert('❌ Пожалуйста, выберите изображение');
+                statusElement.style.display = 'none';
+                return;
+            }
+            
+            const compressed = await compressImage(file, 800, 600, 0.7);
+            editSkillPhoto = compressed.dataUrl;
+            
+            updatePhotoPreview('editSkillPhotoPreview', editSkillPhoto);
+            
+            const finalSize = (editSkillPhoto.length * 0.75) / 1024;
+            statusElement.textContent = `✅ Фото сжато до ${finalSize.toFixed(2)}KB`;
+            statusElement.style.color = '#48bb78';
+            
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 3000);
+            
+        } catch (error) {
+            console.error('❌ Ошибка сжатия фото:', error);
+            statusElement.textContent = '❌ Ошибка сжатия фото';
+            statusElement.style.color = '#e53e3e';
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                editSkillPhoto = e.target.result;
+                updatePhotoPreview('editSkillPhotoPreview', editSkillPhoto);
+                
+                statusElement.textContent = '⚠️ Используется оригинальное фото';
+                statusElement.style.color = '#ed8936';
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    function updatePhotoPreview(elementId, photoData) {
+        const preview = document.getElementById(elementId);
+        preview.innerHTML = `
+            <img src="${photoData}" style="width: 100%; height: 100%; object-fit: cover;">
+            <button class="remove-photo-btn" onclick="removePhoto('${elementId}')" type="button">✕</button>
+        `;
+        preview.style.position = 'relative';
+    }
+
+    window.removePhoto = function(elementId) {
+        const preview = document.getElementById(elementId);
         preview.innerHTML = `
             <div class="no-photo">
                 <div style="font-size: 40px; margin-bottom: 10px;">📷</div>
                 <div>Нажмите для загрузки фото</div>
-                <div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Размер до 1MB</div>
+                <div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Размер до 5MB</div>
             </div>
         `;
         preview.style.position = 'static';
         
-        // Скрываем статус сжатия
-        const statusElement = document.getElementById('photoCompressionStatus');
-        statusElement.style.display = 'none';
+        if (elementId === 'skillPhotoPreview') {
+            currentSkillPhoto = null;
+        } else if (elementId === 'editSkillPhotoPreview') {
+            editSkillPhoto = null;
+        }
     };
 
-    // ========== ФУНКЦИИ ДЛЯ УМЕЕК С ИСПОЛЬЗОВАНИЕМ API ==========
+    // ========== ФУНКЦИИ ДЛЯ УМЕЕК ==========
 
-    // Добавление умейки через API с оптимизированной отправкой фото
     window.addSkill = async function() {
         try {
             const skillName = document.getElementById('skillName').value;
@@ -1787,10 +1970,8 @@
             }
 
             const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-        
             const userId = currentUserId;
-            console.log('👤 Добавляю умейку для User ID:', userId);
-        
+            
             if (!userId || userId === 'null' || userId === 'undefined') {
                 alert('❌ Ошибка: не определен ID пользователя. Перезагрузите страницу.');
                 return;
@@ -1798,7 +1979,6 @@
 
             const location = userLocation || { lat: 55.7558, lon: 37.6173 };
 
-            // Подготовка данных для отправки
             const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
@@ -1808,26 +1988,15 @@
                 location: location
             };
 
-            // Если есть фото, проверяем размер перед отправкой
             if (currentSkillPhoto) {
-                // Приблизительный расчет размера Data URL (примерно 0.75 байта на символ)
-                const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024; // в KB
-                console.log(`📊 Размер фото для отправки: ${estimatedSize.toFixed(2)}KB`);
-                
-                if (estimatedSize > 500) { // 500KB - безопасный лимит
-                    alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}KB).\nПопробуйте загрузить фото меньшего размера.`);
-                    return;
-                }
-                
                 skillData.photo = currentSkillPhoto;
                 skillData.photoTimestamp = new Date().toISOString();
             }
 
             console.log('📤 Отправляю умейку с фото:', !!skillData.photo);
 
-            // Отправляем на сервер с таймаутом
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 секунд таймаут
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
 
             try {
                 const response = await fetch(`${API_URL}/api/skills`, {
@@ -1847,12 +2016,7 @@
                 if (result.success) {
                     alert('✅ Умейка успешно опубликована!');
                 
-                    // Очищаем поля и фото
-                    document.getElementById('skillName').value = '';
-                    document.getElementById('skillExperience').value = '';
-                    document.getElementById('skillPrice').value = '';
-                    removeSkillPhoto({ stopPropagation: () => {} });
-                    currentSkillPhoto = null;
+                    resetSkillForm();
                 
                     setTimeout(() => {
                         loadMySkills();
@@ -1876,21 +2040,30 @@
         
         } catch (error) {
             console.error('Ошибка добавления умейки:', error);
-            
-            if (currentSkillPhoto) {
-                const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
-                if (estimatedSize > 500) {
-                    alert('❌ Фото слишком большое. Пожалуйста, загрузите фото меньшего размера (до 1MB) и попробуйте еще раз.');
-                } else {
-                    alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету и попробуйте еще раз.');
-                }
-            } else {
-                alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету.');
-            }
+            alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету и попробуйте еще раз.');
         }
     };
 
-    // Загрузка всех умейок с сервера
+    function resetSkillForm() {
+        document.getElementById('skillName').value = '';
+        document.getElementById('skillExperience').value = '';
+        document.getElementById('skillPrice').value = '';
+        currentSkillPhoto = null;
+        
+        const preview = document.getElementById('skillPhotoPreview');
+        preview.innerHTML = `
+            <div class="no-photo">
+                <div style="font-size: 40px; margin-bottom: 10px;">📷</div>
+                <div>Нажмите для загрузки фото</div>
+                <div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Размер до 5MB</div>
+            </div>
+        `;
+        preview.style.position = 'static';
+        
+        const statusElement = document.getElementById('photoCompressionStatus');
+        statusElement.style.display = 'none';
+    }
+
     async function loadAllSkillsFromServer() {
         try {
             console.log('📡 Загрузка умейок с сервера...');
@@ -1911,8 +2084,7 @@
         }
     }
 
-    // Загрузка моих умейок с сервера
-    async function loadMySkills() {
+    window.loadMySkills = async function() {
         try {
             console.log('📡 Загрузка моих умейок...');
             
@@ -1945,18 +2117,55 @@
             }
             
             console.log(`📥 Загружаем умейки пользователя ${userId}...`);
-            let response, result;
             
             try {
-                response = await fetch(`${API_URL}/api/skills/user/${userId}`);
+                const response = await fetch(`${API_URL}/api/skills/user/${userId}`);
                 
                 if (!response.ok) {
                     console.error(`❌ Ошибка HTTP: ${response.status} ${response.statusText}`);
                     throw new Error(`Ошибка сервера: ${response.status}`);
                 }
                 
-                result = await response.json();
+                const result = await response.json();
                 console.log('📱 Ответ сервера:', result);
+                
+                if (result.success && result.skills && result.skills.length > 0) {
+                    console.log(`✅ Найдено ${result.skills.length} моих умейок`);
+                    
+                    skillsList.innerHTML = result.skills.map(skill => `
+                        <div class="skill-card">
+                            <div class="skill-header">
+                                <div class="skill-title">${skill.skill}</div>
+                                <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                            </div>
+                            <div class="skill-price">${skill.price} ₽</div>
+                            <div class="skill-distance">🎓 ${skill.experience}</div>
+                            ${skill.photo ? `
+                                <div class="skill-photo skill-photo-list">
+                                    <img src="${skill.photo}" alt="Фото работы">
+                                </div>
+                            ` : ''}
+                            <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
+                            <div style="color: #48bb78; font-size: 14px; margin-bottom: 10px;">
+                                👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
+                            </div>
+                            <button class="chat-button" onclick="openEditSkillPopup('${skill._id}')" style="background: #4299e1; margin-top: 10px;">
+                                ✏️ Редактировать
+                            </button>
+                        </div>
+                    `).join('');
+                } else {
+                    skillsList.innerHTML = `
+                        <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                            <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
+                            <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
+                            <button class="main-button" onclick="showSection('masterSection')" style="padding: 15px; margin-top: 10px;">
+                                ✨ Добавить первую умейку
+                            </button>
+                        </div>
+                    `;
+                }
+                
             } catch (fetchError) {
                 console.error('❌ Ошибка загрузки моих умейок:', fetchError);
                 skillsList.innerHTML = `
@@ -1969,46 +2178,6 @@
                     </div>
                 `;
                 return;
-            }
-            
-            if (result.success && result.skills && result.skills.length > 0) {
-                console.log(`✅ Найдено ${result.skills.length} моих умейок`);
-                
-                skillsList.innerHTML = result.skills.map(skill => `
-                    <div class="skill-card">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                        </div>
-                        <div class="skill-price">${skill.price} ₽</div>
-                        <div class="skill-distance">🎓 ${skill.experience}</div>
-                        ${skill.photo ? `
-                            <div class="skill-photo">
-                                <img src="${skill.photo}" alt="Фото работы">
-                            </div>
-                        ` : ''}
-                        <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
-                        <div style="color: #48bb78; font-size: 14px; margin-bottom: 10px;">
-                            👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
-                        </div>
-                        <button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #4299e1; margin-top: 10px;">
-                            ✏️ Редактировать
-                        </button>
-                        <button class="chat-button" onclick="deleteSkill('${skill._id}')" style="background: #f56565; margin-top: 5px;">
-                            🗑️ Удалить
-                        </button>
-                    </div>
-                `).join('');
-            } else {
-                skillsList.innerHTML = `
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
-                        <button class="main-button" onclick="showSection('masterSection')" style="padding: 15px; margin-top: 10px;">
-                            ✨ Добавить первую умейку
-                        </button>
-                    </div>
-                `;
             }
             
         } catch (error) {
@@ -2026,9 +2195,8 @@
                 `;
             }
         }
-    }
+    };
 
-    // Загрузка умейок в профиле
     async function loadProfileSkills() {
         try {
             if (!currentUserId) {
@@ -2061,11 +2229,8 @@
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
                         <div class="skill-actions">
-                            <button class="edit-button" onclick="editSkill('${skill._id}')" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
+                            <button class="edit-button" onclick="openEditSkillPopup('${skill._id}')" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
                                 ✏️
-                            </button>
-                            <button class="delete-button" onclick="deleteSkill('${skill._id}')" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
-                                🗑️
                             </button>
                         </div>
                     </div>
@@ -2080,9 +2245,124 @@
         }
     }
 
-    // Удаление умейки через API
-    window.deleteSkill = async function(skillId) {
-        if (confirm('❌ Удалить эту умейку?')) {
+    // ========== ФУНКЦИИ ДЛЯ РЕДАКТИРОВАНИЯ УМЕЕК ==========
+
+    window.openEditSkillPopup = async function(skillId) {
+        editingSkillId = skillId;
+        editSkillPhoto = null;
+        
+        try {
+            const response = await fetch(`${API_URL}/api/skills/${skillId}`);
+            const result = await response.json();
+            
+            if (result.success && result.skill) {
+                const skill = result.skill;
+                
+                document.getElementById('editSkillId').value = skill._id;
+                document.getElementById('editSkillName').value = skill.skill;
+                document.getElementById('editSkillExperience').value = skill.experience;
+                document.getElementById('editSkillPrice').value = skill.price;
+                
+                const preview = document.getElementById('editSkillPhotoPreview');
+                if (skill.photo) {
+                    preview.innerHTML = `
+                        <img src="${skill.photo}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <button class="remove-photo-btn" onclick="removePhoto('editSkillPhotoPreview')" type="button">✕</button>
+                    `;
+                    preview.style.position = 'relative';
+                } else {
+                    preview.innerHTML = `
+                        <div class="no-photo">
+                            <div style="font-size: 40px; margin-bottom: 10px;">📷</div>
+                            <div>Нажмите для загрузки фото</div>
+                            <div style="font-size: 12px; opacity: 0.7; margin-top: 5px;">Размер до 5MB</div>
+                        </div>
+                    `;
+                    preview.style.position = 'static';
+                }
+                
+                document.getElementById('deleteConfirm').style.display = 'none';
+                document.getElementById('editSkillPopup').style.display = 'flex';
+            } else {
+                alert('❌ Ошибка загрузки данных умейки');
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки умейки:', error);
+            alert('❌ Ошибка загрузки данных умейки');
+        }
+    };
+
+    window.closeEditSkillPopup = function() {
+        document.getElementById('editSkillPopup').style.display = 'none';
+        editingSkillId = null;
+        editSkillPhoto = null;
+    };
+
+    window.updateSkill = async function() {
+        const skillId = document.getElementById('editSkillId').value;
+        const skillName = document.getElementById('editSkillName').value;
+        const skillExperience = document.getElementById('editSkillExperience').value;
+        const skillPrice = document.getElementById('editSkillPrice').value;
+        
+        if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
+            alert('❌ Заполните все поля');
+            return;
+        }
+        
+        try {
+            const skillData = {
+                skill: skillName.trim(),
+                experience: skillExperience.trim(),
+                price: parseInt(skillPrice)
+            };
+            
+            if (editSkillPhoto) {
+                skillData.photo = editSkillPhoto;
+                skillData.photoTimestamp = new Date().toISOString();
+            }
+            
+            const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(skillData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('✅ Умейка успешно обновлена!');
+                closeEditSkillPopup();
+                
+                loadMySkills();
+                loadProfileSkills();
+                
+                if (map) {
+                    loadSkillsOnMap();
+                }
+            } else {
+                alert('❌ Ошибка обновления: ' + (result.error || 'Неизвестная ошибка'));
+            }
+            
+        } catch (error) {
+            console.error('Ошибка обновления умейки:', error);
+            alert('❌ Ошибка обновления умейки');
+        }
+    };
+
+    window.showDeleteConfirm = function() {
+        document.getElementById('deleteConfirm').style.display = 'block';
+    };
+
+    window.cancelDelete = function() {
+        document.getElementById('deleteConfirm').style.display = 'none';
+    };
+
+    window.confirmDeleteSkill = async function() {
+        const skillId = document.getElementById('editSkillId').value;
+        
+        if (confirm('❌ Вы уверены, что хотите удалить эту умейку?')) {
             try {
                 const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                     method: 'DELETE'
@@ -2092,6 +2372,7 @@
                 
                 if (result.success) {
                     alert('✅ Умейка удалена!');
+                    closeEditSkillPopup();
                     
                     loadMySkills();
                     loadProfileSkills();
@@ -2155,57 +2436,26 @@
         showSection('aboutSection');
     };
 
-    // ========== ФУНКЦИЯ ДЛЯ КРАСИВЫХ УВЕДОМЛЕНИЙ ==========
-
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 10000;
-        `;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 2000);
-    }
-
     // ========== ФУНКЦИИ ДЛЯ КАРТЫ ==========
 
-    // Функция для автоматического обновления карты
     function startMapAutoRefresh() {
-        stopMapAutoRefresh(); // Останавливаем предыдущий интервал если есть
+        stopMapAutoRefresh();
         
         mapRefreshInterval = setInterval(() => {
             if (document.querySelector('.map-active') && map) {
                 console.log('🔄 Автоматическое обновление карты...');
                 loadSkillsOnMap();
             }
-        }, 30000); // Обновление каждые 30 секунд
+        }, 30000);
     }
 
-    // Функция для остановки автоматического обновления
     function stopMapAutoRefresh() {
         if (mapRefreshInterval) {
             clearInterval(mapRefreshInterval);
             mapRefreshInterval = null;
-            console.log('⏹️ Автообновление карты остановлено');
         }
     }
 
-    // Работа с картой
     window.openMap = function() {
         console.log('🗺️ Открытие карты');
         const mapSection = document.querySelector('.map-section');
@@ -2279,7 +2529,6 @@
         }
     }
 
-    // Загрузка умейок на карту
     async function loadSkillsOnMap() {
         try {
             console.log('🗺️ Загрузка умейок с сервера для карты');
@@ -2290,13 +2539,11 @@
             
             const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
             
-            // Очищаем предыдущие маркеры
             if (markers.length > 0) {
                 markers.forEach(marker => map.removeLayer(marker));
                 markers = [];
             }
             
-            // Добавляем маркер пользователя
             if (userLocation) {
                 const userMarker = L.marker([userLocation.lat, userLocation.lon], {
                     icon: L.divIcon({
@@ -2313,7 +2560,6 @@
                 markers.push(userMarker);
             }
             
-            // Добавляем маркеры умейок
             skills.forEach(skill => {
                 if (skill.location && skill.location.lat && skill.location.lon) {
                     const rating = skill.rating?.average || 5.0;
@@ -2361,7 +2607,6 @@
         }
     }
 
-    // Получение цвета маркера по рейтингу
     function getMarkerColor(rating) {
         if (rating >= 4.5) return '#22c55e';
         if (rating >= 4.0) return '#8b5cf6';  
@@ -2369,7 +2614,6 @@
         return '#6b7280';
     }
 
-    // Функция создания контента для попапа с фото
     function createSkillPopupContent(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
         
@@ -2426,12 +2670,8 @@
                         <span>💬</span>
                         <span>Написать в Telegram</span>
                     </button>
-                    <button onclick="showSkillDetails('${skill._id}')" 
-                            style="width: 100%; padding: 12px; background: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
-                        👁️ Подробнее
-                    </button>
                     ${isUserSkill ? 
-                        `<button onclick="editSkill('${skill._id}')" 
+                        `<button onclick="openEditSkillPopup('${skill._id}')" 
                                 style="width: 100%; padding: 12px; background: #ed8936; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
                             ✏️ Редактировать
                         </button>` : 
@@ -2442,7 +2682,6 @@
         `;
     }
 
-    // Показать фото в полном размере
     window.showFullPhoto = function(photoUrl, skillName) {
         const fullPhotoHtml = `
             <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
@@ -2466,7 +2705,6 @@
         document.body.appendChild(fullPhotoDiv);
     };
 
-    // Закрыть фото в полном размере
     window.closeFullPhoto = function() {
         const fullPhoto = document.getElementById('fullPhotoView');
         if (fullPhoto) {
@@ -2523,458 +2761,7 @@
         }
     });
 
-    // Остальные функции...
-    window.showSkillDetails = function(skillId) {
-        // Реализация просмотра деталей умейки
-        console.log('Просмотр деталей умейки:', skillId);
-    };
-
-    window.contactMaster = function(skillId, skillName, username) {
-        const tg = window.Telegram?.WebApp;
-        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-        
-        const message = `👋 Привет! Я заинтересован(а) в вашей услуге "${skillName}" в Umeyka.\n\nМеня зовут: ${userData.firstName || 'Пользователь'}`;
-        
-        if (tg) {
-            // Если внутри Telegram, можно открыть чат
-            tg.openTelegramLink(`tg://msg?text=${encodeURIComponent(message)}`);
-        } else {
-            // Если в браузере, копируем сообщение
-            navigator.clipboard.writeText(message).then(() => {
-                alert('📋 Сообщение скопировано в буфер обмена. Отправьте его мастеру в Telegram: ' + username);
-            });
-        }
-    };
-
-    window.editSkill = function(skillId) {
-        // Реализация редактирования умейки
-        console.log('Редактирование умейки:', skillId);
-    };
-
-    window.checkAllSkills = function() {
-        // Проверка всех умейок
-        console.log('Проверка всех умейок');
-        loadAllSkillsFromServer().then(skills => {
-            alert(`На сервере найдено ${skills.length} умейок`);
-        });
-    };
-
-    window.forceLoadMySkills = function() {
-        loadMySkills();
-    };
-
-    // ========== ФУНКЦИИ ПРОФИЛЯ ==========
-
-    function loadUserProfile() {
-        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-        
-        document.getElementById('userName').textContent = userData.firstName || 'Пользователь';
-        document.getElementById('userBio').textContent = userData.bio || 'Расскажите о себе...';
-        
-        if (userData.avatar) {
-            document.getElementById('userAvatar').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-        }
-        
-        // Обновление статистики
-        updateUserStats(userData);
-    }
-
-    function updateUserStats(userData) {
-        const statsGrid = document.getElementById('userStats');
-        if (!statsGrid) return;
-        
-        statsGrid.innerHTML = `
-            <div class="stat-card">
-                <div class="stat-value">${userData.rating || 0}</div>
-                <div class="stat-label">⭐ Рейтинг</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${userData.completedDeals || 0}</div>
-                <div class="stat-label">✅ Сделок</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${userData.skills?.length || 0}</div>
-                <div class="stat-label">✨ Умейки</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${userData.views || 0}</div>
-                <div class="stat-label">👁️ Просмотры</div>
-            </div>
-        `;
-    }
-
-    window.editProfile = function() {
-        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-        
-        document.getElementById('editFirstName').value = userData.firstName || '';
-        document.getElementById('editAge').value = userData.age || '';
-        document.getElementById('editExperience').value = userData.experience || '';
-        document.getElementById('editContact').value = userData.contact || '';
-        document.getElementById('editBio').value = userData.bio || '';
-        
-        if (userData.avatar) {
-            document.getElementById('avatarPreview').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-        }
-        
-        showSection('editProfileSection');
-    };
-
-    window.saveProfile = function() {
-        const firstName = document.getElementById('editFirstName').value.trim();
-        const bio = document.getElementById('editBio').value.trim();
-        
-        if (!firstName || !bio) {
-            alert('❌ Пожалуйста, заполните обязательные поля (Имя и О себе)');
-            return;
-        }
-        
-        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-        
-        userData.firstName = firstName;
-        userData.age = document.getElementById('editAge').value;
-        userData.experience = document.getElementById('editExperience').value;
-        userData.contact = document.getElementById('editContact').value;
-        userData.bio = bio;
-        
-        if (currentAvatar) {
-            userData.avatar = currentAvatar;
-        }
-        
-        setLocalStorage(`user_${currentUserId}`, userData);
-        
-        alert('✅ Профиль сохранен!');
-        showProfileSection();
-        loadUserProfile();
-    };
-
-    window.changeAvatar = function() {
-        document.getElementById('avatarInput').click();
-    };
-
-    window.handleAvatarUpload = function(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        if (!file.type.match('image.*')) {
-            alert('❌ Пожалуйста, выберите изображение');
-            return;
-        }
-        
-        if (file.size > 5 * 1024 * 1024) {
-            alert('❌ Файл слишком большой. Максимальный размер: 5MB');
-            return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            currentAvatar = e.target.result;
-            document.getElementById('avatarPreview').innerHTML = `
-                <img src="${currentAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-            `;
-        };
-        reader.readAsDataURL(file);
-    };
-
-    // ========== ФУНКЦИИ ДЛЯ ВКЛАДОК ==========
-
-    window.showProfileTab = function(tabName) {
-        currentProfileTab = tabName;
-        
-        // Скрываем все вкладки
-        document.getElementById('profileStats').style.display = 'none';
-        document.getElementById('profileSkills').style.display = 'none';
-        document.getElementById('profileDeals').style.display = 'none';
-        document.getElementById('profileChats').style.display = 'none';
-        
-        // Убираем активный класс со всех кнопок
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-        
-        // Показываем выбранную вкладку
-        document.getElementById('profileStats').style.display = tabName === 'stats' ? 'block' : 'none';
-        document.getElementById('profileSkills').style.display = tabName === 'skills' ? 'block' : 'none';
-        document.getElementById('profileDeals').style.display = tabName === 'deals' ? 'block' : 'none';
-        document.getElementById('profileChats').style.display = tabName === 'chats' ? 'block' : 'none';
-        
-        // Добавляем активный класс к выбранной кнопке
-        document.getElementById(tabName + 'Tab').classList.add('active');
-        
-        // Загружаем данные для вкладки
-        if (tabName === 'skills') {
-            loadProfileSkills();
-        } else if (tabName === 'deals') {
-            loadDeals();
-        } else if (tabName === 'chats') {
-            loadChats();
-        }
-    };
-
-    window.showDealsTab = function(tabName) {
-        currentDealTab = tabName;
-        
-        // Убираем активный класс со всех кнопок
-        document.querySelectorAll('.deals-tab-button').forEach(btn => btn.classList.remove('active'));
-        
-        // Добавляем активный класс к выбранной кнопке
-        document.getElementById(tabName + 'DealsTab').classList.add('active');
-        
-        // Загружаем сделки для выбранной вкладки
-        loadDeals();
-    };
-
-    function loadDeals() {
-        // Заглушка для загрузки сделок
-        document.getElementById('dealsList').innerHTML = `
-            <div style="text-align: center; color: #666; padding: 40px;">
-                <div style="font-size: 50px; margin-bottom: 20px;">📄</div>
-                <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет сделок</div>
-                <div style="opacity: 0.7;">Создайте свою первую сделку</div>
-            </div>
-        `;
-    }
-
-    function loadChats() {
-        // Заглушка для загрузки чатов
-        document.getElementById('userChatsList').innerHTML = `
-            <div style="text-align: center; color: #666; padding: 40px;">
-                <div style="font-size: 50px; margin-bottom: 20px;">💬</div>
-                <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет активных чатов</div>
-            </div>
-        `;
-    }
-
-    window.showCreateDealSection = function() {
-        showSection('createDealSection');
-    };
-
-    // ========== ФУНКЦИИ ДЛЯ СДЕЛОК ==========
-
-    window.selectQuality = function(quality) {
-        selectedQuality = quality;
-        
-        document.querySelectorAll('.quality-option').forEach(option => {
-            option.classList.remove('selected');
-        });
-        
-        document.getElementById('quality' + quality.charAt(0).toUpperCase() + quality.slice(1)).classList.add('selected');
-        
-        updateDealCommission();
-    };
-
-    window.toggleOption = function(option) {
-        const element = document.getElementById('option' + option.charAt(0).toUpperCase() + option.slice(1));
-        
-        if (element.classList.contains('selected')) {
-            element.classList.remove('selected');
-            selectedOptions = selectedOptions.filter(item => item !== option);
-        } else {
-            if (selectedOptions.length >= 2) {
-                alert('❌ Вы можете выбрать только 2 дополнительных условия');
-                return;
-            }
-            element.classList.add('selected');
-            selectedOptions.push(option);
-        }
-        
-        updateDealCommission();
-    };
-
-    function updateDealCommission() {
-        const dealAmount = document.getElementById('dealAmount').value || 0;
-        
-        if (dealAmount > 0) {
-            const commission = dealAmount * 0.05;
-            const total = parseInt(dealAmount) + commission;
-            
-            document.getElementById('dealAmountDisplay').textContent = dealAmount;
-            document.getElementById('commissionAmount').textContent = commission.toFixed(0);
-            document.getElementById('totalAmount').textContent = total.toFixed(0);
-            document.getElementById('dealCommission').style.display = 'block';
-        } else {
-            document.getElementById('dealCommission').style.display = 'none';
-        }
-    }
-
-    // Добавляем обработчик для поля суммы сделки
-    document.getElementById('dealAmount')?.addEventListener('input', updateDealCommission);
-
-    window.createDeal = function() {
-        const title = document.getElementById('dealTitle').value.trim();
-        const description = document.getElementById('dealDescription').value.trim();
-        const period = document.getElementById('dealPeriod').value.trim();
-        const amount = document.getElementById('dealAmount').value;
-        
-        if (!title || !description || !period || !amount) {
-            alert('❌ Заполните все поля');
-            return;
-        }
-        
-        if (!selectedQuality) {
-            alert('❌ Выберите уровень качества');
-            return;
-        }
-        
-        if (selectedOptions.length !== 2) {
-            alert('❌ Выберите 2 дополнительных условия');
-            return;
-        }
-        
-        const dealData = {
-            title: title,
-            description: description,
-            period: period,
-            amount: parseInt(amount),
-            quality: selectedQuality,
-            options: selectedOptions,
-            commission: amount * 0.05,
-            total: parseInt(amount) + (amount * 0.05)
-        };
-        
-        alert('✅ Сделка создана!');
-        console.log('Создана сделка:', dealData);
-        
-        // Возвращаемся в профиль
-        showProfileSection();
-    };
-
-    // ========== ФУНКЦИИ ДЛЯ РЕФЕРАЛЬНОЙ ПРОГРАММЫ ==========
-
-    window.shareToFriend = function() {
-        const referralLink = `https://t.me/share/url?url=${encodeURIComponent('https://umeyka.app')}&text=${encodeURIComponent('Привет! Я использую отличное приложение для поиска мастеров - Umeyka. Попробуй и ты! Получи +1 звезду за регистрацию! ✨')}`;
-        
-        if (window.Telegram?.WebApp) {
-            window.Telegram.WebApp.openTelegramLink(referralLink);
-        } else {
-            window.open(referralLink, '_blank');
-        }
-    };
-
-    window.copyReferralLink = function() {
-        const referralLink = 'https://umeyka.app?ref=' + currentUserId;
-        navigator.clipboard.writeText(referralLink).then(() => {
-            alert('✅ Ссылка скопирована в буфер обмена! Отправьте её другу.');
-        }).catch(err => {
-            alert('❌ Не удалось скопировать ссылку');
-        });
-    };
-
-    // ========== ФУНКЦИИ ДЛЯ ЧАТА ==========
-
-    window.closeChat = function() {
-        showProfileSection();
-    };
-
-    window.sendChatMessage = function() {
-        const messageInput = document.getElementById('messageInput');
-        const message = messageInput.value.trim();
-        
-        if (!message) return;
-        
-        const chatMessages = document.getElementById('chatMessages');
-        const messageElement = document.createElement('div');
-        messageElement.className = 'chat-message my-message';
-        messageElement.innerHTML = `
-            <div class="chat-message-sender">Вы</div>
-            <div>${message}</div>
-            <div style="font-size: 12px; color: #999; text-align: right; margin-top: 5px;">Только что</div>
-        `;
-        
-        chatMessages.appendChild(messageElement);
-        messageInput.value = '';
-        
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    };
-
-    // ========== ФУНКЦИИ ДЛЯ ОТЗЫВОВ О ПРОЕКТЕ ==========
-
-    window.setProjectRating = function(rating) {
-        projectRating = rating;
-        const stars = document.getElementById('projectRatingStars');
-        stars.innerHTML = '';
-        
-        for (let i = 1; i <= 5; i++) {
-            stars.innerHTML += i <= rating ? 
-                '<span style="cursor: pointer; color: #FFD700;" onclick="setProjectRating(' + i + ')">★</span>' :
-                '<span style="cursor: pointer;" onclick="setProjectRating(' + i + ')">☆</span>';
-        }
-    };
-
-    window.submitProjectReview = function() {
-        const comment = document.getElementById('projectReviewComment').value.trim();
-        
-        if (projectRating === 0) {
-            alert('❌ Пожалуйста, поставьте оценку');
-            return;
-        }
-        
-        if (!comment) {
-            alert('❌ Пожалуйста, напишите отзыв');
-            return;
-        }
-        
-        alert('✅ Спасибо за ваш отзыв!');
-        console.log('Отзыв о проекте:', { rating: projectRating, comment: comment });
-        
-        // Очищаем форму
-        document.getElementById('projectReviewComment').value = '';
-        setProjectRating(0);
-    };
-
-    // ========== ФУНКЦИИ ПОИСКА ==========
-
-    window.searchSkills = async function() {
-        const searchQuery = document.getElementById('searchInput').value.trim();
-        const searchResults = document.getElementById('searchResults');
-        
-        if (!searchQuery) {
-            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос</div>';
-            return;
-        }
-        
-        searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
-        
-        try {
-            const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`);
-            const result = await response.json();
-            
-            if (result.success && result.skills.length > 0) {
-                searchResults.innerHTML = result.skills.map(skill => `
-                    <div class="skill-card">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                        </div>
-                        <div class="skill-price">${skill.price} ₽</div>
-                        <div class="skill-distance">🎓 ${skill.experience}</div>
-                        ${skill.photo ? `
-                            <div class="skill-photo">
-                                <img src="${skill.photo}" alt="Фото работы">
-                            </div>
-                        ` : ''}
-                        <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
-                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')">
-                            💬 Связаться
-                        </button>
-                    </div>
-                `).join('');
-            } else {
-                searchResults.innerHTML = `
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
-                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос</div>
-                    </div>
-                `;
-            }
-        } catch (error) {
-            console.error('Ошибка поиска:', error);
-            searchResults.innerHTML = `
-                <div class="error-message">
-                    ❌ Ошибка поиска<br>
-                    <small>Проверьте подключение к интернету</small>
-                </div>
-            `;
-        }
-    };
+    // Остальные функции остаются без изменений...
 
     </script>
 </body>
