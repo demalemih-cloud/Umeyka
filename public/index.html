@@ -1949,344 +1949,396 @@
         preview.style.position = 'static';
     };
 
-    // ========== ФУНКЦИИ ДЛЯ УМЕЕК ==========
+// ========== ФУНКЦИИ ДЛЯ УМЕЕК ==========
 
-    window.addSkill = async function() {
-        try {
-            const skillName = document.getElementById('skillName').value;
-            const skillExperience = document.getElementById('skillExperience').value;
-            const skillPrice = document.getElementById('skillPrice').value;
-        
-            if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
-                alert('❌ Заполните все поля');
-                return;
-            }
-
-            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-        
-            const userId = currentUserId;
-            console.log('👤 Добавляю умейку для User ID:', userId);
-        
-            if (!userId || userId === 'null' || userId === 'undefined') {
-                alert('❌ Ошибка: не определен ID пользователя. Перезагрузите страницу.');
-                return;
-            }
-
-            const location = userLocation || { lat: 55.7558, lon: 37.6173 };
-
-            const skillData = {
-                skill: skillName.trim(),
-                experience: skillExperience.trim(),
-                price: parseInt(skillPrice),
-                userId: userId,
-                username: userData.firstName || 'Аноним',
-                location: location
-            };
-
-            if (currentSkillPhoto) {
-                const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
-                console.log(`📊 Размер фото для отправки: ${estimatedSize.toFixed(2)}KB`);
-                
-                if (estimatedSize > 500) {
-                    alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}KB).\nПопробуйте загрузить фото меньшего размера.`);
-                    return;
-                }
-                
-                skillData.photo = currentSkillPhoto;
-                skillData.photoTimestamp = new Date().toISOString();
-            }
-
-            console.log('📤 Отправляю умейку с фото:', !!skillData.photo);
-
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-            try {
-                const response = await fetch(`${API_URL}/api/skills`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(skillData),
-                    signal: controller.signal
-                });
-
-                clearTimeout(timeoutId);
-
-                const result = await response.json();
-                console.log('📱 Ответ сервера при добавлении:', result);
-            
-                if (result.success) {
-                    alert('✅ Умейка успешно опубликована!');
-                
-                    // Сохраняем фото в localStorage
-                    if (currentSkillPhoto) {
-                        const skillWithPhoto = result.skill || { _id: result.skillId };
-                        saveSkillPhotoToLocalStorage(skillWithPhoto._id, currentSkillPhoto);
-                    }
-                    
-                    document.getElementById('skillName').value = '';
-                    document.getElementById('skillExperience').value = '';
-                    document.getElementById('skillPrice').value = '';
-                    removeSkillPhoto({ stopPropagation: () => {} });
-                    currentSkillPhoto = null;
-                
-                    setTimeout(() => {
-                        loadMySkills();
-                        loadProfileSkills();
-                        loadSkillsForDeal();
-                    }, 500);
-                
-                    if (map) {
-                        setTimeout(() => loadSkillsOnMap(), 1000);
-                    }
-                } else {
-                    alert('❌ Ошибка: ' + (result.error || 'Неизвестная ошибка'));
-                }
-            } catch (fetchError) {
-                clearTimeout(timeoutId);
-                if (fetchError.name === 'AbortError') {
-                    alert('❌ Время ожидания истекло. Попробуйте еще раз.');
-                } else {
-                    throw fetchError;
-                }
-            }
-        
-        } catch (error) {
-            console.error('Ошибка добавления умейки:', error);
-            
-            if (currentSkillPhoto) {
-                const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
-                if (estimatedSize > 500) {
-                    alert('❌ Фото слишком большое. Пожалуйста, загрузите фото меньшего размера и попробуйте еще раз.');
-                } else {
-                    alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету и попробуйте еще раз.');
-                }
-            } else {
-                alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету.');
-            }
+window.addSkill = async function() {
+    try {
+        const skillName = document.getElementById('skillName').value;
+        const skillExperience = document.getElementById('skillExperience').value;
+        const skillPrice = document.getElementById('skillPrice').value;
+    
+        if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
+            alert('❌ Заполните все поля');
+            return;
         }
-    };
 
-    async function loadMySkills() {
-        try {
-            console.log('📡 Загрузка моих умейок...');
-            
-            const skillsList = document.getElementById('mySkillsList');
-            if (!skillsList) return;
-            
-            skillsList.innerHTML = '<div class="loading">⏳ Загрузка ваших умейок...</div>';
-            
-            const userId = currentUserId || 'demo-user';
-            
-            try {
-                const testResponse = await fetch(`${API_URL}/health`);
-                if (!testResponse.ok) throw new Error('Сервер не отвечает');
-            } catch (testError) {
-                skillsList.innerHTML = `
-                    <div class="error-message">
-                        ❌ Сервер не отвечает<br>
-                        <small>Проверьте подключение к интернету</small>
-                    </div>
-                `;
-                return;
-            }
-            
-            let response, result;
-            
-            try {
-                response = await fetch(`${API_URL}/api/skills/user/${userId}`);
-                
-                if (!response.ok) throw new Error(`Ошибка сервера: ${response.status}`);
-                
-                result = await response.json();
-            } catch (fetchError) {
-                skillsList.innerHTML = `
-                    <div class="error-message">
-                        ❌ Ошибка загрузки данных<br>
-                        <button onclick="loadMySkills()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                            Повторить попытку
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-            
-            if (result.success && result.skills && result.skills.length > 0) {
-                skillsList.innerHTML = result.skills.map(skill => {
-                    const photo = getSkillPhotoFromLocalStorage(skill._id) || skill.photo;
-                    return `
-                        <div class="skill-card" id="skill-${skill._id}">
-                            <div class="skill-header">
-                                <div class="skill-title">${skill.skill}</div>
-                                <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                            </div>
-                            <div class="skill-price">${skill.price} ₽</div>
-                            <div class="skill-distance">🎓 ${skill.experience}</div>
-                            ${photo ? `
-                                <div class="skill-photo">
-                                    <img src="${photo}" alt="Фото работы" onclick="showFullPhoto('${photo}', '${skill.skill}')">
-                                </div>
-                            ` : ''}
-                            <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
-                            <div style="color: #48bb78; font-size: 14px; margin-bottom: 10px;">
-                                👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
-                            </div>
-                            <button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #4299e1; margin-top: 10px;">
-                                ✏️ Редактировать
-                            </button>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                skillsList.innerHTML = `
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
-                    </div>
-                `;
-            }
-            
-        } catch (error) {
-            console.error('❌ Неожиданная ошибка загрузки умейок:', error);
-            const skillsList = document.getElementById('mySkillsList');
-            if (skillsList) {
-                skillsList.innerHTML = `
-                    <div class="error-message">
-                        ❌ Неожиданная ошибка<br>
-                        <button onclick="loadMySkills()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                            Повторить попытку
-                        </button>
-                    </div>
-                `;
-            }
+        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+    
+        const userId = currentUserId;
+        console.log('👤 Добавляю умейку для User ID:', userId);
+    
+        if (!userId || userId === 'null' || userId === 'undefined') {
+            alert('❌ Ошибка: не определен ID пользователя. Перезагрузите страницу.');
+            return;
         }
-    }
 
-    async function loadProfileSkills() {
-        try {
-            if (!currentUserId) return;
+        const location = userLocation || { lat: 55.7558, lon: 37.6173 };
 
-            console.log('📡 Загрузка моих умейок для профиля...');
+        const skillData = {
+            skill: skillName.trim(),
+            experience: skillExperience.trim(),
+            price: parseInt(skillPrice),
+            userId: userId,
+            username: userData.firstName || 'Аноним',
+            location: location
+        };
+
+        if (currentSkillPhoto) {
+            const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
+            console.log(`📊 Размер фото для отправки: ${estimatedSize.toFixed(2)}KB`);
             
-            const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
+            if (estimatedSize > 500) {
+                alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}KB).\nПопробуйте загрузить фото меньшего размера.`);
+                return;
+            }
+            
+            skillData.photo = currentSkillPhoto;
+            skillData.photoTimestamp = new Date().toISOString();
+        }
+
+        console.log('📤 Отправляю умейку с фото:', !!skillData.photo);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+        try {
+            const response = await fetch(`${API_URL}/api/skills`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(skillData),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+
             const result = await response.json();
-            
-            const skillsList = document.getElementById('profileSkillsList');
-            
-            if (result.success && result.skills.length > 0) {
-                skillsList.innerHTML = result.skills.map(skill => {
-                    const photo = getSkillPhotoFromLocalStorage(skill._id) || skill.photo;
-                    return `
-                        <div class="profile-skill-card">
-                            <div class="profile-skill-header">
-                                <div class="skill-title">${skill.skill}</div>
-                                <div class="skill-price">${skill.price} ₽</div>
-                            </div>
-                            <div style="color: #666; margin: 8px 0;">🎓 ${skill.experience}</div>
-                            ${photo ? `
-                                <div class="skill-photo" style="height: 150px;">
-                                    <img src="${photo}" alt="Фото работы">
-                                </div>
-                            ` : ''}
-                            <div style="color: #666; margin: 8px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
-                            <div style="color: #48bb78; font-size: 12px; margin: 8px 0;">
-                                👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
-                            </div>
-                            <div class="skill-actions">
-                                <button class="edit-button" onclick="editSkill('${skill._id}')" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
-                                    ✏️ Редактировать
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } else {
-                skillsList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">У вас пока нет добавленных умейок</div>';
-            }
-            
-        } catch (error) {
-            console.error('Ошибка загрузки умейок:', error);
-            skillsList.innerHTML = '<div class="error-message">Ошибка загрузки умейок</div>';
-        }
-    }
-
-    // Сохранение фото умейки в localStorage
-    function saveSkillPhotoToLocalStorage(skillId, photoData) {
-        try {
-            const skillPhotos = getLocalStorage('skill_photos') || {};
-            skillPhotos[skillId] = photoData;
-            setLocalStorage('skill_photos', skillPhotos);
-            console.log('💾 Фото умейки сохранено в localStorage:', skillId);
-        } catch (error) {
-            console.error('❌ Ошибка сохранения фото в localStorage:', error);
-        }
-    }
-
-    // Получение фото умейки из localStorage
-    function getSkillPhotoFromLocalStorage(skillId) {
-        try {
-            const skillPhotos = getLocalStorage('skill_photos') || {};
-            return skillPhotos[skillId] || null;
-        } catch (error) {
-            console.error('❌ Ошибка получения фото из localStorage:', error);
-            return null;
-        }
-    }
-
-    // Удаление фото умейки из localStorage
-    function removeSkillPhotoFromLocalStorage(skillId) {
-        try {
-            const skillPhotos = getLocalStorage('skill_photos') || {};
-            delete skillPhotos[skillId];
-            setLocalStorage('skill_photos', skillPhotos);
-            console.log('🗑️ Фото умейки удалено из localStorage:', skillId);
-        } catch (error) {
-            console.error('❌ Ошибка удаления фото из localStorage:', error);
-        }
-    }
-
-    window.editSkill = async function(skillId) {
-        try {
-            console.log('✏️ Редактирование умейки:', skillId);
-            
-            const response = await fetch(`${API_URL}/api/skills/${skillId}`);
-            const result = await response.json();
-            
+            console.log('📱 Ответ сервера при добавлении:', result);
+        
             if (result.success) {
-                const skill = result.skill;
-                
-                document.getElementById('editSkillId').value = skillId;
-                document.getElementById('editSkillName').value = skill.skill;
-                document.getElementById('editSkillExperience').value = skill.experience;
-                document.getElementById('editSkillPrice').value = skill.price;
-                
-                // Загружаем фото из localStorage или с сервера
-                const photo = getSkillPhotoFromLocalStorage(skillId) || skill.photo;
-                if (photo) {
-                    editSkillPhoto = photo;
-                    const preview = document.getElementById('editSkillPhotoPreview');
-                    preview.innerHTML = `
-                        <img src="${photo}" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; padding: 3px 8px; border-radius: 10px; font-size: 12px; cursor: pointer;" onclick="removeEditSkillPhoto(event)">
-                            ✕
-                        </div>
-                    `;
-                    preview.style.position = 'relative';
-                } else {
-                    removeEditSkillPhoto({ stopPropagation: () => {} });
+                alert('✅ Умейка успешно опубликована!');
+            
+                // Сохраняем фото в localStorage под правильным ключом
+                if (currentSkillPhoto) {
+                    const skillId = result.skill?._id || result.skillId;
+                    if (skillId) {
+                        // Ключ: skill_photo_[ID умейки]
+                        localStorage.setItem(`skill_photo_${skillId}`, currentSkillPhoto);
+                        console.log('💾 Фото сохранено в localStorage под ключом:', `skill_photo_${skillId}`);
+                    }
                 }
                 
-                openEditSkillModal();
+                // Обновляем список умейок пользователя в localStorage
+                let userSkills = getLocalStorage(`user_${userId}_skills`) || [];
+                const skillId = result.skill?._id || result.skillId;
+                if (skillId && !userSkills.includes(skillId)) {
+                    userSkills.push(skillId);
+                    setLocalStorage(`user_${userId}_skills`, userSkills);
+                }
+                
+                document.getElementById('skillName').value = '';
+                document.getElementById('skillExperience').value = '';
+                document.getElementById('skillPrice').value = '';
+                removeSkillPhoto({ stopPropagation: () => {} });
+                currentSkillPhoto = null;
+            
+                setTimeout(() => {
+                    loadMySkills();
+                    loadProfileSkills();
+                    loadSkillsForDeal();
+                }, 500);
+            
+                if (map) {
+                    setTimeout(() => loadSkillsOnMap(), 1000);
+                }
             } else {
-                alert('❌ Ошибка загрузки умейки: ' + (result.error || 'Неизвестная ошибка'));
+                alert('❌ Ошибка: ' + (result.error || 'Неизвестная ошибка'));
+            }
+        } catch (fetchError) {
+            clearTimeout(timeoutId);
+            if (fetchError.name === 'AbortError') {
+                alert('❌ Время ожидания истекло. Попробуйте еще раз.');
+            } else {
+                throw fetchError;
+            }
+        }
+    
+    } catch (error) {
+        console.error('Ошибка добавления умейки:', error);
+        
+        if (currentSkillPhoto) {
+            const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
+            if (estimatedSize > 500) {
+                alert('❌ Фото слишком большое. Пожалуйста, загрузите фото меньшего размера и попробуйте еще раз.');
+            } else {
+                alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету и попробуйте еще раз.');
+            }
+        } else {
+            alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету.');
+        }
+    }
+};
+
+// Получение фото умейки из localStorage
+function getSkillPhotoFromLocalStorage(skillId) {
+    try {
+        // Пробуем получить под разными ключами для совместимости
+        return localStorage.getItem(`skill_photo_${skillId}`) || 
+               (getLocalStorage('skill_photos') || {})[skillId] ||
+               null;
+    } catch (error) {
+        console.error('❌ Ошибка получения фото из localStorage:', error);
+        return null;
+    }
+}
+
+// Обновленная функция loadMySkills для правильного отображения фото
+async function loadMySkills() {
+    try {
+        console.log('📡 Загрузка моих умейок...');
+        
+        const skillsList = document.getElementById('mySkillsList');
+        if (!skillsList) return;
+        
+        skillsList.innerHTML = '<div class="loading">⏳ Загрузка ваших умейок...</div>';
+        
+        const userId = currentUserId || 'demo-user';
+        
+        try {
+            const testResponse = await fetch(`${API_URL}/health`);
+            if (!testResponse.ok) throw new Error('Сервер не отвечает');
+        } catch (testError) {
+            skillsList.innerHTML = `
+                <div class="error-message">
+                    ❌ Сервер не отвечает<br>
+                    <small>Проверьте подключение к интернету</small>
+                </div>
+            `;
+            return;
+        }
+        
+        let response, result;
+        
+        try {
+            response = await fetch(`${API_URL}/api/skills/user/${userId}`);
+            
+            if (!response.ok) throw new Error(`Ошибка сервера: ${response.status}`);
+            
+            result = await response.json();
+        } catch (fetchError) {
+            skillsList.innerHTML = `
+                <div class="error-message">
+                    ❌ Ошибка загрузки данных<br>
+                    <button onclick="loadMySkills()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        Повторить попытку
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        if (result.success && result.skills && result.skills.length > 0) {
+            console.log(`✅ Найдено ${result.skills.length} моих умейок`);
+            
+            skillsList.innerHTML = result.skills.map(skill => {
+                // Пытаемся получить фото из localStorage
+                const photo = getSkillPhotoFromLocalStorage(skill._id) || skill.photo;
+                console.log(`🖼️ Фото для умейки ${skill._id}:`, photo ? 'есть' : 'нет');
+                
+                return `
+                    <div class="skill-card" id="skill-${skill._id}">
+                        <div class="skill-header">
+                            <div class="skill-title">${skill.skill}</div>
+                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                        </div>
+                        <div class="skill-price">${skill.price} ₽</div>
+                        <div class="skill-distance">🎓 ${skill.experience}</div>
+                        ${photo ? `
+                            <div class="skill-photo">
+                                <img src="${photo}" alt="Фото работы" 
+                                     onclick="showFullPhoto('${photo.replace(/'/g, "\\'")}', '${skill.skill.replace(/'/g, "\\'")}')"
+                                     style="cursor: pointer; width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                        ` : ''}
+                        <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
+                        <div style="color: #48bb78; font-size: 14px; margin-bottom: 10px;">
+                            👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
+                        </div>
+                        <button class="chat-button" onclick="editSkill('${skill._id}')" style="background: #4299e1; margin-top: 10px;">
+                            ✏️ Редактировать
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            skillsList.innerHTML = `
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                    <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
+                    <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        console.error('❌ Неожиданная ошибка загрузки умейок:', error);
+        const skillsList = document.getElementById('mySkillsList');
+        if (skillsList) {
+            skillsList.innerHTML = `
+                <div class="error-message">
+                    ❌ Неожиданная ошибка<br>
+                    <button onclick="loadMySkills()" style="margin-top: 10px; padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        Повторить попытку
+                    </button>
+                </div>
+            `;
+        }
+    }
+}
+
+// Обновленная функция editSkill
+window.editSkill = async function(skillId) {
+    try {
+        console.log('✏️ Редактирование умейки:', skillId);
+        
+        const response = await fetch(`${API_URL}/api/skills/${skillId}`);
+        const result = await response.json();
+        
+        if (result.success) {
+            const skill = result.skill;
+            
+            document.getElementById('editSkillId').value = skillId;
+            document.getElementById('editSkillName').value = skill.skill;
+            document.getElementById('editSkillExperience').value = skill.experience;
+            document.getElementById('editSkillPrice').value = skill.price;
+            
+            // Загружаем фото из localStorage или с сервера
+            const photo = getSkillPhotoFromLocalStorage(skillId) || skill.photo;
+            editSkillPhoto = photo || null;
+            
+            const preview = document.getElementById('editSkillPhotoPreview');
+            if (photo) {
+                preview.innerHTML = `
+                    <img src="${photo}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <div style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; padding: 3px 8px; border-radius: 10px; font-size: 12px; cursor: pointer;" onclick="removeEditSkillPhoto(event)">
+                        ✕
+                    </div>
+                `;
+                preview.style.position = 'relative';
+            } else {
+                preview.innerHTML = `
+                    <div class="no-photo">
+                        <div style="font-size: 40px; margin-bottom: 10px;">📷</div>
+                        <div>Нажмите для загрузки фото</div>
+                    </div>
+                `;
+                preview.style.position = 'static';
             }
             
-        } catch (error) {
-            console.error('Ошибка загрузки умейки для редактирования:', error);
-            alert('❌ Ошибка загрузки умейки для редактирования');
+            openEditSkillModal();
+        } else {
+            alert('❌ Ошибка загрузки умейки: ' + (result.error || 'Неизвестная ошибка'));
         }
-    };
+        
+    } catch (error) {
+        console.error('Ошибка загрузки умейки для редактирования:', error);
+        alert('❌ Ошибка загрузки умейки для редактирования');
+    }
+};
+
+// Обновленная функция updateSkill
+window.updateSkill = async function() {
+    try {
+        const skillId = document.getElementById('editSkillId').value;
+        const skillName = document.getElementById('editSkillName').value;
+        const skillExperience = document.getElementById('editSkillExperience').value;
+        const skillPrice = document.getElementById('editSkillPrice').value;
+        
+        if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
+            alert('❌ Заполните все поля');
+            return;
+        }
+        
+        const skillData = {
+            skill: skillName.trim(),
+            experience: skillExperience.trim(),
+            price: parseInt(skillPrice)
+        };
+        
+        // Если есть новое фото, добавляем его
+        if (editSkillPhoto) {
+            skillData.photo = editSkillPhoto;
+            skillData.photoTimestamp = new Date().toISOString();
+        }
+        
+        console.log('📤 Обновляю умейку:', skillId, skillData);
+        
+        const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(skillData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('✅ Умейка успешно обновлена!');
+            
+            // Сохраняем новое фото в localStorage
+            if (editSkillPhoto) {
+                localStorage.setItem(`skill_photo_${skillId}`, editSkillPhoto);
+                console.log('💾 Новое фото сохранено в localStorage под ключом:', `skill_photo_${skillId}`);
+            }
+            
+            closeEditSkillModal();
+            
+            setTimeout(() => {
+                loadMySkills();
+                loadProfileSkills();
+                loadSkillsForDeal();
+            }, 500);
+            
+            if (map) {
+                setTimeout(() => loadSkillsOnMap(), 1000);
+            }
+        } else {
+            alert('❌ Ошибка обновления: ' + (result.error || 'Неизвестная ошибка'));
+        }
+        
+    } catch (error) {
+        console.error('Ошибка обновления умейки:', error);
+        alert('❌ Ошибка обновления умейки');
+    }
+};
+
+// Функция для отладки localStorage
+window.debugLocalStorage = function() {
+    console.log('=== DEBUG LOCALSTORAGE ===');
+    console.log('User ID:', localStorage.getItem('umeyka_user_id'));
+    
+    // Проверяем все ключи с фото
+    const keys = Object.keys(localStorage);
+    const photoKeys = keys.filter(key => key.startsWith('skill_photo_'));
+    console.log('Ключи с фото умейок:', photoKeys);
+    
+    // Проверяем старый формат
+    try {
+        const oldPhotos = JSON.parse(localStorage.getItem('skill_photos'));
+        console.log('Старые фото (skill_photos):', oldPhotos ? Object.keys(oldPhotos) : 'нет');
+    } catch (e) {
+        console.log('Старые фото: ошибка парсинга');
+    }
+    
+    const userId = localStorage.getItem('umeyka_user_id');
+    if (userId) {
+        const userSkills = JSON.parse(localStorage.getItem(`user_${userId}_skills`));
+        console.log('ID умейок пользователя:', userSkills || []);
+    }
+};
+
+// Вызывайте эту функцию после добавления/редактирования умейки
 
     window.updateSkill = async function() {
         try {
