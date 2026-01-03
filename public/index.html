@@ -1919,6 +1919,7 @@
     <script>
     // ========== КОНФИГУРАЦИЯ API ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
+    const TELEGRAM_BOT_URL = 'https://t.me/umeyka_bot';
     let currentUserId = null;
     let currentAvatar = null;
     let currentSkillPhoto = null;
@@ -2881,30 +2882,29 @@
         `;
         
         if (phone) {
-            const cleanPhone = phone.replace(/\s/g, '');
             contactHtml += `
                 <div class="contact-item">
                     <div class="contact-icon">📞</div>
                     <div class="contact-text">${phone}</div>
-                    <button class="copy-contact" onclick="copyToClipboard('${cleanPhone}')">Копировать</button>
+                    <button class="copy-contact" onclick="copyToClipboard('${phone}')">Копировать</button>
                 </div>
             `;
-            callButton.href = `tel:${cleanPhone}`;
+            callButton.href = `tel:${phone.replace(/\s/g, '')}`;
             callButton.style.display = 'block';
         } else {
             callButton.style.display = 'none';
         }
         
         if (telegram) {
-            const telegramUsername = telegram.replace('@', '');
             contactHtml += `
                 <div class="contact-item">
                     <div class="contact-icon">✈️</div>
                     <div class="contact-text">${telegram}</div>
-                    <button class="copy-contact" onclick="copyToClipboard('${telegramUsername}')">Копировать</button>
+                    <button class="copy-contact" onclick="copyToClipboard('${telegram}')">Копировать</button>
                 </div>
             `;
             // Создаем корректную ссылку для Telegram
+            const telegramUsername = telegram.replace('@', '');
             telegramButton.href = `https://t.me/${telegramUsername}`;
             telegramButton.style.display = 'block';
         } else {
@@ -3382,7 +3382,7 @@
     };
 
     window.shareToFriend = function() {
-        const referralLink = `https://t.me/share/url?url=${encodeURIComponent('https://umeyka.app')}&text=${encodeURIComponent('Привет! Я использую отличное приложение для поиска мастеров - Umeyka. Попробуй и ты! Получи +1 звезду за регистрацию! ✨')}`;
+        const referralLink = `https://t.me/share/url?url=${encodeURIComponent(TELEGRAM_BOT_URL + '?start=' + currentUserId)}&text=${encodeURIComponent('Привет! Я использую отличное приложение для поиска мастеров - Umeyka. Попробуй и ты! Получи +1 звезду за регистрацию! ✨')}`;
         
         if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.openTelegramLink(referralLink);
@@ -3392,7 +3392,7 @@
     };
 
     window.copyReferralLink = function() {
-        const referralLink = 'https://umeyka.app?ref=' + currentUserId;
+        const referralLink = TELEGRAM_BOT_URL + '?start=' + currentUserId;
         navigator.clipboard.writeText(referralLink).then(() => {
             alert('✅ Ссылка скопирована в буфер обмена! Отправьте её другу.');
         }).catch(err => {
