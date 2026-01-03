@@ -2881,29 +2881,30 @@
         `;
         
         if (phone) {
+            const cleanPhone = phone.replace(/\s/g, '');
             contactHtml += `
                 <div class="contact-item">
                     <div class="contact-icon">📞</div>
                     <div class="contact-text">${phone}</div>
-                    <button class="copy-contact" onclick="copyToClipboard('${phone}')">Копировать</button>
+                    <button class="copy-contact" onclick="copyToClipboard('${cleanPhone}')">Копировать</button>
                 </div>
             `;
-            callButton.href = `tel:${phone.replace(/\s/g, '')}`;
+            callButton.href = `tel:${cleanPhone}`;
             callButton.style.display = 'block';
         } else {
             callButton.style.display = 'none';
         }
         
         if (telegram) {
+            const telegramUsername = telegram.replace('@', '');
             contactHtml += `
                 <div class="contact-item">
                     <div class="contact-icon">✈️</div>
                     <div class="contact-text">${telegram}</div>
-                    <button class="copy-contact" onclick="copyToClipboard('${telegram}')">Копировать</button>
+                    <button class="copy-contact" onclick="copyToClipboard('${telegramUsername}')">Копировать</button>
                 </div>
             `;
             // Создаем корректную ссылку для Telegram
-            const telegramUsername = telegram.replace('@', '');
             telegramButton.href = `https://t.me/${telegramUsername}`;
             telegramButton.style.display = 'block';
         } else {
