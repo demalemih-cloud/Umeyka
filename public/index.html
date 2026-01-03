@@ -1324,6 +1324,89 @@
             text-align: center;
             margin-top: 5px;
         }
+
+        /* Стили для кнопок связи */
+        .contact-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .call-button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .telegram-button {
+            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        /* Стили для отображения контактов */
+        .contact-info {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            color: #2d3748;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .contact-icon {
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .contact-text {
+            flex: 1;
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .copy-contact {
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -1374,6 +1457,16 @@
                 <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)">
                 <input type="text" id="skillExperience" class="input-field" placeholder="Мой опыт (например: 3 года)">
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях">
+                
+                <!-- Контактная информация -->
+                <div style="margin: 15px 0;">
+                    <div style="color: white; margin-bottom: 10px;">📞 Контактная информация для клиентов</div>
+                    <input type="text" id="skillPhone" class="input-field" placeholder="Телефон (например: +7 999 123-45-67)">
+                    <input type="text" id="skillTelegram" class="input-field" placeholder="Telegram (например: @username)">
+                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
+                        Эти данные будут видны клиентам для связи
+                    </div>
+                </div>
                 
                 <!-- Загрузка фото для умейки -->
                 <div style="margin: 15px 0;">
@@ -1764,6 +1857,13 @@
             <input type="text" id="editSkillExperience" class="input-field" placeholder="Мой опыт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
+            <!-- Контактная информация -->
+            <div style="margin: 15px 0;">
+                <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📞 Контактная информация</div>
+                <input type="text" id="editSkillPhone" class="input-field" placeholder="Телефон">
+                <input type="text" id="editSkillTelegram" class="input-field" placeholder="Telegram">
+            </div>
+            
             <!-- Загрузка фото для редактирования -->
             <div style="margin: 15px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📸 Фото вашей работы</div>
@@ -1788,6 +1888,31 @@
                 <button class="modal-button modal-save" onclick="saveEditedSkill()">💾 Сохранить</button>
                 <button class="modal-button modal-cancel" onclick="closeEditSkillModal()">Отмена</button>
             </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО КОНТАКТОВ МАСТЕРА -->
+    <div id="contactModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeContactModal()">×</button>
+            <div class="modal-title">📞 Контакты мастера</div>
+            
+            <div id="contactInfo" class="contact-info">
+                <!-- Контактная информация будет загружена динамически -->
+            </div>
+            
+            <div class="contact-buttons">
+                <a id="callButton" class="call-button" href="#" target="_blank">
+                    📞 Позвонить
+                </a>
+                <a id="telegramButton" class="telegram-button" href="#" target="_blank">
+                    ✈️ Написать в Telegram
+                </a>
+            </div>
+            
+            <button class="modal-button modal-cancel" onclick="closeContactModal()" style="margin-top: 15px;">
+                Закрыть
+            </button>
         </div>
     </div>
 
@@ -2038,9 +2163,11 @@
             const skillName = document.getElementById('skillName').value;
             const skillExperience = document.getElementById('skillExperience').value;
             const skillPrice = document.getElementById('skillPrice').value;
+            const skillPhone = document.getElementById('skillPhone').value;
+            const skillTelegram = document.getElementById('skillTelegram').value;
         
             if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
-                alert('❌ Заполните все поля');
+                alert('❌ Заполните все обязательные поля');
                 return;
             }
 
@@ -2062,6 +2189,8 @@
                 price: parseInt(skillPrice),
                 userId: userId,
                 username: userData.firstName || 'Аноним',
+                phone: skillPhone.trim() || '',
+                telegram: skillTelegram.trim() || '',
                 location: location
             };
 
@@ -2104,6 +2233,8 @@
                     document.getElementById('skillName').value = '';
                     document.getElementById('skillExperience').value = '';
                     document.getElementById('skillPrice').value = '';
+                    document.getElementById('skillPhone').value = '';
+                    document.getElementById('skillTelegram').value = '';
                     removeSkillPhoto();
                     currentSkillPhoto = null;
                 
@@ -2235,7 +2366,13 @@
                         <div class="skill-distance">🎓 ${skill.experience}</div>
                         ${skill.photo ? `
                             <div class="skill-photo">
-                                <img src="${skill.photo}" alt="Фото работы">
+                                <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+                            </div>
+                        ` : ''}
+                        ${skill.phone || skill.telegram ? `
+                            <div class="contact-info">
+                                ${skill.phone ? `<div>📞 ${skill.phone}</div>` : ''}
+                                ${skill.telegram ? `<div>✈️ ${skill.telegram}</div>` : ''}
                             </div>
                         ` : ''}
                         <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
@@ -2303,7 +2440,13 @@
                         <div style="color: #666; margin: 8px 0;">🎓 ${skill.experience}</div>
                         ${skill.photo ? `
                             <div class="skill-photo" style="height: 150px;">
-                                <img src="${skill.photo}" alt="Фото работы">
+                                <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+                            </div>
+                        ` : ''}
+                        ${skill.phone || skill.telegram ? `
+                            <div class="contact-info" style="margin: 8px 0;">
+                                ${skill.phone ? `<div style="display: flex; align-items: center; gap: 8px;"><span>📞</span><span>${skill.phone}</span></div>` : ''}
+                                ${skill.telegram ? `<div style="display: flex; align-items: center; gap: 8px;"><span>✈️</span><span>${skill.telegram}</span></div>` : ''}
                             </div>
                         ` : ''}
                         <div style="color: #666; margin: 8px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
@@ -2345,6 +2488,8 @@
                 document.getElementById('editSkillName').value = skill.skill || '';
                 document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
+                document.getElementById('editSkillPhone').value = skill.phone || '';
+                document.getElementById('editSkillTelegram').value = skill.telegram || '';
                 
                 // Сброс фото
                 editSkillPhoto = null;
@@ -2378,6 +2523,8 @@
         document.getElementById('editSkillName').value = '';
         document.getElementById('editSkillExperience').value = '';
         document.getElementById('editSkillPrice').value = '';
+        document.getElementById('editSkillPhone').value = '';
+        document.getElementById('editSkillTelegram').value = '';
         
         const preview = document.getElementById('editSkillPhotoPreview');
         preview.style.display = 'none';
@@ -2389,6 +2536,8 @@
             const skillName = document.getElementById('editSkillName').value;
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
+            const skillPhone = document.getElementById('editSkillPhone').value;
+            const skillTelegram = document.getElementById('editSkillTelegram').value;
             
             if (!skillId) {
                 alert('❌ Ошибка: не указан ID умейки');
@@ -2396,14 +2545,16 @@
             }
             
             if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
-                alert('❌ Заполните все поля');
+                alert('❌ Заполните все обязательные поля');
                 return;
             }
             
             const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
-                price: parseInt(skillPrice)
+                price: parseInt(skillPrice),
+                phone: skillPhone.trim() || '',
+                telegram: skillTelegram.trim() || ''
             };
             
             // Если загружено новое фото, добавляем его
@@ -2661,7 +2812,7 @@
                 
                 ${skill.photo ? `
                     <div class="map-skill-photo">
-                        <img src="${skill.photo}" alt="Фото работы" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px;">
+                        <img src="${skill.photo}" alt="Фото работы" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px;" onerror="this.style.display='none'">
                     </div>
                 ` : ''}
                 
@@ -2681,9 +2832,9 @@
                 </div>
                 
                 <div class="map-skill-actions">
-                    <button onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')" 
+                    <button onclick="openContactModal('${skill._id}', '${skill.skill}', '${skill.username}', '${skill.phone || ''}', '${skill.telegram || ''}')" 
                             class="map-skill-button map-contact-button">
-                        💬 Связаться
+                        📞 Контакты
                     </button>
                     ${isUserSkill ? 
                         `<button onclick="openEditSkillModal('${skill._id}')" 
@@ -2715,6 +2866,75 @@
             console.log('⏹️ Автообновление карты остановлено');
         }
     }
+
+    // ========== ФУНКЦИИ КОНТАКТОВ ==========
+
+    window.openContactModal = function(skillId, skillName, username, phone, telegram) {
+        const contactInfo = document.getElementById('contactInfo');
+        const callButton = document.getElementById('callButton');
+        const telegramButton = document.getElementById('telegramButton');
+        
+        // Формируем контактную информацию
+        let contactHtml = `
+            <h3 style="margin-bottom: 15px;">${skillName}</h3>
+            <p style="margin-bottom: 10px; color: #666;">👤 ${username}</p>
+        `;
+        
+        if (phone) {
+            contactHtml += `
+                <div class="contact-item">
+                    <div class="contact-icon">📞</div>
+                    <div class="contact-text">${phone}</div>
+                    <button class="copy-contact" onclick="copyToClipboard('${phone}')">Копировать</button>
+                </div>
+            `;
+            callButton.href = `tel:${phone.replace(/\s/g, '')}`;
+            callButton.style.display = 'block';
+        } else {
+            callButton.style.display = 'none';
+        }
+        
+        if (telegram) {
+            contactHtml += `
+                <div class="contact-item">
+                    <div class="contact-icon">✈️</div>
+                    <div class="contact-text">${telegram}</div>
+                    <button class="copy-contact" onclick="copyToClipboard('${telegram}')">Копировать</button>
+                </div>
+            `;
+            // Создаем корректную ссылку для Telegram
+            const telegramUsername = telegram.replace('@', '');
+            telegramButton.href = `https://t.me/${telegramUsername}`;
+            telegramButton.style.display = 'block';
+        } else {
+            telegramButton.style.display = 'none';
+        }
+        
+        if (!phone && !telegram) {
+            contactHtml += '<p style="color: #999; text-align: center;">Контактная информация не указана</p>';
+        }
+        
+        contactInfo.innerHTML = contactHtml;
+        document.getElementById('contactModal').style.display = 'flex';
+    };
+
+    window.closeContactModal = function() {
+        document.getElementById('contactModal').style.display = 'none';
+    };
+
+    window.copyToClipboard = function(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('✅ Скопировано в буфер обмена: ' + text);
+        }).catch(err => {
+            alert('❌ Не удалось скопировать');
+        });
+    };
+
+    // Старая функция для обратной совместимости
+    window.contactMaster = function(skillId, skillName, username) {
+        // Используем новую функцию с модальным окном
+        openContactModal(skillId, skillName, username, '', '');
+    };
 
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
 
@@ -2837,7 +3057,7 @@
         }
     });
 
-    // Остальные функции...
+    // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 
     window.checkAllSkills = function() {
         loadAllSkillsFromServer().then(skills => {
@@ -2847,6 +3067,61 @@
 
     window.forceLoadMySkills = function() {
         loadMySkills();
+    };
+
+    window.searchSkills = async function() {
+        const searchQuery = document.getElementById('searchInput').value.trim();
+        const searchResults = document.getElementById('searchResults');
+        
+        if (!searchQuery) {
+            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос</div>';
+            return;
+        }
+        
+        searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
+        
+        try {
+            const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`);
+            const result = await response.json();
+            
+            if (result.success && result.skills.length > 0) {
+                searchResults.innerHTML = result.skills.map(skill => `
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-title">${skill.skill}</div>
+                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                        </div>
+                        <div class="skill-price">${skill.price} ₽</div>
+                        <div class="skill-distance">🎓 ${skill.experience}</div>
+                        ${skill.photo ? `
+                            <div class="skill-photo">
+                                <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+                            </div>
+                        ` : ''}
+                        <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
+                        <button class="chat-button" onclick="openContactModal('${skill._id}', '${skill.skill}', '${skill.username}', '${skill.phone || ''}', '${skill.telegram || ''}')">
+                            📞 Контакты
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                searchResults.innerHTML = `
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
+                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос</div>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Ошибка поиска:', error);
+            searchResults.innerHTML = `
+                <div class="error-message">
+                    ❌ Ошибка поиска<br>
+                    <small>Проверьте подключение к интернету</small>
+                </div>
+            `;
+        }
     };
 
     // ========== ФУНКЦИИ ПРОФИЛЯ ==========
@@ -2887,80 +3162,6 @@
             </div>
         `;
     }
-
-    // ========== ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ ==========
-
-    window.contactMaster = function(skillId, skillName, username) {
-        const tg = window.Telegram?.WebApp;
-        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-        
-        const message = `👋 Привет! Я заинтересован(а) в вашей услуге "${skillName}" в Umeyka.\n\nМеня зовут: ${userData.firstName || 'Пользователь'}`;
-        
-        if (tg) {
-            tg.openTelegramLink(`tg://msg?text=${encodeURIComponent(message)}`);
-        } else {
-            navigator.clipboard.writeText(message).then(() => {
-                alert('📋 Сообщение скопировано в буфер обмена. Отправьте его мастеру в Telegram: ' + username);
-            });
-        }
-    };
-
-    window.searchSkills = async function() {
-        const searchQuery = document.getElementById('searchInput').value.trim();
-        const searchResults = document.getElementById('searchResults');
-        
-        if (!searchQuery) {
-            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос</div>';
-            return;
-        }
-        
-        searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
-        
-        try {
-            const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`);
-            const result = await response.json();
-            
-            if (result.success && result.skills.length > 0) {
-                searchResults.innerHTML = result.skills.map(skill => `
-                    <div class="skill-card">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                        </div>
-                        <div class="skill-price">${skill.price} ₽</div>
-                        <div class="skill-distance">🎓 ${skill.experience}</div>
-                        ${skill.photo ? `
-                            <div class="skill-photo">
-                                <img src="${skill.photo}" alt="Фото работы">
-                            </div>
-                        ` : ''}
-                        <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
-                        <button class="chat-button" onclick="contactMaster('${skill._id}', '${skill.skill}', '${skill.username}')">
-                            💬 Связаться
-                        </button>
-                    </div>
-                `).join('');
-            } else {
-                searchResults.innerHTML = `
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
-                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос</div>
-                    </div>
-                `;
-            }
-        } catch (error) {
-            console.error('Ошибка поиска:', error);
-            searchResults.innerHTML = `
-                <div class="error-message">
-                    ❌ Ошибка поиска<br>
-                    <small>Проверьте подключение к интернету</small>
-                </div>
-            `;
-        }
-    };
-
-    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (заглушки) ==========
 
     window.editProfile = function() {
         const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
