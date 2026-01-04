@@ -1407,69 +1407,6 @@
             font-size: 12px;
             cursor: pointer;
         }
-
-        /* Стили для фотографии в попапе карты */
-        .popup-photo {
-            margin: 10px 0;
-            border-radius: 8px;
-            overflow: hidden;
-            max-height: 150px;
-        }
-
-        .popup-photo img {
-            width: 100%;
-            height: auto;
-            object-fit: cover;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .popup-photo img:hover {
-            transform: scale(1.05);
-        }
-
-        /* Стили для увеличенного просмотра фото */
-        .photo-viewer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 3000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .photo-viewer img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 10px;
-        }
-
-        .photo-viewer-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .photo-viewer-close:hover {
-            background: rgba(255,255,255,0.3);
-        }
     </style>
 </head>
 <body>
@@ -1979,12 +1916,6 @@
         </div>
     </div>
 
-    <!-- ОКНО ПРОСМОТРА ФОТО -->
-    <div id="photoViewer" class="photo-viewer" style="display: none;">
-        <button class="photo-viewer-close" onclick="closePhotoViewer()">×</button>
-        <img id="viewerPhoto" src="" alt="Фото работы">
-    </div>
-
     <script>
     // ========== КОНФИГУРАЦИЯ API ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
@@ -2434,7 +2365,7 @@
                         <div class="skill-price">${skill.price} ₽</div>
                         <div class="skill-distance">🎓 ${skill.experience}</div>
                         ${skill.photo ? `
-                            <div class="skill-photo" onclick="viewPhoto('${skill.photo}', '${skill.skill}')">
+                            <div class="skill-photo">
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
                             </div>
                         ` : ''}
@@ -2508,7 +2439,7 @@
                         </div>
                         <div style="color: #666; margin: 8px 0;">🎓 ${skill.experience}</div>
                         ${skill.photo ? `
-                            <div class="skill-photo" style="height: 150px;" onclick="viewPhoto('${skill.photo}', '${skill.skill}')">
+                            <div class="skill-photo" style="height: 150px;">
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
                             </div>
                         ` : ''}
@@ -2880,8 +2811,8 @@
                 </div>
                 
                 ${skill.photo ? `
-                    <div class="popup-photo" onclick="viewPhoto('${skill.photo}', '${skill.skill}')">
-                        <img src="${skill.photo}" alt="Фото работы" style="width: 100%; height: auto; object-fit: cover; border-radius: 8px;" onerror="this.style.display='none'">
+                    <div class="map-skill-photo">
+                        <img src="${skill.photo}" alt="Фото работы" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px;" onerror="this.style.display='none'">
                     </div>
                 ` : ''}
                 
@@ -2999,57 +2930,10 @@
         });
     };
 
-    // ========== ФУНКЦИИ ПРОСМОТРА ФОТО ==========
-
-    window.viewPhoto = function(photoUrl, title) {
-        const viewer = document.getElementById('photoViewer');
-        const photo = document.getElementById('viewerPhoto');
-        
-        photo.src = photoUrl;
-        photo.alt = title || 'Фото работы';
-        viewer.style.display = 'flex';
-    };
-
-    window.closePhotoViewer = function() {
-        document.getElementById('photoViewer').style.display = 'none';
-        document.getElementById('viewerPhoto').src = '';
-    };
-
     // Старая функция для обратной совместимости
     window.contactMaster = function(skillId, skillName, username) {
         // Используем новую функцию с модальным окном
         openContactModal(skillId, skillName, username, '', '');
-    };
-
-    // ========== ФУНКЦИИ РЕФЕРАЛЬНОЙ ПРОГРАММЫ ==========
-
-    window.shareToFriend = function() {
-        const botLink = "https://t.me/umeyka_bot";
-        const referralText = encodeURIComponent(`Привет! Я использую отличное приложение для поиска мастеров - Umeyka! 🛠️✨
-
-Тут можно найти мастеров на все руки: сантехников, электриков, строителей и многих других. Все проверенные мастера с рейтингом и отзывами!
-
-Переходи в бот и получи +1 звезду за регистрацию по моей ссылке:
-${botLink}
-
-#умейка #мастера #сервис`);
-
-        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${referralText}`;
-
-        if (window.Telegram?.WebApp) {
-            window.Telegram.WebApp.openTelegramLink(shareUrl);
-        } else {
-            window.open(shareUrl, '_blank');
-        }
-    };
-
-    window.copyReferralLink = function() {
-        const referralLink = "https://t.me/umeyka_bot";
-        navigator.clipboard.writeText(referralLink).then(() => {
-            alert('✅ Ссылка на бот скопирована в буфер обмена! Отправьте её другу.');
-        }).catch(err => {
-            alert('❌ Не удалось скопировать ссылку');
-        });
     };
 
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
@@ -3210,7 +3094,7 @@ ${botLink}
                         <div class="skill-price">${skill.price} ₽</div>
                         <div class="skill-distance">🎓 ${skill.experience}</div>
                         ${skill.photo ? `
-                            <div class="skill-photo" onclick="viewPhoto('${skill.photo}', '${skill.skill}')">
+                            <div class="skill-photo">
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
                             </div>
                         ` : ''}
@@ -3494,6 +3378,28 @@ ${botLink}
         console.log('Создана сделка:', dealData);
         
         showProfileSection();
+    };
+
+    // ========== ИЗМЕНЕННЫЕ ФУНКЦИИ РЕФЕРАЛЬНОЙ ПРОГРАММЫ ==========
+    window.shareToFriend = function() {
+        const botLink = 'https://t.me/umeyka_bot';
+        const shareText = encodeURIComponent('Привет! Я использую отличное приложение для поиска мастеров - Umeyka. Попробуй и ты! Получи +1 звезду за регистрацию! ✨\n\n' + botLink);
+        const referralLink = `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${shareText}`;
+        
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.openTelegramLink(referralLink);
+        } else {
+            window.open(referralLink, '_blank');
+        }
+    };
+
+    window.copyReferralLink = function() {
+        const botLink = 'https://t.me/umeyka_bot';
+        navigator.clipboard.writeText(botLink).then(() => {
+            alert('✅ Ссылка на бот Umeyka скопирована в буфер обмена!\n\nОтправьте её другу, чтобы он мог присоединиться к проекту.');
+        }).catch(err => {
+            alert('❌ Не удалось скопировать ссылку');
+        });
     };
 
     window.closeChat = function() {
