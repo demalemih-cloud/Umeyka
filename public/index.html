@@ -1559,6 +1559,7 @@
                     </div>
                     
                     <div class="referral-buttons">
+                        <!-- Измененные кнопки реферальной программы -->
                         <button class="referral-button share-button" onclick="shareToFriend()">
                             📤 Отправить другу
                         </button>
@@ -1919,7 +1920,6 @@
     <script>
     // ========== КОНФИГУРАЦИЯ API ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
-    const TELEGRAM_BOT_URL = 'https://t.me/umeyka_bot';
     let currentUserId = null;
     let currentAvatar = null;
     let currentSkillPhoto = null;
@@ -3099,6 +3099,12 @@
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
                             </div>
                         ` : ''}
+                        ${skill.phone || skill.telegram ? `
+                            <div class="contact-info">
+                                ${skill.phone ? `<div>📞 ${skill.phone}</div>` : ''}
+                                ${skill.telegram ? `<div>✈️ ${skill.telegram}</div>` : ''}
+                            </div>
+                        ` : ''}
                         <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
                         <button class="chat-button" onclick="openContactModal('${skill._id}', '${skill.skill}', '${skill.username}', '${skill.phone || ''}', '${skill.telegram || ''}')">
                             📞 Контакты
@@ -3381,20 +3387,24 @@
         showProfileSection();
     };
 
+    // ========== РЕФЕРАЛЬНЫЕ КНОПКИ - ПЕРЕНАПРАВЛЕНИЕ В БОТ ==========
+
     window.shareToFriend = function() {
-        const referralLink = `https://t.me/share/url?url=${encodeURIComponent(TELEGRAM_BOT_URL + '?start=' + currentUserId)}&text=${encodeURIComponent('Привет! Я использую отличное приложение для поиска мастеров - Umeyka. Попробуй и ты! Получи +1 звезду за регистрацию! ✨')}`;
+        const botUrl = 'https://t.me/umeyka_bot';
+        const message = 'Привет! Я использую отличное приложение для поиска мастеров - Umeyka. Попробуй и ты! Получи +1 звезду за регистрацию! ✨';
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botUrl)}&text=${encodeURIComponent(message)}`;
         
         if (window.Telegram?.WebApp) {
-            window.Telegram.WebApp.openTelegramLink(referralLink);
+            window.Telegram.WebApp.openTelegramLink(shareUrl);
         } else {
-            window.open(referralLink, '_blank');
+            window.open(shareUrl, '_blank');
         }
     };
 
     window.copyReferralLink = function() {
-        const referralLink = TELEGRAM_BOT_URL + '?start=' + currentUserId;
-        navigator.clipboard.writeText(referralLink).then(() => {
-            alert('✅ Ссылка скопирована в буфер обмена! Отправьте её другу.');
+        const botLink = 'https://t.me/umeyka_bot';
+        navigator.clipboard.writeText(botLink).then(() => {
+            alert('✅ Ссылка на бот скопирована в буфер обмена! Отправьте её другу.');
         }).catch(err => {
             alert('❌ Не удалось скопировать ссылку');
         });
