@@ -1491,18 +1491,6 @@
                 <button class="submit-button" onclick="addSkill()">✅ Опубликовать умейку</button>
                 
                 <div id="mySkillsList" style="margin-top: 20px;"></div>
-                
-               <!-- Кнопки отладки -->
-               <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button onclick="checkAllSkills()" 
-                            style="flex: 1; padding: 12px; background: #9f7aea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
-                       🔍 Проверить сервер
-                    </button>
-                    <button onclick="forceLoadMySkills()" 
-                            style="flex: 1; padding: 12px; background: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
-                        🔄 Обновить список
-                    </button>
-                </div>
             </div>
         </div>
 
@@ -2053,7 +2041,7 @@
             img.src = currentSkillPhoto;
             preview.style.display = 'block';
             
-            statusElement.textContent = `✅ Фото сжато до ${compressed.compressedSize.toFixed(2)}KB`;
+            statusElement.textContent = `✅ Фото сжато до ${(compressed.compressedSize / 1024).toFixed(2)}MB`;
             statusElement.style.color = '#48bb78';
             
             setTimeout(() => {
@@ -2119,7 +2107,7 @@
             img.src = editSkillPhoto;
             preview.style.display = 'block';
             
-            statusElement.textContent = `✅ Фото сжато до ${compressed.compressedSize.toFixed(2)}KB`;
+            statusElement.textContent = `✅ Фото сжато до ${(compressed.compressedSize / 1024).toFixed(2)}MB`;
             statusElement.style.color = '#48bb78';
             
             setTimeout(() => {
@@ -2195,11 +2183,11 @@
             };
 
             if (currentSkillPhoto) {
-                const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
-                console.log(`📊 Размер фото для отправки: ${estimatedSize.toFixed(2)}KB`);
+                const estimatedSize = (currentSkillPhoto.length * 0.75) / (1024 * 1024); // MB
+                console.log(`📊 Размер фото для отправки: ${estimatedSize.toFixed(2)}MB`);
                 
-                if (estimatedSize > 500) {
-                    alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}KB).\nПопробуйте загрузить фото меньшего размера.`);
+                if (estimatedSize > 1) {
+                    alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}MB).\nПожалуйста, загрузите фото до 1MB.`);
                     return;
                 }
                 
@@ -2262,8 +2250,8 @@
             console.error('Ошибка добавления умейки:', error);
             
             if (currentSkillPhoto) {
-                const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
-                if (estimatedSize > 500) {
+                const estimatedSize = (currentSkillPhoto.length * 0.75) / (1024 * 1024);
+                if (estimatedSize > 1) {
                     alert('❌ Фото слишком большое. Пожалуйста, загрузите фото меньшего размера (до 1MB) и попробуйте еще раз.');
                 } else {
                     alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету и попробуйте еще раз.');
@@ -2559,9 +2547,9 @@
             
             // Если загружено новое фото, добавляем его
             if (editSkillPhoto) {
-                const estimatedSize = (editSkillPhoto.length * 0.75) / 1024;
-                if (estimatedSize > 500) {
-                    alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}KB).\nПопробуйте загрузить фото меньшего размера.`);
+                const estimatedSize = (editSkillPhoto.length * 0.75) / (1024 * 1024);
+                if (estimatedSize > 1) {
+                    alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}MB).\nПожалуйста, загрузите фото до 1MB.`);
                     return;
                 }
                 
