@@ -269,6 +269,15 @@
             margin-bottom: 15px;
         }
         
+        .skill-contact {
+            font-size: 14px;
+            color: #667eea;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
         .chat-button {
             width: 100%;
             padding: 15px;
@@ -1407,34 +1416,6 @@
             font-size: 12px;
             cursor: pointer;
         }
-
-        /* Стили для контактной информации в карточке */
-        .skill-contact {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border-left: 3px solid #667eea;
-        }
-
-        .contact-line {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 8px 0;
-            color: #2d3748;
-        }
-
-        .contact-label {
-            font-weight: 600;
-            min-width: 70px;
-            color: #667eea;
-        }
-
-        .contact-value {
-            flex: 1;
-            word-break: break-all;
-        }
     </style>
 </head>
 <body>
@@ -1488,9 +1469,9 @@
                 
                 <!-- Контактная информация -->
                 <div style="margin: 15px 0;">
-                    <div style="color: white; margin-bottom: 10px;">📞 Контактная информация для клиентов</div>
+                    <div style="color: white; margin-bottom: 10px;">📞 Контактная информация</div>
                     <input type="text" id="skillPhone" class="input-field" placeholder="Телефон (например: +7 999 123-45-67)">
-                    <input type="text" id="skillTelegram" class="input-field" placeholder="Текст (например: Напишите мне в Telegram)">
+                    <input type="text" id="skillTelegram" class="input-field" placeholder="Текст">
                     <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
                         Эти данные будут видны клиентам для связи
                     </div>
@@ -2392,32 +2373,24 @@
                             <div class="skill-rating">${'⭐'.repeat(5)}</div>
                         </div>
                         <div class="skill-price">${skill.price} ₽</div>
-                        
-                        ${skill.phone || skill.telegram ? `
+                        ${skill.phone ? `
                             <div class="skill-contact">
-                                ${skill.phone ? `
-                                    <div class="contact-line">
-                                        <span class="contact-label">📞 Телефон:</span>
-                                        <span class="contact-value">${skill.phone}</span>
-                                    </div>
-                                ` : ''}
-                                ${skill.telegram ? `
-                                    <div class="contact-line">
-                                        <span class="contact-label">✉️ Текст:</span>
-                                        <span class="contact-value">${skill.telegram}</span>
-                                    </div>
-                                ` : ''}
+                                <span>📞</span>
+                                <span>${skill.phone}</span>
                             </div>
                         ` : ''}
-                        
+                        ${skill.telegram ? `
+                            <div class="skill-contact">
+                                <span>✍️</span>
+                                <span>${skill.telegram}</span>
+                            </div>
+                        ` : ''}
                         <div class="skill-distance">🎓 ${skill.experience}</div>
-                        
                         ${skill.photo ? `
                             <div class="skill-photo">
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
                             </div>
                         ` : ''}
-                        
                         <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
                         <div style="color: #48bb78; font-size: 14px; margin-bottom: 10px;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
@@ -2480,32 +2453,24 @@
                             <div class="skill-title">${skill.skill}</div>
                             <div class="skill-price">${skill.price} ₽</div>
                         </div>
-                        
-                        ${skill.phone || skill.telegram ? `
-                            <div class="skill-contact" style="margin: 8px 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
-                                ${skill.phone ? `
-                                    <div class="contact-line" style="font-size: 14px;">
-                                        <span style="font-weight: 600; color: #667eea;">📞 Телефон:</span>
-                                        <span>${skill.phone}</span>
-                                    </div>
-                                ` : ''}
-                                ${skill.telegram ? `
-                                    <div class="contact-line" style="font-size: 14px;">
-                                        <span style="font-weight: 600; color: #667eea;">✉️ Текст:</span>
-                                        <span>${skill.telegram}</span>
-                                    </div>
-                                ` : ''}
+                        ${skill.phone ? `
+                            <div class="skill-contact" style="margin: 5px 0;">
+                                <span>📞</span>
+                                <span>${skill.phone}</span>
                             </div>
                         ` : ''}
-                        
+                        ${skill.telegram ? `
+                            <div class="skill-contact" style="margin: 5px 0;">
+                                <span>✍️</span>
+                                <span>${skill.telegram}</span>
+                            </div>
+                        ` : ''}
                         <div style="color: #666; margin: 8px 0;">🎓 ${skill.experience}</div>
-                        
                         ${skill.photo ? `
                             <div class="skill-photo" style="height: 150px;">
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
                             </div>
                         ` : ''}
-                        
                         <div style="color: #666; margin: 8px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
                         <div style="color: #48bb78; font-size: 12px; margin: 8px 0;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
@@ -2882,24 +2847,18 @@
                         <span style="color: #667eea;">💰</span>
                         <span><strong>${skill.price} руб.</strong></span>
                     </p>
-                    
-                    ${skill.phone || skill.telegram ? `
-                        <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin: 10px 0; border-left: 3px solid #667eea;">
-                            ${skill.phone ? `
-                                <p style="margin: 4px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
-                                    <span style="color: #667eea;">📞</span>
-                                    <span>${skill.phone}</span>
-                                </p>
-                            ` : ''}
-                            ${skill.telegram ? `
-                                <p style="margin: 4px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
-                                    <span style="color: #667eea;">✉️</span>
-                                    <span>${skill.telegram}</span>
-                                </p>
-                            ` : ''}
-                        </div>
+                    ${skill.phone ? `
+                        <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: #667eea;">📞</span>
+                            <span>${skill.phone}</span>
+                        </p>
                     ` : ''}
-                    
+                    ${skill.telegram ? `
+                        <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
+                            <span style="color: #667eea;">✍️</span>
+                            <span>${skill.telegram}</span>
+                        </p>
+                    ` : ''}
                     <p style="margin: 6px 0; color: #2d3748; display: flex; align-items: center; gap: 8px;">
                         <span style="color: #667eea;">⭐</span>
                         <span>Рейтинг: <strong>${rating.toFixed(1)}/5</strong></span>
@@ -2972,15 +2931,12 @@
         if (telegram) {
             contactHtml += `
                 <div class="contact-item">
-                    <div class="contact-icon">✈️</div>
+                    <div class="contact-icon">✍️</div>
                     <div class="contact-text">${telegram}</div>
                     <button class="copy-contact" onclick="copyToClipboard('${telegram}')">Копировать</button>
                 </div>
             `;
-            // Создаем корректную ссылку для Telegram
-            const telegramUsername = telegram.replace('@', '');
-            telegramButton.href = `https://t.me/${telegramUsername}`;
-            telegramButton.style.display = 'block';
+            telegramButton.style.display = 'none';
         } else {
             telegramButton.style.display = 'none';
         }
@@ -3167,32 +3123,24 @@
                             <div class="skill-rating">${'⭐'.repeat(5)}</div>
                         </div>
                         <div class="skill-price">${skill.price} ₽</div>
-                        
-                        ${skill.phone || skill.telegram ? `
+                        ${skill.phone ? `
                             <div class="skill-contact">
-                                ${skill.phone ? `
-                                    <div class="contact-line">
-                                        <span class="contact-label">📞 Телефон:</span>
-                                        <span class="contact-value">${skill.phone}</span>
-                                    </div>
-                                ` : ''}
-                                ${skill.telegram ? `
-                                    <div class="contact-line">
-                                        <span class="contact-label">✉️ Текст:</span>
-                                        <span class="contact-value">${skill.telegram}</span>
-                                    </div>
-                                ` : ''}
+                                <span>📞</span>
+                                <span>${skill.phone}</span>
                             </div>
                         ` : ''}
-                        
+                        ${skill.telegram ? `
+                            <div class="skill-contact">
+                                <span>✍️</span>
+                                <span>${skill.telegram}</span>
+                            </div>
+                        ` : ''}
                         <div class="skill-distance">🎓 ${skill.experience}</div>
-                        
                         ${skill.photo ? `
                             <div class="skill-photo">
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
                             </div>
                         ` : ''}
-                        
                         <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
                         <button class="chat-button" onclick="openContactModal('${skill._id}', '${skill.skill}', '${skill.username}', '${skill.phone || ''}', '${skill.telegram || ''}')">
                             📞 Контакты
