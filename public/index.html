@@ -1900,6 +1900,31 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО КОНТАКТОВ МАСТЕРА -->
+    <div id="contactModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeContactModal()">×</button>
+            <div class="modal-title">📞 Контакты мастера</div>
+            
+            <div id="contactInfo" class="contact-info">
+                <!-- Контактная информация будет загружена динамически -->
+            </div>
+            
+            <div class="contact-buttons">
+                <a id="callButton" class="call-button" href="#" target="_blank">
+                    📞 Позвонить
+                </a>
+                <a id="telegramButton" class="telegram-button" href="#" target="_blank">
+                    ✈️ Написать в Telegram
+                </a>
+            </div>
+            
+            <button class="modal-button modal-cancel" onclick="closeContactModal()" style="margin-top: 15px;">
+                Закрыть
+            </button>
+        </div>
+    </div>
+
     <script>
     // ========== КОНФИГУРАЦИЯ API ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
@@ -2840,15 +2865,15 @@
                     </p>
                 </div>
                 
-                ${isUserSkill ? 
-                    `<div class="map-skill-actions">
-                        <button onclick="openEditSkillModal('${skill._id}')" 
+                <div class="map-skill-actions">
+                    ${isUserSkill ? 
+                        `<button onclick="openEditSkillModal('${skill._id}')" 
                                 class="map-skill-button map-edit-button">
                             ✏️ Редактировать
-                        </button>
-                    </div>` : 
-                    ''
-                }
+                        </button>` : 
+                        ''
+                    }
+                </div>
             </div>
         `;
     }
@@ -2871,6 +2896,73 @@
             console.log('⏹️ Автообновление карты остановлено');
         }
     }
+
+    // ========== ФУНКЦИИ КОНТАКТОВ ==========
+
+    window.openContactModal = function(skillId, skillName, username, phone, telegram) {
+        const contactInfo = document.getElementById('contactInfo');
+        const callButton = document.getElementById('callButton');
+        const telegramButton = document.getElementById('telegramButton');
+        
+        // Формируем контактную информацию
+        let contactHtml = `
+            <h3 style="margin-bottom: 15px;">${skillName}</h3>
+            <p style="margin-bottom: 10px; color: #666;">👤 ${username}</p>
+        `;
+        
+        if (phone) {
+            contactHtml += `
+                <div class="contact-item">
+                    <div class="contact-icon">📞</div>
+                    <div class="contact-text">${phone}</div>
+                    <button class="copy-contact" onclick="copyToClipboard('${phone}')">Копировать</button>
+                </div>
+            `;
+            callButton.href = `tel:${phone.replace(/\s/g, '')}`;
+            callButton.style.display = 'block';
+        } else {
+            callButton.style.display = 'none';
+        }
+        
+        if (telegram) {
+            contactHtml += `
+                <div class="contact-item">
+                    <div class="contact-icon">✍️</div>
+                    <div class="contact-text">${telegram}</div>
+                    <button class="copy-contact" onclick="copyToClipboard('${telegram}')">Копировать</button>
+                </div>
+            `;
+            telegramButton.href = `https://t.me/${telegram.replace('@', '')}`;
+            telegramButton.style.display = 'block';
+        } else {
+            telegramButton.style.display = 'none';
+        }
+        
+        if (!phone && !telegram) {
+            contactHtml += '<p style="color: #999; text-align: center;">Контактная информация не указана</p>';
+        }
+        
+        contactInfo.innerHTML = contactHtml;
+        document.getElementById('contactModal').style.display = 'flex';
+    };
+
+    window.closeContactModal = function() {
+        document.getElementById('contactModal').style.display = 'none';
+    };
+
+    window.copyToClipboard = function(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert('✅ Скопировано в буфер обмена: ' + text);
+        }).catch(err => {
+            alert('❌ Не удалось скопировать');
+        });
+    };
+
+    // Старая функция для обратной совместимости
+    window.contactMaster = function(skillId, skillName, username) {
+        // Используем новую функцию с модальным окном
+        openContactModal(skillId, skillName, username, '', '');
+    };
 
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
 
@@ -3047,6 +3139,9 @@
                             </div>
                         ` : ''}
                         <div style="color: #666; margin-bottom: 15px;">👤 ${skill.username}</div>
+                        <div style="color: #48bb78; font-size: 14px; margin-bottom: 10px;">
+                            👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
+                        </div>
                     </div>
                 `).join('');
             } else {
