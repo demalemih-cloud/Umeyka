@@ -433,7 +433,6 @@
             font-weight: bold;
         }
 
-        /* Стили для чатов */
         .chat-item {
             background: rgba(255,255,255,0.9);
             color: #2d3748;
@@ -443,8 +442,9 @@
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
-            flex-direction: column;
-            gap: 5px;
+            align-items: center;
+            gap: 12px;
+            position: relative;
         }
 
         .chat-item:hover {
@@ -452,23 +452,10 @@
             transform: translateX(5px);
         }
 
-        .chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
         .chat-partner {
             font-weight: bold;
             margin-bottom: 5px;
             color: #2d3748;
-            font-size: 16px;
-        }
-
-        .chat-skill {
-            font-size: 14px;
-            color: #667eea;
-            margin-bottom: 5px;
         }
 
         .chat-preview {
@@ -477,12 +464,14 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            flex: 1;
         }
 
         .chat-time {
             font-size: 12px;
             color: #999;
             text-align: right;
+            min-width: 50px;
         }
 
         .unread-badge {
@@ -495,184 +484,7 @@
             align-items: center;
             justify-content: center;
             font-size: 12px;
-        }
-
-        /* Стили для сообщений в чате */
-        .message-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .message {
-            padding: 12px 16px;
-            border-radius: 15px;
-            max-width: 80%;
-            word-wrap: break-word;
-            position: relative;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .message-incoming {
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-            align-self: flex-start;
-            border-bottom-left-radius: 5px;
-        }
-
-        .message-outgoing {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
-        }
-
-        .message-text {
-            margin-bottom: 5px;
-        }
-
-        .message-time {
-            font-size: 11px;
-            opacity: 0.7;
-            text-align: right;
-        }
-
-        .message-sender {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            opacity: 0.9;
-        }
-
-        .no-chats {
-            text-align: center;
-            padding: 40px 20px;
-            color: rgba(255,255,255,0.7);
-        }
-
-        .no-chats-icon {
-            font-size: 50px;
-            margin-bottom: 20px;
-        }
-
-        .no-chats-text {
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-
-        .start-chat-button {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 15px;
-            display: inline-block;
-        }
-
-        /* Стили для чат-окна */
-        .chat-window {
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 180px);
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .chat-input-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid rgba(102, 126, 234, 0.3);
-            border-radius: 12px;
-            font-size: 16px;
-            background: white;
-            transition: all 0.3s ease;
-        }
-
-        .chat-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .send-button {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            min-width: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .send-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Анимации */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .pulse {
-            animation: pulse 0.5s ease;
-        }
-
-        /* Стили для новой кнопки "Написать сообщение" */
-        .message-button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .message-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+            flex-shrink: 0;
         }
 
         .stats-grid {
@@ -883,6 +695,30 @@
             background: rgba(72, 187, 120, 0.1);
         }
 
+        /* Стили для сообщений в чате */
+        .chat-message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .my-message {
+            margin-left: auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .other-message {
+            margin-right: auto;
+            background: #f1f1f1;
+            color: #2d3748;
+            border-bottom-left-radius: 5px;
+        }
+
         .chat-message-sender {
             font-size: 12px;
             color: #667eea;
@@ -892,6 +728,13 @@
 
         .my-message .chat-message-sender {
             color: #48bb78;
+            text-align: right;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
             text-align: right;
         }
 
@@ -1227,6 +1070,71 @@
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             border: 2px solid rgba(255,255,255,0.5);
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
+        }
+
+        /* Стили для сообщений чата */
+        .chat-message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        #chatMessages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        #messageInput:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Кнопка отправки сообщения */
+        #chatWindow .submit-button {
+            width: auto;
+            padding: 15px 25px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #chatWindow .submit-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+        
+        /* Заголовок чата */
+        #chatTitle {
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
         }
 
         /* Стили для фото в карточке */
@@ -1569,6 +1477,91 @@
             font-size: 12px;
             cursor: pointer;
         }
+
+        /* Стили для аватара в чате */
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .chat-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Стили для индикатора набора текста */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 5px 0;
+            opacity: 0.7;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        /* Стили для приветственного сообщения */
+        .welcome-message {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #dee2e6;
+        }
+
+        /* Стили для кнопки "Написать сообщение" */
+        .message-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .message-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -1744,6 +1737,7 @@
                     </button>
                     <button class="tab-button" onclick="showProfileTab('chats')" id="chatsTab">
                         💬 Чаты
+                        <span id="unreadChatsCount" class="unread-badge" style="display: none;">0</span>
                     </button>
                 </div>
                 
@@ -1793,7 +1787,12 @@
                 <!-- Мои чаты -->
                 <div id="profileChats" class="profile-tab" style="display: none;">
                     <h3 style="margin-bottom: 15px;">💬 Активные чаты</h3>
-                    <div id="userChatsList"></div>
+                    <div id="userChatsList">
+                        <div class="welcome-message">
+                            💬 Здесь будут отображаться ваши чаты с другими пользователями.<br>
+                            Начните общение с мастером или клиентом!
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Ссылки на каналы -->
@@ -1995,15 +1994,20 @@
             <div class="form-section">
                 <h2 id="chatTitle" style="margin-bottom: 20px; text-align: center;">💬 Чат</h2>
                 
-                <div class="chat-window">
-                    <div id="chatMessages" class="chat-messages">
-                        <!-- Сообщения будут загружаться здесь -->
-                    </div>
-                    
-                    <div class="chat-input-container">
-                        <input type="text" id="messageInput" class="chat-input" placeholder="Введите сообщение..." onkeypress="handleChatKeyPress(event)">
-                        <button id="sendButton" class="send-button" onclick="sendChatMessage()">📤</button>
-                    </div>
+                <div id="chatMessages" style="height: 300px; overflow-y: auto; margin-bottom: 20px; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px;">
+                    <!-- Сообщения чата будут загружены динамически -->
+                </div>
+                
+                <div id="typingIndicator" class="typing-indicator" style="display: none; margin-bottom: 10px;">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="messageInput" class="input-field" placeholder="Введите сообщение..." 
+                           onkeypress="handleMessageKeyPress(event)" style="flex: 1;">
+                    <button class="submit-button" onclick="sendChatMessage()" style="width: auto; padding: 15px 20px;">📤</button>
                 </div>
             </div>
         </div>
@@ -2072,6 +2076,9 @@
                 <a id="telegramButton" class="telegram-button" href="#" target="_blank">
                     ✈️ Написать в Telegram
                 </a>
+                <button id="messageButton" class="message-button" onclick="startChatFromContact()">
+                    💬 Написать сообщение
+                </button>
             </div>
             
             <button class="modal-button modal-cancel" onclick="closeContactModal()" style="margin-top: 15px;">
@@ -2084,8 +2091,8 @@
     // ========== КОНФИГУРАЦИЯ API ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
     const TELEGRAM_BOT_URL = 'https://t.me/umeyka_bot';
-    
     let currentUserId = null;
+    let currentUserName = 'Пользователь';
     let currentAvatar = null;
     let currentSkillPhoto = null;
     let editSkillPhoto = null;
@@ -2100,12 +2107,15 @@
     let mapRefreshInterval = null;
     let currentEditingSkill = null;
     
-    // Переменные для чатов
+    // Переменные для системы чатов
     let currentChatId = null;
     let currentChatPartner = null;
-    let currentChatPartnerId = null;
-    let currentChatSkillId = null;
+    let currentChatPartnerName = null;
     let chatPollingInterval = null;
+    let unreadMessagesCount = 0;
+    let userChats = [];
+    let isTyping = false;
+    let typingTimeout = null;
 
     // ========== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ==========
 
@@ -2197,53 +2207,118 @@
 
     // ========== СИСТЕМА ЧАТОВ ==========
 
-    // Функция для создания или получения существующего чата
-    async function startChat(partnerId, partnerName, skillId, skillName) {
+    // Инициализация системы чатов
+    function initializeChatSystem() {
+        console.log('💬 Инициализация системы чатов');
+        
+        // Загружаем чаты пользователя
+        loadUserChats();
+        
+        // Запускаем опрос новых сообщений
+        startChatPolling();
+        
+        // Загружаем счетчик непрочитанных сообщений
+        updateUnreadMessagesCount();
+    }
+
+    // Загрузка чатов пользователя
+    async function loadUserChats() {
         try {
-            console.log('💬 Начинаю чат с:', partnerName, 'ID:', partnerId, 'Skill ID:', skillId);
+            if (!currentUserId) return;
             
-            const response = await fetch(`${API_URL}/api/chats`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    participant1: currentUserId,
-                    participant2: partnerId,
-                    skillId: skillId,
-                    skillName: skillName
-                })
-            });
-            
+            const response = await fetch(`${API_URL}/api/chats/user/${currentUserId}`);
             const result = await response.json();
             
             if (result.success) {
-                console.log('✅ Чат создан/получен:', result.chat);
-                currentChatId = result.chat._id;
-                currentChatPartner = partnerName;
-                currentChatPartnerId = partnerId;
-                currentChatSkillId = skillId;
+                userChats = result.chats || [];
+                console.log(`💬 Загружено ${userChats.length} чатов`);
                 
-                openChatWindow(partnerName, skillName);
-                loadChatMessages();
-                startChatPolling();
-            } else {
-                console.error('❌ Ошибка создания чата:', result.error);
-                alert('❌ Не удалось начать чат. Пожалуйста, попробуйте позже.');
+                // Обновляем список чатов в интерфейсе
+                updateChatsList();
+                
+                // Обновляем счетчик непрочитанных
+                updateUnreadMessagesCount();
             }
         } catch (error) {
-            console.error('❌ Ошибка создания чата:', error);
-            alert('❌ Ошибка соединения с сервером. Проверьте подключение к интернету.');
+            console.error('❌ Ошибка загрузки чатов:', error);
         }
     }
 
-    // Функция для открытия окна чата
-    function openChatWindow(partnerName, skillName) {
-        document.getElementById('chatTitle').textContent = `💬 Чат с ${partnerName} - ${skillName}`;
-        showSection('chatWindow');
+    // Обновление списка чатов в интерфейсе
+    function updateChatsList() {
+        const chatsList = document.getElementById('userChatsList');
+        if (!chatsList) return;
+        
+        if (userChats.length === 0) {
+            chatsList.innerHTML = `
+                <div class="welcome-message">
+                    💬 Здесь будут отображаться ваши чаты с другими пользователями.<br>
+                    Начните общение с мастером или клиентом!
+                </div>
+            `;
+            return;
+        }
+        
+        // Сортируем чаты по дате последнего сообщения
+        const sortedChats = [...userChats].sort((a, b) => {
+            const timeA = a.lastMessageTime ? new Date(a.lastMessageTime) : new Date(a.createdAt);
+            const timeB = b.lastMessageTime ? new Date(b.lastMessageTime) : new Date(b.createdAt);
+            return timeB - timeA;
+        });
+        
+        chatsList.innerHTML = sortedChats.map(chat => {
+            const partnerId = chat.user1 === currentUserId ? chat.user2 : chat.user1;
+            const partnerName = chat.user1 === currentUserId ? chat.user2Name : chat.user1Name;
+            const unreadCount = chat.unreadCount || 0;
+            const lastMessage = chat.lastMessage || 'Нет сообщений';
+            const lastMessageTime = chat.lastMessageTime ? formatMessageTime(new Date(chat.lastMessageTime)) : '';
+            
+            return `
+                <div class="chat-item" onclick="openChat('${chat._id}', '${partnerId}', '${partnerName.replace(/'/g, "\\'")}')">
+                    <div class="chat-avatar">
+                        ${partnerName.charAt(0).toUpperCase()}
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div class="chat-partner">${partnerName}</div>
+                        <div class="chat-preview">${lastMessage}</div>
+                    </div>
+                    <div class="chat-time">${lastMessageTime}</div>
+                    ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
+                </div>
+            `;
+        }).join('');
     }
 
-    // Функция для загрузки сообщений чата
+    // Открытие чата
+    window.openChat = async function(chatId, partnerId, partnerName) {
+        currentChatId = chatId;
+        currentChatPartner = partnerId;
+        currentChatPartnerName = partnerName;
+        
+        // Показываем окно чата
+        document.getElementById('mainScreen').style.display = 'none';
+        document.getElementById('chatWindow').style.display = 'block';
+        
+        // Устанавливаем заголовок чата
+        document.getElementById('chatTitle').textContent = `💬 Чат с ${partnerName}`;
+        
+        // Загружаем историю сообщений
+        await loadChatMessages();
+        
+        // Помечаем сообщения как прочитанные
+        await markMessagesAsRead();
+        
+        // Обновляем список чатов
+        updateChatsList();
+        updateUnreadMessagesCount();
+        
+        // Фокусируемся на поле ввода
+        setTimeout(() => {
+            document.getElementById('messageInput').focus();
+        }, 100);
+    };
+
+    // Загрузка сообщений чата
     async function loadChatMessages() {
         try {
             if (!currentChatId) return;
@@ -2252,197 +2327,225 @@
             const result = await response.json();
             
             const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
             
-            if (result.success && result.messages) {
-                chatMessages.innerHTML = '';
-                
+            if (result.success && result.messages.length > 0) {
                 result.messages.forEach(message => {
-                    const isMyMessage = message.senderId === currentUserId;
-                    const messageElement = document.createElement('div');
-                    messageElement.className = `message ${isMyMessage ? 'message-outgoing' : 'message-incoming'}`;
-                    
-                    const time = new Date(message.timestamp).toLocaleTimeString([], { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                    });
-                    
-                    messageElement.innerHTML = `
-                        ${!isMyMessage ? `<div class="message-sender">${message.senderName}</div>` : ''}
-                        <div class="message-text">${message.text}</div>
-                        <div class="message-time">${time}</div>
-                    `;
-                    
-                    chatMessages.appendChild(messageElement);
+                    addMessageToChat(message, false);
                 });
                 
-                // Прокрутка вниз
+                // Прокручиваем к последнему сообщению
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             } else {
-                chatMessages.innerHTML = '<div class="no-chats"><div class="no-chats-text">Начните общение первым!</div></div>';
+                chatMessages.innerHTML = `
+                    <div class="welcome-message" style="margin: auto;">
+                        💬 Начните общение!<br>
+                        Напишите первое сообщение.
+                    </div>
+                `;
             }
         } catch (error) {
             console.error('❌ Ошибка загрузки сообщений:', error);
             document.getElementById('chatMessages').innerHTML = 
-                '<div class="error-message">❌ Ошибка загрузки сообщений</div>';
+                '<div class="error-message">Ошибка загрузки сообщений</div>';
         }
     }
 
-    // Функция для отправки сообщения
-    async function sendChatMessage() {
+    // Добавление сообщения в чат
+    function addMessageToChat(message, scrollToBottom = true) {
+        const chatMessages = document.getElementById('chatMessages');
+        
+        // Убираем приветственное сообщение, если оно есть
+        if (chatMessages.querySelector('.welcome-message')) {
+            chatMessages.innerHTML = '';
+        }
+        
+        const messageElement = document.createElement('div');
+        messageElement.className = `chat-message ${message.senderId === currentUserId ? 'my-message' : 'other-message'}`;
+        
+        const messageTime = formatMessageTime(new Date(message.timestamp || message.createdAt));
+        
+        messageElement.innerHTML = `
+            ${message.senderId !== currentUserId ? 
+                `<div class="chat-message-sender">${currentChatPartnerName}</div>` : 
+                `<div class="chat-message-sender" style="text-align: right;">Вы</div>`}
+            <div>${message.text}</div>
+            <div class="message-time">${messageTime}</div>
+        `;
+        
+        chatMessages.appendChild(messageElement);
+        
+        if (scrollToBottom) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+
+    // Отправка сообщения
+    window.sendChatMessage = async function() {
+        const messageInput = document.getElementById('messageInput');
+        const messageText = messageInput.value.trim();
+        
+        if (!messageText || !currentChatId || !currentChatPartner) return;
+        
         try {
-            const messageInput = document.getElementById('messageInput');
-            const sendButton = document.getElementById('sendButton');
-            const message = messageInput.value.trim();
+            const messageData = {
+                chatId: currentChatId,
+                senderId: currentUserId,
+                receiverId: currentChatPartner,
+                text: messageText,
+                timestamp: new Date().toISOString()
+            };
             
-            if (!message || !currentChatId) return;
+            // Добавляем сообщение в интерфейс сразу
+            const tempMessage = {
+                ...messageData,
+                senderId: currentUserId,
+                text: messageText,
+                timestamp: new Date().toISOString()
+            };
             
-            // Блокируем кнопку и поле ввода
-            messageInput.disabled = true;
-            sendButton.disabled = true;
+            addMessageToChat(tempMessage);
+            messageInput.value = '';
             
-            const response = await fetch(`${API_URL}/api/chats/${currentChatId}/messages`, {
+            // Отправляем сообщение на сервер
+            const response = await fetch(`${API_URL}/api/chats/messages`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    senderId: currentUserId,
-                    senderName: getUserName(),
-                    text: message
-                })
+                body: JSON.stringify(messageData)
+            });
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                console.error('❌ Ошибка отправки сообщения:', result.error);
+                // Можно добавить уведомление об ошибке
+            } else {
+                // Обновляем список чатов
+                loadUserChats();
+            }
+            
+        } catch (error) {
+            console.error('❌ Ошибка отправки сообщения:', error);
+        }
+    };
+
+    // Обработка нажатия Enter для отправки сообщения
+    window.handleMessageKeyPress = function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendChatMessage();
+        }
+    };
+
+    // Запуск чата с новым пользователем
+    window.startChatWithUser = async function(userId, userName, skillId = null) {
+        try {
+            // Проверяем, есть ли уже чат с этим пользователем
+            const existingChat = userChats.find(chat => 
+                (chat.user1 === currentUserId && chat.user2 === userId) ||
+                (chat.user1 === userId && chat.user2 === currentUserId)
+            );
+            
+            if (existingChat) {
+                // Открываем существующий чат
+                openChat(existingChat._id, userId, userName);
+                return;
+            }
+            
+            // Создаем новый чат
+            const chatData = {
+                user1: currentUserId,
+                user1Name: currentUserName,
+                user2: userId,
+                user2Name: userName,
+                skillId: skillId
+            };
+            
+            const response = await fetch(`${API_URL}/api/chats`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(chatData)
             });
             
             const result = await response.json();
             
             if (result.success) {
-                messageInput.value = '';
-                loadChatMessages();
+                // Открываем новый чат
+                openChat(result.chat._id, userId, userName);
+                
+                // Обновляем список чатов
+                loadUserChats();
             } else {
-                alert('❌ Не удалось отправить сообщение. Попробуйте еще раз.');
+                alert('❌ Ошибка создания чата');
             }
-            
-            // Разблокируем кнопку и поле ввода
-            messageInput.disabled = false;
-            sendButton.disabled = false;
-            messageInput.focus();
             
         } catch (error) {
-            console.error('❌ Ошибка отправки сообщения:', error);
-            alert('❌ Ошибка отправки сообщения. Проверьте подключение к интернету.');
-            
-            // Разблокируем кнопку и поле ввода в случае ошибки
-            document.getElementById('messageInput').disabled = false;
-            document.getElementById('sendButton').disabled = false;
+            console.error('❌ Ошибка создания чата:', error);
+            alert('❌ Ошибка создания чата');
         }
-    }
+    };
 
-    // Функция для получения имени пользователя
-    function getUserName() {
-        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-        return userData.firstName || 'Пользователь';
-    }
+    // Запуск чата из модального окна контактов
+    window.startChatFromContact = function() {
+        if (currentChatPartner) {
+            closeContactModal();
+            startChatWithUser(currentChatPartner, currentChatPartnerName);
+        }
+    };
 
-    // Функция для опроса новых сообщений
+    // Опрос новых сообщений
     function startChatPolling() {
-        stopChatPolling();
-        
-        chatPollingInterval = setInterval(() => {
-            if (currentChatId && document.getElementById('chatWindow').style.display !== 'none') {
-                loadChatMessages();
-                loadChats(); // Обновляем список чатов
-            }
-        }, 3000); // Проверка каждые 3 секунды
-    }
-
-    // Функция для остановки опроса
-    function stopChatPolling() {
         if (chatPollingInterval) {
             clearInterval(chatPollingInterval);
-            chatPollingInterval = null;
         }
+        
+        chatPollingInterval = setInterval(async () => {
+            if (currentChatId) {
+                // Проверяем новые сообщения в текущем чате
+                await checkNewMessages();
+            }
+            
+            // Обновляем список чатов
+            await loadUserChats();
+            
+            // Обновляем счетчик непрочитанных
+            updateUnreadMessagesCount();
+            
+        }, 3000); // Проверяем каждые 3 секунды
     }
 
-    // Функция для загрузки списка чатов пользователя
-    async function loadChats() {
+    // Проверка новых сообщений
+    async function checkNewMessages() {
         try {
-            if (!currentUserId) return;
+            if (!currentChatId) return;
             
-            const response = await fetch(`${API_URL}/api/chats/user/${currentUserId}`);
+            const response = await fetch(`${API_URL}/api/chats/${currentChatId}/messages/new?userId=${currentUserId}&lastChecked=${new Date().toISOString()}`);
             const result = await response.json();
             
-            const userChatsList = document.getElementById('userChatsList');
-            
-            if (result.success && result.chats && result.chats.length > 0) {
-                let chatsHTML = '';
+            if (result.success && result.messages.length > 0) {
+                // Добавляем новые сообщения в чат
+                result.messages.forEach(message => {
+                    addMessageToChat(message);
+                });
                 
-                for (const chat of result.chats) {
-                    const partner = chat.participant1 === currentUserId ? 
-                        chat.participant2Name : chat.participant1Name;
-                    const partnerId = chat.participant1 === currentUserId ? 
-                        chat.participant2 : chat.participant1;
-                    const lastMessage = chat.lastMessage || {};
-                    const unreadCount = chat.unreadCount || 0;
-                    
-                    const time = lastMessage.timestamp ? 
-                        new Date(lastMessage.timestamp).toLocaleTimeString([], { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                        }) : '';
-                    
-                    chatsHTML += `
-                        <div class="chat-item" onclick="openExistingChat('${chat._id}', '${partner}', '${partnerId}', '${chat.skillId}', '${chat.skillName || 'Обсуждение'}')">
-                            <div class="chat-header">
-                                <div>
-                                    <div class="chat-partner">${partner}</div>
-                                    <div class="chat-skill">${chat.skillName || 'Обсуждение'}</div>
-                                </div>
-                                ${unreadCount > 0 ? 
-                                    `<div class="unread-badge">${unreadCount}</div>` : 
-                                    `<div class="chat-time">${time}</div>`
-                                }
-                            </div>
-                            <div class="chat-preview">${lastMessage.text || 'Нет сообщений'}</div>
-                        </div>
-                    `;
-                }
-                
-                userChatsList.innerHTML = chatsHTML;
-            } else {
-                userChatsList.innerHTML = `
-                    <div class="no-chats">
-                        <div class="no-chats-icon">💬</div>
-                        <div class="no-chats-text">У вас пока нет активных чатов</div>
-                        <div style="opacity: 0.7; font-size: 14px; margin-top: 10px;">Начните общение с мастером</div>
-                    </div>
-                `;
+                // Помечаем как прочитанные
+                await markMessagesAsRead();
             }
         } catch (error) {
-            console.error('❌ Ошибка загрузки чатов:', error);
-            document.getElementById('userChatsList').innerHTML = `
-                <div class="error-message">
-                    ❌ Ошибка загрузки чатов<br>
-                    <small>Проверьте подключение к интернету</small>
-                </div>
-            `;
+            console.error('❌ Ошибка проверки новых сообщений:', error);
         }
     }
 
-    // Функция для открытия существующего чата
-    async function openExistingChat(chatId, partnerName, partnerId, skillId, skillName) {
+    // Пометить сообщения как прочитанные
+    async function markMessagesAsRead() {
         try {
-            console.log('💬 Открываю чат:', chatId);
+            if (!currentChatId) return;
             
-            currentChatId = chatId;
-            currentChatPartner = partnerName;
-            currentChatPartnerId = partnerId;
-            currentChatSkillId = skillId;
-            
-            openChatWindow(partnerName, skillName);
-            loadChatMessages();
-            startChatPolling();
-            
-            // Помечаем сообщения как прочитанные
-            await fetch(`${API_URL}/api/chats/${chatId}/read`, {
+            await fetch(`${API_URL}/api/chats/${currentChatId}/read`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -2450,30 +2553,65 @@
                 body: JSON.stringify({ userId: currentUserId })
             });
             
+            // Обновляем счетчик непрочитанных
+            updateUnreadMessagesCount();
+            
         } catch (error) {
-            console.error('❌ Ошибка открытия чата:', error);
-            alert('❌ Не удалось открыть чат. Попробуйте позже.');
+            console.error('❌ Ошибка пометки сообщений как прочитанных:', error);
         }
     }
 
-    // Функция для закрытия чата
-    window.closeChat = function() {
-        stopChatPolling();
+    // Обновление счетчика непрочитанных сообщений
+    function updateUnreadMessagesCount() {
+        let totalUnread = 0;
         
+        userChats.forEach(chat => {
+            totalUnread += chat.unreadCount || 0;
+        });
+        
+        unreadMessagesCount = totalUnread;
+        
+        const unreadBadge = document.getElementById('unreadChatsCount');
+        if (unreadBadge) {
+            if (totalUnread > 0) {
+                unreadBadge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+                unreadBadge.style.display = 'flex';
+            } else {
+                unreadBadge.style.display = 'none';
+            }
+        }
+    }
+
+    // Форматирование времени сообщения
+    function formatMessageTime(date) {
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+        
+        if (diffMins < 1) {
+            return 'только что';
+        } else if (diffMins < 60) {
+            return `${diffMins} мин назад`;
+        } else if (diffHours < 24) {
+            return `${diffHours} ч назад`;
+        } else if (diffDays < 7) {
+            return `${diffDays} дн назад`;
+        } else {
+            return date.toLocaleDateString('ru-RU');
+        }
+    }
+
+    // Закрытие чата
+    window.closeChat = function() {
         currentChatId = null;
         currentChatPartner = null;
-        currentChatPartnerId = null;
-        currentChatSkillId = null;
+        currentChatPartnerName = null;
         
         showProfileSection();
+        showProfileTab('chats');
     };
-
-    // Функция для обработки нажатия Enter в поле ввода
-    function handleChatKeyPress(event) {
-        if (event.key === 'Enter') {
-            sendChatMessage();
-        }
-    }
 
     // ========== ФУНКЦИИ ДЛЯ ФОТОГРАФИЙ ==========
 
@@ -3334,21 +3472,22 @@
                 </div>
                 
                 <div class="map-skill-actions">
+                    <button onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.phone || ''}', '${skill.telegram || ''}')"
+                            class="map-skill-button map-contact-button">
+                        📞 Подробные контакты
+                    </button>
                     ${!isUserSkill ? `
-                        <button onclick="startChat('${skill.userId}', '${skill.username.replace(/'/g,"\\'")}', '${skill._id}', '${skill.skill.replace(/'/g,"\\'")}')"
-                                class="map-skill-button map-contact-button">
+                        <button onclick="startChatWithUser('${skill.userId}', '${skill.username.replace(/'/g,"\\'")}', '${skill._id}')"
+                                class="map-skill-button" style="background: #48bb78; color: white;">
                             💬 Написать сообщение
                         </button>
-                        <button onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.phone || ''}', '${skill.telegram || ''}')"
-                                class="map-skill-button map-contact-button">
-                            📞 Подробные контакты
-                        </button>
-                    ` : `
+                    ` : ''}
+                    ${isUserSkill ? `
                         <button onclick="openEditSkillModal('${skill._id}')"
                                 class="map-skill-button map-edit-button">
                             ✏️ Редактировать
                         </button>
-                    `}
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -3379,6 +3518,11 @@
         const contactInfo = document.getElementById('contactInfo');
         const callButton = document.getElementById('callButton');
         const telegramButton = document.getElementById('telegramButton');
+        const messageButton = document.getElementById('messageButton');
+        
+        // Сохраняем информацию о мастере для чата
+        currentChatPartner = skillId;
+        currentChatPartnerName = username;
         
         // Формируем контактную информацию
         let contactHtml = `
@@ -3419,11 +3563,17 @@
         }
         
         contactInfo.innerHTML = contactHtml;
+        
+        // Показываем кнопку сообщения
+        messageButton.style.display = 'block';
+        
         document.getElementById('contactModal').style.display = 'flex';
     };
 
     window.closeContactModal = function() {
         document.getElementById('contactModal').style.display = 'none';
+        currentChatPartner = null;
+        currentChatPartnerName = null;
     };
 
     window.copyToClipboard = function(text) {
@@ -3434,11 +3584,16 @@
         });
     };
 
+    // Старая функция для обратной совместимости
+    window.contactMaster = function(skillId, skillName, username) {
+        // Используем новую функцию с модальным окном
+        openContactModal(skillId, skillName, username, '', '');
+    };
+
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
 
     window.showMainScreen = function() {
         stopMapAutoRefresh();
-        stopChatPolling();
         
         document.getElementById('mainScreen').style.display = 'block';
         document.getElementById('masterSection').style.display = 'none';
@@ -3454,11 +3609,6 @@
     window.showSection = function(sectionId) {
         if (!document.querySelector('.map-active') && mapRefreshInterval) {
             stopMapAutoRefresh();
-        }
-        
-        // Останавливаем опрос чатов, если переключаемся на другой раздел
-        if (sectionId !== 'chatWindow') {
-            stopChatPolling();
         }
         
         document.getElementById('mainScreen').style.display = 'none';
@@ -3479,11 +3629,189 @@
     window.showProfileSection = function() {
         showSection('profileSection');
         loadUserProfile();
-        loadChats(); // Загружаем чаты при открытии профиля
     };
 
     window.showAboutSection = function() {
         showSection('aboutSection');
+    };
+
+    // ========== ФУНКЦИЯ ДЛЯ КРАСИВЫХ УВЕДОМЛЕНИЙ ==========
+
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 2000);
+    }
+
+    // ========== ФУНКЦИЯ ОТЛАДКИ ==========
+
+    window.checkAndSetUserId = function() {
+        console.log('🔍 Проверка User ID...');
+        
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.initDataUnsafe?.user) {
+            const user = tg.initDataUnsafe.user;
+            currentUserId = user.id.toString();
+            currentUserName = user.first_name || 'Пользователь';
+            console.log('✅ User ID из Telegram:', currentUserId);
+            console.log('👤 Данные пользователя Telegram:', user);
+        } else {
+            if (!currentUserId || currentUserId === 'null' || currentUserId === 'undefined') {
+                currentUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+                currentUserName = 'Пользователь';
+                console.log('🆔 Создан новый User ID:', currentUserId);
+            } else {
+                console.log('📌 Используем существующий User ID:', currentUserId);
+            }
+        }
+        
+        if (currentUserId) {
+            localStorage.setItem('umeyka_user_id', currentUserId);
+            console.log('💾 User ID сохранен в localStorage:', currentUserId);
+        }
+        
+        return currentUserId;
+    };
+
+    // Инициализация приложения
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Umeyka app loaded successfully!');
+        showMainScreen();
+        
+        currentUserId = checkAndSetUserId();
+        
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            console.log('✅ Telegram Web App initialized');
+            
+            if (tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                console.log('👤 User ID from Telegram:', user.id);
+                console.log('👤 User data:', user);
+            }
+        }
+        
+        // Инициализируем систему чатов
+        setTimeout(() => {
+            initializeChatSystem();
+        }, 1000);
+    });
+
+    // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+
+    window.checkAllSkills = function() {
+        loadAllSkillsFromServer().then(skills => {
+            alert(`На сервере найдено ${skills.length} умейок`);
+        });
+    };
+
+    window.forceLoadMySkills = function() {
+        loadMySkills();
+    };
+
+    window.searchSkills = async function() {
+        const searchQuery = document.getElementById('searchInput').value.trim();
+        const searchResults = document.getElementById('searchResults');
+        
+        if (!searchQuery) {
+            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос</div>';
+            return;
+        }
+        
+        searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
+        
+        try {
+            const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`);
+            const result = await response.json();
+            
+            if (result.success && result.skills.length > 0) {
+                searchResults.innerHTML = result.skills.map(skill => `
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-title">${skill.skill}</div>
+                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                        </div>
+                        
+                        <div class="skill-price">${skill.price} ₽</div>
+                        
+                        <!-- Контакты сразу под ценой -->
+                        <div class="skill-contacts-row">
+                            ${skill.phone ? `
+                                <div class="contact-item">
+                                    <span class="contact-icon">📞</span>
+                                    <span class="contact-text">${skill.phone}</span>
+                                </div>
+                            ` : ''}
+                            ${skill.telegram ? `
+                                <div class="contact-item">
+                                    <span class="contact-icon">✈️</span>
+                                    <span class="contact-text">${skill.telegram}</span>
+                                </div>
+                            ` : ''}
+                            ${!skill.phone && !skill.telegram ? 
+                                '<div style="color:#999; text-align:center; font-size:14px;">Контакты не указаны</div>' : 
+                                ''}
+                        </div>
+                        
+                        <div class="skill-distance">🎓 ${skill.experience}</div>
+                        
+                        ${skill.photo ? `
+                            <div class="skill-photo">
+                                <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
+                            </div>
+                        ` : ''}
+                        
+                        <div style="color: #666; margin: 12px 0 16px;">
+                            👤 ${skill.username}
+                        </div>
+                        
+                        <button class="chat-button" onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.phone || ''}', '${skill.telegram || ''}')">
+                            📞 Контакты
+                        </button>
+                        <button class="chat-button" onclick="startChatWithUser('${skill.userId}', '${skill.username.replace(/'/g,"\\'")}', '${skill._id}')" style="background: #48bb78; margin-top: 5px;">
+                            💬 Написать сообщение
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                searchResults.innerHTML = `
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
+                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос</div>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Ошибка поиска:', error);
+            searchResults.innerHTML = `
+                <div class="error-message">
+                    ❌ Ошибка поиска<br>
+                    <small>Проверьте подключение к интернету</small>
+                </div>
+            `;
+        }
     };
 
     // ========== ФУНКЦИИ ПРОФИЛЯ ==========
@@ -3519,8 +3847,8 @@
                 <div class="stat-label">✨ Умейки</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">${userData.views || 0}</div>
-                <div class="stat-label">👁️ Просмотры</div>
+                <div class="stat-value">${unreadMessagesCount}</div>
+                <div class="stat-label">💬 Непрочитанных</div>
             </div>
         `;
     }
@@ -3619,7 +3947,7 @@
         } else if (tabName === 'deals') {
             loadDeals();
         } else if (tabName === 'chats') {
-            loadChats();
+            loadUserChats();
         }
     };
 
@@ -3750,179 +4078,6 @@
         }).catch(err => {
             alert('❌ Не удалось скопировать ссылку');
         });
-    };
-
-    // ========== ФУНКЦИЯ ДЛЯ КРАСИВЫХ УВЕДОМЛЕНИЙ ==========
-
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 10000;
-        `;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 2000);
-    }
-
-    // ========== ФУНКЦИЯ ОТЛАДКИ ==========
-
-    window.checkAndSetUserId = function() {
-        console.log('🔍 Проверка User ID...');
-        
-        const tg = window.Telegram?.WebApp;
-        if (tg && tg.initDataUnsafe?.user) {
-            const user = tg.initDataUnsafe.user;
-            currentUserId = user.id.toString();
-            console.log('✅ User ID из Telegram:', currentUserId);
-            console.log('👤 Данные пользователя Telegram:', user);
-        } else {
-            if (!currentUserId || currentUserId === 'null' || currentUserId === 'undefined') {
-                currentUserId = 'user_' + Math.random().toString(36).substr(2, 9);
-                console.log('🆔 Создан новый User ID:', currentUserId);
-            } else {
-                console.log('📌 Используем существующий User ID:', currentUserId);
-            }
-        }
-        
-        if (currentUserId) {
-            localStorage.setItem('umeyka_user_id', currentUserId);
-            console.log('💾 User ID сохранен в localStorage:', currentUserId);
-        }
-        
-        return currentUserId;
-    };
-
-    // Инициализация приложения
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Umeyka app loaded successfully!');
-        showMainScreen();
-        
-        currentUserId = checkAndSetUserId();
-        
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
-            console.log('✅ Telegram Web App initialized');
-            
-            if (tg.initDataUnsafe.user) {
-                const user = tg.initDataUnsafe.user;
-                console.log('👤 User ID from Telegram:', user.id);
-                console.log('👤 User data:', user);
-            }
-        }
-    });
-
-    // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
-
-    window.checkAllSkills = function() {
-        loadAllSkillsFromServer().then(skills => {
-            alert(`На сервере найдено ${skills.length} умейок`);
-        });
-    };
-
-    window.forceLoadMySkills = function() {
-        loadMySkills();
-    };
-
-    window.searchSkills = async function() {
-        const searchQuery = document.getElementById('searchInput').value.trim();
-        const searchResults = document.getElementById('searchResults');
-        
-        if (!searchQuery) {
-            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос</div>';
-            return;
-        }
-        
-        searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
-        
-        try {
-            const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`);
-            const result = await response.json();
-            
-            if (result.success && result.skills.length > 0) {
-                searchResults.innerHTML = result.skills.map(skill => `
-                    <div class="skill-card">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                        </div>
-                        
-                        <div class="skill-price">${skill.price} ₽</div>
-                        
-                        <!-- Контакты сразу под ценой -->
-                        <div class="skill-contacts-row">
-                            ${skill.phone ? `
-                                <div class="contact-item">
-                                    <span class="contact-icon">📞</span>
-                                    <span class="contact-text">${skill.phone}</span>
-                                </div>
-                            ` : ''}
-                            ${skill.telegram ? `
-                                <div class="contact-item">
-                                    <span class="contact-icon">✈️</span>
-                                    <span class="contact-text">${skill.telegram}</span>
-                                </div>
-                            ` : ''}
-                            ${!skill.phone && !skill.telegram ? 
-                                '<div style="color:#999; text-align:center; font-size:14px;">Контакты не указаны</div>' : 
-                                ''}
-                        </div>
-                        
-                        <div class="skill-distance">🎓 ${skill.experience}</div>
-                        
-                        ${skill.photo ? `
-                            <div class="skill-photo">
-                                <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
-                            </div>
-                        ` : ''}
-                        
-                        <div style="color: #666; margin: 12px 0 16px;">
-                            👤 ${skill.username}
-                        </div>
-                        
-                        <button class="message-button" onclick="startChat('${skill.userId}', '${skill.username.replace(/'/g,"\\'")}', '${skill._id}', '${skill.skill.replace(/'/g,"\\'")}')">
-                            💬 Написать сообщение
-                        </button>
-                        
-                        <button class="chat-button" onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.phone || ''}', '${skill.telegram || ''}')">
-                            📞 Подробные контакты
-                        </button>
-                    </div>
-                `).join('');
-            } else {
-                searchResults.innerHTML = `
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
-                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос</div>
-                    </div>
-                `;
-            }
-        } catch (error) {
-            console.error('Ошибка поиска:', error);
-            searchResults.innerHTML = `
-                <div class="error-message">
-                    ❌ Ошибка поиска<br>
-                    <small>Проверьте подключение к интернету</small>
-                </div>
-            `;
-        }
     };
 
     window.setProjectRating = function(rating) {
