@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* Все стили остаются без изменений */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -24,14 +23,2070 @@
             line-height: 1.5;
         }
         
-        /* ... остальные стили остаются без изменений ... */
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
         
+        .header {
+            padding: 30px 20px 20px;
+            text-align: center;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            position: relative;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .about-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+        
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .app-description {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        .rating {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .stars {
+            color: #FFD700;
+            margin-right: 8px;
+        }
+        
+        .main-buttons {
+            padding: 40px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .main-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 20px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .main-button:active {
+            transform: scale(0.98);
+            background: rgba(255,255,255,0.25);
+        }
+        
+        .button-master {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
+        }
+
+        .button-master:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+        
+        .button-client {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+        
+        .button-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+        
+        .map-section {
+            padding: 20px;
+        }
+        
+        .map-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        
+        .section {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .back-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 18px 30px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            width: 90%;
+            max-width: 300px;
+            margin: 0 auto 20px auto;
+            display: block;
+            position: relative;
+            left: auto;
+            top: auto;
+        }
+        
+        .back-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .form-section {
+            background: rgba(255,255,255,0.1);
+            padding: 25px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            margin-bottom: 20px;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 18px;
+            margin: 12px 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .submit-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .skill-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .gold-card {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #744210;
+            border: 3px solid #FFD700;
+        }
+        
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .skill-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+        
+        .skill-rating {
+            color: #FFD700;
+            font-size: 14px;
+        }
+        
+        .skill-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #48bb78;
+            margin: 10px 0;
+        }
+        
+        .skill-distance {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .skill-contact {
+            font-size: 14px;
+            color: #667eea;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Новый стиль для контактов в карточке */
+        .skill-contacts-row {
+            margin: 12px 0;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 10px;
+            font-size: 15px;
+            color: #2d3748;
+        }
+
+        .skill-contacts-row .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 6px 0;
+        }
+
+        .skill-contacts-row .contact-icon {
+            font-size: 18px;
+            min-width: 24px;
+            color: #667eea;
+        }
+
+        .skill-contacts-row .contact-text {
+            word-break: break-all;
+        }
+        
+        .chat-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #map {
+            height: 400px;
+            border-radius: 15px;
+            margin-top: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .map-active #map {
+            display: block;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+        }
+        
+        .error-message {
+            background: rgba(255,0,0,0.1);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid rgba(255,0,0,0.2);
+        }
+
+        /* Стили для личного кабинета */
+        .profile-skill-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .profile-skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .skill-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Стили для кнопок вкладок */
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 120px;
+            padding: 18px 15px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-button:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .tab-button:active {
+            transform: translateY(0);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .edit-button {
+            background: #4299e1;
+            color: white;
+        }
+
+        .delete-button {
+            background: #f56565;
+            color: white;
+        }
+
+        .rating-badge {
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .chat-item {
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+            padding: 15px;
+            margin: 8px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .chat-item:hover {
+            background: rgba(255,255,255,1);
+            transform: translateX(5px);
+        }
+
+        .chat-partner {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2d3748;
+        }
+
+        .chat-preview {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+            min-width: 50px;
+        }
+
+        .unread-badge {
+            background: #e53e3e;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .rating-stars {
+            color: #FFD700;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .rating-details {
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .rating-label {
+            width: 100px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .rating-value {
+            width: 40px;
+            text-align: right;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .rating-progress {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .rating-progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            border-radius: 4px;
+        }
+
+        /* Стили для сделок */
+        .deal-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .deal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .deal-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .deal-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-draft { background: #e2e8f0; color: #4a5568; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-completed { background: #dcfce7; color: #166534; }
+
+        .deal-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .deal-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .signature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signed { color: #38a169; }
+        .unsigned { color: #e53e3e; }
+
+        .deal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .deal-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .sign-button { background: #48bb78; color: white; }
+        .view-button { background: #4299e1; color: white; }
+        .complete-button { background: #ed8936; color: white; }
+
+        /* Стили для формы создания сделки */
+        .quality-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .quality-option {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .quality-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .additional-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .option-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .option-checkbox.selected {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        /* Стили для сообщений в чате */
+        .chat-message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+        }
+
+        .my-message {
+            margin-left: auto;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .other-message {
+            margin-right: auto;
+            background: #f1f1f1;
+            color: #2d3748;
+            border-bottom-left-radius: 5px;
+        }
+
+        .chat-message-sender {
+            font-size: 12px;
+            color: #667eea;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .my-message .chat-message-sender {
+            color: #48bb78;
+            text-align: right;
+        }
+
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        /* Стили для звездной системы */
+        .level-achieved {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+        }
+
+        .referral-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px 20px;
+            border-radius: 20px;
+            margin: 25px 0;
+            color: white;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .referral-section::before {
+            content: '🎁';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 40px;
+            opacity: 0.3;
+        }
+
+        .referral-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .referral-description {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .referral-benefits {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .referral-benefit {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .referral-link-container {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px dashed #667eea;
+        }
+
+        .referral-link {
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            word-break: break-all;
+            margin-bottom: 15px;
+        }
+
+        .referral-note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .referral-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .share-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .share-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .copy-button {
+            background: rgba(255,255,255,0.9);
+            border: 2px solid #667eea;
+            padding: 18px;
+            border-radius: 15px;
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .copy-button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .referral-note {
+            font-size: 14px;
+            opacity: 0.8;
+            text-align: center;
+            line-height: 1.4;
+            margin-top: 10px;
+        }
+
+        .referral-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+
+        .referral-button:active {
+            transform: translateY(0);
+        }
+
+        /* Стили для раздела "О проекте" */
+        .about-section {
+            background: rgba(255,255,255,0.9);
+            padding: 25px;
+            border-radius: 20px;
+            color: #2d3748;
+            margin: 20px 0;
+        }
+
+        .about-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .channel-links {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .channel-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .channel-link:active {
+            transform: scale(0.98);
+        }
+
+        .channel-icon {
+            font-size: 30px;
+        }
+
+        .channel-info {
+            flex: 1;
+        }
+
+        .channel-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .channel-description {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Стили для кастомизации */
+        .customization-section {
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            color: #2d3748;
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-option.selected {
+            border-color: #2d3748;
+            transform: scale(1.1);
+        }
+
+        .premium-badge {
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .top-master-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Новые стили для улучшенного дизайна */
+        .section-header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .back-button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .back-button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+             
+        /* Стили для кнопок вкладок сделок (столбиком) */
+        .deals-tab-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 0 0 20px 0;
+            padding: 0 20px;
+        }
+
+        .deals-tab-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .deals-tab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+
+        .deals-tab-button:active {
+            transform: translateY(0);
+        }
+
+        .deals-tab-button.active {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
+        }
+
+        /* Стили для сообщений чата */
+        .chat-message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        #chatMessages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        #messageInput:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Кнопка отправки сообщения */
+        #chatWindow .submit-button {
+            width: auto;
+            padding: 15px 25px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #chatWindow .submit-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+        
+        /* Заголовок чата */
+        #chatTitle {
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        /* Стили для фото в карточке */
+        .skill-photo {
+            width: 100%;
+            height: 200px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .skill-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .skill-photo:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .upload-photo-button {
+            width: 100%;
+            padding: 12px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .no-photo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 14px;
+            height: 100%;
+        }
+
+        /* Стили для модального окна редактирования */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background: #f7fafc;
+        }
+
+        .modal-title {
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-save {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .modal-cancel {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Стили для карточки в карте */
+        .map-popup-content {
+            min-width: 300px;
+            max-width: 300px;
+        }
+
+        .map-skill-photo {
+            width: 100%;
+            height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .map-skill-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .map-skill-info {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .map-skill-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .map-skill-button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .map-contact-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .map-details-button {
+            background: #48bb78;
+            color: white;
+        }
+
+        .map-edit-button {
+            background: #ed8936;
+            color: white;
+        }
+
+        /* Стили для загрузки фото */
+        .photo-upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 15px 0;
+            background: rgba(102, 126, 234, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-upload-area:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #764ba2;
+        }
+
+        .photo-upload-icon {
+            font-size: 40px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .photo-preview {
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .photo-info {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        /* Стили для кнопок связи */
+        .contact-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .call-button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .telegram-button {
+            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        /* Стили для отображения контактов */
+        .contact-info {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            color: #2d3748;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .contact-icon {
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .contact-text {
+            flex: 1;
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .copy-contact {
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Стили для аватара в чате */
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .chat-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Стили для индикатора набора текста */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 5px 0;
+            opacity: 0.7;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #667eea;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        /* Стили для приветственного сообщения */
+        .welcome-message {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #dee2e6;
+        }
+
+        /* Стили для кнопки "Написать сообщение" */
+        .message-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        .message-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
     </style>
 </head>
 <body>
-    <!-- Весь HTML код остаётся без изменений -->
-    <!-- ... -->
+    <div class="container">
+        <!-- ГЛАВНЫЙ ЭКРАН -->
+        <div id="mainScreen">
+            <div class="header">
+                <button class="about-button" onclick="showAboutSection()">ℹ️ О проекте</button>
+                <div class="logo">🤝✨</div>
+                <div class="app-title">Umeyka</div>
+                <div class="app-description">Мастера на все руки рядом с вами</div>
+                <div class="rating">
+                    <span class="stars">★★★★★</span>
+                    <span>4.9/5</span>
+                </div>
+            </div>
+            
+            <div class="main-buttons">
+                <button class="main-button button-master" onclick="showSection('masterSection')">
+                    <span class="button-icon">✨</span>
+                    Я умейка
+                </button>
+                <button class="main-button button-client" onclick="showSection('clientSection')">
+                    <span class="button-icon">🔍</span>
+                    Я ищу
+                </button>
+                <button class="main-button" onclick="showProfileSection()" 
+                        style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">
+                    <span class="button-icon">👤</span>
+                    Личный кабинет
+                </button>
+            </div>
+            
+            <div class="map-section">
+                <button class="map-button" onclick="openMap()">
+                    🗺️ Поиск по карте
+                </button>
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <!-- СЕКЦИЯ МАСТЕРА -->
+        <div id="masterSection" class="section">
+            <button class="back-button" onclick="showMainScreen()">← Назад</button>
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
+                
+                <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)">
+                <input type="text" id="skillExperience" class="input-field" placeholder="Мой опыт (например: 3 года)">
+                <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях">
+                
+                <!-- Контактная информация -->
+                <div style="margin: 15px 0;">
+                    <div style="color: white; margin-bottom: 10px;">📞 Контактная информация</div>
+                    <input type="text" id="skillPhone" class="input-field" placeholder="Телефон (например: +7 999 123-45-67)">
+                    <input type="text" id="skillTelegram" class="input-field" placeholder="Текст">
+                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
+                        Эти данные будут видны клиентам для связи
+                    </div>
+                </div>
+                
+                <!-- Загрузка фото для умейки -->
+                <div style="margin: 15px 0;">
+                    <div style="color: white; margin-bottom: 10px;">📸 Фото вашей работы (максимум 1 фото, размер до 1MB)</div>
+                    <div class="photo-upload-area" onclick="document.getElementById('skillPhotoInput').click()">
+                        <div class="photo-upload-icon">📷</div>
+                        <div style="color: #2d3748; margin-bottom: 5px;">Нажмите для загрузки фото</div>
+                        <div class="photo-info">JPG, PNG до 1MB</div>
+                    </div>
+                    <input type="file" id="skillPhotoInput" accept="image/*" style="display: none;" onchange="handleSkillPhotoUpload(event)">
+                    
+                    <div id="skillPhotoPreview" class="photo-preview" style="display: none;">
+                        <img id="skillPhotoImg" src="" alt="Фото работы">
+                        <button class="photo-remove" onclick="removeSkillPhoto()">×</button>
+                    </div>
+                    
+                    <div id="photoCompressionStatus" style="color: #48bb78; font-size: 12px; text-align: center; margin-top: 5px; display: none;">
+                        ⚡ Сжимаю фото...
+                    </div>
+                </div>
+                
+                <button class="submit-button" onclick="addSkill()">✅ Опубликовать умейку</button>
+                
+                <div id="mySkillsList" style="margin-top: 20px;"></div>
+                
+               <!-- Кнопки отладки -->
+               <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button onclick="checkAllSkills()" 
+                            style="flex: 1; padding: 12px; background: #9f7aea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                       🔍 Проверить сервер
+                    </button>
+                    <button onclick="forceLoadMySkills()" 
+                            style="flex: 1; padding: 12px; background: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                        🔄 Обновить список
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- СЕКЦИЯ КЛИЕНТА -->
+        <div id="clientSection" class="section">
+            <button class="back-button" onclick="showMainScreen()">← Назад</button>
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">🔍 Найти мастера</h2>
+                
+                <input type="text" id="searchInput" class="input-field" placeholder="🔎 Что ищем? (например: сантехник, электрик)">
+                <button class="submit-button" onclick="searchSkills()">Найти мастеров</button>
+                
+                <div id="searchResults" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА -->
+        <div id="profileSection" class="section">
+            <button class="back-button" onclick="showMainScreen()">← Назад</button>
+            
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
+                
+                <!-- Профиль пользователя -->
+                <div id="userProfile">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">
+                            👤
+                        </div>
+                        <h3 id="userName">Пользователь</h3>
+                        <p id="userBio" style="opacity: 0.8; margin: 10px 0;">Расскажите о себе...</p>
+                        <div id="userBadges" style="margin: 10px 0;"></div>
+                    </div>
+                    
+                    <button class="main-button" onclick="editProfile()" style="margin-bottom: 15px;">
+                        ✏️ Редактировать профиль
+                    </button>
+                </div>
+                
+                <!-- Реферальная программа -->
+                <div class="referral-section">
+                    <div class="referral-title">
+                        <span>👥</span>
+                        <span>Пригласи друзей</span>
+                    </div>
+                    
+                    <div class="referral-description">
+                        Дари друзьям +1 звезду за регистрацию<br>и получай +1 звезду за каждого приглашенного!
+                    </div>
+                    
+                    <div class="referral-benefits">
+                        <div class="referral-benefit">🎁 Друг получает +1 звезду</div>
+                        <div class="referral-benefit">⭐ Вы получаете +1 звезду</div>
+                    </div>
+                    
+                    <div class="referral-buttons">
+                        <button class="referral-button share-button" onclick="shareToFriend()">
+                            📤 Отправить другу
+                        </button>
+                        
+                        <button class="referral-button copy-button" onclick="copyReferralLink()">
+                            📋 Скопировать ссылку
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Вкладки личного кабинета -->
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="showProfileTab('stats')" id="statsTab">
+                        📊 Статистика
+                    </button>
+                    <button class="tab-button" onclick="showProfileTab('skills')" id="skillsTab">
+                        ✨ Мои умейки
+                    </button>
+                    <button class="tab-button" onclick="showProfileTab('deals')" id="dealsTab">
+                        📝 Сделки
+                    </button>
+                    <button class="tab-button" onclick="showProfileTab('chats')" id="chatsTab">
+                        💬 Чаты
+                        <span id="unreadChatsCount" class="unread-badge" style="display: none;">0</span>
+                    </button>
+                </div>
+                
+                <!-- Статистика -->
+                <div id="profileStats" class="profile-tab">
+                    <h3 style="margin-bottom: 15px;">📊 Моя статистика</h3>
+                    <div id="userStats" class="stats-grid"></div>
+                </div>
+                
+                <!-- Мои умейки -->
+                <div id="profileSkills" class="profile-tab" style="display: none;">
+                    <h3 style="margin-bottom: 15px;">✨ Мои умейки</h3>
+                    <div id="profileSkillsList"></div>
+                    
+                    <button class="main-button button-master" onclick="showSection('masterSection')" style="margin-top: 15px;">
+                        ➕ Добавить новую умейку
+                    </button>
+                </div>
+                
+                <!-- Сделки -->
+                <div id="profileDeals" class="profile-tab" style="display: none;">
+                    <h3 style="margin-bottom: 15px;">📝 Мои сделки</h3>
+                    
+                    <!-- Вкладки сделок -->
+                    <div class="deals-tab-buttons">
+                        <button class="deals-tab-button active" onclick="showDealsTab('pending')" id="pendingDealsTab">
+                            ✍️ Ожидают подписи
+                        </button>
+                        <button class="deals-tab-button" onclick="showDealsTab('active')" id="activeDealsTab">
+                            ✅ Активные
+                        </button>
+                        <button class="deals-tab-button" onclick="showDealsTab('completed')" id="completedDealsTab">
+                            📋 Завершенные
+                        </button>
+                    </div>
+                    
+                    <!-- Кнопка создания сделки -->
+                    <button class="main-button" onclick="showCreateDealSection()" 
+                            style="margin-bottom: 20px; background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);">
+                        ➕ Создать сделку
+                    </button>
+                    
+                    <!-- Список сделок -->
+                    <div id="dealsList"></div>
+                </div>
+                
+                <!-- Мои чаты -->
+                <div id="profileChats" class="profile-tab" style="display: none;">
+                    <h3 style="margin-bottom: 15px;">💬 Активные чаты</h3>
+                    <div id="userChatsList">
+                        <div class="welcome-message">
+                            💬 Здесь будут отображаться ваши чаты с другими пользователями.<br>
+                            Начните общение с мастером или клиентом!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ссылки на каналы -->
+                <div class="channel-links">
+                    <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank">
+                        <div class="channel-icon">🎯</div>
+                        <div class="channel-info">
+                            <div class="channel-name">Мотивация</div>
+                            <div class="channel-description">Подпишись и получи бонус!</div>
+                        </div>
+                    </a>
+                    
+                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank">
+                        <div class="channel-icon">✨</div>
+                        <div class="channel-info">
+                            <div class="channel-name">Umeyka</div>
+                            <div class="channel-description">Официальный канал проекта</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+        <div id="editProfileSection" class="section">
+            <button class="back-button" onclick="showProfileSection()">← Назад</button>
     
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
+        
+                <!-- Аватар -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div id="avatarPreview" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; cursor: pointer;" onclick="changeAvatar()">
+                        👤
+                    </div>
+                    <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Нажмите на аватар для выбора</div>
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                </div>
+        
+                <!-- Основная информация -->
+                <input type="text" id="editFirstName" class="input-field" placeholder="Имя *" required>
+                <input type="number" id="editAge" class="input-field" placeholder="Возраст">
+                <input type="text" id="editExperience" class="input-field" placeholder="Общий опыт работы (например: 5 лет)">
+                <input type="text" id="editContact" class="input-field" placeholder="Контактная информация (телефон, Telegram)">
+                <textarea id="editBio" class="input-field" placeholder="О себе (расскажите о ваших навыках и опыте) *" style="height: 120px; resize: vertical;" required></textarea>
+        
+                <button class="submit-button" onclick="saveProfile()">💾 Сохранить профиль</button>
+            </div>
+        </div>
+
+        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
+        <div id="createDealSection" class="section">
+            <button class="back-button" onclick="showProfileSection()">← Назад</button>
+            
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">📄 Создание сделки</h2>
+                
+                <input type="text" id="dealTitle" class="input-field" placeholder="Название сделки">
+                <textarea id="dealDescription" class="input-field" placeholder="Описание работ" style="height: 80px; resize: vertical;"></textarea>
+                
+                <input type="text" id="dealPeriod" class="input-field" placeholder="Срок выполнения (например: 3 дня)">
+                <input type="number" id="dealAmount" class="input-field" placeholder="Сумма в рублях">
+                
+                <!-- Уровень качества -->
+                <div>
+                    <label style="color: white; display: block; margin-bottom: 10px;">⭐ Уровень качества</label>
+                    <div class="quality-options">
+                        <div class="quality-option" onclick="selectQuality('premium')" id="qualityPremium">
+                            Премиум
+                        </div>
+                        <div class="quality-option" onclick="selectQuality('standard')" id="qualityStandard">
+                            Стандарт
+                        </div>
+                        <div class="quality-option" onclick="selectQuality('economy')" id="qualityEconomy">
+                            Эконом
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Дополнительные условия -->
+                <div>
+                    <label style="color: white; display: block; margin-bottom: 10px;">✅ Дополнительные условия (выберите 2)</label>
+                    <div class="additional-options">
+                        <div class="option-checkbox" onclick="toggleOption('quality')" id="optionQuality">
+                            ⭐ Качество
+                        </div>
+                        <div class="option-checkbox" onclick="toggleOption('price')" id="optionPrice">
+                            💰 Цена
+                        </div>
+                        <div class="option-checkbox" onclick="toggleOption('timeRange')" id="optionTimeRange">
+                            ⏱️ Диапазон Времени
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="dealCommission" style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; margin: 15px 0; color: #2d3748; display: none;">
+                    <h4 style="margin-bottom: 10px;">💰 Комиссия системы</h4>
+                    <div>Сумма сделки: <span id="dealAmountDisplay">0</span> ₽</div>
+                    <div>Комиссия 5%: <span id="commissionAmount">0</span> ₽</div>
+                    <div style="font-weight: bold; margin-top: 5px;">Итого: <span id="totalAmount">0</span> ₽</div>
+                </div>
+                
+                <button class="submit-button" onclick="createDeal()">📝 Создать сделку</button>
+            </div>
+        </div>
+
+        <!-- РАЗДЕЛ "О ПРОЕКТЕ" -->
+        <div id="aboutSection" class="section">
+            <button class="back-button" onclick="showMainScreen()">← Назад</button>
+            
+            <div class="form-section">
+                <div class="about-section">
+                    <div class="about-title">🤝 О проекте Umeyka</div>
+                    
+                    <p style="margin-bottom: 15px; line-height: 1.6;">
+                        <strong>Umeyka</strong> - это инновационная платформа, которая соединяет мастеров и клиентов, 
+                        создавая экосистему доверия и качества.
+                    </p>
+                    
+                    <h4 style="margin: 20px 0 10px 0; color: #667eea;">🎯 Наша миссия</h4>
+                    <p style="margin-bottom: 15px; line-height: 1.6;">
+                        Сделать поиск проверенных мастеров простым, быстрым и безопасным для каждого.
+                    </p>
+                    
+                    <h4 style="margin: 20px 0 10px 0; color: #667eea;">✨ Преимущества</h4>
+                    <ul style="margin-bottom: 20px; padding-left: 20px; line-height: 1.6;">
+                        <li>⭐ Звездная система мотивации</li>
+                        <li>🔐 Безопасные сделки с гарантией</li>
+                        <li>🎯 Только проверенные мастера</li>
+                        <li>💬 Прямое общение без посредников</li>
+                        <li>📱 Удобный интерфейс для любого возраста</li>
+                    </ul>
+                    
+                    <h4 style="margin: 20px 0 10px 0; color: #667eea;">📊 Статистика</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">1,000+</div>
+                            <div class="stat-label">Мастеров</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">5,000+</div>
+                            <div class="stat-label">Сделок</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">4.9/5</div>
+                            <div class="stat-label">Рейтинг</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">98%</div>
+                            <div class="stat-label">Довольных клиентов</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Форма отзыва о проекте -->
+                <div class="about-section">
+                    <h3 style="margin-bottom: 15px; text-align: center;">💬 Оставьте отзыв о проекте</h3>
+                    
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div class="rating-stars" id="projectRatingStars">
+                            <span style="cursor: pointer;" onclick="setProjectRating(1)">☆</span>
+                            <span style="cursor: pointer;" onclick="setProjectRating(2)">☆</span>
+                            <span style="cursor: pointer;" onclick="setProjectRating(3)">☆</span>
+                            <span style="cursor: pointer;" onclick="setProjectRating(4)">☆</span>
+                            <span style="cursor: pointer;" onclick="setProjectRating(5)">☆</span>
+                        </div>
+                    </div>
+                    
+                    <textarea id="projectReviewComment" class="input-field" placeholder="Ваш отзыв о проекте..." style="height: 100px; resize: vertical; background: white;"></textarea>
+                    
+                    <button class="submit-button" onclick="submitProjectReview()">📤 Отправить отзыв</button>
+                </div>
+
+                <!-- Ссылки на каналы -->
+                <div class="channel-links">
+                    <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank">
+                        <div class="channel-icon">🎯</div>
+                        <div class="channel-info">
+                            <div class="channel-name">Мотивация</div>
+                            <div class="channel-description">Подпишись и получи бонус!</div>
+                        </div>
+                    </a>
+                    
+                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank">
+                        <div class="channel-icon">✨</div>
+                        <div class="channel-info">
+                            <div class="channel-name">Umeyka</div>
+                            <div class="channel-description">Официальный канал проекта</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ОКНО ЧАТА -->
+        <div id="chatWindow" class="section">
+            <button class="back-button" onclick="closeChat()">← Назад к чатам</button>
+            
+            <div class="form-section">
+                <h2 id="chatTitle" style="margin-bottom: 20px; text-align: center;">💬 Чат</h2>
+                
+                <div id="chatMessages" style="height: 300px; overflow-y: auto; margin-bottom: 20px; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px;">
+                    <!-- Сообщения чата будут загружены динамически -->
+                </div>
+                
+                <div id="typingIndicator" class="typing-indicator" style="display: none; margin-bottom: 10px;">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="messageInput" class="input-field" placeholder="Введите сообщение..." 
+                           onkeypress="handleMessageKeyPress(event)" style="flex: 1;">
+                    <button class="submit-button" onclick="sendChatMessage()" style="width: auto; padding: 15px 20px;">📤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ УМЕЙКИ -->
+    <div id="editSkillModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeEditSkillModal()">×</button>
+            <div class="modal-title">✏️ Редактировать умейку</div>
+            
+            <input type="hidden" id="editSkillId">
+            
+            <input type="text" id="editSkillName" class="input-field" placeholder="Моё умение" required>
+            <input type="text" id="editSkillExperience" class="input-field" placeholder="Мой опыт" required>
+            <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
+            
+            <!-- Контактная информация -->
+            <div style="margin: 15px 0;">
+                <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📞 Контактная информация</div>
+                <input type="text" id="editSkillPhone" class="input-field" placeholder="Телефон">
+                <input type="text" id="editSkillTelegram" class="input-field" placeholder="Текст">
+            </div>
+            
+            <!-- Загрузка фото для редактирования -->
+            <div style="margin: 15px 0;">
+                <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📸 Фото вашей работы</div>
+                <div class="photo-upload-area" onclick="document.getElementById('editSkillPhotoInput').click()">
+                    <div class="photo-upload-icon">📷</div>
+                    <div style="color: #2d3748; margin-bottom: 5px;">Нажмите для загрузки нового фото</div>
+                    <div class="photo-info">JPG, PNG до 1MB</div>
+                </div>
+                <input type="file" id="editSkillPhotoInput" accept="image/*" style="display: none;" onchange="handleEditSkillPhotoUpload(event)">
+                
+                <div id="editSkillPhotoPreview" class="photo-preview" style="display: none;">
+                    <img id="editSkillPhotoImg" src="" alt="Фото работы">
+                    <button class="photo-remove" onclick="removeEditSkillPhoto()">×</button>
+                </div>
+                
+                <div id="editPhotoCompressionStatus" style="color: #48bb78; font-size: 12px; text-align: center; margin-top: 5px; display: none;">
+                    ⚡ Сжимаю фото...
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-button modal-save" onclick="saveEditedSkill()">💾 Сохранить</button>
+                <button class="modal-button modal-cancel" onclick="closeEditSkillModal()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО КОНТАКТОВ МАСТЕРА -->
+    <div id="contactModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeContactModal()">×</button>
+            <div class="modal-title">📞 Контакты мастера</div>
+            
+            <div id="contactInfo" class="contact-info">
+                <!-- Контактная информация будет загружена динамически -->
+            </div>
+            
+            <div class="contact-buttons">
+                <a id="callButton" class="call-button" href="#" target="_blank">
+                    📞 Позвонить
+                </a>
+                <a id="telegramButton" class="telegram-button" href="#" target="_blank">
+                    ✈️ Написать в Telegram
+                </a>
+                <button id="messageButton" class="message-button" onclick="startChatFromContact()">
+                    💬 Написать сообщение
+                </button>
+            </div>
+            
+            <button class="modal-button modal-cancel" onclick="closeContactModal()" style="margin-top: 15px;">
+                Закрыть
+            </button>
+        </div>
+    </div>
+
     <script>
     // ========== КОНФИГУРАЦИЯ API ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
@@ -52,7 +2107,7 @@
     let mapRefreshInterval = null;
     let currentEditingSkill = null;
     
-    // Переменные для системы чатов (КЛИЕНТСКАЯ ЭМУЛЯЦИЯ)
+    // Переменные для системы чатов (клиентская реализация)
     let currentChatId = null;
     let currentChatPartner = null;
     let currentChatPartnerName = null;
@@ -96,173 +2151,52 @@
         completedDeals: 0
     };
 
-    // ========== КЛИЕНТСКАЯ ЭМУЛЯЦИЯ ЧАТОВ ==========
+    // ========== КЛИЕНТСКАЯ СИСТЕМА ЧАТОВ (без серверных запросов) ==========
 
     // Инициализация системы чатов
     function initializeChatSystem() {
-        console.log('💬 Инициализация системы чатов (клиентская эмуляция)');
+        console.log('💬 Инициализация клиентской системы чатов');
         
         // Загружаем чаты пользователя из localStorage
-        loadUserChatsFromStorage();
-        
-        // Обновляем список чатов в интерфейсе
-        updateChatsList();
+        loadUserChats();
         
         // Обновляем счетчик непрочитанных сообщений
         updateUnreadMessagesCount();
-        
-        // Запускаем опрос новых сообщений (эмуляция)
-        startChatPolling();
     }
 
-    // Загрузка чатов из localStorage
-    function loadUserChatsFromStorage() {
+    // Загрузка чатов пользователя из localStorage
+    function loadUserChats() {
         try {
-            if (!currentUserId) {
-                console.log('👤 Пользователь не определен, пропускаем загрузку чатов');
-                userChats = [];
-                return;
-            }
+            if (!currentUserId) return;
             
-            const storedChats = getLocalStorage(`umeyka_chats_${currentUserId}`);
+            // Получаем чаты из localStorage
+            const chatsKey = `umeyka_chats_${currentUserId}`;
+            userChats = getLocalStorage(chatsKey) || [];
             
-            if (storedChats && Array.isArray(storedChats)) {
-                userChats = storedChats;
-                console.log(`💬 Загружено ${userChats.length} чатов из localStorage`);
-            } else {
-                userChats = [];
-                console.log('💬 Нет сохраненных чатов, создаем пустой список');
-                
-                // Создаем демо чаты для тестирования
-                createDemoChats();
-            }
+            console.log(`💬 Загружено ${userChats.length} чатов из localStorage`);
+            
+            // Обновляем список чатов в интерфейсе
+            updateChatsList();
+            
+            // Обновляем счетчик непрочитанных
+            updateUnreadMessagesCount();
+            
         } catch (error) {
-            console.error('❌ Ошибка загрузки чатов из localStorage:', error);
+            console.error('❌ Ошибка загрузки чатов:', error);
             userChats = [];
         }
     }
 
-    // Создание демо чатов для тестирования
-    function createDemoChats() {
-        const demoChats = [
-            {
-                _id: 'chat_demo_1',
-                user1: currentUserId,
-                user1Name: currentUserName,
-                user2: 'user_demo_1',
-                user2Name: 'Алексей (сантехник)',
-                skillId: null,
-                lastMessage: 'Здравствуйте! Когда сможете приехать?',
-                lastMessageTime: new Date(Date.now() - 3600000).toISOString(),
-                unreadCount: 2,
-                createdAt: new Date(Date.now() - 86400000).toISOString()
-            },
-            {
-                _id: 'chat_demo_2',
-                user1: currentUserId,
-                user1Name: currentUserName,
-                user2: 'user_demo_2',
-                user2Name: 'Мария (швея)',
-                skillId: null,
-                lastMessage: 'Спасибо за заказ!',
-                lastMessageTime: new Date(Date.now() - 7200000).toISOString(),
-                unreadCount: 0,
-                createdAt: new Date(Date.now() - 172800000).toISOString()
-            },
-            {
-                _id: 'chat_demo_3',
-                user1: 'user_demo_3',
-                user1Name: 'Иван (электрик)',
-                user2: currentUserId,
-                user2Name: currentUserName,
-                skillId: null,
-                lastMessage: 'Привет! Нужна помощь с ремонтом?',
-                lastMessageTime: new Date(Date.now() - 10800000).toISOString(),
-                unreadCount: 1,
-                createdAt: new Date(Date.now() - 259200000).toISOString()
-            }
-        ];
-        
-        // Загружаем сообщения для демо чатов
-        demoChats.forEach(chat => {
-            loadChatMessagesFromStorage(chat._id);
-        });
-        
-        userChats = demoChats;
-        saveChatsToStorage();
-    }
-
-    // Загрузка сообщений чата из localStorage
-    function loadChatMessagesFromStorage(chatId) {
-        try {
-            const messagesKey = `umeyka_chat_messages_${chatId}`;
-            const storedMessages = getLocalStorage(messagesKey);
-            
-            if (!storedMessages || !Array.isArray(storedMessages)) {
-                // Создаем демо сообщения для чата
-                const demoMessages = createDemoMessages(chatId);
-                setLocalStorage(messagesKey, demoMessages);
-                return demoMessages;
-            }
-            
-            return storedMessages;
-        } catch (error) {
-            console.error('❌ Ошибка загрузки сообщений:', error);
-            return [];
-        }
-    }
-
-    // Создание демо сообщений
-    function createDemoMessages(chatId) {
-        const partnerId = chatId === 'chat_demo_1' ? 'user_demo_1' : 
-                         chatId === 'chat_demo_2' ? 'user_demo_2' : 'user_demo_3';
-        const partnerName = chatId === 'chat_demo_1' ? 'Алексей' : 
-                          chatId === 'chat_demo_2' ? 'Мария' : 'Иван';
-        
-        return [
-            {
-                _id: `msg_${chatId}_1`,
-                chatId: chatId,
-                senderId: partnerId,
-                receiverId: currentUserId,
-                text: chatId === 'chat_demo_1' ? 'Здравствуйте! Я Алексей, сантехник. Чем могу помочь?' :
-                      chatId === 'chat_demo_2' ? 'Привет! Я Мария, швея. Нужна помощь с пошивом?' :
-                      'Добрый день! Я Иван, электрик. Есть проблемы с электрикой?',
-                timestamp: new Date(Date.now() - 86400000).toISOString(),
-                read: true
-            },
-            {
-                _id: `msg_${chatId}_2`,
-                chatId: chatId,
-                senderId: currentUserId,
-                receiverId: partnerId,
-                text: chatId === 'chat_demo_1' ? 'Здравствуйте! Нужно починить кран на кухне' :
-                      chatId === 'chat_demo_2' ? 'Да, нужно подшить платье' :
-                      'Да, перегорели лампочки в коридоре',
-                timestamp: new Date(Date.now() - 43200000).toISOString(),
-                read: true
-            },
-            {
-                _id: `msg_${chatId}_3`,
-                chatId: chatId,
-                senderId: partnerId,
-                receiverId: currentUserId,
-                text: chatId === 'chat_demo_1' ? 'Хорошо, когда сможете приехать?' :
-                      chatId === 'chat_demo_2' ? 'Отлично! Когда привезете платье?' :
-                      'Привет! Нужна помощь с ремонтом?',
-                timestamp: new Date(Date.now() - 3600000).toISOString(),
-                read: chatId === 'chat_demo_1' ? false : true
-            }
-        ];
-    }
-
     // Сохранение чатов в localStorage
-    function saveChatsToStorage() {
+    function saveUserChats() {
         try {
             if (!currentUserId) return;
             
-            setLocalStorage(`umeyka_chats_${currentUserId}`, userChats);
+            const chatsKey = `umeyka_chats_${currentUserId}`;
+            setLocalStorage(chatsKey, userChats);
+            
             console.log('💬 Чаты сохранены в localStorage');
+            
         } catch (error) {
             console.error('❌ Ошибка сохранения чатов:', error);
         }
@@ -298,7 +2232,7 @@
             const lastMessageTime = chat.lastMessageTime ? formatMessageTime(new Date(chat.lastMessageTime)) : '';
             
             return `
-                <div class="chat-item" onclick="openChat('${chat._id}', '${partnerId}', '${partnerName.replace(/'/g, "\\'")}')">
+                <div class="chat-item" onclick="openChat('${chat.id}', '${partnerId}', '${partnerName.replace(/'/g, "\\'")}')">
                     <div class="chat-avatar">
                         ${partnerName.charAt(0).toUpperCase()}
                     </div>
@@ -314,7 +2248,7 @@
     }
 
     // Открытие чата
-    window.openChat = async function(chatId, partnerId, partnerName) {
+    window.openChat = function(chatId, partnerId, partnerName) {
         currentChatId = chatId;
         currentChatPartner = partnerId;
         currentChatPartnerName = partnerName;
@@ -327,10 +2261,10 @@
         document.getElementById('chatTitle').textContent = `💬 Чат с ${partnerName}`;
         
         // Загружаем историю сообщений
-        await loadChatMessages();
+        loadChatMessages();
         
         // Помечаем сообщения как прочитанные
-        await markMessagesAsRead();
+        markMessagesAsRead();
         
         // Обновляем список чатов
         updateChatsList();
@@ -342,18 +2276,17 @@
         }, 100);
     };
 
-    // Загрузка сообщений чата
-    async function loadChatMessages() {
+    // Загрузка сообщений чата из localStorage
+    function loadChatMessages() {
         try {
             if (!currentChatId) return;
             
-            const messages = loadChatMessagesFromStorage(currentChatId);
-            
+            const chat = userChats.find(c => c.id === currentChatId);
             const chatMessages = document.getElementById('chatMessages');
             chatMessages.innerHTML = '';
             
-            if (messages.length > 0) {
-                messages.forEach(message => {
+            if (chat && chat.messages && chat.messages.length > 0) {
+                chat.messages.forEach(message => {
                     addMessageToChat(message, false);
                 });
                 
@@ -403,8 +2336,8 @@
         }
     }
 
-    // Отправка сообщения (клиентская эмуляция)
-    window.sendChatMessage = async function() {
+    // Отправка сообщения (клиентская версия)
+    window.sendChatMessage = function() {
         const messageInput = document.getElementById('messageInput');
         const messageText = messageInput.value.trim();
         
@@ -412,7 +2345,7 @@
         
         try {
             const messageData = {
-                _id: `msg_${currentChatId}_${Date.now()}`,
+                id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
                 chatId: currentChatId,
                 senderId: currentUserId,
                 receiverId: currentChatPartner,
@@ -425,154 +2358,61 @@
             addMessageToChat(messageData);
             messageInput.value = '';
             
-            // Сохраняем сообщение в localStorage
-            saveMessageToStorage(messageData);
-            
-            // Обновляем информацию о чате
-            updateChatInfo(messageData);
-            
-            // Эмуляция ответа (через 2-5 секунд)
-            simulateReply();
+            // Находим чат и добавляем сообщение
+            const chatIndex = userChats.findIndex(chat => chat.id === currentChatId);
+            if (chatIndex !== -1) {
+                if (!userChats[chatIndex].messages) {
+                    userChats[chatIndex].messages = [];
+                }
+                userChats[chatIndex].messages.push(messageData);
+                userChats[chatIndex].lastMessage = messageText;
+                userChats[chatIndex].lastMessageTime = messageData.timestamp;
+                
+                // Сохраняем изменения
+                saveUserChats();
+                
+                // Обновляем список чатов
+                updateChatsList();
+            } else {
+                // Если чат не найден, создаем новый
+                createNewChatWithMessage(currentChatPartner, currentChatPartnerName, messageData);
+            }
             
         } catch (error) {
             console.error('❌ Ошибка отправки сообщения:', error);
-            alert('❌ Ошибка отправки сообщения');
+            alert('❌ Ошибка отправки сообщения. Попробуйте еще раз.');
         }
     };
 
-    // Сохранение сообщения в localStorage
-    function saveMessageToStorage(message) {
-        try {
-            const messagesKey = `umeyka_chat_messages_${message.chatId}`;
-            const existingMessages = getLocalStorage(messagesKey) || [];
-            
-            existingMessages.push(message);
-            setLocalStorage(messagesKey, existingMessages);
-            
-            console.log('💾 Сообщение сохранено в localStorage');
-        } catch (error) {
-            console.error('❌ Ошибка сохранения сообщения:', error);
-        }
-    }
-
-    // Обновление информации о чате
-    function updateChatInfo(message) {
-        const chatIndex = userChats.findIndex(chat => chat._id === message.chatId);
+    // Создание нового чата с первым сообщением
+    function createNewChatWithMessage(partnerId, partnerName, messageData) {
+        const newChat = {
+            id: currentChatId,
+            user1: currentUserId,
+            user1Name: currentUserName,
+            user2: partnerId,
+            user2Name: partnerName,
+            createdAt: new Date().toISOString(),
+            lastMessage: messageData.text,
+            lastMessageTime: messageData.timestamp,
+            messages: [messageData],
+            unreadCount: 0
+        };
         
-        if (chatIndex !== -1) {
-            const chat = userChats[chatIndex];
-            
-            // Обновляем последнее сообщение
-            chat.lastMessage = message.text;
-            chat.lastMessageTime = message.timestamp;
-            
-            // Если сообщение не от нас, увеличиваем счетчик непрочитанных у получателя
-            if (message.senderId !== currentUserId) {
-                chat.unreadCount = (chat.unreadCount || 0) + 1;
-            }
-            
-            // Сохраняем обновленные чаты
-            saveChatsToStorage();
-            
-            // Обновляем список чатов
-            updateChatsList();
-            updateUnreadMessagesCount();
+        userChats.push(newChat);
+        saveUserChats();
+        updateChatsList();
+    }
+
+    // Обработка нажатия Enter для отправки сообщения
+    window.handleMessageKeyPress = function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendChatMessage();
         }
-    }
+    };
 
-    // Эмуляция ответа от собеседника
-    function simulateReply() {
-        // Через 2-5 секунд отправляем автоматический ответ
-        const replyDelay = 2000 + Math.random() * 3000;
-        
-        setTimeout(() => {
-            if (!currentChatId || !currentChatPartner) return;
-            
-            const replies = [
-                "Спасибо за сообщение!",
-                "Хорошо, понял вас.",
-                "Давайте обсудим детали.",
-                "Могу подъехать завтра.",
-                "Какой у вас бюджет?",
-                "Есть фотографии проблемы?",
-                "Могу помочь с этим!",
-                "Давайте договоримся о времени.",
-                "Какие у вас пожелания?",
-                "Сколько это будет стоить?"
-            ];
-            
-            const randomReply = replies[Math.floor(Math.random() * replies.length)];
-            
-            const replyMessage = {
-                _id: `msg_${currentChatId}_${Date.now()}`,
-                chatId: currentChatId,
-                senderId: currentChatPartner,
-                receiverId: currentUserId,
-                text: randomReply,
-                timestamp: new Date().toISOString(),
-                read: false
-            };
-            
-            // Добавляем ответ в чат
-            addMessageToChat(replyMessage);
-            
-            // Сохраняем ответ
-            saveMessageToStorage(replyMessage);
-            
-            // Обновляем информацию о чате
-            updateChatInfo(replyMessage);
-            
-            // Показываем уведомление о новом сообщении
-            showNewMessageNotification(currentChatPartnerName, randomReply);
-            
-        }, replyDelay);
-    }
-
-    // Уведомление о новом сообщении
-    function showNewMessageNotification(senderName, messageText) {
-        // Только если чат не активен
-        if (!document.getElementById('chatWindow') || 
-            document.getElementById('chatWindow').style.display === 'none') {
-            
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 15px 20px;
-                border-radius: 10px;
-                font-size: 14px;
-                font-weight: 600;
-                box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-                z-index: 10000;
-                max-width: 300px;
-                animation: slideIn 0.3s ease;
-            `;
-            
-            notification.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 5px;">💬 ${senderName}</div>
-                <div style="opacity: 0.9; font-size: 12px;">${messageText}</div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Убираем уведомление через 5 секунд
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => {
-                        if (notification.parentNode) {
-                            document.body.removeChild(notification);
-                        }
-                    }, 300);
-                }
-            }, 5000);
-        }
-    }
-
-    // Запуск чата с новым пользователем (клиентская эмуляция)
+    // Запуск чата с новым пользователем
     window.startChatWithUser = async function(userId, userName, skillId = null) {
         try {
             // Проверяем, есть ли уже чат с этим пользователем
@@ -583,49 +2423,36 @@
             
             if (existingChat) {
                 // Открываем существующий чат
-                openChat(existingChat._id, userId, userName);
+                openChat(existingChat.id, userId, userName);
                 return;
             }
             
+            // Создаем новый чат ID
+            const chatId = 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
             // Создаем новый чат
             const newChat = {
-                _id: `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                id: chatId,
                 user1: currentUserId,
                 user1Name: currentUserName,
                 user2: userId,
                 user2Name: userName,
                 skillId: skillId,
+                createdAt: new Date().toISOString(),
                 lastMessage: 'Нет сообщений',
-                lastMessageTime: new Date().toISOString(),
-                unreadCount: 0,
-                createdAt: new Date().toISOString()
+                lastMessageTime: null,
+                messages: [],
+                unreadCount: 0
             };
             
-            // Добавляем чат в список
             userChats.push(newChat);
-            
-            // Сохраняем чаты
-            saveChatsToStorage();
-            
-            // Создаем приветственное сообщение
-            const welcomeMessage = {
-                _id: `msg_${newChat._id}_welcome`,
-                chatId: newChat._id,
-                senderId: userId,
-                receiverId: currentUserId,
-                text: `Привет! Я ${userName}. Чем могу помочь?`,
-                timestamp: new Date(Date.now() - 60000).toISOString(),
-                read: false
-            };
-            
-            // Сохраняем приветственное сообщение
-            saveMessageToStorage(welcomeMessage);
-            
-            // Обновляем информацию о чате
-            updateChatInfo(welcomeMessage);
+            saveUserChats();
             
             // Открываем новый чат
-            openChat(newChat._id, userId, userName);
+            openChat(chatId, userId, userName);
+            
+            // Обновляем список чатов
+            updateChatsList();
             
         } catch (error) {
             console.error('❌ Ошибка создания чата:', error);
@@ -635,61 +2462,35 @@
 
     // Запуск чата из модального окна контактов
     window.startChatFromContact = function() {
-        if (currentChatPartner && currentChatPartnerName) {
+        if (currentChatPartner) {
             closeContactModal();
             startChatWithUser(currentChatPartner, currentChatPartnerName);
         }
     };
 
-    // Опрос новых сообщений (эмуляция)
-    function startChatPolling() {
-        if (chatPollingInterval) {
-            clearInterval(chatPollingInterval);
-        }
-        
-        // В клиентской эмуляции просто обновляем счетчик
-        chatPollingInterval = setInterval(() => {
-            // Обновляем счетчик непрочитанных
-            updateUnreadMessagesCount();
-            
-            // Обновляем статистику в профиле
-            updateUserStats(getLocalStorage(`user_${currentUserId}`) || demoUserData);
-            
-        }, 5000);
-    }
-
     // Пометить сообщения как прочитанные
-    async function markMessagesAsRead() {
+    function markMessagesAsRead() {
         try {
             if (!currentChatId) return;
             
-            const messagesKey = `umeyka_chat_messages_${currentChatId}`;
-            const messages = getLocalStorage(messagesKey) || [];
-            
-            let hasUnread = false;
-            
-            // Помечаем все непрочитанные сообщения от собеседника как прочитанные
-            const updatedMessages = messages.map(message => {
-                if (message.senderId !== currentUserId && !message.read) {
-                    message.read = true;
-                    hasUnread = true;
-                }
-                return message;
-            });
-            
-            if (hasUnread) {
-                // Сохраняем обновленные сообщения
-                setLocalStorage(messagesKey, updatedMessages);
-                
-                // Обновляем счетчик непрочитанных в чате
-                const chatIndex = userChats.findIndex(chat => chat._id === currentChatId);
-                if (chatIndex !== -1) {
-                    userChats[chatIndex].unreadCount = 0;
-                    saveChatsToStorage();
+            const chatIndex = userChats.findIndex(chat => chat.id === currentChatId);
+            if (chatIndex !== -1) {
+                // Помечаем все сообщения от партнера как прочитанные
+                if (userChats[chatIndex].messages) {
+                    userChats[chatIndex].messages.forEach(message => {
+                        if (message.senderId !== currentUserId) {
+                            message.read = true;
+                        }
+                    });
                 }
                 
-                // Обновляем интерфейс
-                updateChatsList();
+                // Сбрасываем счетчик непрочитанных
+                userChats[chatIndex].unreadCount = 0;
+                
+                // Сохраняем изменения
+                saveUserChats();
+                
+                // Обновляем счетчик непрочитанных
                 updateUnreadMessagesCount();
             }
             
@@ -717,6 +2518,9 @@
                 unreadBadge.style.display = 'none';
             }
         }
+        
+        // Также обновляем статистику в профиле
+        updateUserStats(getLocalStorage(`user_${currentUserId}`) || demoUserData);
     }
 
     // Форматирование времени сообщения
@@ -748,14 +2552,6 @@
         
         showProfileSection();
         showProfileTab('chats');
-    };
-
-    // Обработка нажатия Enter для отправки сообщения
-    window.handleMessageKeyPress = function(event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            sendChatMessage();
-        }
     };
 
     // ========== ФУНКЦИЯ СЖАТИЯ ИЗОБРАЖЕНИЙ ==========
@@ -1720,8 +3516,7 @@
         const messageButton = document.getElementById('messageButton');
         
         // Сохраняем информацию о мастере для чата
-        // Используем userId из навыка для идентификации пользователя
-        currentChatPartner = skillId; // Используем skillId как временный идентификатор
+        currentChatPartner = skillId;
         currentChatPartnerName = username;
         
         // Формируем контактную информацию
@@ -1782,6 +3577,12 @@
         }).catch(err => {
             alert('❌ Не удалось скопировать');
         });
+    };
+
+    // Старая функция для обратной совместимости
+    window.contactMaster = function(skillId, skillName, username) {
+        // Используем новую функцию с модальным окном
+        openContactModal(skillId, skillName, username, '', '');
     };
 
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
@@ -2141,7 +3942,7 @@
         } else if (tabName === 'deals') {
             loadDeals();
         } else if (tabName === 'chats') {
-            updateChatsList();
+            loadUserChats();
         }
     };
 
