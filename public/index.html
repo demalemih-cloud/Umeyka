@@ -263,28 +263,12 @@
             margin: 10px 0;
         }
         
-        .skill-distance {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 15px;
-        }
-        
-        .skill-contact {
-            font-size: 14px;
-            color: #667eea;
-            margin: 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        /* Улучшенные стили для контактов */
         .skill-contacts-row {
-            margin: 12px 0 20px 0;
-            padding: 12px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-radius: 12px;
-            border: 1px solid rgba(102, 126, 234, 0.2);
+            background: rgba(102, 126, 234, 0.08);
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin: 12px 0;
+            color: #2d3748;
         }
 
         .skill-contacts-row .contact-item {
@@ -292,9 +276,10 @@
             align-items: center;
             gap: 10px;
             margin: 8px 0;
-            padding: 10px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
         }
 
         .skill-contacts-row .contact-icon {
@@ -304,24 +289,47 @@
         }
 
         .skill-contacts-row .contact-text {
-            word-break: break-all;
             flex: 1;
-            font-weight: 500;
+            word-break: break-all;
+            font-size: 14px;
         }
-        
-        .skill-contacts-row .copy-button {
-            background: #667eea;
+
+        .skill-contacts-row .copy-contact {
+            background: #4299e1;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
             padding: 6px 12px;
             font-size: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            white-space: nowrap;
         }
         
-        .skill-contacts-row .copy-button:hover {
-            background: #764ba2;
+        .skill-experience {
+            font-size: 14px;
+            color: #666;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .skill-distance {
+            font-size: 14px;
+            color: #666;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .skill-contact {
+            font-size: 14px;
+            color: #667eea;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .chat-button {
@@ -335,6 +343,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            margin-top: 10px;
         }
         
         #map {
@@ -1517,7 +1526,7 @@
                 <div style="margin: 15px 0;">
                     <div style="color: white; margin-bottom: 10px;">📞 Контактная информация</div>
                     <input type="text" id="skillPhone" class="input-field" placeholder="Телефон (например: +7 999 123-45-67)">
-                    <input type="text" id="skillTelegram" class="input-field" placeholder="Telegram (например: @username)">
+                    <input type="text" id="skillTelegram" class="input-field" placeholder="Текст">
                     <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
                         Эти данные будут видны клиентам для связи
                     </div>
@@ -1916,7 +1925,7 @@
             <div style="margin: 15px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📞 Контактная информация</div>
                 <input type="text" id="editSkillPhone" class="input-field" placeholder="Телефон">
-                <input type="text" id="editSkillTelegram" class="input-field" placeholder="Telegram (например: @username)">
+                <input type="text" id="editSkillTelegram" class="input-field" placeholder="Текст">
             </div>
             
             <!-- Загрузка фото для редактирования -->
@@ -2421,20 +2430,20 @@
                         
                         <div class="skill-price">${skill.price} ₽</div>
                         
-                        <!-- Контакты сразу под ценой (4-е место) -->
+                        <!-- КОНТАКТЫ - 4-й пункт -->
                         <div class="skill-contacts-row">
                             ${skill.phone ? `
                                 <div class="contact-item">
                                     <span class="contact-icon">📞</span>
                                     <span class="contact-text">${skill.phone}</span>
-                                    <button class="copy-button" onclick="copyToClipboard('${skill.phone}')">Копировать</button>
+                                    <button class="copy-contact" onclick="copyToClipboard('${skill.phone.replace(/'/g, "\\'")}')">Копировать</button>
                                 </div>
                             ` : ''}
                             ${skill.telegram ? `
                                 <div class="contact-item">
                                     <span class="contact-icon">✈️</span>
                                     <span class="contact-text">${skill.telegram}</span>
-                                    <button class="copy-button" onclick="copyToClipboard('${skill.telegram}')">Копировать</button>
+                                    <button class="copy-contact" onclick="copyToClipboard('${skill.telegram.replace(/'/g, "\\'")}')">Копировать</button>
                                 </div>
                             ` : ''}
                             ${!skill.phone && !skill.telegram ? 
@@ -2442,7 +2451,9 @@
                                 ''}
                         </div>
                         
-                        <div class="skill-distance">🎓 ${skill.experience}</div>
+                        <div class="skill-experience">
+                            <span style="color:#667eea;">🎓</span> ${skill.experience}
+                        </div>
                         
                         ${skill.photo ? `
                             <div class="skill-photo">
@@ -2450,14 +2461,14 @@
                             </div>
                         ` : ''}
                         
-                        <div style="color: #666; margin: 12px 0 16px;">
+                        <div style="color: #666; margin: 12px 0 16px; display: flex; align-items: center; gap: 8px;">
                             👤 ${skill.username}
                         </div>
                         
-                        <button class="chat-button" onclick="openEditSkillModal('${skill._id}')" style="background: #4299e1; margin-top: 10px;">
+                        <button class="chat-button" onclick="openEditSkillModal('${skill._id}')" style="background: #4299e1;">
                             ✏️ Редактировать
                         </button>
-                        <button class="chat-button" onclick="deleteSkill('${skill._id}')" style="background: #f56565; margin-top: 5px;">
+                        <button class="chat-button" onclick="deleteSkill('${skill._id}')" style="background: #f56565;">
                             🗑️ Удалить
                         </button>
                     </div>
@@ -2513,20 +2524,20 @@
                             <div class="skill-price">${skill.price} ₽</div>
                         </div>
                         
-                        <!-- Контакты сразу под ценой (4-е место) -->
+                        <!-- КОНТАКТЫ - 4-й пункт -->
                         <div class="skill-contacts-row">
                             ${skill.phone ? `
                                 <div class="contact-item">
                                     <span class="contact-icon">📞</span>
                                     <span class="contact-text">${skill.phone}</span>
-                                    <button class="copy-button" onclick="copyToClipboard('${skill.phone}')">Копировать</button>
+                                    <button class="copy-contact" onclick="copyToClipboard('${skill.phone.replace(/'/g, "\\'")}')">Копировать</button>
                                 </div>
                             ` : ''}
                             ${skill.telegram ? `
                                 <div class="contact-item">
                                     <span class="contact-icon">✈️</span>
                                     <span class="contact-text">${skill.telegram}</span>
-                                    <button class="copy-button" onclick="copyToClipboard('${skill.telegram}')">Копировать</button>
+                                    <button class="copy-contact" onclick="copyToClipboard('${skill.telegram.replace(/'/g, "\\'")}')">Копировать</button>
                                 </div>
                             ` : ''}
                             ${!skill.phone && !skill.telegram ? 
@@ -2534,14 +2545,18 @@
                                 ''}
                         </div>
                         
-                        <div style="color: #666; margin: 8px 0;">🎓 ${skill.experience}</div>
+                        <div class="skill-experience">
+                            <span style="color:#667eea;">🎓</span> ${skill.experience}
+                        </div>
                         ${skill.photo ? `
                             <div class="skill-photo" style="height: 150px;">
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
                             </div>
                         ` : ''}
-                        <div style="color: #666; margin: 8px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
-                        <div style="color: #48bb78; font-size: 12px; margin: 8px 0;">
+                        <div style="color: #666; margin: 8px 0; display: flex; align-items: center; gap: 8px;">
+                            ⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5
+                        </div>
+                        <div style="color: #48bb78; font-size: 12px; margin: 8px 0; display: flex; align-items: center; gap: 8px;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
                         <div class="skill-actions">
@@ -2912,27 +2927,19 @@
                         ${skill.price} руб.
                     </p>
                     
-                    <!-- Контакты под ценой (4-е место) -->
+                    <!-- КОНТАКТЫ под ценой -->
                     ${skill.phone || skill.telegram ? `
-                        <div style="margin: 10px 0; padding: 12px; background: rgba(102,126,234,0.08); border-radius: 8px;">
+                        <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px;">
                             ${skill.phone ? `
-                                <div style="display:flex; align-items:center; gap:10px; margin:6px 0; padding:8px; background:white; border-radius:6px;">
+                                <div style="display:flex; align-items:center; gap:10px; margin:6px 0;">
                                     <span style="font-size:18px; color:#667eea;">📞</span>
-                                    <span style="flex:1;">${skill.phone}</span>
-                                    <button onclick="copyToClipboard('${skill.phone}')" 
-                                            style="background:#667eea; color:white; border:none; border-radius:4px; padding:4px 8px; font-size:12px; cursor:pointer;">
-                                        Копировать
-                                    </button>
+                                    <span>${skill.phone}</span>
                                 </div>
                             ` : ''}
                             ${skill.telegram ? `
-                                <div style="display:flex; align-items:center; gap:10px; margin:6px 0; padding:8px; background:white; border-radius:6px;">
+                                <div style="display:flex; align-items:center; gap:10px; margin:6px 0;">
                                     <span style="font-size:18px; color:#667eea;">✈️</span>
-                                    <span style="flex:1;">${skill.telegram}</span>
-                                    <button onclick="copyToClipboard('${skill.telegram}')" 
-                                            style="background:#667eea; color:white; border:none; border-radius:4px; padding:4px 8px; font-size:12px; cursor:pointer;">
-                                        Копировать
-                                    </button>
+                                    <span>${skill.telegram}</span>
                                 </div>
                             ` : ''}
                         </div>
@@ -2993,7 +3000,7 @@
         // Формируем контактную информацию
         let contactHtml = `
             <h3 style="margin-bottom: 15px; color: #2d3748;">${skillName}</h3>
-            <p style="margin-bottom: 10px; color: #666;">👤 ${username}</p>
+            <p style="margin-bottom: 15px; color: #666;">👤 ${username}</p>
         `;
         
         if (phone) {
@@ -3001,11 +3008,11 @@
                 <div class="contact-item">
                     <div class="contact-icon">📞</div>
                     <div class="contact-text">${phone}</div>
-                    <button class="copy-contact" onclick="copyToClipboard('${phone}')">Копировать</button>
+                    <button class="copy-contact" onclick="copyToClipboard('${phone.replace(/'/g, "\\'")}')">Копировать</button>
                 </div>
             `;
             callButton.href = `tel:${phone.replace(/\s/g, '')}`;
-            callButton.style.display = 'block';
+            callButton.style.display = 'flex';
         } else {
             callButton.style.display = 'none';
         }
@@ -3015,11 +3022,12 @@
                 <div class="contact-item">
                     <div class="contact-icon">✈️</div>
                     <div class="contact-text">${telegram}</div>
-                    <button class="copy-contact" onclick="copyToClipboard('${telegram}')">Копировать</button>
+                    <button class="copy-contact" onclick="copyToClipboard('${telegram.replace(/'/g, "\\'")}')">Копировать</button>
                 </div>
             `;
-            telegramButton.href = `https://t.me/${telegram.replace('@', '')}`;
-            telegramButton.style.display = 'block';
+            const telegramUsername = telegram.startsWith('@') ? telegram.substring(1) : telegram;
+            telegramButton.href = `https://t.me/${telegramUsername}`;
+            telegramButton.style.display = 'flex';
         } else {
             telegramButton.style.display = 'none';
         }
@@ -3038,10 +3046,16 @@
 
     window.copyToClipboard = function(text) {
         navigator.clipboard.writeText(text).then(() => {
-            showNotification('✅ Скопировано в буфер обмена: ' + text);
+            alert('✅ Скопировано в буфер обмена: ' + text);
         }).catch(err => {
-            showNotification('❌ Не удалось скопировать');
+            alert('❌ Не удалось скопировать');
         });
+    };
+
+    // Старая функция для обратной совместимости
+    window.contactMaster = function(skillId, skillName, username) {
+        // Используем новую функцию с модальным окном
+        openContactModal(skillId, skillName, username, '', '');
     };
 
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
@@ -3202,20 +3216,20 @@
                         
                         <div class="skill-price">${skill.price} ₽</div>
                         
-                        <!-- Контакты сразу под ценой (4-е место) -->
+                        <!-- КОНТАКТЫ - 4-й пункт -->
                         <div class="skill-contacts-row">
                             ${skill.phone ? `
                                 <div class="contact-item">
                                     <span class="contact-icon">📞</span>
                                     <span class="contact-text">${skill.phone}</span>
-                                    <button class="copy-button" onclick="copyToClipboard('${skill.phone}')">Копировать</button>
+                                    <button class="copy-contact" onclick="copyToClipboard('${skill.phone.replace(/'/g, "\\'")}')">Копировать</button>
                                 </div>
                             ` : ''}
                             ${skill.telegram ? `
                                 <div class="contact-item">
                                     <span class="contact-icon">✈️</span>
                                     <span class="contact-text">${skill.telegram}</span>
-                                    <button class="copy-button" onclick="copyToClipboard('${skill.telegram}')">Копировать</button>
+                                    <button class="copy-contact" onclick="copyToClipboard('${skill.telegram.replace(/'/g, "\\'")}')">Копировать</button>
                                 </div>
                             ` : ''}
                             ${!skill.phone && !skill.telegram ? 
@@ -3223,7 +3237,9 @@
                                 ''}
                         </div>
                         
-                        <div class="skill-distance">🎓 ${skill.experience}</div>
+                        <div class="skill-experience">
+                            <span style="color:#667eea;">🎓</span> ${skill.experience}
+                        </div>
                         
                         ${skill.photo ? `
                             <div class="skill-photo">
@@ -3231,7 +3247,7 @@
                             </div>
                         ` : ''}
                         
-                        <div style="color: #666; margin: 12px 0 16px;">
+                        <div style="color: #666; margin: 12px 0 16px; display: flex; align-items: center; gap: 8px;">
                             👤 ${skill.username}
                         </div>
                         
