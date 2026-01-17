@@ -260,54 +260,45 @@
             font-size: 20px;
             font-weight: 700;
             color: #48bb78;
-            margin: 10px 0;
-        }
-        
-        .skill-experience {
-            font-size: 14px;
-            color: #666;
-            margin: 10px 0;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .skill-contacts-row {
-            margin: 10px 0;
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .skill-contacts-row .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 6px 0;
-            padding: 8px 0;
-        }
-
-        .skill-contacts-row .contact-icon {
-            font-size: 18px;
-            min-width: 24px;
-            color: #667eea;
-        }
-
-        .skill-contacts-row .contact-text {
-            word-break: break-all;
-            flex: 1;
+            margin: 15px 0;
         }
         
         .skill-distance {
             font-size: 14px;
             color: #666;
-            margin: 10px 0;
-            padding: 8px 0;
+            margin: 15px 0;
         }
         
-        .skill-author {
-            color: #666;
-            margin: 10px 0 16px;
-            padding: 8px 0;
-            font-size: 14px;
+        /* Новый стиль для контактов под ценой */
+        .skill-contact-info {
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 10px;
+            font-size: 15px;
+            color: #2d3748;
+        }
+
+        .skill-contact-info .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .skill-contact-info .contact-icon {
+            font-size: 18px;
+            min-width: 24px;
+            color: #667eea;
+        }
+
+        .skill-contact-info .contact-text {
+            word-break: break-all;
+            flex: 1;
         }
         
         .chat-button {
@@ -1114,7 +1105,7 @@
             height: 200px;
             border-radius: 10px;
             overflow: hidden;
-            margin: 10px 0;
+            margin: 15px 0;
             background: #f7fafc;
             display: flex;
             align-items: center;
@@ -1499,13 +1490,11 @@
                 <input type="text" id="skillExperience" class="input-field" placeholder="Мой опыт (например: 3 года)">
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях">
                 
-                <!-- Контактная информация (без заголовка) -->
-                <div style="margin: 15px 0;">
-                    <input type="text" id="skillPhone" class="input-field" placeholder="📞 Телефон (например: +7 999 123-45-67)">
-                    <input type="text" id="skillTelegram" class="input-field" placeholder="✈️ Текст">
-                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
-                        Эти данные будут видны клиентам для связи
-                    </div>
+                <!-- Контактная информация (четвертый пункт) -->
+                <input type="text" id="skillPhone" class="input-field" placeholder="Телефон (например: +7 999 123-45-67)">
+                <input type="text" id="skillTelegram" class="input-field" placeholder="Текст">
+                <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin: 5px 0 15px 0;">
+                    Эти данные будут видны клиентам для связи
                 </div>
                 
                 <!-- Загрузка фото для умейки -->
@@ -1897,11 +1886,9 @@
             <input type="text" id="editSkillExperience" class="input-field" placeholder="Мой опыт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
-            <!-- Контактная информация -->
-            <div style="margin: 15px 0;">
-                <input type="text" id="editSkillPhone" class="input-field" placeholder="📞 Телефон">
-                <input type="text" id="editSkillTelegram" class="input-field" placeholder="✈️ Текст">
-            </div>
+            <!-- Контактная информация (четвертый пункт) -->
+            <input type="text" id="editSkillPhone" class="input-field" placeholder="Телефон">
+            <input type="text" id="editSkillTelegram" class="input-field" placeholder="Текст">
             
             <!-- Загрузка фото для редактирования -->
             <div style="margin: 15px 0;">
@@ -2406,7 +2393,7 @@
                         <div class="skill-price">${skill.price} ₽</div>
                         
                         <!-- Контакты сразу под ценой (четвертый пункт) -->
-                        <div class="skill-contacts-row">
+                        <div class="skill-contact-info">
                             ${skill.phone ? `
                                 <div class="contact-item">
                                     <span class="contact-icon">📞</span>
@@ -2420,14 +2407,11 @@
                                 </div>
                             ` : ''}
                             ${!skill.phone && !skill.telegram ? 
-                                '<div style="color:#999; text-align:center; font-size:14px; padding: 8px 0;">Контакты не указаны</div>' : 
+                                '<div style="color:#999; text-align:center; font-size:14px;">Контакты не указаны</div>' : 
                                 ''}
                         </div>
                         
-                        <!-- Опыт после контактов (пятый пункт) -->
-                        <div class="skill-experience">
-                            🎓 ${skill.experience}
-                        </div>
+                        <div class="skill-distance">🎓 ${skill.experience}</div>
                         
                         ${skill.photo ? `
                             <div class="skill-photo">
@@ -2435,14 +2419,14 @@
                             </div>
                         ` : ''}
                         
-                        <div class="skill-author">
+                        <div style="color: #666; margin: 15px 0 20px;">
                             👤 ${skill.username}
                         </div>
                         
-                        <button class="chat-button" onclick="openEditSkillModal('${skill._id}')" style="background: #4299e1; margin-top: 10px;">
+                        <button class="chat-button" onclick="openEditSkillModal('${skill._id}')" style="background: #4299e1; margin-bottom: 8px;">
                             ✏️ Редактировать
                         </button>
-                        <button class="chat-button" onclick="deleteSkill('${skill._id}')" style="background: #f56565; margin-top: 5px;">
+                        <button class="chat-button" onclick="deleteSkill('${skill._id}')" style="background: #f56565;">
                             🗑️ Удалить
                         </button>
                     </div>
@@ -2499,7 +2483,7 @@
                         </div>
                         
                         <!-- Контакты сразу под ценой (четвертый пункт) -->
-                        <div class="skill-contacts-row">
+                        <div class="skill-contact-info">
                             ${skill.phone ? `
                                 <div class="contact-item">
                                     <span class="contact-icon">📞</span>
@@ -2513,22 +2497,18 @@
                                 </div>
                             ` : ''}
                             ${!skill.phone && !skill.telegram ? 
-                                '<div style="color:#999; text-align:center; font-size:14px; padding: 8px 0;">Контакты не указаны</div>' : 
+                                '<div style="color:#999; text-align:center; font-size:14px;">Контакты не указаны</div>' : 
                                 ''}
                         </div>
                         
-                        <!-- Опыт после контактов (пятый пункт) -->
-                        <div style="color: #666; margin: 10px 0; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
-                            🎓 ${skill.experience}
-                        </div>
-                        
+                        <div style="color: #666; margin: 15px 0;">🎓 ${skill.experience}</div>
                         ${skill.photo ? `
-                            <div class="skill-photo" style="height: 150px;">
+                            <div class="skill-photo" style="height: 150px; margin: 15px 0;">
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
                             </div>
                         ` : ''}
-                        <div style="color: #666; margin: 8px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
-                        <div style="color: #48bb78; font-size: 12px; margin: 8px 0;">
+                        <div style="color: #666; margin: 15px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
+                        <div style="color: #48bb78; font-size: 12px; margin: 15px 0;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
                         <div class="skill-actions">
@@ -2888,28 +2868,22 @@
                     </div>
                 </div>
                 
-                ${skill.photo ? `
-                    <div class="map-skill-photo">
-                        <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
-                    </div>
-                ` : ''}
-                
-                <div class="map-skill-info">
+                <div style="margin: 10px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
                     <p style="margin: 8px 0; font-weight: bold; color: #48bb78;">
                         ${skill.price} руб.
                     </p>
                     
                     <!-- Контакты под ценой (четвертый пункт) -->
                     ${skill.phone || skill.telegram ? `
-                        <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px; border-bottom: 1px solid rgba(102,126,234,0.2);">
+                        <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px;">
                             ${skill.phone ? `
-                                <div style="display:flex; align-items:center; gap:10px; margin:6px 0; padding: 6px 0;">
+                                <div style="display:flex; align-items:center; gap:10px; margin:6px 0;">
                                     <span style="font-size:18px;">📞</span>
                                     <span>${skill.phone}</span>
                                 </div>
                             ` : ''}
                             ${skill.telegram ? `
-                                <div style="display:flex; align-items:center; gap:10px; margin:6px 0; padding: 6px 0;">
+                                <div style="display:flex; align-items:center; gap:10px; margin:6px 0;">
                                     <span style="font-size:18px;">✈️</span>
                                     <span>${skill.telegram}</span>
                                 </div>
@@ -2917,16 +2891,21 @@
                         </div>
                     ` : ''}
                     
-                    <!-- Опыт после контактов (пятый пункт) -->
-                    <p style="margin: 10px 0; color: #2d3748; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+                    <p style="margin: 15px 0; color: #2d3748;">
                         <span style="color:#667eea;">🎓</span> ${skill.experience}
                     </p>
                     
-                    <p style="margin: 10px 0; color: #2d3748;">
+                    <p style="margin: 15px 0; color: #2d3748;">
                         <span style="color:#667eea;">⭐</span> 
                         Рейтинг: <strong>${rating.toFixed(1)}/5</strong>
                     </p>
                 </div>
+                
+                ${skill.photo ? `
+                    <div class="map-skill-photo">
+                        <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+                    </div>
+                ` : ''}
                 
                 <div class="map-skill-actions">
                     <button onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.phone || ''}', '${skill.telegram || ''}')"
@@ -3189,7 +3168,7 @@
                         <div class="skill-price">${skill.price} ₽</div>
                         
                         <!-- Контакты сразу под ценой (четвертый пункт) -->
-                        <div class="skill-contacts-row">
+                        <div class="skill-contact-info">
                             ${skill.phone ? `
                                 <div class="contact-item">
                                     <span class="contact-icon">📞</span>
@@ -3203,14 +3182,11 @@
                                 </div>
                             ` : ''}
                             ${!skill.phone && !skill.telegram ? 
-                                '<div style="color:#999; text-align:center; font-size:14px; padding: 8px 0;">Контакты не указаны</div>' : 
+                                '<div style="color:#999; text-align:center; font-size:14px;">Контакты не указаны</div>' : 
                                 ''}
                         </div>
                         
-                        <!-- Опыт после контактов (пятый пункт) -->
-                        <div class="skill-experience">
-                            🎓 ${skill.experience}
-                        </div>
+                        <div class="skill-distance">🎓 ${skill.experience}</div>
                         
                         ${skill.photo ? `
                             <div class="skill-photo">
@@ -3218,7 +3194,7 @@
                             </div>
                         ` : ''}
                         
-                        <div class="skill-author">
+                        <div style="color: #666; margin: 15px 0 20px;">
                             👤 ${skill.username}
                         </div>
                         
