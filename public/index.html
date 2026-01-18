@@ -2234,6 +2234,8 @@
                 location: location
             };
 
+            console.log('📤 Данные для отправки на сервер:', skillData);
+
             if (currentSkillPhoto) {
                 const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
                 console.log(`📊 Размер фото для отправки: ${estimatedSize.toFixed(2)}KB`);
@@ -2246,8 +2248,6 @@
                 skillData.photo = currentSkillPhoto;
                 skillData.photoTimestamp = new Date().toISOString();
             }
-
-            console.log('📤 Отправляю умейку:', skillData);
 
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -2369,6 +2369,21 @@
                 
                 result = await response.json();
                 console.log('📱 Ответ сервера:', result);
+                
+                // ДЕБАГ: Проверяем данные с сервера
+                if (result.success && result.skills && result.skills.length > 0) {
+                    console.log('=== ДЕБАГ ДАННЫХ С СЕРВЕРА ===');
+                    result.skills.forEach((skill, index) => {
+                        console.log(`Умейка ${index + 1}:`, {
+                            id: skill._id,
+                            name: skill.skill,
+                            phone: skill.phone,
+                            telegram: skill.telegram,
+                            fullData: skill
+                        });
+                    });
+                    console.log('=== КОНЕЦ ДЕБАГА ===');
+                }
             } catch (fetchError) {
                 console.error('❌ Ошибка загрузки моих умейок:', fetchError);
                 skillsList.innerHTML = `
@@ -2384,8 +2399,10 @@
                 console.log(`✅ Найдено ${result.skills.length} моих умейок`);
                 
                 skillsList.innerHTML = result.skills.map(skill => {
-                    // Определяем, есть ли контакты
-                    const hasContacts = skill.phone || skill.telegram;
+                    // Обрабатываем контакты - проверяем все возможные варианты полей
+                    const phone = skill.phone || skill.contactPhone || '';
+                    const telegram = skill.telegram || skill.contactTelegram || skill.contact || '';
+                    const hasContacts = phone || telegram;
                     
                     return `
                     <div class="skill-card">
@@ -2400,16 +2417,16 @@
                         <div class="skill-contact-info">
                             ${hasContacts ? `
                                 <div class="contact-label">📞 Контактная информация:</div>
-                                ${skill.phone ? `
+                                ${phone ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">📱</span>
-                                        <span class="contact-text">${skill.phone}</span>
+                                        <span class="contact-text">${phone}</span>
                                     </div>
                                 ` : ''}
-                                ${skill.telegram ? `
+                                ${telegram ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">✈️</span>
-                                        <span class="contact-text">${skill.telegram}</span>
+                                        <span class="contact-text">${telegram}</span>
                                     </div>
                                 ` : ''}
                             ` : `
@@ -2483,7 +2500,9 @@
             
             if (result.success && result.skills.length > 0) {
                 skillsList.innerHTML = result.skills.map(skill => {
-                    const hasContacts = skill.phone || skill.telegram;
+                    const phone = skill.phone || skill.contactPhone || '';
+                    const telegram = skill.telegram || skill.contactTelegram || skill.contact || '';
+                    const hasContacts = phone || telegram;
                     
                     return `
                     <div class="profile-skill-card">
@@ -2495,16 +2514,16 @@
                         <!-- Контакты сразу под ценой (четвертый пункт) -->
                         <div class="skill-contact-info">
                             ${hasContacts ? `
-                                ${skill.phone ? `
+                                ${phone ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">📱</span>
-                                        <span class="contact-text">${skill.phone}</span>
+                                        <span class="contact-text">${phone}</span>
                                     </div>
                                 ` : ''}
-                                ${skill.telegram ? `
+                                ${telegram ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">✈️</span>
-                                        <span class="contact-text">${skill.telegram}</span>
+                                        <span class="contact-text">${telegram}</span>
                                     </div>
                                 ` : ''}
                             ` : `
@@ -2553,12 +2572,16 @@
                 const skill = result.skill;
                 currentEditingSkill = skill;
                 
+                // Получаем контакты из всех возможных полей
+                const phone = skill.phone || skill.contactPhone || '';
+                const telegram = skill.telegram || skill.contactTelegram || skill.contact || '';
+                
                 document.getElementById('editSkillId').value = skillId;
                 document.getElementById('editSkillName').value = skill.skill || '';
                 document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
-                document.getElementById('editSkillPhone').value = skill.phone || '';
-                document.getElementById('editSkillTelegram').value = skill.telegram || '';
+                document.getElementById('editSkillPhone').value = phone;
+                document.getElementById('editSkillTelegram').value = telegram;
                 
                 // Сброс фото
                 editSkillPhoto = null;
@@ -2872,7 +2895,9 @@
 
     function createMapSkillPopup(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
-        const hasContacts = skill.phone || skill.telegram;
+        const phone = skill.phone || skill.contactPhone || '';
+        const telegram = skill.telegram || skill.contactTelegram || skill.contact || '';
+        const hasContacts = phone || telegram;
         
         return `
             <div class="map-popup-content">
@@ -2895,16 +2920,16 @@
                     ${hasContacts ? `
                         <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px;">
                             <div style="font-weight: 600; color: #667eea; margin-bottom: 5px; font-size: 12px;">📞 Контакты:</div>
-                            ${skill.phone ? `
+                            ${phone ? `
                                 <div style="display:flex; align-items:center; gap:10px; margin:6px 0; font-size: 14px;">
                                     <span style="font-size:16px;">📱</span>
-                                    <span>${skill.phone}</span>
+                                    <span>${phone}</span>
                                 </div>
                             ` : ''}
-                            ${skill.telegram ? `
+                            ${telegram ? `
                                 <div style="display:flex; align-items:center; gap:10px; margin:6px 0; font-size: 14px;">
                                     <span style="font-size:16px;">✈️</span>
-                                    <span>${skill.telegram}</span>
+                                    <span>${telegram}</span>
                                 </div>
                             ` : ''}
                         </div>
@@ -2927,7 +2952,7 @@
                 ` : ''}
                 
                 <div class="map-skill-actions">
-                    <button onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.phone || ''}', '${skill.telegram || ''}')"
+                    <button onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${phone}', '${telegram}')"
                             class="map-skill-button map-contact-button">
                         📞 Подробные контакты
                     </button>
@@ -3022,12 +3047,6 @@
         });
     };
 
-    // Старая функция для обратной совместимости
-    window.contactMaster = function(skillId, skillName, username) {
-        // Используем новую функцию с модальным окном
-        openContactModal(skillId, skillName, username, '', '');
-    };
-
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
 
     window.showMainScreen = function() {
@@ -3072,33 +3091,6 @@
     window.showAboutSection = function() {
         showSection('aboutSection');
     };
-
-    // ========== ФУНКЦИЯ ДЛЯ КРАСИВЫХ УВЕДОМЛЕНИЙ ==========
-
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 10000;
-        `;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 2000);
-    }
 
     // ========== ФУНКЦИЯ ОТЛАДКИ ==========
 
@@ -3168,7 +3160,9 @@
             
             if (result.success && result.skills.length > 0) {
                 searchResults.innerHTML = result.skills.map(skill => {
-                    const hasContacts = skill.phone || skill.telegram;
+                    const phone = skill.phone || skill.contactPhone || '';
+                    const telegram = skill.telegram || skill.contactTelegram || skill.contact || '';
+                    const hasContacts = phone || telegram;
                     
                     return `
                     <div class="skill-card">
@@ -3183,16 +3177,16 @@
                         <div class="skill-contact-info">
                             ${hasContacts ? `
                                 <div class="contact-label">📞 Контактная информация:</div>
-                                ${skill.phone ? `
+                                ${phone ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">📱</span>
-                                        <span class="contact-text">${skill.phone}</span>
+                                        <span class="contact-text">${phone}</span>
                                     </div>
                                 ` : ''}
-                                ${skill.telegram ? `
+                                ${telegram ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">✈️</span>
-                                        <span class="contact-text">${skill.telegram}</span>
+                                        <span class="contact-text">${telegram}</span>
                                     </div>
                                 ` : ''}
                             ` : `
@@ -3214,7 +3208,7 @@
                             👤 ${skill.username}
                         </div>
                         
-                        <button class="chat-button" onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.phone || ''}', '${skill.telegram || ''}')">
+                        <button class="chat-button" onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${phone}', '${telegram}')">
                             📞 Подробные контакты
                         </button>
                     </div>
@@ -3570,6 +3564,66 @@
         document.getElementById('projectReviewComment').value = '';
         setProjectRating(0);
     };
+
+    // ========== ДОПОЛНИТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ТЕСТИРОВАНИЯ ==========
+
+    window.testSkillData = async function() {
+        try {
+            console.log('🔍 Тестирование данных...');
+            
+            const response = await fetch(`${API_URL}/api/skills`);
+            const result = await response.json();
+            
+            if (result.success && result.skills.length > 0) {
+                const lastSkill = result.skills[result.skills.length - 1];
+                
+                console.log('📊 Последняя умейка в базе:', lastSkill);
+                
+                alert(`Тестовые данные:\n\n` +
+                      `ID: ${lastSkill._id}\n` +
+                      `Название: ${lastSkill.skill}\n` +
+                      `Цена: ${lastSkill.price}\n` +
+                      `Телефон: ${lastSkill.phone || 'НЕТ в базе'}\n` +
+                      `Telegram: ${lastSkill.telegram || 'НЕТ в базе'}\n` +
+                      `Все поля: ${JSON.stringify(lastSkill, null, 2)}`);
+            }
+        } catch (error) {
+            console.error('Ошибка тестирования:', error);
+            alert('Ошибка тестирования данных');
+        }
+    };
+
+    // Добавим кнопку тестирования в раздел мастера
+    document.addEventListener('DOMContentLoaded', function() {
+        // Добавляем кнопку тестирования после загрузки
+        setTimeout(() => {
+            const masterSection = document.getElementById('masterSection');
+            if (masterSection) {
+                const testButton = document.createElement('button');
+                testButton.innerHTML = '🐛 Тест данных';
+                testButton.style.cssText = `
+                    margin: 10px 0;
+                    padding: 10px;
+                    background: #9f7aea;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    width: 100%;
+                    font-size: 14px;
+                `;
+                testButton.onclick = testSkillData;
+                
+                const formSection = masterSection.querySelector('.form-section');
+                if (formSection) {
+                    const mySkillsList = formSection.querySelector('#mySkillsList');
+                    if (mySkillsList) {
+                        formSection.insertBefore(testButton, mySkillsList);
+                    }
+                }
+            }
+        }, 1000);
+    });
 
     </script>
 </body>
