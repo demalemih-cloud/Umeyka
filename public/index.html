@@ -2229,14 +2229,16 @@
                 price: parseInt(skillPrice),
                 userId: userId,
                 username: userData.firstName || 'Аноним',
-                phone: skillPhone.trim() || '',
-                telegram: skillTelegram.trim() || '',
-                contactPhone: skillPhone.trim() || '', // ДОБАВИЛИ АЛЬТЕРНАТИВНОЕ ПОЛЕ
-                contactTelegram: skillTelegram.trim() || '', // ДОБАВИЛИ АЛЬТЕРНАТИВНОЕ ПОЛЕ
+                phone: skillPhone.trim(),
+                telegram: skillTelegram.trim(),
                 location: location
             };
 
-            console.log('📤 Отправляю данные на сервер:', skillData);
+            // ВАЖНОЕ ИЗМЕНЕНИЕ: Добавляем проверку и отправляем ВСЕ поля
+            console.log('📤 Отправляю данные на сервер:');
+            console.log('Телефон:', skillData.phone);
+            console.log('Telegram:', skillData.telegram);
+            console.log('Все данные:', skillData);
 
             if (currentSkillPhoto) {
                 const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
@@ -2251,8 +2253,10 @@
                 skillData.photoTimestamp = new Date().toISOString();
             }
 
+            console.log('📤 Итоговые данные для отправки:', skillData);
+
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000); // УВЕЛИЧИЛИ ТАЙМАУТ
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
 
             try {
                 const response = await fetch(`${API_URL}/api/skills`, {
@@ -2294,10 +2298,9 @@
             } catch (fetchError) {
                 clearTimeout(timeoutId);
                 if (fetchError.name === 'AbortError') {
-                    alert('❌ Время ожидания истекло. Сервер не отвечает. Попробуйте еще раз.');
+                    alert('❌ Время ожидания истекло. Попробуйте еще раз.');
                 } else {
-                    console.error('Ошибка запроса:', fetchError);
-                    alert('❌ Ошибка сети. Проверьте подключение к интернету.');
+                    throw fetchError;
                 }
             }
         
@@ -2309,7 +2312,7 @@
 
     async function loadAllSkillsFromServer() {
         try {
-            console.log('📡 Загрузка всех умейок с сервера...');
+            console.log('📡 Загрузка умейок с сервера...');
             
             const response = await fetch(`${API_URL}/api/skills`);
             const result = await response.json();
@@ -2372,6 +2375,23 @@
                 
                 result = await response.json();
                 console.log('📱 Ответ сервера:', result);
+                
+                // ДЕБАГ: Выводим все данные для проверки
+                if (result.success && result.skills && result.skills.length > 0) {
+                    console.log('=== ДЕБАГ ДАННЫХ С СЕРВЕРА ===');
+                    result.skills.forEach((skill, index) => {
+                        console.log(`Умейка ${index + 1}:`, {
+                            name: skill.skill,
+                            price: skill.price,
+                            phone: skill.phone,
+                            telegram: skill.telegram,
+                            experience: skill.experience,
+                            ALL_DATA: skill
+                        });
+                    });
+                    console.log('=== КОНЕЦ ДЕБАГА ===');
+                }
+                
             } catch (fetchError) {
                 console.error('❌ Ошибка загрузки моих умейок:', fetchError);
                 skillsList.innerHTML = `
@@ -2387,15 +2407,17 @@
                 console.log(`✅ Найдено ${result.skills.length} моих умейок`);
                 
                 skillsList.innerHTML = result.skills.map(skill => {
-                    // ПРОВЕРЯЕМ РАЗНЫЕ ВАРИАНТЫ НАЗВАНИЙ ПОЛЕЙ КОНТАКТОВ
-                    const phone = skill.phone || skill.contactPhone || '';
-                    const telegram = skill.telegram || skill.contactTelegram || '';
-                    const hasContacts = phone || telegram;
+                    // Проверяем наличие контактов в данных
+                    const hasPhone = skill.phone && skill.phone.trim() !== '';
+                    const hasTelegram = skill.telegram && skill.telegram.trim() !== '';
+                    const hasContacts = hasPhone || hasTelegram;
                     
-                    console.log(`Умейка "${skill.skill}":`, {
-                        phone: phone,
-                        telegram: telegram,
-                        allFields: skill
+                    // Отладочная информация
+                    console.log(`📱 Контакты для "${skill.skill}":`, {
+                        phone: skill.phone,
+                        telegram: skill.telegram,
+                        hasPhone: hasPhone,
+                        hasTelegram: hasTelegram
                     });
                     
                     return `
@@ -2410,17 +2432,17 @@
                         <!-- Контакты сразу под ценой (четвертый пункт) -->
                         <div class="skill-contact-info">
                             ${hasContacts ? `
-                                <div class="contact-label">📞 Контактная информация:</div>
-                                ${phone ? `
+                                <div class="contact-label">📞 Контакты:</div>
+                                ${hasPhone ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">📱</span>
-                                        <span class="contact-text">${phone}</span>
+                                        <span class="contact-text">${skill.phone}</span>
                                     </div>
                                 ` : ''}
-                                ${telegram ? `
+                                ${hasTelegram ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">✈️</span>
-                                        <span class="contact-text">${telegram}</span>
+                                        <span class="contact-text">${skill.telegram}</span>
                                     </div>
                                 ` : ''}
                             ` : `
@@ -2494,9 +2516,9 @@
             
             if (result.success && result.skills.length > 0) {
                 skillsList.innerHTML = result.skills.map(skill => {
-                    const phone = skill.phone || skill.contactPhone || '';
-                    const telegram = skill.telegram || skill.contactTelegram || '';
-                    const hasContacts = phone || telegram;
+                    const hasPhone = skill.phone && skill.phone.trim() !== '';
+                    const hasTelegram = skill.telegram && skill.telegram.trim() !== '';
+                    const hasContacts = hasPhone || hasTelegram;
                     
                     return `
                     <div class="profile-skill-card">
@@ -2508,16 +2530,16 @@
                         <!-- Контакты сразу под ценой (четвертый пункт) -->
                         <div class="skill-contact-info">
                             ${hasContacts ? `
-                                ${phone ? `
+                                ${hasPhone ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">📱</span>
-                                        <span class="contact-text">${phone}</span>
+                                        <span class="contact-text">${skill.phone}</span>
                                     </div>
                                 ` : ''}
-                                ${telegram ? `
+                                ${hasTelegram ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">✈️</span>
-                                        <span class="contact-text">${telegram}</span>
+                                        <span class="contact-text">${skill.telegram}</span>
                                     </div>
                                 ` : ''}
                             ` : `
@@ -2570,13 +2592,8 @@
                 document.getElementById('editSkillName').value = skill.skill || '';
                 document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
-                
-                // ПРОВЕРЯЕМ РАЗНЫЕ ВАРИАНТЫ ПОЛЕЙ
-                const phone = skill.phone || skill.contactPhone || '';
-                const telegram = skill.telegram || skill.contactTelegram || '';
-                
-                document.getElementById('editSkillPhone').value = phone;
-                document.getElementById('editSkillTelegram').value = telegram;
+                document.getElementById('editSkillPhone').value = skill.phone || '';
+                document.getElementById('editSkillTelegram').value = skill.telegram || '';
                 
                 // Сброс фото
                 editSkillPhoto = null;
@@ -2646,11 +2663,11 @@
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
-                phone: skillPhone.trim() || '',
-                telegram: skillTelegram.trim() || '',
-                contactPhone: skillPhone.trim() || '', // ДОБАВИЛИ АЛЬТЕРНАТИВНОЕ ПОЛЕ
-                contactTelegram: skillTelegram.trim() || '' // ДОБАВИЛИ АЛЬТЕРНАТИВНОЕ ПОЛЕ
+                phone: skillPhone.trim(),
+                telegram: skillTelegram.trim()
             };
+            
+            console.log('📤 Сохраняю изменения умейки:', skillData);
             
             // Если загружено новое фото, добавляем его
             if (editSkillPhoto) {
@@ -2666,8 +2683,6 @@
                 // Сохраняем старое фото, если новое не загружено
                 skillData.photo = currentEditingSkill.photo;
             }
-            
-            console.log('📤 Сохраняю изменения умейки:', skillId, skillData);
             
             const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                 method: 'PUT',
@@ -2843,8 +2858,9 @@
                 if (skill.location && skill.location.lat && skill.location.lon) {
                     const rating = skill.rating?.average || 5.0;
                     const isUserSkill = skill.userId === currentUserId;
-                    const phone = skill.phone || skill.contactPhone || '';
-                    const telegram = skill.telegram || skill.contactTelegram || '';
+                    const hasPhone = skill.phone && skill.phone.trim() !== '';
+                    const hasTelegram = skill.telegram && skill.telegram.trim() !== '';
+                    const hasContacts = hasPhone || hasTelegram;
                     
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
                         icon: L.divIcon({
@@ -2855,7 +2871,7 @@
                         })
                     })
                     .addTo(map)
-                    .bindPopup(createMapSkillPopup(skill, isUserSkill, phone, telegram));
+                    .bindPopup(createMapSkillPopup(skill, isUserSkill, hasPhone, hasTelegram, hasContacts));
                     
                     marker.on('popupopen', async () => {
                         try {
@@ -2892,9 +2908,8 @@
         return '#6b7280';
     }
 
-    function createMapSkillPopup(skill, isUserSkill, phone, telegram) {
+    function createMapSkillPopup(skill, isUserSkill, hasPhone, hasTelegram, hasContacts) {
         const rating = skill.rating?.average || 5.0;
-        const hasContacts = phone || telegram;
         
         return `
             <div class="map-popup-content">
@@ -2917,16 +2932,16 @@
                     ${hasContacts ? `
                         <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px;">
                             <div style="font-weight: 600; color: #667eea; margin-bottom: 5px; font-size: 12px;">📞 Контакты:</div>
-                            ${phone ? `
+                            ${hasPhone ? `
                                 <div style="display:flex; align-items:center; gap:10px; margin:6px 0; font-size: 14px;">
                                     <span style="font-size:16px;">📱</span>
-                                    <span>${phone}</span>
+                                    <span>${skill.phone}</span>
                                 </div>
                             ` : ''}
-                            ${telegram ? `
+                            ${hasTelegram ? `
                                 <div style="display:flex; align-items:center; gap:10px; margin:6px 0; font-size: 14px;">
                                     <span style="font-size:16px;">✈️</span>
-                                    <span>${telegram}</span>
+                                    <span>${skill.telegram}</span>
                                 </div>
                             ` : ''}
                         </div>
@@ -2949,7 +2964,7 @@
                 ` : ''}
                 
                 <div class="map-skill-actions">
-                    <button onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${phone || ''}', '${telegram || ''}')"
+                    <button onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.phone || ''}', '${skill.telegram || ''}')"
                             class="map-skill-button map-contact-button">
                         📞 Подробные контакты
                     </button>
@@ -2996,7 +3011,7 @@
             <p style="margin-bottom: 10px; color: #666;">👤 ${username}</p>
         `;
         
-        if (phone) {
+        if (phone && phone.trim() !== '') {
             contactHtml += `
                 <div class="contact-item">
                     <div class="contact-icon">📞</div>
@@ -3010,7 +3025,7 @@
             callButton.style.display = 'none';
         }
         
-        if (telegram) {
+        if (telegram && telegram.trim() !== '') {
             contactHtml += `
                 <div class="contact-item">
                     <div class="contact-icon">✍️</div>
@@ -3024,7 +3039,7 @@
             telegramButton.style.display = 'none';
         }
         
-        if (!phone && !telegram) {
+        if ((!phone || phone.trim() === '') && (!telegram || telegram.trim() === '')) {
             contactHtml += '<p style="color: #999; text-align: center;">Контактная информация не указана</p>';
         }
         
@@ -3042,6 +3057,12 @@
         }).catch(err => {
             alert('❌ Не удалось скопировать');
         });
+    };
+
+    // Старая функция для обратной совместимости
+    window.contactMaster = function(skillId, skillName, username) {
+        // Используем новую функцию с модальным окном
+        openContactModal(skillId, skillName, username, '', '');
     };
 
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
@@ -3184,9 +3205,9 @@
             
             if (result.success && result.skills.length > 0) {
                 searchResults.innerHTML = result.skills.map(skill => {
-                    const phone = skill.phone || skill.contactPhone || '';
-                    const telegram = skill.telegram || skill.contactTelegram || '';
-                    const hasContacts = phone || telegram;
+                    const hasPhone = skill.phone && skill.phone.trim() !== '';
+                    const hasTelegram = skill.telegram && skill.telegram.trim() !== '';
+                    const hasContacts = hasPhone || hasTelegram;
                     
                     return `
                     <div class="skill-card">
@@ -3200,17 +3221,17 @@
                         <!-- Контакты сразу под ценой (четвертый пункт) -->
                         <div class="skill-contact-info">
                             ${hasContacts ? `
-                                <div class="contact-label">📞 Контактная информация:</div>
-                                ${phone ? `
+                                <div class="contact-label">📞 Контакты:</div>
+                                ${hasPhone ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">📱</span>
-                                        <span class="contact-text">${phone}</span>
+                                        <span class="contact-text">${skill.phone}</span>
                                     </div>
                                 ` : ''}
-                                ${telegram ? `
+                                ${hasTelegram ? `
                                     <div class="contact-item">
                                         <span class="contact-icon">✈️</span>
-                                        <span class="contact-text">${telegram}</span>
+                                        <span class="contact-text">${skill.telegram}</span>
                                     </div>
                                 ` : ''}
                             ` : `
@@ -3232,7 +3253,7 @@
                             👤 ${skill.username}
                         </div>
                         
-                        <button class="chat-button" onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${phone || ''}', '${telegram || ''}')">
+                        <button class="chat-button" onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.phone || ''}', '${skill.telegram || ''}')">
                             📞 Подробные контакты
                         </button>
                     </div>
