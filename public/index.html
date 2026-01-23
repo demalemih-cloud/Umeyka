@@ -263,13 +263,6 @@
             margin: 15px 0;
         }
         
-        .skill-distance {
-            font-size: 14px;
-            color: #666;
-            margin: 15px 0;
-        }
-        
-        /* УНИФИЦИРОВАННЫЙ СТИЛЬ ДЛЯ КОНТАКТОВ (как цена и опыт) */
         .skill-contact-info {
             margin: 15px 0;
             padding: 12px;
@@ -1509,7 +1502,8 @@
                 <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
                 
                 <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
-                <input type="text" id="skillContact" class="input-field" placeholder="Мой контакт (например: 9782872146)*" required>
+                <!-- ИЗМЕНЕНИЕ: Мой опыт → Мой контакт -->
+                <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
                 
                 <!-- Контактная информация (четвертый пункт) -->
@@ -1893,7 +1887,8 @@
             <input type="hidden" id="editSkillId">
             
             <input type="text" id="editSkillName" class="input-field" placeholder="Моё умение" required>
-            <input type="text" id="editSkillContact" class="input-field" placeholder="Мой контакт" required>
+            <!-- ИЗМЕНЕНИЕ: Мой опыт → Мой контакт -->
+            <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
             <!-- Контактная информация (четвертый пункт) -->
@@ -2198,12 +2193,12 @@
     window.addSkill = async function() {
         try {
             const skillName = document.getElementById('skillName').value;
-            const skillContact = document.getElementById('skillContact').value;
+            const skillExperience = document.getElementById('skillExperience').value;
             const skillPrice = document.getElementById('skillPrice').value;
             const skillPhone = document.getElementById('skillPhone').value;
             const skillTelegram = document.getElementById('skillTelegram').value;
         
-            if (!skillName.trim() || !skillContact.trim() || !skillPrice) {
+            if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
                 alert('❌ Заполните все обязательные поля (отмечены *)');
                 return;
             }
@@ -2228,7 +2223,7 @@
 
             const skillData = {
                 skill: skillName.trim(),
-                contact: skillContact.trim(),
+                experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
                 userId: userId,
                 username: userData.firstName || 'Аноним',
@@ -2239,7 +2234,6 @@
 
             // ВАЖНОЕ ИЗМЕНЕНИЕ: Добавляем проверку и отправляем ВСЕ поля
             console.log('📤 Отправляю данные на сервер:');
-            console.log('Контакт:', skillData.contact);
             console.log('Телефон:', skillData.phone);
             console.log('Telegram:', skillData.telegram);
             console.log('Все данные:', skillData);
@@ -2281,7 +2275,7 @@
                     alert('✅ Умейка успешно опубликована!');
                 
                     document.getElementById('skillName').value = '';
-                    document.getElementById('skillContact').value = '';
+                    document.getElementById('skillExperience').value = '';
                     document.getElementById('skillPrice').value = '';
                     document.getElementById('skillPhone').value = '';
                     document.getElementById('skillTelegram').value = '';
@@ -2387,9 +2381,9 @@
                         console.log(`Умейка ${index + 1}:`, {
                             name: skill.skill,
                             price: skill.price,
-                            contact: skill.contact,
                             phone: skill.phone,
                             telegram: skill.telegram,
+                            experience: skill.experience,
                             ALL_DATA: skill
                         });
                     });
@@ -2418,7 +2412,6 @@
                     
                     // Отладочная информация
                     console.log(`📱 Контакты для "${skill.skill}":`, {
-                        contact: skill.contact,
                         phone: skill.phone,
                         telegram: skill.telegram,
                         hasPhone: hasPhone,
@@ -2457,7 +2450,8 @@
                             `}
                         </div>
                         
-                        <div class="skill-distance">📞 ${skill.contact}</div>
+                        <!-- ИЗМЕНЕНИЕ: Иконка изменена с 🎓 на 📞 -->
+                        <div class="skill-distance">📞 ${skill.experience}</div>
                         
                         ${skill.photo ? `
                             <div class="skill-photo">
@@ -2552,7 +2546,8 @@
                             `}
                         </div>
                         
-                        <div style="color: #666; margin: 15px 0;">📞 ${skill.contact}</div>
+                        <!-- ИЗМЕНЕНИЕ: Иконка изменена с 🎓 на 📞 -->
+                        <div style="color: #666; margin: 15px 0;">📞 ${skill.experience}</div>
                         ${skill.photo ? `
                             <div class="skill-photo" style="height: 150px; margin: 15px 0;">
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
@@ -2595,7 +2590,7 @@
                 
                 document.getElementById('editSkillId').value = skillId;
                 document.getElementById('editSkillName').value = skill.skill || '';
-                document.getElementById('editSkillContact').value = skill.contact || '';
+                document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
                 document.getElementById('editSkillPhone').value = skill.phone || '';
                 document.getElementById('editSkillTelegram').value = skill.telegram || '';
@@ -2630,7 +2625,7 @@
         // Сброс формы
         document.getElementById('editSkillId').value = '';
         document.getElementById('editSkillName').value = '';
-        document.getElementById('editSkillContact').value = '';
+        document.getElementById('editSkillExperience').value = '';
         document.getElementById('editSkillPrice').value = '';
         document.getElementById('editSkillPhone').value = '';
         document.getElementById('editSkillTelegram').value = '';
@@ -2643,7 +2638,7 @@
         try {
             const skillId = document.getElementById('editSkillId').value;
             const skillName = document.getElementById('editSkillName').value;
-            const skillContact = document.getElementById('editSkillContact').value;
+            const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
             const skillPhone = document.getElementById('editSkillPhone').value;
             const skillTelegram = document.getElementById('editSkillTelegram').value;
@@ -2653,7 +2648,7 @@
                 return;
             }
             
-            if (!skillName.trim() || !skillContact.trim() || !skillPrice) {
+            if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
                 alert('❌ Заполните все обязательные поля');
                 return;
             }
@@ -2666,7 +2661,7 @@
             
             const skillData = {
                 skill: skillName.trim(),
-                contact: skillContact.trim(),
+                experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
                 phone: skillPhone.trim(),
                 telegram: skillTelegram.trim()
@@ -2956,8 +2951,9 @@
                         </div>
                     `}
                     
+                    <!-- ИЗМЕНЕНИЕ: Иконка изменена с 🎓 на 📞 -->
                     <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
-                        <span style="color:#667eea;">📞</span> ${skill.contact}
+                        <span style="color:#667eea;">📞</span> ${skill.experience}
                     </p>
                     
                     <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
@@ -3250,7 +3246,8 @@
                             `}
                         </div>
                         
-                        <div class="skill-distance">📞 ${skill.contact}</div>
+                        <!-- ИЗМЕНЕНИЕ: Иконка изменена с 🎓 на 📞 -->
+                        <div class="skill-distance">📞 ${skill.experience}</div>
                         
                         ${skill.photo ? `
                             <div class="skill-photo">
