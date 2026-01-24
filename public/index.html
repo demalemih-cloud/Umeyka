@@ -1505,7 +1505,7 @@
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
                 
-                <!-- ИЗМЕНЕНИЕ: Удалены два последних поля (телефон и Telegram), осталось только три поля -->
+                <!-- УДАЛЕНЫ: лишние поля для телефона и Telegram -->
                 
                 <!-- Загрузка фото для умейки -->
                 <div style="margin: 15px 0;">
@@ -1884,7 +1884,7 @@
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
-            <!-- ИЗМЕНЕНИЕ: Удалены два последних поля (телефон и Telegram) -->
+            <!-- УДАЛЕНЫ: лишние поля для телефона и Telegram -->
             
             <!-- Загрузка фото для редактирования -->
             <div style="margin: 15px 0;">
@@ -2186,14 +2186,11 @@
             const skillName = document.getElementById('skillName').value;
             const skillExperience = document.getElementById('skillExperience').value;
             const skillPrice = document.getElementById('skillPrice').value;
-            // ИЗМЕНЕНИЕ: Удалены переменные для телефона и Telegram
-        
+            
             if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
                 alert('❌ Заполните все обязательные поля (отмечены *)');
                 return;
             }
-
-            // ИЗМЕНЕНИЕ: Убрана проверка на наличие контактов, так как теперь только одно поле контакта
 
             const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
         
@@ -2213,7 +2210,6 @@
                 price: parseInt(skillPrice),
                 userId: userId,
                 username: userData.firstName || 'Аноним',
-                // ИЗМЕНЕНИЕ: Убраны поля phone и telegram
                 location: location
             };
 
@@ -2259,7 +2255,6 @@
                     document.getElementById('skillName').value = '';
                     document.getElementById('skillExperience').value = '';
                     document.getElementById('skillPrice').value = '';
-                    // ИЗМЕНЕНИЕ: Убрано очищение полей телефона и Telegram
                     removeSkillPhoto();
                     currentSkillPhoto = null;
                 
@@ -2355,18 +2350,58 @@
                 result = await response.json();
                 console.log('📱 Ответ сервера:', result);
                 
-                // ДЕБАГ: Выводим все данные для проверки
                 if (result.success && result.skills && result.skills.length > 0) {
-                    console.log('=== ДЕБАГ ДАННЫХ С СЕРВЕРА ===');
-                    result.skills.forEach((skill, index) => {
-                        console.log(`Умейка ${index + 1}:`, {
-                            name: skill.skill,
-                            price: skill.price,
-                            experience: skill.experience,
-                            ALL_DATA: skill
-                        });
-                    });
-                    console.log('=== КОНЕЦ ДЕБАГА ===');
+                    console.log(`✅ Найдено ${result.skills.length} моих умейок`);
+                    
+                    skillsList.innerHTML = result.skills.map(skill => {
+                        return `
+                        <div class="skill-card">
+                            <div class="skill-header">
+                                <div class="skill-title">${skill.skill}</div>
+                                <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                            </div>
+                            
+                            <div class="skill-price">${skill.price} ₽</div>
+                            
+                            <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под ценой -->
+                            <div class="skill-contact-info">
+                                <div class="contact-label">📞 Контакты:</div>
+                                <div class="contact-item">
+                                    <span class="contact-icon">📱</span>
+                                    <span class="contact-text">${skill.experience || 'Не указано'}</span>
+                                </div>
+                            </div>
+                            
+                            <div style="color: #666; margin: 15px 0 20px;">
+                                👤 ${skill.username}
+                            </div>
+                            
+                            ${skill.photo ? `
+                                <div class="skill-photo">
+                                    <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
+                                </div>
+                            ` : ''}
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button class="edit-button" onclick="openEditSkillModal('${skill._id}')">
+                                    ✏️ Редактировать
+                                </button>
+                                <button class="delete-button" onclick="deleteSkill('${skill._id}')">
+                                    🗑️ Удалить
+                                </button>
+                            </div>
+                        </div>
+                    `}).join('');
+                } else {
+                    skillsList.innerHTML = `
+                        <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                            <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
+                            <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
+                            <button class="main-button" onclick="showSection('masterSection')" style="padding: 15px; margin-top: 10px;">
+                                ✨ Добавить первую умейку
+                            </button>
+                        </div>
+                    `;
                 }
                 
             } catch (fetchError) {
@@ -2378,65 +2413,6 @@
                     </div>
                 `;
                 return;
-            }
-            
-            if (result.success && result.skills && result.skills.length > 0) {
-                console.log(`✅ Найдено ${result.skills.length} моих умейок`);
-                
-                skillsList.innerHTML = result.skills.map(skill => {
-                    // ИЗМЕНЕНИЕ: Убрана проверка на наличие контактов
-                    // Теперь контактная информация - это поле experience
-                    
-                    return `
-                    <div class="skill-card">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                        </div>
-                        
-                        <div class="skill-price">${skill.price} ₽</div>
-                        
-                        <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под ценой -->
-                        <div class="skill-contact-info">
-                            <div class="contact-label">📞 Контакты:</div>
-                            <div class="contact-item">
-                                <span class="contact-icon">📱</span>
-                                <span class="contact-text">${skill.experience || 'Не указано'}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="skill-distance">📞 ${skill.experience || 'Контакт не указан'}</div>
-                        
-                        ${skill.photo ? `
-                            <div class="skill-photo">
-                                <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
-                            </div>
-                        ` : ''}
-                        
-                        <div style="color: #666; margin: 15px 0 20px;">
-                            👤 ${skill.username}
-                        </div>
-                        
-                        <div style="display: flex; gap: 10px; margin-top: 15px;">
-                            <button class="edit-button" onclick="openEditSkillModal('${skill._id}')">
-                                ✏️ Редактировать
-                            </button>
-                            <button class="delete-button" onclick="deleteSkill('${skill._id}')">
-                                🗑️ Удалить
-                            </button>
-                        </div>
-                    </div>
-                `}).join('');
-            } else {
-                skillsList.innerHTML = `
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
-                        <button class="main-button" onclick="showSection('masterSection')" style="padding: 15px; margin-top: 10px;">
-                            ✨ Добавить первую умейку
-                        </button>
-                    </div>
-                `;
             }
             
         } catch (error) {
@@ -2469,9 +2445,6 @@
             
             if (result.success && result.skills.length > 0) {
                 skillsList.innerHTML = result.skills.map(skill => {
-                    // ИЗМЕНЕНИЕ: Убрана проверка на наличие отдельных контактов
-                    // Теперь контактная информация - это поле experience
-                    
                     return `
                     <div class="profile-skill-card">
                         <div class="profile-skill-header">
@@ -2479,7 +2452,7 @@
                             <div class="skill-price">${skill.price} ₽</div>
                         </div>
                         
-                        <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под ценой -->
+                        <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ -->
                         <div class="skill-contact-info">
                             <div class="contact-item">
                                 <span class="contact-icon">📱</span>
@@ -2487,7 +2460,6 @@
                             </div>
                         </div>
                         
-                        <div style="color: #666; margin: 15px 0;">📞 ${skill.experience || 'Контакт не указан'}</div>
                         ${skill.photo ? `
                             <div class="skill-photo" style="height: 150px; margin: 15px 0;">
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
@@ -2532,7 +2504,6 @@
                 document.getElementById('editSkillName').value = skill.skill || '';
                 document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
-                // ИЗМЕНЕНИЕ: Убраны поля телефона и Telegram
                 
                 // Сброс фото
                 editSkillPhoto = null;
@@ -2566,7 +2537,6 @@
         document.getElementById('editSkillName').value = '';
         document.getElementById('editSkillExperience').value = '';
         document.getElementById('editSkillPrice').value = '';
-        // ИЗМЕНЕНИЕ: Убраны поля телефона и Telegram
         
         const preview = document.getElementById('editSkillPhotoPreview');
         preview.style.display = 'none';
@@ -2578,7 +2548,6 @@
             const skillName = document.getElementById('editSkillName').value;
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
-            // ИЗМЕНЕНИЕ: Убраны переменные для телефона и Telegram
             
             if (!skillId) {
                 alert('❌ Ошибка: не указан ID умейки');
@@ -2590,13 +2559,10 @@
                 return;
             }
             
-            // ИЗМЕНЕНИЕ: Убрана проверка на наличие контактов
-            
             const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice)
-                // ИЗМЕНЕНИЕ: Убраны поля phone и telegram
             };
             
             console.log('📤 Сохраняю изменения умейки:', skillData);
@@ -2790,7 +2756,6 @@
                 if (skill.location && skill.location.lat && skill.location.lon) {
                     const rating = skill.rating?.average || 5.0;
                     const isUserSkill = skill.userId === currentUserId;
-                    // ИЗМЕНЕНИЕ: Теперь контактная информация - это поле experience
                     
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
                         icon: L.divIcon({
@@ -3125,9 +3090,6 @@
             
             if (result.success && result.skills.length > 0) {
                 searchResults.innerHTML = result.skills.map(skill => {
-                    // ИЗМЕНЕНИЕ: Убрана проверка на наличие отдельных контактов
-                    // Теперь контактная информация - это поле experience
-                    
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
@@ -3145,8 +3107,6 @@
                                 <span class="contact-text">${skill.experience || 'Не указано'}</span>
                             </div>
                         </div>
-                        
-                        <div class="skill-distance">📞 ${skill.experience || 'Контакт не указан'}</div>
                         
                         ${skill.photo ? `
                             <div class="skill-photo">
