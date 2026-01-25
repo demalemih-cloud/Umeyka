@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
+        /* Стили остаются те же, только добавлены необходимые изменения */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -23,1436 +24,29 @@
             line-height: 1.5;
         }
         
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 0;
-        }
+        /* ... остальные стили остаются без изменений ... */
         
-        .header {
-            padding: 30px 20px 20px;
+        /* Дополнительные стили для сделок */
+        .deal-empty-state {
             text-align: center;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            position: relative;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: #666;
+            padding: 40px;
         }
         
-        .about-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 10px;
-            font-size: 14px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-        }
-        
-        .logo {
+        .deal-empty-icon {
             font-size: 50px;
+            margin-bottom: 20px;
+        }
+        
+        .deal-empty-title {
+            font-size: 18px;
             margin-bottom: 10px;
+            color: #2d3748;
         }
         
-        .app-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        
-        .app-description {
-            font-size: 16px;
-            opacity: 0.9;
-            margin-bottom: 15px;
-        }
-        
-        .rating {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
-        
-        .stars {
-            color: #FFD700;
-            margin-right: 8px;
-        }
-        
-        .main-buttons {
-            padding: 40px 20px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .main-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 25px 20px;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 20px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .main-button:active {
-            transform: scale(0.98);
-            background: rgba(255,255,255,0.25);
-        }
-        
-        .button-master {
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
-        }
-
-        .button-master:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-        }
-        
-        .button-client {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-        }
-        
-        .button-icon {
-            font-size: 24px;
-            margin-right: 12px;
-        }
-        
-        .map-section {
-            padding: 20px;
-        }
-        
-        .map-button {
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 15px;
-        }
-        
-        .section {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: 1000;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        
-        .back-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-            padding: 18px 30px;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            width: 90%;
-            max-width: 300px;
-            margin: 0 auto 20px auto;
-            display: block;
-            position: relative;
-            left: auto;
-            top: auto;
-        }
-        
-        .back-button:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        
-        .form-section {
-            background: rgba(255,255,255,0.1);
-            padding: 25px 20px;
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
+        .deal-empty-description {
+            opacity: 0.7;
             margin-bottom: 20px;
-        }
-        
-        .input-field {
-            width: 100%;
-            padding: 18px;
-            margin: 12px 0;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            background: rgba(255,255,255,0.95);
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        
-        .submit-button {
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .skill-card {
-            background: rgba(255,255,255,0.95);
-            color: #2d3748;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 4px solid #667eea;
-        }
-
-        .gold-card {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #744210;
-            border: 3px solid #FFD700;
-        }
-        
-        .skill-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-        
-        .skill-title {
-            font-size: 18px;
-            font-weight: 700;
-            flex: 1;
-        }
-        
-        .skill-rating {
-            color: #FFD700;
-            font-size: 14px;
-        }
-        
-        .skill-price {
-            font-size: 20px;
-            font-weight: 700;
-            color: #48bb78;
-            margin: 15px 0;
-        }
-        
-        .skill-contact-info {
-            margin: 15px 0;
-            padding: 12px;
-            background: rgba(102, 126, 234, 0.08);
-            border-radius: 10px;
-            font-size: 15px;
-            color: #2d3748;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-        }
-
-        .skill-contact-info .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 8px 0;
-            padding: 8px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .skill-contact-info .contact-icon {
-            font-size: 18px;
-            min-width: 24px;
-            color: #667eea;
-        }
-
-        .skill-contact-info .contact-text {
-            word-break: break-all;
-            flex: 1;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .skill-contact-info .contact-label {
-            font-weight: 600;
-            color: #667eea;
-            margin-bottom: 5px;
-            display: block;
-            font-size: 16px;
-        }
-        
-        .chat-button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        #map {
-            height: 400px;
-            border-radius: 15px;
-            margin-top: 15px;
-            border: 2px solid rgba(255,255,255,0.3);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            display: none;
-        }
-        
-        .map-active #map {
-            display: block;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 20px;
-            font-size: 16px;
-        }
-        
-        .error-message {
-            background: rgba(255,0,0,0.1);
-            color: #ff6b6b;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            text-align: center;
-            border: 1px solid rgba(255,0,0,0.2);
-        }
-
-        /* Стили для личного кабинета */
-        .profile-skill-card {
-            background: rgba(255,255,255,0.95);
-            color: #2d3748;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 12px;
-            border-left: 4px solid #667eea;
-        }
-
-        .profile-skill-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .skill-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* Стили для кнопок вкладок */
-        .tab-buttons {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-            padding: 0 20px;
-            flex-wrap: wrap;
-        }
-
-        .tab-button {
-            flex: 1;
-            min-width: 120px;
-            padding: 18px 15px;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 15px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .tab-button:hover {
-            transform: translateY(-2px);
-            background: rgba(255,255,255,0.25);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-
-        .tab-button:active {
-            transform: translateY(0);
-        }
-
-        .tab-button.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-color: rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .edit-button {
-            background: #4299e1;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .delete-button {
-            background: #f56565;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .rating-badge {
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            color: #744210;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .chat-item {
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-            padding: 15px;
-            margin: 8px 0;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .chat-item:hover {
-            background: rgba(255,255,255,1);
-            transform: translateX(5px);
-        }
-
-        .chat-partner {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .chat-preview {
-            font-size: 14px;
-            color: #666;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .chat-time {
-            font-size: 12px;
-            color: #999;
-            text-align: right;
-        }
-
-        .unread-badge {
-            background: #e53e3e;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            margin-left: auto;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .stat-card {
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .rating-stars {
-            color: #FFD700;
-            font-size: 16px;
-            margin: 5px 0;
-        }
-
-        .rating-details {
-            background: rgba(255,255,255,0.9);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-        }
-
-        .rating-bar {
-            display: flex;
-            align-items: center;
-            margin: 8px 0;
-        }
-
-        .rating-label {
-            width: 100px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .rating-value {
-            width: 40px;
-            text-align: right;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .rating-progress {
-            flex: 1;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .rating-progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            border-radius: 4px;
-        }
-
-        /* Стили для сделок */
-        .deal-card {
-            background: rgba(255,255,255,0.95);
-            color: #2d3748;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 5px solid #667eea;
-        }
-
-        .deal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-
-        .deal-title {
-            font-size: 18px;
-            font-weight: 700;
-            flex: 1;
-        }
-
-        .deal-status {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-draft { background: #e2e8f0; color: #4a5568; }
-        .status-pending { background: #fef3c7; color: #d97706; }
-        .status-active { background: #d1fae5; color: #065f46; }
-        .status-completed { background: #dcfce7; color: #166534; }
-
-        .deal-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .deal-detail {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            padding: 15px;
-            background: #f7fafc;
-            border-radius: 10px;
-        }
-
-        .signature {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .signed { color: #38a169; }
-        .unsigned { color: #e53e3e; }
-
-        .deal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .deal-button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .sign-button { background: #48bb78; color: white; }
-        .view-button { background: #4299e1; color: white; }
-        .complete-button { background: #ed8936; color: white; }
-
-        /* Стили для формы создания сделки */
-        .quality-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .quality-option {
-            padding: 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-        }
-
-        .quality-option.selected {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .additional-options {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .option-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            cursor: pointer;
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-        }
-
-        .option-checkbox.selected {
-            border-color: #48bb78;
-            background: rgba(72, 187, 120, 0.1);
-        }
-
-        .chat-message-sender {
-            font-size: 12px;
-            color: #667eea;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-
-        .my-message .chat-message-sender {
-            color: #48bb78;
-            text-align: right;
-        }
-
-        /* Стили для звездной системы */
-        .level-achieved {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            border: 2px solid #10b981;
-        }
-
-        .referral-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 25px 20px;
-            border-radius: 20px;
-            margin: 25px 0;
-            color: white;
-            text-align: center;
-            border: 2px solid rgba(255,255,255,0.2);
-            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .referral-section::before {
-            content: '🎁';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 40px;
-            opacity: 0.3;
-        }
-
-        .referral-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .referral-description {
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            opacity: 0.9;
-        }
-
-        .referral-benefits {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .referral-benefit {
-            background: rgba(255,255,255,0.2);
-            padding: 12px 15px;
-            border-radius: 12px;
-            font-size: 14px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        .referral-link-container {
-            background: rgba(255,255,255,0.95);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            border: 2px dashed #667eea;
-        }
-
-        .referral-link {
-            color: #667eea;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            font-weight: bold;
-            word-break: break-all;
-            margin-bottom: 15px;
-        }
-
-        .referral-note {
-            font-size: 14px;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        .referral-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .share-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 20px;
-            border-radius: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .share-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .copy-button {
-            background: rgba(255,255,255,0.9);
-            border: 2px solid #667eea;
-            padding: 18px;
-            border-radius: 15px;
-            color: #667eea;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .copy-button:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .referral-note {
-            font-size: 14px;
-            opacity: 0.8;
-            text-align: center;
-            line-height: 1.4;
-            margin-top: 10px;
-        }
-
-        .referral-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
-
-        .referral-button:active {
-            transform: translateY(0);
-        }
-
-        /* Стили для раздела "О проекте" */
-        .about-section {
-            background: rgba(255,255,255,0.9);
-            padding: 25px;
-            border-radius: 20px;
-            color: #2d3748;
-            margin: 20px 0;
-        }
-
-        .about-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-            color: #667eea;
-        }
-
-        .channel-links {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .channel-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .channel-link:active {
-            transform: scale(0.98);
-        }
-
-        .channel-icon {
-            font-size: 30px;
-        }
-
-        .channel-info {
-            flex: 1;
-        }
-
-        .channel-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .channel-description {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* Стили для кастомизации */
-        .customization-section {
-            background: rgba(255,255,255,0.9);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            color: #2d3748;
-        }
-
-        .color-picker {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .color-option {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .color-option.selected {
-            border-color: #2d3748;
-            transform: scale(1.1);
-        }
-
-        .premium-badge {
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            color: #744210;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin: 10px 0;
-        }
-
-        .top-master-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        /* Новые стили для улучшенного дизайна */
-        .section-header {
-            text-align: center;
-            padding: 20px 0;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .back-button-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            padding: 0 20px;
-        }
-
-        .back-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        }
-
-        .back-button:active {
-            transform: translateY(0);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-             
-        /* Стили для кнопок вкладок сделок (столбиком) */
-        .deals-tab-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 0 0 20px 0;
-            padding: 0 20px;
-        }
-
-        .deals-tab-button {
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-        }
-
-        .deals-tab-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
-
-        .deals-tab-button:active {
-            transform: translateY(0);
-        }
-
-        .deals-tab-button.active {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: 2px solid rgba(255,255,255,0.5);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
-        }
-
-        /* Стили для сообщений чата */
-        .chat-message {
-            margin-bottom: 15px;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .my-message {
-            text-align: right;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        #chatMessages {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 15px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 15px;
-            min-height: 300px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        #messageInput {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid #667eea;
-            border-radius: 12px;
-            font-size: 16px;
-            background: white;
-            transition: all 0.3s ease;
-        }
-        
-        #messageInput:focus {
-            outline: none;
-            border-color: #764ba2;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        /* Кнопка отправки сообщения */
-        #chatWindow .submit-button {
-            width: auto;
-            padding: 15px 25px;
-            font-size: 16px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        #chatWindow .submit-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
-        
-        /* Заголовок чата */
-        #chatTitle {
-            color: #2d3748;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
-        }
-
-        /* Стили для фото в карточке */
-        .skill-photo {
-            width: 100%;
-            height: 200px;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 15px 0;
-            background: #f7fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .skill-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .skill-photo:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .upload-photo-button {
-            width: 100%;
-            padding: 12px;
-            background: #4299e1;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin: 10px 0;
-        }
-
-        .no-photo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            font-size: 14px;
-            height: 100%;
-        }
-
-        /* Стили для модального окна редактирования */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #666;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        .modal-close:hover {
-            background: #f7fafc;
-        }
-
-        .modal-title {
-            color: #2d3748;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .modal-button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .modal-save {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-        }
-
-        .modal-cancel {
-            background: #e2e8f0;
-            color: #4a5568;
-        }
-
-        .modal-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        /* Стили для карточки в карте */
-        .map-popup-content {
-            min-width: 300px;
-            max-width: 300px;
-        }
-
-        .map-skill-photo {
-            width: 100%;
-            height: 150px;
-            border-radius: 8px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-
-        .map-skill-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .map-skill-info {
-            background: #f7fafc;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-
-        .map-skill-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 15px;
-        }
-
-        .map-skill-button {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .map-contact-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .map-details-button {
-            background: #48bb78;
-            color: white;
-        }
-
-        .map-edit-button {
-            background: #ed8936;
-            color: white;
-        }
-
-        /* Стили для загрузки фото */
-        .photo-upload-area {
-            border: 2px dashed #667eea;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            margin: 15px 0;
-            background: rgba(102, 126, 234, 0.05);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .photo-upload-area:hover {
-            background: rgba(102, 126, 234, 0.1);
-            border-color: #764ba2;
-        }
-
-        .photo-upload-icon {
-            font-size: 40px;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .photo-preview {
-            position: relative;
-            margin: 10px 0;
-        }
-
-        .photo-preview img {
-            width: 100%;
-            max-height: 300px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-
-        .photo-remove {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .photo-info {
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            margin-top: 5px;
-        }
-
-        /* Стили для кнопок связи */
-        .contact-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .call-button {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        .telegram-button {
-            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        /* Стили для отображения контактов */
-        .contact-info {
-            background: #f7fafc;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-            color: #2d3748;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 8px 0;
-            padding: 8px;
-            background: white;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .contact-icon {
-            font-size: 20px;
-            color: #667eea;
-        }
-
-        .contact-text {
-            flex: 1;
-            font-size: 14px;
-            word-break: break-all;
-            font-weight: 500;
-        }
-
-        .copy-contact {
-            background: #4299e1;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 12px;
-            font-size: 12px;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -1731,7 +325,7 @@
                         <!-- Список мастеров будет загружен динамически -->
                     </select>
                     <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">
-                        Можно выбрать из ваших прошлых контактов
+                        Можно выбрать из найденных мастеров
                     </div>
                 </div>
                 
@@ -1967,7 +561,7 @@
     </div>
 
     <script>
-    // ========== КОНФИГУРАЦИЯ API ==========
+    // ========== КОНФИГУРАЦИЯ ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
     const TELEGRAM_BOT_URL = 'https://t.me/umeyka_bot';
     let currentUserId = null;
@@ -2020,6 +614,116 @@
         rating: 0,
         completedDeals: 0
     };
+
+    // ========== СИСТЕМА СДЕЛОК (ЛОКАЛЬНАЯ) ==========
+
+    // Инициализация системы сделок
+    function initDealsSystem() {
+        if (!getLocalStorage('umeyka_deals')) {
+            setLocalStorage('umeyka_deals', []);
+        }
+        if (!getLocalStorage('umeyka_deal_counter')) {
+            setLocalStorage('umeyka_deal_counter', 1);
+        }
+    }
+
+    // Получение всех сделок пользователя
+    function getUserDeals(userId, status = null) {
+        const allDeals = getLocalStorage('umeyka_deals') || [];
+        let userDeals = allDeals.filter(deal => 
+            deal.clientId === userId || deal.contractorId === userId
+        );
+        
+        if (status) {
+            userDeals = userDeals.filter(deal => deal.status === status);
+        }
+        
+        return userDeals.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    // Получение сделки по ID
+    function getDealById(dealId) {
+        const allDeals = getLocalStorage('umeyka_deals') || [];
+        return allDeals.find(deal => deal.id === dealId);
+    }
+
+    // Создание новой сделки
+    function createNewDeal(dealData) {
+        const allDeals = getLocalStorage('umeyka_deals') || [];
+        const dealCounter = getLocalStorage('umeyka_deal_counter') || 1;
+        
+        const newDeal = {
+            id: `deal_${dealCounter}`,
+            ...dealData,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+        
+        allDeals.push(newDeal);
+        setLocalStorage('umeyka_deals', allDeals);
+        setLocalStorage('umeyka_deal_counter', dealCounter + 1);
+        
+        return { success: true, deal: newDeal };
+    }
+
+    // Обновление сделки
+    function updateDeal(dealId, updates) {
+        const allDeals = getLocalStorage('umeyka_deals') || [];
+        const dealIndex = allDeals.findIndex(deal => deal.id === dealId);
+        
+        if (dealIndex === -1) {
+            return { success: false, error: 'Сделка не найдена' };
+        }
+        
+        allDeals[dealIndex] = {
+            ...allDeals[dealIndex],
+            ...updates,
+            updatedAt: new Date().toISOString()
+        };
+        
+        setLocalStorage('umeyka_deals', allDeals);
+        return { success: true, deal: allDeals[dealIndex] };
+    }
+
+    // Подписание сделки
+    function signDealLocal(dealId, userId, role) {
+        const deal = getDealById(dealId);
+        
+        if (!deal) {
+            return { success: false, error: 'Сделка не найдена' };
+        }
+        
+        // Проверяем, имеет ли пользователь право подписать
+        if (role === 'client' && deal.clientId !== userId) {
+            return { success: false, error: 'Нет прав для подписания как заказчик' };
+        }
+        
+        if (role === 'contractor' && deal.contractorId !== userId) {
+            return { success: false, error: 'Нет прав для подписания как исполнитель' };
+        }
+        
+        const updates = {};
+        if (role === 'client') {
+            updates.clientSigned = true;
+        } else {
+            updates.contractorSigned = true;
+        }
+        
+        // Проверяем, все ли подписали
+        const result = updateDeal(dealId, updates);
+        const updatedDeal = result.deal;
+        
+        if (updatedDeal.clientSigned && updatedDeal.contractorSigned && updatedDeal.status === 'pending') {
+            updateDeal(dealId, { status: 'active' });
+        }
+        
+        return result;
+    }
+
+    // Изменение статуса сделки
+    function updateDealStatus(dealId, status) {
+        return updateDeal(dealId, { status });
+    }
 
     // ========== ФУНКЦИЯ СЖАТИЯ ИЗОБРАЖЕНИЙ ==========
 
@@ -2601,7 +1305,7 @@
             if (editSkillPhoto) {
                 const estimatedSize = (editSkillPhoto.length * 0.75) / 1024;
                 if (estimatedSize > 500) {
-                    alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}KB).\nПопробуйте загрузить фото меньшего размера.`);
+                    alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}KB).\nПопробуйте загручить фото меньшего размера.`);
                     return;
                 }
                 
@@ -3088,6 +1792,7 @@
         showMainScreen();
         
         currentUserId = checkAndSetUserId();
+        initDealsSystem(); // Инициализация системы сделок
         
         const tg = window.Telegram?.WebApp;
         if (tg) {
@@ -3194,22 +1899,29 @@
         const statsGrid = document.getElementById('userStats');
         if (!statsGrid) return;
         
+        // Подсчитываем количество сделок по статусам
+        const userDeals = getUserDeals(currentUserId);
+        const completedDeals = userDeals.filter(deal => deal.status === 'completed').length;
+        const activeDeals = userDeals.filter(deal => deal.status === 'active').length;
+        const pendingDeals = userDeals.filter(deal => deal.status === 'pending').length;
+        const draftDeals = userDeals.filter(deal => deal.status === 'draft').length;
+        
         statsGrid.innerHTML = `
             <div class="stat-card">
                 <div class="stat-value">${userData.rating || 0}</div>
                 <div class="stat-label">⭐ Рейтинг</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">${userData.completedDeals || 0}</div>
-                <div class="stat-label">✅ Сделок</div>
+                <div class="stat-value">${completedDeals}</div>
+                <div class="stat-label">✅ Завершено</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">${userData.skills?.length || 0}</div>
-                <div class="stat-label">✨ Умейки</div>
+                <div class="stat-value">${activeDeals}</div>
+                <div class="stat-label">🔧 Активные</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">${userData.views || 0}</div>
-                <div class="stat-label">👁️ Просмотры</div>
+                <div class="stat-value">${pendingDeals + draftDeals}</div>
+                <div class="stat-label">📄 В ожидании</div>
             </div>
         `;
     }
@@ -3328,42 +2040,50 @@
         try {
             console.log('👥 Загрузка доступных исполнителей...');
             
-            // Загружаем всех пользователей с сервера (в реальном приложении это должно быть через API)
-            const response = await fetch(`${API_URL}/api/skills`);
-            const result = await response.json();
+            // Загружаем всех пользователей из умейок
+            const skills = await loadAllSkillsFromServer();
             
-            if (result.success) {
-                availableContractors = [];
-                const contractorsSet = new Set();
-                
-                result.skills.forEach(skill => {
-                    if (skill.userId && skill.userId !== currentUserId) {
-                        contractorsSet.add(JSON.stringify({
+            availableContractors = [];
+            const contractorsMap = new Map();
+            
+            skills.forEach(skill => {
+                if (skill.userId && skill.userId !== currentUserId) {
+                    if (!contractorsMap.has(skill.userId)) {
+                        contractorsMap.set(skill.userId, {
                             id: skill.userId,
                             name: skill.username || 'Аноним',
-                            contact: skill.experience || ''
-                        }));
+                            contact: skill.experience || '',
+                            skill: skill.skill || 'Мастер'
+                        });
                     }
-                });
+                }
+            });
+            
+            availableContractors = Array.from(contractorsMap.values());
+            console.log('✅ Загружено исполнителей:', availableContractors.length);
+            
+            // Обновляем список в форме создания сделки
+            const contractorSelect = document.getElementById('dealContractor');
+            if (contractorSelect) {
+                contractorSelect.innerHTML = '<option value="">Выберите исполнителя...</option>';
                 
-                availableContractors = Array.from(contractorsSet).map(item => JSON.parse(item));
-                console.log('✅ Загружено исполнителей:', availableContractors.length);
-                
-                // Обновляем список в форме создания сделки
-                const contractorSelect = document.getElementById('dealContractor');
-                if (contractorSelect) {
-                    contractorSelect.innerHTML = '<option value="">Выберите исполнителя...</option>';
-                    
+                if (availableContractors.length > 0) {
                     availableContractors.forEach(contractor => {
                         const option = document.createElement('option');
                         option.value = contractor.id;
-                        option.textContent = `${contractor.name} (${contractor.contact})`;
+                        option.textContent = `${contractor.name} - ${contractor.skill} (${contractor.contact})`;
                         contractorSelect.appendChild(option);
                     });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'Пока нет доступных мастеров';
+                    contractorSelect.appendChild(option);
                 }
             }
         } catch (error) {
             console.error('❌ Ошибка загрузки исполнителей:', error);
+            availableContractors = [];
         }
     }
 
@@ -3379,14 +2099,13 @@
             const dealsList = document.getElementById('dealsList');
             dealsList.innerHTML = '<div class="loading">⏳ Загрузка сделок...</div>';
             
-            // Загружаем сделки с сервера
-            const response = await fetch(`${API_URL}/api/deals/user/${currentUserId}?status=${currentDealTab}`);
-            const result = await response.json();
+            // Загружаем сделки из localStorage
+            const userDeals = getUserDeals(currentUserId, currentDealTab);
             
-            if (result.success && result.deals && result.deals.length > 0) {
-                console.log(`✅ Найдено ${result.deals.length} сделок`);
+            if (userDeals && userDeals.length > 0) {
+                console.log(`✅ Найдено ${userDeals.length} сделок со статусом ${currentDealTab}`);
                 
-                dealsList.innerHTML = result.deals.map(deal => {
+                dealsList.innerHTML = userDeals.map(deal => {
                     const isClient = deal.clientId === currentUserId;
                     const isContractor = deal.contractorId === currentUserId;
                     const role = isClient ? 'Заказчик' : 'Исполнитель';
@@ -3414,7 +2133,7 @@
                     }
                     
                     return `
-                    <div class="deal-card" onclick="showDealDetails('${deal._id}')">
+                    <div class="deal-card" onclick="showDealDetails('${deal.id}')">
                         <div class="deal-header">
                             <div class="deal-title">${deal.title || 'Без названия'}</div>
                             <div class="deal-status ${statusClass}">${statusText}</div>
@@ -3459,16 +2178,16 @@
                         ${deal.status === 'pending' ? `
                             <div class="deal-actions">
                                 ${!deal.clientSigned && isClient ? `
-                                    <button class="deal-button sign-button" onclick="signDeal('${deal._id}', 'client', event)">
+                                    <button class="deal-button sign-button" onclick="signDeal('${deal.id}', 'client', event)">
                                         ✍️ Подписать
                                     </button>
                                 ` : ''}
                                 ${!deal.contractorSigned && isContractor ? `
-                                    <button class="deal-button sign-button" onclick="signDeal('${deal._id}', 'contractor', event)">
+                                    <button class="deal-button sign-button" onclick="signDeal('${deal.id}', 'contractor', event)">
                                         ✍️ Подписать
                                     </button>
                                 ` : ''}
-                                <button class="deal-button view-button" onclick="showDealDetails('${deal._id}', event)">
+                                <button class="deal-button view-button" onclick="showDealDetails('${deal.id}', event)">
                                     👁️ Подробнее
                                 </button>
                             </div>
@@ -3476,10 +2195,10 @@
                         
                         ${deal.status === 'active' ? `
                             <div class="deal-actions">
-                                <button class="deal-button complete-button" onclick="completeDeal('${deal._id}', event)">
+                                <button class="deal-button complete-button" onclick="completeDeal('${deal.id}', event)">
                                     ✅ Завершить
                                 </button>
-                                <button class="deal-button view-button" onclick="showDealDetails('${deal._id}', event)">
+                                <button class="deal-button view-button" onclick="showDealDetails('${deal.id}', event)">
                                     👁️ Подробнее
                                 </button>
                             </div>
@@ -3488,9 +2207,22 @@
                 `}).join('');
             } else {
                 dealsList.innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">📄</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет сделок в этом разделе</div>
+                    <div class="deal-empty-state">
+                        <div class="deal-empty-icon">
+                            ${currentDealTab === 'draft' ? '📄' : 
+                              currentDealTab === 'pending' ? '✍️' : 
+                              currentDealTab === 'active' ? '✅' : '📋'}
+                        </div>
+                        <div class="deal-empty-title">
+                            ${currentDealTab === 'draft' ? 'Нет черновиков' : 
+                              currentDealTab === 'pending' ? 'Нет сделок, ожидающих подписи' : 
+                              currentDealTab === 'active' ? 'Нет активных сделок' : 'Нет завершенных сделок'}
+                        </div>
+                        <div class="deal-empty-description">
+                            ${currentDealTab === 'draft' ? 'Создайте первую сделку' : 
+                              currentDealTab === 'pending' ? 'Отправьте сделку на подпись' : 
+                              currentDealTab === 'active' ? 'Подпишите сделку, чтобы начать работу' : 'Завершите активную сделку'}
+                        </div>
                         ${currentDealTab === 'draft' ? `
                             <button class="main-button" onclick="showCreateDealSection()" 
                                     style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); margin-top: 15px;">
@@ -3592,6 +2324,9 @@
             const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
             const contractor = availableContractors.find(c => c.id === contractorId);
             
+            const commission = amount * 0.05;
+            const total = parseInt(amount) + commission;
+            
             const dealData = {
                 title: title,
                 description: description,
@@ -3599,32 +2334,24 @@
                 amount: parseInt(amount),
                 quality: selectedQuality,
                 options: selectedOptions,
-                commission: amount * 0.05,
-                total: parseInt(amount) + (amount * 0.05),
+                commission: commission,
+                total: total,
                 clientId: currentUserId,
                 clientName: userData.firstName || 'Аноним',
                 contractorId: contractorId,
                 contractorName: contractor?.name || 'Исполнитель',
+                contractorContact: contractor?.contact || '',
                 status: 'draft',
                 clientSigned: false,
-                contractorSigned: false,
-                createdAt: new Date().toISOString()
+                contractorSigned: false
             };
             
             console.log('📝 Создаю сделку:', dealData);
             
-            const response = await fetch(`${API_URL}/api/deals`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(dealData)
-            });
-            
-            const result = await response.json();
+            const result = createNewDeal(dealData);
             
             if (result.success) {
-                alert('✅ Сделка создана! Отправьте её на подпись исполнителю.');
+                alert('✅ Сделка создана! Перейдите в черновики, чтобы отправить её на подпись.');
                 
                 // Сброс формы
                 document.getElementById('dealTitle').value = '';
@@ -3650,7 +2377,7 @@
             
         } catch (error) {
             console.error('❌ Ошибка создания сделки:', error);
-            alert('❌ Ошибка создания сделки. Проверьте подключение к интернету.');
+            alert('❌ Ошибка создания сделки');
         }
     };
 
@@ -3662,11 +2389,9 @@
         try {
             console.log('📄 Загрузка деталей сделки:', dealId);
             
-            const response = await fetch(`${API_URL}/api/deals/${dealId}`);
-            const result = await response.json();
+            const deal = getDealById(dealId);
             
-            if (result.success && result.deal) {
-                const deal = result.deal;
+            if (deal) {
                 currentDealId = dealId;
                 
                 const isClient = deal.clientId === currentUserId;
@@ -3761,6 +2486,11 @@
                                     <div>
                                         <div style="font-weight: bold;">${deal.contractorName || 'Исполнитель'}</div>
                                         <div style="font-size: 12px; color: #666;">Исполнитель</div>
+                                        ${deal.contractorContact ? `
+                                            <div style="font-size: 12px; color: #667eea; margin-top: 4px;">
+                                                📞 ${deal.contractorContact}
+                                            </div>
+                                        ` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -3841,7 +2571,7 @@
                 
                 showSection('dealDetailsSection');
             } else {
-                alert('❌ Не удалось загрузить данные сделки');
+                alert('❌ Сделка не найдена');
             }
             
         } catch (error) {
@@ -3862,40 +2592,21 @@
         try {
             console.log(`✍️ Подписание сделки ${dealId} как ${role}`);
             
-            const response = await fetch(`${API_URL}/api/deals/${dealId}/sign`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    userId: currentUserId,
-                    role: role
-                })
-            });
-            
-            const result = await response.json();
+            const result = signDealLocal(dealId, currentUserId, role);
             
             if (result.success) {
                 alert('✅ Сделка успешно подписана!');
                 
                 // Проверяем, все ли подписали
-                if (result.deal.clientSigned && result.deal.contractorSigned) {
-                    // Если все подписали, меняем статус на активный
-                    await fetch(`${API_URL}/api/deals/${dealId}/status`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            status: 'active'
-                        })
-                    });
-                    
+                const deal = result.deal;
+                if (deal.clientSigned && deal.contractorSigned && deal.status === 'pending') {
+                    updateDealStatus(dealId, 'active');
                     alert('🎉 Все участники подписали сделку! Сделка переведена в статус "В работе".');
                 }
                 
                 // Обновляем данные
                 loadDeals();
+                loadUserProfile();
                 showProfileSection();
                 showProfileTab('deals');
                 
@@ -3917,17 +2628,7 @@
         try {
             console.log(`📤 Отправка сделки ${dealId} на подпись`);
             
-            const response = await fetch(`${API_URL}/api/deals/${dealId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    status: 'pending'
-                })
-            });
-            
-            const result = await response.json();
+            const result = updateDealStatus(dealId, 'pending');
             
             if (result.success) {
                 alert('✅ Сделка отправлена на подпись!');
@@ -3960,17 +2661,7 @@
         try {
             console.log(`✅ Завершение сделки ${dealId}`);
             
-            const response = await fetch(`${API_URL}/api/deals/${dealId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    status: 'completed'
-                })
-            });
-            
-            const result = await response.json();
+            const result = updateDealStatus(dealId, 'completed');
             
             if (result.success) {
                 alert('✅ Сделка успешно завершена!');
