@@ -2359,7 +2359,14 @@
                             
                             <div class="skill-price">${skill.price} ₽</div>
                             
-                            <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под ценой -->
+                            <!-- ФОТО РАБОТЫ -->
+                            ${skill.photo ? `
+                                <div class="skill-photo">
+                                    <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
+                                </div>
+                            ` : ''}
+                            
+                            <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под фото -->
                             <div class="skill-contact-info">
                                 <div class="contact-label">📞 Контакты:</div>
                                 <div class="contact-item">
@@ -2371,12 +2378,6 @@
                             <div style="color: #666; margin: 15px 0 20px;">
                                 👤 ${skill.username}
                             </div>
-                            
-                            ${skill.photo ? `
-                                <div class="skill-photo">
-                                    <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
-                                </div>
-                            ` : ''}
                             
                             <div style="display: flex; gap: 10px; margin-top: 15px;">
                                 <button class="edit-button" onclick="openEditSkillModal('${skill._id}')">
@@ -2448,7 +2449,14 @@
                             <div class="skill-price">${skill.price} ₽</div>
                         </div>
                         
-                        <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ -->
+                        <!-- ФОТО РАБОТЫ -->
+                        ${skill.photo ? `
+                            <div class="skill-photo" style="height: 150px; margin: 15px 0;">
+                                <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+                            </div>
+                        ` : ''}
+                        
+                        <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под фото -->
                         <div class="skill-contact-info">
                             <div class="contact-item">
                                 <span class="contact-icon">📱</span>
@@ -2456,11 +2464,6 @@
                             </div>
                         </div>
                         
-                        ${skill.photo ? `
-                            <div class="skill-photo" style="height: 150px; margin: 15px 0;">
-                                <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
-                            </div>
-                        ` : ''}
                         <div style="color: #666; margin: 15px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
                         <div style="color: #48bb78; font-size: 12px; margin: 15px 0;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
@@ -2819,7 +2822,14 @@
                         ${skill.price} руб.
                     </p>
                     
-                    <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под ценой -->
+                    <!-- ФОТО РАБОТЫ -->
+                    ${skill.photo ? `
+                        <div class="map-skill-photo">
+                            <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+                        </div>
+                    ` : ''}
+                    
+                    <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под фото -->
                     <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px; border: 1px solid rgba(102,126,234,0.1);">
                         <div style="font-weight: 600; color: #667eea; margin-bottom: 5px; font-size: 14px;">📞 Контакты:</div>
                         <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding: 8px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
@@ -2829,20 +2839,10 @@
                     </div>
                     
                     <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
-                        <span style="color:#667eea;">📞</span> ${skill.experience || 'Контакт не указан'}
-                    </p>
-                    
-                    <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
                         <span style="color:#667eea;">⭐</span> 
                         Рейтинг: <strong>${rating.toFixed(1)}/5</strong>
                     </p>
                 </div>
-                
-                ${skill.photo ? `
-                    <div class="map-skill-photo">
-                        <img src="${skill.photo}" alt="Фото работы">
-                    </div>
-                ` : ''}
                 
                 <div class="map-skill-actions">
                     <button onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '')"
@@ -3086,13 +3086,6 @@
             
             if (result.success && result.skills.length > 0) {
                 searchResults.innerHTML = result.skills.map(skill => {
-                    // ВАЖНОЕ ИСПРАВЛЕНИЕ: Теперь фото отображается у других пользователей
-                    const photoHtml = skill.photo ? `
-                        <div class="skill-photo">
-                            <img src="${skill.photo}" alt="Фото работы" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
-                        </div>
-                    ` : '';
-                    
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
@@ -3102,7 +3095,14 @@
                         
                         <div class="skill-price">${skill.price} ₽</div>
                         
-                        <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под ценой -->
+                        <!-- ФОТО РАБОТЫ -->
+                        ${skill.photo ? `
+                            <div class="skill-photo">
+                                <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
+                            </div>
+                        ` : ''}
+                        
+                        <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под фото -->
                         <div class="skill-contact-info">
                             <div class="contact-label">📞 Контакты:</div>
                             <div class="contact-item">
@@ -3110,8 +3110,6 @@
                                 <span class="contact-text">${skill.experience || 'Не указано'}</span>
                             </div>
                         </div>
-                        
-                        ${photoHtml}
                         
                         <div style="color: #666; margin: 15px 0 20px;">
                             👤 ${skill.username}
