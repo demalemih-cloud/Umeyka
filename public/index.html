@@ -1505,8 +1505,6 @@
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
                 
-                <!-- УДАЛЕНЫ: лишние поля для телефона и Telegram -->
-                
                 <!-- Загрузка фото для умейки -->
                 <div style="margin: 15px 0;">
                     <div style="color: white; margin-bottom: 10px;">📸 Фото вашей работы (максимум 1 фото, размер до 1MB)</div>
@@ -1883,8 +1881,6 @@
             <input type="text" id="editSkillName" class="input-field" placeholder="Моё умение" required>
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
-            
-            <!-- УДАЛЕНЫ: лишние поля для телефона и Telegram -->
             
             <!-- Загрузка фото для редактирования -->
             <div style="margin: 15px 0;">
@@ -2844,7 +2840,7 @@
                 
                 ${skill.photo ? `
                     <div class="map-skill-photo">
-                        <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+                        <img src="${skill.photo}" alt="Фото работы">
                     </div>
                 ` : ''}
                 
@@ -3090,6 +3086,13 @@
             
             if (result.success && result.skills.length > 0) {
                 searchResults.innerHTML = result.skills.map(skill => {
+                    // ВАЖНОЕ ИСПРАВЛЕНИЕ: Теперь фото отображается у других пользователей
+                    const photoHtml = skill.photo ? `
+                        <div class="skill-photo">
+                            <img src="${skill.photo}" alt="Фото работы" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;">
+                        </div>
+                    ` : '';
+                    
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
@@ -3108,11 +3111,7 @@
                             </div>
                         </div>
                         
-                        ${skill.photo ? `
-                            <div class="skill-photo">
-                                <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
-                            </div>
-                        ` : ''}
+                        ${photoHtml}
                         
                         <div style="color: #666; margin: 15px 0 20px;">
                             👤 ${skill.username}
