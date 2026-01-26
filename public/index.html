@@ -8,8 +8,1452 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* ВАШ СТИЛЬ КОДА ОСТАЁТСЯ ПОЛНОСТЬЮ ПРЕЖНИМ */
-        /* ... весь ваш CSS стиль ... */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        .header {
+            padding: 30px 20px 20px;
+            text-align: center;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            position: relative;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .about-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+        
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .app-description {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        .rating {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .stars {
+            color: #FFD700;
+            margin-right: 8px;
+        }
+        
+        .main-buttons {
+            padding: 40px 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .main-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 20px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .main-button:active {
+            transform: scale(0.98);
+            background: rgba(255,255,255,0.25);
+        }
+        
+        .button-master {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
+        }
+
+        .button-master:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+        
+        .button-client {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+        
+        .button-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+        
+        .map-section {
+            padding: 20px;
+        }
+        
+        .map-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        
+        .section {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .back-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 18px 30px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            width: 90%;
+            max-width: 300px;
+            margin: 0 auto 20px auto;
+            display: block;
+            position: relative;
+            left: auto;
+            top: auto;
+        }
+        
+        .back-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .form-section {
+            background: rgba(255,255,255,0.1);
+            padding: 25px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
+            margin-bottom: 20px;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 18px;
+            margin: 12px 0;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .submit-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .skill-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .gold-card {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #744210;
+            border: 3px solid #FFD700;
+        }
+        
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .skill-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+        
+        .skill-rating {
+            color: #FFD700;
+            font-size: 14px;
+        }
+        
+        .skill-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #48bb78;
+            margin: 15px 0;
+        }
+        
+        .skill-contact-info {
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 10px;
+            font-size: 15px;
+            color: #2d3748;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .skill-contact-info .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .skill-contact-info .contact-icon {
+            font-size: 18px;
+            min-width: 24px;
+            color: #667eea;
+        }
+
+        .skill-contact-info .contact-text {
+            word-break: break-all;
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .skill-contact-info .contact-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+            display: block;
+            font-size: 16px;
+        }
+        
+        .chat-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #map {
+            height: 400px;
+            border-radius: 15px;
+            margin-top: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .map-active #map {
+            display: block;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+        }
+        
+        .error-message {
+            background: rgba(255,0,0,0.1);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid rgba(255,0,0,0.2);
+        }
+
+        /* Стили для личного кабинета */
+        .profile-skill-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .profile-skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .skill-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Стили для кнопок вкладок */
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 120px;
+            padding: 18px 15px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-button:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .tab-button:active {
+            transform: translateY(0);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .edit-button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .delete-button {
+            background: #f56565;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .rating-badge {
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .chat-item {
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+            padding: 15px;
+            margin: 8px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-item:hover {
+            background: rgba(255,255,255,1);
+            transform: translateX(5px);
+        }
+
+        .chat-partner {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .chat-preview {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+        }
+
+        .unread-badge {
+            background: #e53e3e;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .rating-stars {
+            color: #FFD700;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .rating-details {
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .rating-label {
+            width: 100px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .rating-value {
+            width: 40px;
+            text-align: right;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .rating-progress {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .rating-progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            border-radius: 4px;
+        }
+
+        /* Стили для сделок */
+        .deal-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .deal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .deal-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .deal-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-draft { background: #e2e8f0; color: #4a5568; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-completed { background: #dcfce7; color: #166534; }
+
+        .deal-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .deal-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .signature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signed { color: #38a169; }
+        .unsigned { color: #e53e3e; }
+
+        .deal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .deal-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .sign-button { background: #48bb78; color: white; }
+        .view-button { background: #4299e1; color: white; }
+        .complete-button { background: #ed8936; color: white; }
+
+        /* Стили для формы создания сделки */
+        .quality-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .quality-option {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .quality-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .additional-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .option-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .option-checkbox.selected {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .chat-message-sender {
+            font-size: 12px;
+            color: #667eea;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .my-message .chat-message-sender {
+            color: #48bb78;
+            text-align: right;
+        }
+
+        /* Стили для звездной системы */
+        .level-achieved {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+        }
+
+        .referral-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px 20px;
+            border-radius: 20px;
+            margin: 25px 0;
+            color: white;
+            text-align: center;
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .referral-section::before {
+            content: '🎁';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 40px;
+            opacity: 0.3;
+        }
+
+        .referral-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .referral-description {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .referral-benefits {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .referral-benefit {
+            background: rgba(255,255,255,0.2);
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .referral-link-container {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px dashed #667eea;
+        }
+
+        .referral-link {
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            word-break: break-all;
+            margin-bottom: 15px;
+        }
+
+        .referral-note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .referral-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .share-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .share-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .copy-button {
+            background: rgba(255,255,255,0.9);
+            border: 2px solid #667eea;
+            padding: 18px;
+            border-radius: 15px;
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .copy-button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .referral-note {
+            font-size: 14px;
+            opacity: 0.8;
+            text-align: center;
+            line-height: 1.4;
+            margin-top: 10px;
+        }
+
+        .referral-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+
+        .referral-button:active {
+            transform: translateY(0);
+        }
+
+        /* Стили для раздела "О проекте" */
+        .about-section {
+            background: rgba(255,255,255,0.9);
+            padding: 25px;
+            border-radius: 20px;
+            color: #2d3748;
+            margin: 20px 0;
+        }
+
+        .about-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .channel-links {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .channel-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .channel-link:active {
+            transform: scale(0.98);
+        }
+
+        .channel-icon {
+            font-size: 30px;
+        }
+
+        .channel-info {
+            flex: 1;
+        }
+
+        .channel-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .channel-description {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Стили для кастомизации */
+        .customization-section {
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            color: #2d3748;
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-option.selected {
+            border-color: #2d3748;
+            transform: scale(1.1);
+        }
+
+        .premium-badge {
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .top-master-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Новые стили для улучшенного дизайна */
+        .section-header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .back-button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .back-button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+             
+        /* Стили для кнопок вкладок сделок (столбиком) */
+        .deals-tab-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 0 0 20px 0;
+            padding: 0 20px;
+        }
+
+        .deals-tab-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .deals-tab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+
+        .deals-tab-button:active {
+            transform: translateY(0);
+        }
+
+        .deals-tab-button.active {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
+        }
+
+        /* Стили для сообщений чата */
+        .chat-message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .my-message {
+            text-align: right;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        #chatMessages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        #messageInput:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Кнопка отправки сообщения */
+        #chatWindow .submit-button {
+            width: auto;
+            padding: 15px 25px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #chatWindow .submit-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+        
+        /* Заголовок чата */
+        #chatTitle {
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        /* Стили для фото в карточке */
+        .skill-photo {
+            width: 100%;
+            height: 200px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .skill-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .skill-photo:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .upload-photo-button {
+            width: 100%;
+            padding: 12px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .no-photo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 14px;
+            height: 100%;
+        }
+
+        /* Стили для модального окна редактирования */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background: #f7fafc;
+        }
+
+        .modal-title {
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-save {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .modal-cancel {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Стили для карточки в карте */
+        .map-popup-content {
+            min-width: 300px;
+            max-width: 300px;
+        }
+
+        .map-skill-photo {
+            width: 100%;
+            height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .map-skill-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .map-skill-info {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .map-skill-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .map-skill-button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .map-contact-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .map-details-button {
+            background: #48bb78;
+            color: white;
+        }
+
+        .map-edit-button {
+            background: #ed8936;
+            color: white;
+        }
+
+        /* Стили для загрузки фото */
+        .photo-upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 15px 0;
+            background: rgba(102, 126, 234, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-upload-area:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #764ba2;
+        }
+
+        .photo-upload-icon {
+            font-size: 40px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .photo-preview {
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .photo-info {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        /* Стили для кнопок связи */
+        .contact-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .call-button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .telegram-button {
+            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        /* Стили для отображения контактов */
+        .contact-info {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            color: #2d3748;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .contact-icon {
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .contact-text {
+            flex: 1;
+            font-size: 14px;
+            word-break: break-all;
+            font-weight: 500;
+        }
+
+        .copy-contact {
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -60,6 +1504,8 @@
                 <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
+                
+                <!-- УДАЛЕНЫ: лишние поля для телефона и Telegram -->
                 
                 <!-- Загрузка фото для умейки -->
                 <div style="margin: 15px 0;">
@@ -438,6 +1884,8 @@
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
+            <!-- УДАЛЕНЫ: лишние поля для телефона и Telegram -->
+            
             <!-- Загрузка фото для редактирования -->
             <div style="margin: 15px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📸 Фото вашей работы</div>
@@ -494,41 +1942,57 @@
     // ========== КОНФИГУРАЦИЯ API ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
     const TELEGRAM_BOT_URL = 'https://t.me/umeyka_bot';
-    
-    // ========== ХРАНИЛИЩЕ ДАННЫХ В ПАМЯТИ ==========
-    const appData = {
-        userId: null,
-        userProfile: {
-            firstName: 'Пользователь',
-            age: null,
-            experience: '',
-            contact: '',
-            bio: 'Расскажите о себе...',
-            avatar: null,
-            rating: 0,
-            completedDeals: 0,
-            views: 0,
-            stars: 0
-        },
-        deals: [],
+    let currentUserId = null;
+    let currentAvatar = null;
+    let currentSkillPhoto = null;
+    let editSkillPhoto = null;
+    let selectedQuality = '';
+    let selectedOptions = [];
+    let currentProfileTab = 'stats';
+    let currentDealTab = 'pending';
+    let projectRating = 0;
+    let map = null;
+    let markers = [];
+    let userLocation = null;
+    let mapRefreshInterval = null;
+    let currentEditingSkill = null;
+
+    // ========== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ==========
+
+    function getLocalStorage(key) {
+        try {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : null;
+        } catch (error) {
+            console.error('❌ Ошибка чтения из localStorage:', error);
+            return null;
+        }
+    }
+
+    function setLocalStorage(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+            return true;
+        } catch (error) {
+            console.error('❌ Ошибка записи в localStorage:', error);
+            return false;
+        }
+    }
+
+    const demoUserData = {
+        firstName: 'Пользователь',
+        age: null,
+        experience: '',
+        contact: '',
+        bio: 'Расскажите о себе...',
+        avatar: null,
         skills: [],
-        chats: [],
-        currentAvatar: null,
-        currentSkillPhoto: null,
-        editSkillPhoto: null,
-        selectedQuality: '',
-        selectedOptions: [],
-        currentProfileTab: 'stats',
-        currentDealTab: 'pending',
-        projectRating: 0,
-        map: null,
-        markers: [],
-        userLocation: null,
-        mapRefreshInterval: null,
-        currentEditingSkill: null
+        rating: 0,
+        completedDeals: 0
     };
 
     // ========== ФУНКЦИЯ СЖАТИЯ ИЗОБРАЖЕНИЙ ==========
+
     async function compressImage(file, maxWidth = 800, maxHeight = 600, quality = 0.7) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -582,6 +2046,7 @@
     }
 
     // ========== ФУНКЦИИ ДЛЯ ФОТОГРАФИЙ ==========
+
     window.handleSkillPhotoUpload = async function(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -604,11 +2069,11 @@
             }
             
             const compressed = await compressImage(file, 800, 600, 0.7);
-            appData.currentSkillPhoto = compressed.dataUrl;
+            currentSkillPhoto = compressed.dataUrl;
             
             const preview = document.getElementById('skillPhotoPreview');
             const img = document.getElementById('skillPhotoImg');
-            img.src = appData.currentSkillPhoto;
+            img.src = currentSkillPhoto;
             preview.style.display = 'block';
             
             statusElement.textContent = `✅ Фото сжато до ${compressed.compressedSize.toFixed(2)}KB`;
@@ -625,10 +2090,10 @@
             
             const reader = new FileReader();
             reader.onload = function(e) {
-                appData.currentSkillPhoto = e.target.result;
+                currentSkillPhoto = e.target.result;
                 const preview = document.getElementById('skillPhotoPreview');
                 const img = document.getElementById('skillPhotoImg');
-                img.src = appData.currentSkillPhoto;
+                img.src = currentSkillPhoto;
                 preview.style.display = 'block';
                 
                 statusElement.textContent = '⚠️ Используется оригинальное фото';
@@ -639,7 +2104,7 @@
     };
 
     window.removeSkillPhoto = function() {
-        appData.currentSkillPhoto = null;
+        currentSkillPhoto = null;
         const preview = document.getElementById('skillPhotoPreview');
         preview.style.display = 'none';
         document.getElementById('skillPhotoInput').value = '';
@@ -670,11 +2135,11 @@
             }
             
             const compressed = await compressImage(file, 800, 600, 0.7);
-            appData.editSkillPhoto = compressed.dataUrl;
+            editSkillPhoto = compressed.dataUrl;
             
             const preview = document.getElementById('editSkillPhotoPreview');
             const img = document.getElementById('editSkillPhotoImg');
-            img.src = appData.editSkillPhoto;
+            img.src = editSkillPhoto;
             preview.style.display = 'block';
             
             statusElement.textContent = `✅ Фото сжато до ${compressed.compressedSize.toFixed(2)}KB`;
@@ -691,10 +2156,10 @@
             
             const reader = new FileReader();
             reader.onload = function(e) {
-                appData.editSkillPhoto = e.target.result;
+                editSkillPhoto = e.target.result;
                 const preview = document.getElementById('editSkillPhotoPreview');
                 const img = document.getElementById('editSkillPhotoImg');
-                img.src = appData.editSkillPhoto;
+                img.src = editSkillPhoto;
                 preview.style.display = 'block';
                 
                 statusElement.textContent = '⚠️ Используется оригинальное фото';
@@ -705,7 +2170,7 @@
     };
 
     window.removeEditSkillPhoto = function() {
-        appData.editSkillPhoto = null;
+        editSkillPhoto = null;
         const preview = document.getElementById('editSkillPhotoPreview');
         preview.style.display = 'none';
         document.getElementById('editSkillPhotoInput').value = '';
@@ -715,6 +2180,7 @@
     };
 
     // ========== ФУНКЦИИ ДЛЯ УМЕЕК ==========
+
     window.addSkill = async function() {
         try {
             const skillName = document.getElementById('skillName').value;
@@ -726,7 +2192,9 @@
                 return;
             }
 
-            const userId = appData.userId || generateUserId();
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+        
+            const userId = currentUserId;
             console.log('👤 Добавляю умейку для User ID:', userId);
         
             if (!userId || userId === 'null' || userId === 'undefined') {
@@ -734,56 +2202,85 @@
                 return;
             }
 
-            const location = appData.userLocation || { lat: 55.7558, lon: 37.6173 };
+            const location = userLocation || { lat: 55.7558, lon: 37.6173 };
 
             const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
                 userId: userId,
-                username: appData.userProfile.firstName || 'Аноним',
-                location: location,
-                _id: 'skill_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+                username: userData.firstName || 'Аноним',
+                location: location
             };
 
-            console.log('📤 Добавляю умейку в память:', skillData);
+            console.log('📤 Отправляю данные на сервер:');
+            console.log('Все данные:', skillData);
 
-            if (appData.currentSkillPhoto) {
-                const estimatedSize = (appData.currentSkillPhoto.length * 0.75) / 1024;
-                console.log(`📊 Размер фото для сохранения: ${estimatedSize.toFixed(2)}KB`);
+            if (currentSkillPhoto) {
+                const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
+                console.log(`📊 Размер фото для отправки: ${estimatedSize.toFixed(2)}KB`);
                 
                 if (estimatedSize > 500) {
                     alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}KB).\nПопробуйте загрузить фото меньшего размера.`);
                     return;
                 }
                 
-                skillData.photo = appData.currentSkillPhoto;
+                skillData.photo = currentSkillPhoto;
                 skillData.photoTimestamp = new Date().toISOString();
             }
 
-            // Добавляем умейку в память
-            appData.skills.push(skillData);
+            console.log('📤 Итоговые данные для отправки:', skillData);
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+            try {
+                const response = await fetch(`${API_URL}/api/skills`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(skillData),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                const result = await response.json();
+                console.log('📱 Ответ сервера при добавлении:', result);
             
-            alert('✅ Умейка успешно опубликована!');
-        
-            document.getElementById('skillName').value = '';
-            document.getElementById('skillExperience').value = '';
-            document.getElementById('skillPrice').value = '';
-            removeSkillPhoto();
-            appData.currentSkillPhoto = null;
-        
-            setTimeout(() => {
-                loadMySkills();
-                loadProfileSkills();
-            }, 500);
-        
-            if (appData.map) {
-                setTimeout(() => loadSkillsOnMap(), 1000);
+                if (result.success) {
+                    alert('✅ Умейка успешно опубликована!');
+                
+                    document.getElementById('skillName').value = '';
+                    document.getElementById('skillExperience').value = '';
+                    document.getElementById('skillPrice').value = '';
+                    removeSkillPhoto();
+                    currentSkillPhoto = null;
+                
+                    setTimeout(() => {
+                        loadMySkills();
+                        loadProfileSkills();
+                    }, 500);
+                
+                    if (map) {
+                        setTimeout(() => loadSkillsOnMap(), 1000);
+                    }
+                } else {
+                    alert('❌ Ошибка: ' + (result.error || 'Неизвестная ошибка'));
+                }
+            } catch (fetchError) {
+                clearTimeout(timeoutId);
+                if (fetchError.name === 'AbortError') {
+                    alert('❌ Время ожидания истекло. Попробуйте еще раз.');
+                } else {
+                    throw fetchError;
+                }
             }
         
         } catch (error) {
             console.error('Ошибка добавления умейки:', error);
-            alert('❌ Ошибка добавления умейки.');
+            alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету.');
         }
     };
 
@@ -799,11 +2296,11 @@
                 return result.skills;
             } else {
                 console.error('❌ Ошибка загрузки умейок:', result.error);
-                return appData.skills; // Возвращаем умейки из памяти
+                return [];
             }
         } catch (error) {
             console.error('❌ Ошибка соединения с сервером:', error);
-            return appData.skills; // Возвращаем умейки из памяти
+            return [];
         }
     }
 
@@ -819,64 +2316,103 @@
             
             skillsList.innerHTML = '<div class="loading">⏳ Загрузка ваших умейок...</div>';
             
-            const userId = appData.userId || 'demo-user';
+            const userId = currentUserId || 'demo-user';
             console.log('🆔 Используем User ID:', userId);
             
-            // Получаем умейки пользователя из памяти
-            const userSkills = appData.skills.filter(skill => skill.userId === userId);
-            
-            if (userSkills.length > 0) {
-                console.log(`✅ Найдено ${userSkills.length} моих умейок`);
-                
-                skillsList.innerHTML = userSkills.map(skill => {
-                    return `
-                    <div class="skill-card">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill}</div>
-                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                        </div>
-                        
-                        <div class="skill-price">${skill.price} ₽</div>
-                        
-                        <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под ценой -->
-                        <div class="skill-contact-info">
-                            <div class="contact-label">📞 Контакты:</div>
-                            <div class="contact-item">
-                                <span class="contact-icon">📱</span>
-                                <span class="contact-text">${skill.experience || 'Не указано'}</span>
-                            </div>
-                        </div>
-                        
-                        ${skill.photo ? `
-                            <div class="skill-photo">
-                                <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
-                            </div>
-                        ` : ''}
-                        
-                        <div style="color: #666; margin: 15px 0 20px;">
-                            👤 ${skill.username}
-                        </div>
-                        
-                        <div style="display: flex; gap: 10px; margin-top: 15px;">
-                            <button class="edit-button" onclick="openEditSkillModal('${skill._id}')">
-                                ✏️ Редактировать
-                            </button>
-                            <button class="delete-button" onclick="deleteSkill('${skill._id}')">
-                                🗑️ Удалить
-                            </button>
-                        </div>
-                    </div>
-                `}).join('');
-            } else {
+            try {
+                const testResponse = await fetch(`${API_URL}/health`);
+                if (!testResponse.ok) {
+                    throw new Error('Сервер не отвечает');
+                }
+                console.log('✅ Сервер работает');
+            } catch (testError) {
+                console.error('❌ Сервер не отвечает:', testError);
                 skillsList.innerHTML = `
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
-                        <button class="main-button" onclick="showSection('masterSection')" style="padding: 15px; margin-top: 10px;">
-                            ✨ Добавить первую умейку
-                        </button>
+                    <div class="error-message">
+                        ❌ Сервер не отвечает<br>
+                        <small>Проверьте подключение к интернету</small>
                     </div>
                 `;
+                return;
+            }
+            
+            console.log(`📥 Загружаем умейки пользователя ${userId}...`);
+            let response, result;
+            
+            try {
+                response = await fetch(`${API_URL}/api/skills/user/${userId}`);
+                
+                if (!response.ok) {
+                    console.error(`❌ Ошибка HTTP: ${response.status} ${response.statusText}`);
+                    throw new Error(`Ошибка сервера: ${response.status}`);
+                }
+                
+                result = await response.json();
+                console.log('📱 Ответ сервера:', result);
+                
+                if (result.success && result.skills && result.skills.length > 0) {
+                    console.log(`✅ Найдено ${result.skills.length} моих умейок`);
+                    
+                    skillsList.innerHTML = result.skills.map(skill => {
+                        return `
+                        <div class="skill-card">
+                            <div class="skill-header">
+                                <div class="skill-title">${skill.skill}</div>
+                                <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                            </div>
+                            
+                            <div class="skill-price">${skill.price} ₽</div>
+                            
+                            <!-- УНИФИЦИРОВАННЫЕ КОНТАКТЫ под ценой -->
+                            <div class="skill-contact-info">
+                                <div class="contact-label">📞 Контакты:</div>
+                                <div class="contact-item">
+                                    <span class="contact-icon">📱</span>
+                                    <span class="contact-text">${skill.experience || 'Не указано'}</span>
+                                </div>
+                            </div>
+                            
+                            <div style="color: #666; margin: 15px 0 20px;">
+                                👤 ${skill.username}
+                            </div>
+                            
+                            ${skill.photo ? `
+                                <div class="skill-photo">
+                                    <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
+                                </div>
+                            ` : ''}
+                            
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button class="edit-button" onclick="openEditSkillModal('${skill._id}')">
+                                    ✏️ Редактировать
+                                </button>
+                                <button class="delete-button" onclick="deleteSkill('${skill._id}')">
+                                    🗑️ Удалить
+                                </button>
+                            </div>
+                        </div>
+                    `}).join('');
+                } else {
+                    skillsList.innerHTML = `
+                        <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                            <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
+                            <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
+                            <button class="main-button" onclick="showSection('masterSection')" style="padding: 15px; margin-top: 10px;">
+                                ✨ Добавить первую умейку
+                            </button>
+                        </div>
+                    `;
+                }
+                
+            } catch (fetchError) {
+                console.error('❌ Ошибка загрузки моих умейок:', fetchError);
+                skillsList.innerHTML = `
+                    <div class="error-message">
+                        ❌ Ошибка загрузки данных<br>
+                        <small>${fetchError.message}</small>
+                    </div>
+                `;
+                return;
             }
             
         } catch (error) {
@@ -895,20 +2431,20 @@
 
     async function loadProfileSkills() {
         try {
-            if (!appData.userId) {
+            if (!currentUserId) {
                 console.log('👤 Пользователь не определен');
                 return;
             }
 
             console.log('📡 Загрузка моих умейок для профиля...');
             
-            const userId = appData.userId;
-            const userSkills = appData.skills.filter(skill => skill.userId === userId);
+            const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
+            const result = await response.json();
             
             const skillsList = document.getElementById('profileSkillsList');
             
-            if (userSkills.length > 0) {
-                skillsList.innerHTML = userSkills.map(skill => {
+            if (result.success && result.skills.length > 0) {
+                skillsList.innerHTML = result.skills.map(skill => {
                     return `
                     <div class="profile-skill-card">
                         <div class="profile-skill-header">
@@ -929,9 +2465,9 @@
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
                             </div>
                         ` : ''}
-                        <div style="color: #666; margin: 15px 0;">⭐ Рейтинг: 5.0/5</div>
+                        <div style="color: #666; margin: 15px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
                         <div style="color: #48bb78; font-size: 12px; margin: 15px 0;">
-                            👁️ ${skill.views || 0} просмотров
+                            👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
                         <div class="skill-actions">
                             <button class="edit-button" onclick="openEditSkillModal('${skill._id}')" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
@@ -957,10 +2493,12 @@
         try {
             console.log('📱 Загрузка умейки для редактирования:', skillId);
             
-            const skill = appData.skills.find(s => s._id === skillId);
+            const response = await fetch(`${API_URL}/api/skills/${skillId}`);
+            const result = await response.json();
             
-            if (skill) {
-                appData.currentEditingSkill = skill;
+            if (result.success && result.skill) {
+                const skill = result.skill;
+                currentEditingSkill = skill;
                 
                 document.getElementById('editSkillId').value = skillId;
                 document.getElementById('editSkillName').value = skill.skill || '';
@@ -968,7 +2506,7 @@
                 document.getElementById('editSkillPrice').value = skill.price || '';
                 
                 // Сброс фото
-                appData.editSkillPhoto = null;
+                editSkillPhoto = null;
                 const preview = document.getElementById('editSkillPhotoPreview');
                 preview.style.display = 'none';
                 
@@ -981,7 +2519,7 @@
                 
                 document.getElementById('editSkillModal').style.display = 'flex';
             } else {
-                alert('❌ Не удалось найти умейку');
+                alert('❌ Не удалось загрузить данные умейки');
             }
         } catch (error) {
             console.error('❌ Ошибка загрузки умейки:', error);
@@ -991,8 +2529,8 @@
 
     window.closeEditSkillModal = function() {
         document.getElementById('editSkillModal').style.display = 'none';
-        appData.currentEditingSkill = null;
-        appData.editSkillPhoto = null;
+        currentEditingSkill = null;
+        editSkillPhoto = null;
         
         // Сброс формы
         document.getElementById('editSkillId').value = '';
@@ -1021,40 +2559,53 @@
                 return;
             }
             
-            const skillIndex = appData.skills.findIndex(s => s._id === skillId);
+            const skillData = {
+                skill: skillName.trim(),
+                experience: skillExperience.trim(),
+                price: parseInt(skillPrice)
+            };
             
-            if (skillIndex === -1) {
-                alert('❌ Умейка не найдена');
-                return;
-            }
+            console.log('📤 Сохраняю изменения умейки:', skillData);
             
-            // Обновляем умейку в памяти
-            appData.skills[skillIndex].skill = skillName.trim();
-            appData.skills[skillIndex].experience = skillExperience.trim();
-            appData.skills[skillIndex].price = parseInt(skillPrice);
-            
-            // Если загружено новое фото, обновляем его
-            if (appData.editSkillPhoto) {
-                const estimatedSize = (appData.editSkillPhoto.length * 0.75) / 1024;
+            // Если загружено новое фото, добавляем его
+            if (editSkillPhoto) {
+                const estimatedSize = (editSkillPhoto.length * 0.75) / 1024;
                 if (estimatedSize > 500) {
                     alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}KB).\nПопробуйте загрузить фото меньшего размера.`);
                     return;
                 }
                 
-                appData.skills[skillIndex].photo = appData.editSkillPhoto;
-                appData.skills[skillIndex].photoTimestamp = new Date().toISOString();
+                skillData.photo = editSkillPhoto;
+                skillData.photoTimestamp = new Date().toISOString();
+            } else if (currentEditingSkill && currentEditingSkill.photo) {
+                // Сохраняем старое фото, если новое не загружено
+                skillData.photo = currentEditingSkill.photo;
             }
             
-            alert('✅ Умейка успешно обновлена!');
-            closeEditSkillModal();
+            const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(skillData)
+            });
             
-            // Обновляем списки
-            loadMySkills();
-            loadProfileSkills();
+            const result = await response.json();
             
-            // Обновляем карту
-            if (appData.map) {
-                loadSkillsOnMap();
+            if (result.success) {
+                alert('✅ Умейка успешно обновлена!');
+                closeEditSkillModal();
+                
+                // Обновляем списки
+                loadMySkills();
+                loadProfileSkills();
+                
+                // Обновляем карту
+                if (map) {
+                    loadSkillsOnMap();
+                }
+            } else {
+                alert('❌ Ошибка обновления: ' + (result.error || 'Неизвестная ошибка'));
             }
             
         } catch (error) {
@@ -1066,21 +2617,23 @@
     window.deleteSkill = async function(skillId) {
         if (confirm('❌ Удалить эту умейку?')) {
             try {
-                // Удаляем умейку из памяти
-                const skillIndex = appData.skills.findIndex(s => s._id === skillId);
+                const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                    method: 'DELETE'
+                });
                 
-                if (skillIndex !== -1) {
-                    appData.skills.splice(skillIndex, 1);
+                const result = await response.json();
+                
+                if (result.success) {
                     alert('✅ Умейка удалена!');
                     
                     loadMySkills();
                     loadProfileSkills();
                     
-                    if (appData.map) {
+                    if (map) {
                         loadSkillsOnMap();
                     }
                 } else {
-                    alert('❌ Умейка не найдена');
+                    alert('❌ Ошибка удаления: ' + (result.error || 'Неизвестная ошибка'));
                 }
                 
             } catch (error) {
@@ -1091,12 +2644,13 @@
     };
 
     // ========== ФУНКЦИИ ДЛЯ КАРТЫ ==========
+
     window.openMap = function() {
         console.log('🗺️ Открытие карты');
         const mapSection = document.querySelector('.map-section');
         mapSection.classList.add('map-active');
         
-        if (!appData.map) {
+        if (!map) {
             initMap();
         } else {
             loadSkillsOnMap();
@@ -1106,20 +2660,20 @@
     };
 
     function initMap() {
-        if (appData.map) return;
+        if (map) return;
         
         console.log('🗺️ Инициализация карты');
         
-        appData.map = L.map('map', {
+        map = L.map('map', {
             attributionControl: false
         }).setView([55.7558, 37.6173], 10);
         
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             subdomains: 'abcd',
             maxZoom: 20
-        }).addTo(appData.map);
+        }).addTo(map);
 
-        appData.map.setMaxBounds([
+        map.setMaxBounds([
             [30, 19],
             [70, 180]
         ]);
@@ -1132,9 +2686,9 @@
             navigator.geolocation.getCurrentPosition(
                 position => {
                     const { latitude, longitude } = position.coords;
-                    appData.userLocation = { lat: latitude, lon: longitude };
-                    console.log('📍 Местоположение пользователя:', appData.userLocation);
-                    appData.map.setView([latitude, longitude], 13);
+                    userLocation = { lat: latitude, lon: longitude };
+                    console.log('📍 Местоположение пользователя:', userLocation);
+                    map.setView([latitude, longitude], 13);
                     
                     L.marker([latitude, longitude], {
                         icon: L.divIcon({
@@ -1144,7 +2698,7 @@
                             iconAnchor: [8, 16]
                         })
                     })
-                    .addTo(appData.map)
+                    .addTo(map)
                     .bindPopup('📍 Ваше местоположение')
                     .openPopup();
                         
@@ -1152,35 +2706,37 @@
                 },
                 error => {
                     console.log('📍 Геолокация недоступна:', error);
-                    appData.userLocation = { lat: 55.7558, lon: 37.6173 };
+                    userLocation = { lat: 55.7558, lon: 37.6173 };
                     console.log('📍 Используем Москву по умолчанию');
                     loadSkillsOnMap();
                 }
             );
         } else {
             console.log('📍 Геолокация не поддерживается браузером');
-            appData.userLocation = { lat: 55.7558, lon: 37.6173 };
+            userLocation = { lat: 55.7558, lon: 37.6173 };
             loadSkillsOnMap();
         }
     }
 
     async function loadSkillsOnMap() {
         try {
-            console.log('🗺️ Загрузка умейок для карты');
+            console.log('🗺️ Загрузка умейок с сервера для карты');
             
             const skills = await loadAllSkillsFromServer();
             
-            console.log('📊 Получено умейок:', skills.length);
+            console.log('📊 Получено умейок с сервера:', skills.length);
+            
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
             
             // Очищаем предыдущие маркеры
-            if (appData.markers.length > 0) {
-                appData.markers.forEach(marker => appData.map.removeLayer(marker));
-                appData.markers = [];
+            if (markers.length > 0) {
+                markers.forEach(marker => map.removeLayer(marker));
+                markers = [];
             }
             
             // Добавляем маркер пользователя
-            if (appData.userLocation) {
-                const userMarker = L.marker([appData.userLocation.lat, appData.userLocation.lon], {
+            if (userLocation) {
+                const userMarker = L.marker([userLocation.lat, userLocation.lon], {
                     icon: L.divIcon({
                         className: 'user-marker',
                         html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
@@ -1188,18 +2744,18 @@
                         iconAnchor: [8, 16]
                     })
                 })
-                .addTo(appData.map)
-                .bindPopup(`📍 <b>${appData.userProfile.firstName || 'Вы'}</b><br>Ваше местоположение`)
+                .addTo(map)
+                .bindPopup(`📍 <b>${userData.firstName || 'Вы'}</b><br>Ваше местоположение`)
                 .openPopup();
                 
-                appData.markers.push(userMarker);
+                markers.push(userMarker);
             }
             
             // Добавляем маркеры умейок
             skills.forEach(skill => {
                 if (skill.location && skill.location.lat && skill.location.lon) {
-                    const rating = 5.0;
-                    const isUserSkill = skill.userId === appData.userId;
+                    const rating = skill.rating?.average || 5.0;
+                    const isUserSkill = skill.userId === currentUserId;
                     
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
                         icon: L.divIcon({
@@ -1209,10 +2765,20 @@
                             iconAnchor: [15, 30]
                         })
                     })
-                    .addTo(appData.map)
+                    .addTo(map)
                     .bindPopup(createMapSkillPopup(skill, isUserSkill));
                     
-                    appData.markers.push(marker);
+                    marker.on('popupopen', async () => {
+                        try {
+                            await fetch(`${API_URL}/api/skills/${skill._id}/view`, {
+                                method: 'POST'
+                            });
+                        } catch (error) {
+                            console.error('❌ Ошибка обновления просмотров:', error);
+                        }
+                    });
+                    
+                    markers.push(marker);
                 }
             });
             
@@ -1221,11 +2787,11 @@
         } catch (error) {
             console.error('❌ Ошибка загрузки карты:', error);
             
-            if (appData.map) {
+            if (map) {
                 L.popup()
                     .setLatLng([55.7558, 37.6173])
-                    .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных.</div>')
-                    .openOn(appData.map);
+                    .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
+                    .openOn(map);
             }
         }
     }
@@ -1238,7 +2804,7 @@
     }
 
     function createMapSkillPopup(skill, isUserSkill) {
-        const rating = 5.0;
+        const rating = skill.rating?.average || 5.0;
         
         return `
             <div class="map-popup-content">
@@ -1265,6 +2831,10 @@
                             <span style="font-size: 14px; font-weight: 500; flex: 1;">${skill.experience || 'Не указано'}</span>
                         </div>
                     </div>
+                    
+                    <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
+                        <span style="color:#667eea;">📞</span> ${skill.experience || 'Контакт не указан'}
+                    </p>
                     
                     <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
                         <span style="color:#667eea;">⭐</span> 
@@ -1297,8 +2867,8 @@
     function startMapAutoRefresh() {
         stopMapAutoRefresh();
         
-        appData.mapRefreshInterval = setInterval(() => {
-            if (document.querySelector('.map-active') && appData.map) {
+        mapRefreshInterval = setInterval(() => {
+            if (document.querySelector('.map-active') && map) {
                 console.log('🔄 Автоматическое обновление карты...');
                 loadSkillsOnMap();
             }
@@ -1306,14 +2876,15 @@
     }
 
     function stopMapAutoRefresh() {
-        if (appData.mapRefreshInterval) {
-            clearInterval(appData.mapRefreshInterval);
-            appData.mapRefreshInterval = null;
+        if (mapRefreshInterval) {
+            clearInterval(mapRefreshInterval);
+            mapRefreshInterval = null;
             console.log('⏹️ Автообновление карты остановлено');
         }
     }
 
     // ========== ФУНКЦИИ КОНТАКТОВ ==========
+
     window.openContactModal = function(skillId, skillName, username, phone, telegram) {
         const contactInfo = document.getElementById('contactInfo');
         const callButton = document.getElementById('callButton');
@@ -1380,6 +2951,7 @@
     };
 
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
+
     window.showMainScreen = function() {
         stopMapAutoRefresh();
         
@@ -1395,7 +2967,7 @@
     };
     
     window.showSection = function(sectionId) {
-        if (!document.querySelector('.map-active') && appData.mapRefreshInterval) {
+        if (!document.querySelector('.map-active') && mapRefreshInterval) {
             stopMapAutoRefresh();
         }
         
@@ -1424,6 +2996,7 @@
     };
 
     // ========== ФУНКЦИЯ ДЛЯ КРАСИВЫХ УВЕДОМЛЕНИЙ ==========
+
     function showNotification(message) {
         const notification = document.createElement('div');
         notification.style.cssText = `
@@ -1450,34 +3023,58 @@
     }
 
     // ========== ФУНКЦИЯ ОТЛАДКИ ==========
+
     window.checkAndSetUserId = function() {
         console.log('🔍 Проверка User ID...');
         
         const tg = window.Telegram?.WebApp;
         if (tg && tg.initDataUnsafe?.user) {
             const user = tg.initDataUnsafe.user;
-            appData.userId = user.id.toString();
-            console.log('✅ User ID из Telegram:', appData.userId);
+            currentUserId = user.id.toString();
+            console.log('✅ User ID из Telegram:', currentUserId);
             console.log('👤 Данные пользователя Telegram:', user);
         } else {
-            if (!appData.userId || appData.userId === 'null' || appData.userId === 'undefined') {
-                appData.userId = generateUserId();
-                console.log('🆔 Создан новый User ID:', appData.userId);
+            if (!currentUserId || currentUserId === 'null' || currentUserId === 'undefined') {
+                currentUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+                console.log('🆔 Создан новый User ID:', currentUserId);
             } else {
-                console.log('📌 Используем существующий User ID:', appData.userId);
+                console.log('📌 Используем существующий User ID:', currentUserId);
             }
         }
         
-        return appData.userId;
+        if (currentUserId) {
+            localStorage.setItem('umeyka_user_id', currentUserId);
+            console.log('💾 User ID сохранен в localStorage:', currentUserId);
+        }
+        
+        return currentUserId;
     };
 
-    function generateUserId() {
-        return 'user_' + Math.random().toString(36).substr(2, 9);
-    }
+    // Инициализация приложения
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Umeyka app loaded successfully!');
+        showMainScreen();
+        
+        currentUserId = checkAndSetUserId();
+        
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            console.log('✅ Telegram Web App initialized');
+            
+            if (tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                console.log('👤 User ID from Telegram:', user.id);
+                console.log('👤 User data:', user);
+            }
+        }
+    });
 
     // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+
     window.searchSkills = async function() {
-        const searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+        const searchQuery = document.getElementById('searchInput').value.trim();
         const searchResults = document.getElementById('searchResults');
         
         if (!searchQuery) {
@@ -1488,14 +3085,11 @@
         searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
         
         try {
-            // Ищем умейки в памяти
-            const filteredSkills = appData.skills.filter(skill => 
-                skill.skill.toLowerCase().includes(searchQuery) ||
-                skill.username.toLowerCase().includes(searchQuery)
-            );
+            const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`);
+            const result = await response.json();
             
-            if (filteredSkills.length > 0) {
-                searchResults.innerHTML = filteredSkills.map(skill => {
+            if (result.success && result.skills.length > 0) {
+                searchResults.innerHTML = result.skills.map(skill => {
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
@@ -1543,60 +3137,62 @@
             searchResults.innerHTML = `
                 <div class="error-message">
                     ❌ Ошибка поиска<br>
-                    <small>${error.message}</small>
+                    <small>Проверьте подключение к интернету</small>
                 </div>
             `;
         }
     };
 
     // ========== ФУНКЦИИ ПРОФИЛЯ ==========
+
     function loadUserProfile() {
-        document.getElementById('userName').textContent = appData.userProfile.firstName || 'Пользователь';
-        document.getElementById('userBio').textContent = appData.userProfile.bio || 'Расскажите о себе...';
+        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
         
-        if (appData.userProfile.avatar) {
-            document.getElementById('userAvatar').innerHTML = `<img src="${appData.userProfile.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        document.getElementById('userName').textContent = userData.firstName || 'Пользователь';
+        document.getElementById('userBio').textContent = userData.bio || 'Расскажите о себе...';
+        
+        if (userData.avatar) {
+            document.getElementById('userAvatar').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
         }
         
-        updateUserStats();
+        updateUserStats(userData);
     }
 
-    function updateUserStats() {
+    function updateUserStats(userData) {
         const statsGrid = document.getElementById('userStats');
         if (!statsGrid) return;
         
-        const userSkillsCount = appData.skills.filter(skill => skill.userId === appData.userId).length;
-        const userDealsCount = appData.deals.filter(deal => deal.userId === appData.userId).length;
-        
         statsGrid.innerHTML = `
             <div class="stat-card">
-                <div class="stat-value">${appData.userProfile.rating || 0}</div>
+                <div class="stat-value">${userData.rating || 0}</div>
                 <div class="stat-label">⭐ Рейтинг</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">${userDealsCount}</div>
+                <div class="stat-value">${userData.completedDeals || 0}</div>
                 <div class="stat-label">✅ Сделок</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">${userSkillsCount}</div>
+                <div class="stat-value">${userData.skills?.length || 0}</div>
                 <div class="stat-label">✨ Умейки</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">${appData.userProfile.views || 0}</div>
+                <div class="stat-value">${userData.views || 0}</div>
                 <div class="stat-label">👁️ Просмотры</div>
             </div>
         `;
     }
 
     window.editProfile = function() {
-        document.getElementById('editFirstName').value = appData.userProfile.firstName || '';
-        document.getElementById('editAge').value = appData.userProfile.age || '';
-        document.getElementById('editExperience').value = appData.userProfile.experience || '';
-        document.getElementById('editContact').value = appData.userProfile.contact || '';
-        document.getElementById('editBio').value = appData.userProfile.bio || '';
+        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
         
-        if (appData.userProfile.avatar) {
-            document.getElementById('avatarPreview').innerHTML = `<img src="${appData.userProfile.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        document.getElementById('editFirstName').value = userData.firstName || '';
+        document.getElementById('editAge').value = userData.age || '';
+        document.getElementById('editExperience').value = userData.experience || '';
+        document.getElementById('editContact').value = userData.contact || '';
+        document.getElementById('editBio').value = userData.bio || '';
+        
+        if (userData.avatar) {
+            document.getElementById('avatarPreview').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
         }
         
         showSection('editProfileSection');
@@ -1611,15 +3207,19 @@
             return;
         }
         
-        appData.userProfile.firstName = firstName;
-        appData.userProfile.age = document.getElementById('editAge').value;
-        appData.userProfile.experience = document.getElementById('editExperience').value;
-        appData.userProfile.contact = document.getElementById('editContact').value;
-        appData.userProfile.bio = bio;
+        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
         
-        if (appData.currentAvatar) {
-            appData.userProfile.avatar = appData.currentAvatar;
+        userData.firstName = firstName;
+        userData.age = document.getElementById('editAge').value;
+        userData.experience = document.getElementById('editExperience').value;
+        userData.contact = document.getElementById('editContact').value;
+        userData.bio = bio;
+        
+        if (currentAvatar) {
+            userData.avatar = currentAvatar;
         }
+        
+        setLocalStorage(`user_${currentUserId}`, userData);
         
         alert('✅ Профиль сохранен!');
         showProfileSection();
@@ -1646,16 +3246,16 @@
         
         const reader = new FileReader();
         reader.onload = function(e) {
-            appData.currentAvatar = e.target.result;
+            currentAvatar = e.target.result;
             document.getElementById('avatarPreview').innerHTML = `
-                <img src="${appData.currentAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                <img src="${currentAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
             `;
         };
         reader.readAsDataURL(file);
     };
 
     window.showProfileTab = function(tabName) {
-        appData.currentProfileTab = tabName;
+        currentProfileTab = tabName;
         
         document.getElementById('profileStats').style.display = 'none';
         document.getElementById('profileSkills').style.display = 'none';
@@ -1681,7 +3281,7 @@
     };
 
     window.showDealsTab = function(tabName) {
-        appData.currentDealTab = tabName;
+        currentDealTab = tabName;
         
         document.querySelectorAll('.deals-tab-button').forEach(btn => btn.classList.remove('active'));
         
@@ -1691,121 +3291,13 @@
     };
 
     function loadDeals() {
-        const dealsList = document.getElementById('dealsList');
-        const userId = appData.userId;
-        
-        if (!userId) {
-            dealsList.innerHTML = `
-                <div style="text-align: center; color: #666; padding: 40px;">
-                    <div style="font-size: 50px; margin-bottom: 20px;">👤</div>
-                    <div style="font-size: 18px; margin-bottom: 10px;">Войдите в систему</div>
-                </div>
-            `;
-            return;
-        }
-        
-        // Фильтруем сделки по пользователю и статусу
-        let filteredDeals = appData.deals.filter(deal => deal.userId === userId);
-        
-        if (appData.currentDealTab === 'pending') {
-            filteredDeals = filteredDeals.filter(deal => deal.status === 'pending');
-        } else if (appData.currentDealTab === 'active') {
-            filteredDeals = filteredDeals.filter(deal => deal.status === 'active');
-        } else if (appData.currentDealTab === 'completed') {
-            filteredDeals = filteredDeals.filter(deal => deal.status === 'completed');
-        }
-        
-        if (filteredDeals.length > 0) {
-            dealsList.innerHTML = filteredDeals.map(deal => {
-                const statusClass = `status-${deal.status}`;
-                const statusText = getStatusText(deal.status);
-                
-                return `
-                    <div class="deal-card">
-                        <div class="deal-header">
-                            <div class="deal-title">${deal.title}</div>
-                            <div class="deal-status ${statusClass}">${statusText}</div>
-                        </div>
-                        
-                        <div style="color: #666; margin: 10px 0;">${deal.description}</div>
-                        
-                        <div class="deal-details">
-                            <div class="deal-detail">
-                                <span style="color: #667eea;">💰</span>
-                                <span>${deal.amount} ₽</span>
-                            </div>
-                            <div class="deal-detail">
-                                <span style="color: #667eea;">⏱️</span>
-                                <span>${deal.period}</span>
-                            </div>
-                            <div class="deal-detail">
-                                <span style="color: #667eea;">⭐</span>
-                                <span>${getQualityText(deal.quality)}</span>
-                            </div>
-                            <div class="deal-detail">
-                                <span style="color: #667eea;">📅</span>
-                                <span>${new Date(deal.createdAt).toLocaleDateString()}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="signatures">
-                            <div class="signature">
-                                <span style="color: #667eea;">👤</span>
-                                <span>Заказчик: <span class="${deal.customerSigned ? 'signed' : 'unsigned'}">${deal.customerSigned ? '✓ Подписано' : '✗ Не подписано'}</span></span>
-                            </div>
-                            <div class="signature">
-                                <span style="color: #667eea;">🔧</span>
-                                <span>Исполнитель: <span class="${deal.executorSigned ? 'signed' : 'unsigned'}">${deal.executorSigned ? '✓ Подписано' : '✗ Не подписано'}</span></span>
-                            </div>
-                        </div>
-                        
-                        <div class="deal-actions">
-                            ${deal.status === 'pending' ? `
-                                <button class="deal-button sign-button" onclick="signDeal('${deal._id}')">
-                                    ✍️ Подписать
-                                </button>
-                            ` : ''}
-                            
-                            ${deal.status === 'active' ? `
-                                <button class="deal-button complete-button" onclick="completeDeal('${deal._id}')">
-                                    ✅ Завершить
-                                </button>
-                            ` : ''}
-                            
-                            <button class="deal-button view-button" onclick="viewDeal('${deal._id}')">
-                                👁️ Подробнее
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        } else {
-            dealsList.innerHTML = `
-                <div style="text-align: center; color: #666; padding: 40px;">
-                    <div style="font-size: 50px; margin-bottom: 20px;">📄</div>
-                    <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет сделок</div>
-                    <div style="opacity: 0.7;">Создайте свою первую сделку</div>
-                </div>
-            `;
-        }
-    }
-
-    function getStatusText(status) {
-        switch(status) {
-            case 'pending': return 'Ожидает подписи';
-            case 'active': return 'Активная';
-            case 'completed': return 'Завершена';
-            default: return 'Черновик';
-        }
-    }
-
-    function getQualityText(quality) {
-        switch(quality) {
-            case 'premium': return 'Премиум';
-            case 'standard': return 'Стандарт';
-            case 'economy': return 'Эконом';
-            default: return 'Не указано';
-        }
+        document.getElementById('dealsList').innerHTML = `
+            <div style="text-align: center; color: #666; padding: 40px;">
+                <div style="font-size: 50px; margin-bottom: 20px;">📄</div>
+                <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет сделок</div>
+                <div style="opacity: 0.7;">Создайте свою первую сделку</div>
+            </div>
+        `;
     }
 
     function loadChats() {
@@ -1822,7 +3314,7 @@
     };
 
     window.selectQuality = function(quality) {
-        appData.selectedQuality = quality;
+        selectedQuality = quality;
         
         document.querySelectorAll('.quality-option').forEach(option => {
             option.classList.remove('selected');
@@ -1838,14 +3330,14 @@
         
         if (element.classList.contains('selected')) {
             element.classList.remove('selected');
-            appData.selectedOptions = appData.selectedOptions.filter(item => item !== option);
+            selectedOptions = selectedOptions.filter(item => item !== option);
         } else {
-            if (appData.selectedOptions.length >= 2) {
+            if (selectedOptions.length >= 2) {
                 alert('❌ Вы можете выбрать только 2 дополнительных условия');
                 return;
             }
             element.classList.add('selected');
-            appData.selectedOptions.push(option);
+            selectedOptions.push(option);
         }
         
         updateDealCommission();
@@ -1867,15 +3359,8 @@
         }
     }
 
-    // Добавляем обработчик изменения суммы сделки
-    document.addEventListener('DOMContentLoaded', function() {
-        const dealAmountInput = document.getElementById('dealAmount');
-        if (dealAmountInput) {
-            dealAmountInput.addEventListener('input', updateDealCommission);
-        }
-    });
+    document.getElementById('dealAmount')?.addEventListener('input', updateDealCommission);
 
-    // ========== ФУНКЦИИ ДЛЯ РАБОТЫ СО СДЕЛКАМИ ==========
     window.createDeal = function() {
         const title = document.getElementById('dealTitle').value.trim();
         const description = document.getElementById('dealDescription').value.trim();
@@ -1887,126 +3372,35 @@
             return;
         }
         
-        if (!appData.selectedQuality) {
+        if (!selectedQuality) {
             alert('❌ Выберите уровень качества');
             return;
         }
         
-        if (appData.selectedOptions.length !== 2) {
+        if (selectedOptions.length !== 2) {
             alert('❌ Выберите 2 дополнительных условия');
             return;
         }
         
-        const userId = appData.userId || generateUserId();
-        
-        // Создаем новую сделку
-        const newDeal = {
-            _id: 'deal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-            userId: userId,
+        const dealData = {
             title: title,
             description: description,
             period: period,
             amount: parseInt(amount),
-            quality: appData.selectedQuality,
-            options: [...appData.selectedOptions],
+            quality: selectedQuality,
+            options: selectedOptions,
             commission: amount * 0.05,
-            total: parseInt(amount) + (amount * 0.05),
-            status: 'pending',
-            customerSigned: false,
-            executorSigned: false,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            total: parseInt(amount) + (amount * 0.05)
         };
         
-        // Добавляем сделку в память
-        appData.deals.push(newDeal);
-        
-        alert('✅ Сделка успешно создана!');
-        console.log('Создана сделка:', newDeal);
-        
-        // Сбрасываем форму
-        document.getElementById('dealTitle').value = '';
-        document.getElementById('dealDescription').value = '';
-        document.getElementById('dealPeriod').value = '';
-        document.getElementById('dealAmount').value = '';
-        
-        // Сбрасываем выбор
-        appData.selectedQuality = '';
-        appData.selectedOptions = [];
-        document.querySelectorAll('.quality-option').forEach(option => option.classList.remove('selected'));
-        document.querySelectorAll('.option-checkbox').forEach(option => option.classList.remove('selected'));
-        document.getElementById('dealCommission').style.display = 'none';
+        alert('✅ Сделка создана!');
+        console.log('Создана сделка:', dealData);
         
         showProfileSection();
-        showProfileTab('deals');
     };
-
-    window.signDeal = function(dealId) {
-        const dealIndex = appData.deals.findIndex(deal => deal._id === dealId);
-        
-        if (dealIndex !== -1) {
-            appData.deals[dealIndex].customerSigned = true;
-            appData.deals[dealIndex].executorSigned = true;
-            appData.deals[dealIndex].status = 'active';
-            appData.deals[dealIndex].updatedAt = new Date().toISOString();
-            
-            alert('✅ Сделка подписана и активирована!');
-            loadDeals();
-        }
-    };
-
-    window.completeDeal = function(dealId) {
-        if (confirm('✅ Завершить сделку?')) {
-            const dealIndex = appData.deals.findIndex(deal => deal._id === dealId);
-            
-            if (dealIndex !== -1) {
-                appData.deals[dealIndex].status = 'completed';
-                appData.deals[dealIndex].updatedAt = new Date().toISOString();
-                appData.deals[dealIndex].completedAt = new Date().toISOString();
-                
-                // Обновляем статистику пользователя
-                appData.userProfile.completedDeals = (appData.userProfile.completedDeals || 0) + 1;
-                appData.userProfile.rating = (appData.userProfile.rating || 0) + 0.5; // +0.5 звезды за сделку
-                
-                alert('✅ Сделка завершена!');
-                loadDeals();
-                updateUserStats();
-            }
-        }
-    };
-
-    window.viewDeal = function(dealId) {
-        const deal = appData.deals.find(deal => deal._id === dealId);
-        
-        if (deal) {
-            alert(`
-                📄 Детали сделки:
-                
-                📝 Название: ${deal.title}
-                📋 Описание: ${deal.description}
-                💰 Сумма: ${deal.amount} ₽
-                ⏱️ Срок: ${deal.period}
-                ⭐ Качество: ${getQualityText(deal.quality)}
-                📅 Создана: ${new Date(deal.createdAt).toLocaleDateString()}
-                📊 Статус: ${getStatusText(deal.status)}
-                
-                Дополнительные условия:
-                ${deal.options.map(option => `• ${getOptionText(option)}`).join('\n')}
-            `);
-        }
-    };
-
-    function getOptionText(option) {
-        switch(option) {
-            case 'quality': return 'Качество работ';
-            case 'price': return 'Фиксированная цена';
-            case 'timeRange': return 'Гибкий график';
-            default: return option;
-        }
-    }
 
     window.shareToFriend = function() {
-        const referralLink = `https://t.me/share/url?url=${encodeURIComponent(TELEGRAM_BOT_URL + '?start=' + appData.userId)}&text=${encodeURIComponent('Привет! Я использую отличное приложение для поиска мастеров - Umeyka. Попробуй и ты! Получи +1 звезду за регистрацию! ✨')}`;
+        const referralLink = `https://t.me/share/url?url=${encodeURIComponent(TELEGRAM_BOT_URL + '?start=' + currentUserId)}&text=${encodeURIComponent('Привет! Я использую отличное приложение для поиска мастеров - Umeyka. Попробуй и ты! Получи +1 звезду за регистрацию! ✨')}`;
         
         if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.openTelegramLink(referralLink);
@@ -2016,7 +3410,7 @@
     };
 
     window.copyReferralLink = function() {
-        const referralLink = TELEGRAM_BOT_URL + '?start=' + appData.userId;
+        const referralLink = TELEGRAM_BOT_URL + '?start=' + currentUserId;
         navigator.clipboard.writeText(referralLink).then(() => {
             alert('✅ Ссылка скопирована в буфер обмена! Отправьте её другу.');
         }).catch(err => {
@@ -2050,7 +3444,7 @@
     };
 
     window.setProjectRating = function(rating) {
-        appData.projectRating = rating;
+        projectRating = rating;
         const stars = document.getElementById('projectRatingStars');
         stars.innerHTML = '';
         
@@ -2064,7 +3458,7 @@
     window.submitProjectReview = function() {
         const comment = document.getElementById('projectReviewComment').value.trim();
         
-        if (appData.projectRating === 0) {
+        if (projectRating === 0) {
             alert('❌ Пожалуйста, поставьте оценку');
             return;
         }
@@ -2075,113 +3469,11 @@
         }
         
         alert('✅ Спасибо за ваш отзыв!');
-        console.log('Отзыв о проекте:', { rating: appData.projectRating, comment: comment });
+        console.log('Отзыв о проекте:', { rating: projectRating, comment: comment });
         
         document.getElementById('projectReviewComment').value = '';
         setProjectRating(0);
     };
-
-    // Инициализация приложения
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Umeyka app loaded successfully!');
-        showMainScreen();
-        
-        appData.userId = checkAndSetUserId();
-        
-        const tg = window.Telegram?.WebApp;
-        if (tg) {
-            tg.ready();
-            tg.expand();
-            console.log('✅ Telegram Web App initialized');
-            
-            if (tg.initDataUnsafe.user) {
-                const user = tg.initDataUnsafe.user;
-                console.log('👤 User ID from Telegram:', user.id);
-                console.log('👤 User data:', user);
-                
-                // Автоматически заполняем профиль из Telegram
-                if (user.first_name) {
-                    appData.userProfile.firstName = user.first_name;
-                }
-                if (user.username) {
-                    appData.userProfile.contact = `@${user.username}`;
-                }
-            }
-        }
-        
-        // Инициализируем демо-данные
-        initializeDemoData();
-    });
-
-    function initializeDemoData() {
-        // Добавляем демо-умейки
-        appData.skills.push({
-            _id: 'demo_skill_1',
-            skill: 'Ремонт телефонов',
-            experience: '+7 999 123-45-67',
-            price: 2000,
-            userId: 'demo_master',
-            username: 'Иван Мастеров',
-            location: { lat: 55.7558, lon: 37.6173 }
-        });
-        
-        appData.skills.push({
-            _id: 'demo_skill_2',
-            skill: 'Сантехнические работы',
-            experience: '+7 999 987-65-43',
-            price: 5000,
-            userId: 'demo_master2',
-            username: 'Петр Сантехник',
-            location: { lat: 55.7512, lon: 37.6184 }
-        });
-        
-        appData.skills.push({
-            _id: 'demo_skill_3',
-            skill: 'Ремонт компьютеров',
-            experience: '+7 999 111-22-33',
-            price: 3000,
-            userId: appData.userId,
-            username: appData.userProfile.firstName,
-            location: appData.userLocation || { lat: 55.7558, lon: 37.6173 }
-        });
-        
-        // Добавляем демо-сделки
-        appData.deals.push({
-            _id: 'demo_deal_1',
-            userId: appData.userId,
-            title: 'Ремонт ванной комнаты',
-            description: 'Замена смесителя, установка душевой кабины',
-            period: '3 дня',
-            amount: 15000,
-            quality: 'standard',
-            options: ['quality', 'price'],
-            commission: 750,
-            total: 15750,
-            status: 'pending',
-            customerSigned: false,
-            executorSigned: false,
-            createdAt: new Date(Date.now() - 86400000).toISOString(), // вчера
-            updatedAt: new Date(Date.now() - 86400000).toISOString()
-        });
-        
-        appData.deals.push({
-            _id: 'demo_deal_2',
-            userId: appData.userId,
-            title: 'Установка кондиционера',
-            description: 'Монтаж сплит-системы в спальне',
-            period: '1 день',
-            amount: 8000,
-            quality: 'premium',
-            options: ['quality', 'timeRange'],
-            commission: 400,
-            total: 8400,
-            status: 'active',
-            customerSigned: true,
-            executorSigned: true,
-            createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 дня назад
-            updatedAt: new Date(Date.now() - 86400000).toISOString()
-        });
-    }
 
     </script>
 </body>
