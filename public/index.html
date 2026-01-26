@@ -597,6 +597,7 @@
         .status-pending { background: #fef3c7; color: #d97706; }
         .status-active { background: #d1fae5; color: #065f46; }
         .status-completed { background: #dcfce7; color: #166534; }
+        .status-canceled { background: #fee2e2; color: #991b1b; }
 
         .deal-details {
             display: grid;
@@ -649,6 +650,7 @@
         .sign-button { background: #48bb78; color: white; }
         .view-button { background: #4299e1; color: white; }
         .complete-button { background: #ed8936; color: white; }
+        .cancel-button { background: #f56565; color: white; }
 
         /* Стили для формы создания сделки */
         .quality-options {
@@ -1643,6 +1645,9 @@
                         <button class="deals-tab-button" onclick="showDealsTab('completed')" id="completedDealsTab">
                             📋 Завершенные
                         </button>
+                        <button class="deals-tab-button" onclick="showDealsTab('all')" id="allDealsTab">
+                            📊 Все сделки
+                        </button>
                     </div>
                     
                     <!-- Кнопка создания сделки -->
@@ -1716,15 +1721,27 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📄 Создание сделки</h2>
                 
-                <input type="text" id="dealTitle" class="input-field" placeholder="Название сделки">
-                <textarea id="dealDescription" class="input-field" placeholder="Описание работ" style="height: 80px; resize: vertical;"></textarea>
+                <input type="text" id="dealTitle" class="input-field" placeholder="Название сделки *" required>
+                <textarea id="dealDescription" class="input-field" placeholder="Описание работ *" style="height: 80px; resize: vertical;" required></textarea>
                 
-                <input type="text" id="dealPeriod" class="input-field" placeholder="Срок выполнения (например: 3 дня)">
-                <input type="number" id="dealAmount" class="input-field" placeholder="Сумма в рублях">
+                <!-- Выбор мастера -->
+                <div id="selectMasterContainer" style="margin: 15px 0;">
+                    <label style="color: white; display: block; margin-bottom: 10px;">👥 Выберите мастера:</label>
+                    <select id="selectMaster" class="input-field" style="background: white; color: #2d3748;">
+                        <option value="">Выберите мастера...</option>
+                        <!-- Мастера будут загружены динамически -->
+                    </select>
+                    <div id="noMastersMessage" style="color: #ff6b6b; text-align: center; margin-top: 10px; display: none;">
+                        ❌ У вас нет добавленных умейок. Сначала создайте умейку в разделе "Я умейка".
+                    </div>
+                </div>
+                
+                <input type="text" id="dealPeriod" class="input-field" placeholder="Срок выполнения (например: 3 дня) *" required>
+                <input type="number" id="dealAmount" class="input-field" placeholder="Сумма в рублях *" required>
                 
                 <!-- Уровень качества -->
                 <div>
-                    <label style="color: white; display: block; margin-bottom: 10px;">⭐ Уровень качества</label>
+                    <label style="color: white; display: block; margin-bottom: 10px;">⭐ Уровень качества *</label>
                     <div class="quality-options">
                         <div class="quality-option" onclick="selectQuality('premium')" id="qualityPremium">
                             Премиум
@@ -1740,7 +1757,7 @@
                 
                 <!-- Дополнительные условия -->
                 <div>
-                    <label style="color: white; display: block; margin-bottom: 10px;">✅ Дополнительные условия (выберите 2)</label>
+                    <label style="color: white; display: block; margin-bottom: 10px;">✅ Дополнительные условия (выберите 2) *</label>
                     <div class="additional-options">
                         <div class="option-checkbox" onclick="toggleOption('quality')" id="optionQuality">
                             ⭐ Качество
@@ -2662,7 +2679,7 @@
     function initMap() {
         if (map) return;
         
-        console.log('🗺️ Инициализация карты');
+        console.log('🗺️ Инициализация карта');
         
         map = L.map('map', {
             attributionControl: false
@@ -3290,26 +3307,215 @@
         loadDeals();
     };
 
-    function loadDeals() {
-        document.getElementById('dealsList').innerHTML = `
-            <div style="text-align: center; color: #666; padding: 40px;">
-                <div style="font-size: 50px; margin-bottom: 20px;">📄</div>
-                <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет сделок</div>
-                <div style="opacity: 0.7;">Создайте свою первую сделку</div>
-            </div>
-        `;
+    // ========== ФУНКЦИИ ДЛЯ СДЕЛОК ==========
+
+    async function loadMastersForDeal() {
+        try {
+            console.log('👥 Загрузка мастеров для создания сделки...');
+            
+            const selectElement = document.getElementById('selectMaster');
+            const noMastersMessage = document.getElementById('noMastersMessage');
+            
+            // Загружаем умейки пользователя
+            const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
+            const result = await response.json();
+            
+            if (result.success && result.skills.length > 0) {
+                // Очищаем селект
+                selectElement.innerHTML = '<option value="">Выберите мастера...</option>';
+                
+                // Добавляем мастеров
+                result.skills.forEach(skill => {
+                    const option = document.createElement('option');
+                    option.value = skill._id;
+                    option.textContent = `${skill.skill} - ${skill.price} руб.`;
+                    selectElement.appendChild(option);
+                });
+                
+                noMastersMessage.style.display = 'none';
+                selectElement.style.display = 'block';
+            } else {
+                // Нет умейок
+                selectElement.style.display = 'none';
+                noMastersMessage.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('❌ Ошибка загрузки мастеров:', error);
+            document.getElementById('noMastersMessage').textContent = '❌ Ошибка загрузки мастеров';
+            document.getElementById('noMastersMessage').style.display = 'block';
+        }
     }
 
-    function loadChats() {
-        document.getElementById('userChatsList').innerHTML = `
-            <div style="text-align: center; color: #666; padding: 40px;">
-                <div style="font-size: 50px; margin-bottom: 20px;">💬</div>
-                <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет активных чатов</div>
+    async function loadDeals() {
+        try {
+            const dealsList = document.getElementById('dealsList');
+            dealsList.innerHTML = '<div class="loading">⏳ Загрузка сделок...</div>';
+            
+            let endpoint = '';
+            switch(currentDealTab) {
+                case 'pending':
+                    endpoint = `/api/deals/user/${currentUserId}/status/pending`;
+                    break;
+                case 'active':
+                    endpoint = `/api/deals/user/${currentUserId}/status/active`;
+                    break;
+                case 'completed':
+                    endpoint = `/api/deals/user/${currentUserId}/status/completed`;
+                    break;
+                default:
+                    endpoint = `/api/deals/user/${currentUserId}`;
+            }
+            
+            console.log(`📡 Загружаем сделки по адресу: ${endpoint}`);
+            
+            const response = await fetch(`${API_URL}${endpoint}`);
+            const result = await response.json();
+            
+            if (result.success && result.deals && result.deals.length > 0) {
+                console.log(`✅ Найдено ${result.deals.length} сделок`);
+                
+                dealsList.innerHTML = result.deals.map(deal => {
+                    return createDealCard(deal);
+                }).join('');
+            } else {
+                dealsList.innerHTML = `
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">📄</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Сделок пока нет</div>
+                        <div style="opacity: 0.7;">Создайте свою первую сделку</div>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('❌ Ошибка загрузки сделок:', error);
+            dealsList.innerHTML = `
+                <div class="error-message">
+                    ❌ Ошибка загрузки сделок<br>
+                    <small>${error.message}</small>
+                </div>
+            `;
+        }
+    }
+
+    function createDealCard(deal) {
+        const statusMap = {
+            'pending': '✍️ Ожидает подписи',
+            'active': '✅ Активна',
+            'completed': '📋 Завершена',
+            'canceled': '❌ Отменена'
+        };
+        
+        const statusClassMap = {
+            'pending': 'status-pending',
+            'active': 'status-active',
+            'completed': 'status-completed',
+            'canceled': 'status-canceled'
+        };
+        
+        const statusText = statusMap[deal.status] || deal.status;
+        const statusClass = statusClassMap[deal.status] || 'status-draft';
+        
+        return `
+            <div class="deal-card">
+                <div class="deal-header">
+                    <div class="deal-title">${deal.title}</div>
+                    <div class="deal-status ${statusClass}">${statusText}</div>
+                </div>
+                
+                <div class="deal-details">
+                    <div class="deal-detail">
+                        <span>👤</span>
+                        <span>${deal.clientName || 'Клиент'}</span>
+                    </div>
+                    <div class="deal-detail">
+                        <span>💰</span>
+                        <span>${deal.amount} ₽</span>
+                    </div>
+                    <div class="deal-detail">
+                        <span>📅</span>
+                        <span>${deal.period}</span>
+                    </div>
+                    <div class="deal-detail">
+                        <span>⭐</span>
+                        <span>${deal.quality}</span>
+                    </div>
+                </div>
+                
+                <div style="margin: 15px 0; color: #666;">
+                    ${deal.description}
+                </div>
+                
+                <div class="signatures">
+                    <div class="signature ${deal.clientSigned ? 'signed' : 'unsigned'}">
+                        <span>👤</span>
+                        <span>Клиент: ${deal.clientSigned ? 'Подписал' : 'Не подписал'}</span>
+                    </div>
+                    <div class="signature ${deal.masterSigned ? 'signed' : 'unsigned'}">
+                        <span>🔧</span>
+                        <span>Мастер: ${deal.masterSigned ? 'Подписал' : 'Не подписал'}</span>
+                    </div>
+                </div>
+                
+                ${deal.additionalOptions && deal.additionalOptions.length > 0 ? `
+                    <div style="margin: 15px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
+                        <strong>✅ Дополнительные условия:</strong>
+                        ${deal.additionalOptions.map(option => `<div>• ${option}</div>`).join('')}
+                    </div>
+                ` : ''}
+                
+                <div style="color: #666; font-size: 14px; margin: 10px 0;">
+                    📅 Создано: ${new Date(deal.createdAt).toLocaleDateString()}
+                </div>
+                
+                <div class="deal-actions">
+                    ${deal.status === 'pending' ? `
+                        <button class="deal-button sign-button" onclick="signDeal('${deal._id}')">
+                            ✍️ Подписать
+                        </button>
+                    ` : ''}
+                    
+                    ${deal.status === 'active' ? `
+                        <button class="deal-button complete-button" onclick="completeDeal('${deal._id}')">
+                            ✅ Завершить
+                        </button>
+                        <button class="deal-button cancel-button" onclick="cancelDeal('${deal._id}')">
+                            ❌ Отменить
+                        </button>
+                    ` : ''}
+                    
+                    <button class="deal-button view-button" onclick="viewDealDetails('${deal._id}')">
+                        👁️ Подробнее
+                    </button>
+                </div>
             </div>
         `;
     }
 
     window.showCreateDealSection = function() {
+        // Сбрасываем форму
+        document.getElementById('dealTitle').value = '';
+        document.getElementById('dealDescription').value = '';
+        document.getElementById('dealPeriod').value = '';
+        document.getElementById('dealAmount').value = '';
+        selectedQuality = '';
+        selectedOptions = [];
+        
+        // Сбрасываем выбор качества
+        document.querySelectorAll('.quality-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        // Сбрасываем выбор дополнительных опций
+        document.querySelectorAll('.option-checkbox').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        // Скрываем блок с комиссией
+        document.getElementById('dealCommission').style.display = 'none';
+        
+        // Загружаем список мастеров
+        loadMastersForDeal();
+        
         showSection('createDealSection');
     };
 
@@ -3359,45 +3565,228 @@
         }
     }
 
+    // Добавляем обработчик события для поля суммы
     document.getElementById('dealAmount')?.addEventListener('input', updateDealCommission);
 
-    window.createDeal = function() {
-        const title = document.getElementById('dealTitle').value.trim();
-        const description = document.getElementById('dealDescription').value.trim();
-        const period = document.getElementById('dealPeriod').value.trim();
-        const amount = document.getElementById('dealAmount').value;
-        
-        if (!title || !description || !period || !amount) {
-            alert('❌ Заполните все поля');
-            return;
+    window.createDeal = async function() {
+        try {
+            const title = document.getElementById('dealTitle').value.trim();
+            const description = document.getElementById('dealDescription').value.trim();
+            const period = document.getElementById('dealPeriod').value.trim();
+            const amount = document.getElementById('dealAmount').value;
+            const masterSkillId = document.getElementById('selectMaster').value;
+            
+            if (!title || !description || !period || !amount) {
+                alert('❌ Заполните все обязательные поля (отмечены *)');
+                return;
+            }
+            
+            if (!masterSkillId) {
+                alert('❌ Выберите мастера из списка');
+                return;
+            }
+            
+            if (!selectedQuality) {
+                alert('❌ Выберите уровень качества');
+                return;
+            }
+            
+            if (selectedOptions.length !== 2) {
+                alert('❌ Выберите 2 дополнительных условия');
+                return;
+            }
+            
+            // Получаем информацию о пользователе
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+            
+            // Получаем информацию о выбранной умейке
+            const skillResponse = await fetch(`${API_URL}/api/skills/${masterSkillId}`);
+            const skillResult = await skillResponse.json();
+            
+            if (!skillResult.success) {
+                alert('❌ Ошибка загрузки информации о мастере');
+                return;
+            }
+            
+            const skill = skillResult.skill;
+            
+            // Создаем данные сделки
+            const dealData = {
+                title: title,
+                description: description,
+                period: period,
+                amount: parseInt(amount),
+                quality: selectedQuality,
+                additionalOptions: selectedOptions,
+                commission: amount * 0.05,
+                total: parseInt(amount) + (amount * 0.05),
+                clientId: currentUserId,
+                clientName: userData.firstName || 'Клиент',
+                masterId: skill.userId,
+                masterName: skill.username,
+                skillId: masterSkillId,
+                skillName: skill.skill,
+                status: 'pending'
+            };
+            
+            console.log('📤 Создаем сделку:', dealData);
+            
+            // Отправляем запрос на создание сделки
+            const response = await fetch(`${API_URL}/api/deals`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dealData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('✅ Сделка успешно создана!');
+                console.log('📱 Ответ сервера при создании сделки:', result);
+                
+                // Переходим в профиль и показываем вкладку со сделками
+                showProfileSection();
+                showProfileTab('deals');
+                
+                // Загружаем обновленный список сделок
+                loadDeals();
+            } else {
+                console.error('❌ Ошибка создания сделки:', result);
+                alert('❌ Ошибка создания сделки: ' + (result.error || 'Неизвестная ошибка'));
+            }
+            
+        } catch (error) {
+            console.error('❌ Ошибка создания сделки:', error);
+            alert('❌ Ошибка создания сделки: ' + error.message);
         }
-        
-        if (!selectedQuality) {
-            alert('❌ Выберите уровень качества');
-            return;
-        }
-        
-        if (selectedOptions.length !== 2) {
-            alert('❌ Выберите 2 дополнительных условия');
-            return;
-        }
-        
-        const dealData = {
-            title: title,
-            description: description,
-            period: period,
-            amount: parseInt(amount),
-            quality: selectedQuality,
-            options: selectedOptions,
-            commission: amount * 0.05,
-            total: parseInt(amount) + (amount * 0.05)
-        };
-        
-        alert('✅ Сделка создана!');
-        console.log('Создана сделка:', dealData);
-        
-        showProfileSection();
     };
+
+    async function signDeal(dealId) {
+        if (!confirm('✍️ Подписать эту сделку?')) return;
+        
+        try {
+            const response = await fetch(`${API_URL}/api/deals/${dealId}/sign`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    userName: getLocalStorage(`user_${currentUserId}`)?.firstName || 'Клиент'
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('✅ Сделка успешно подписана!');
+                loadDeals();
+            } else {
+                alert('❌ Ошибка подписания сделки: ' + (result.error || 'Неизвестная ошибка'));
+            }
+        } catch (error) {
+            console.error('❌ Ошибка подписания сделки:', error);
+            alert('❌ Ошибка подписания сделки');
+        }
+    }
+
+    async function completeDeal(dealId) {
+        if (!confirm('✅ Завершить эту сделку?')) return;
+        
+        try {
+            const response = await fetch(`${API_URL}/api/deals/${dealId}/complete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: currentUserId
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('✅ Сделка успешно завершена!');
+                loadDeals();
+                
+                // Обновляем статистику пользователя
+                const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+                userData.completedDeals = (userData.completedDeals || 0) + 1;
+                setLocalStorage(`user_${currentUserId}`, userData);
+                updateUserStats(userData);
+            } else {
+                alert('❌ Ошибка завершения сделки: ' + (result.error || 'Неизвестная ошибка'));
+            }
+        } catch (error) {
+            console.error('❌ Ошибка завершения сделки:', error);
+            alert('❌ Ошибка завершения сделки');
+        }
+    }
+
+    async function cancelDeal(dealId) {
+        if (!confirm('❌ Отменить эту сделку?')) return;
+        
+        try {
+            const response = await fetch(`${API_URL}/api/deals/${dealId}/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userId: currentUserId
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('✅ Сделка отменена!');
+                loadDeals();
+            } else {
+                alert('❌ Ошибка отмены сделки: ' + (result.error || 'Неизвестная ошибка'));
+            }
+        } catch (error) {
+            console.error('❌ Ошибка отмены сделки:', error);
+            alert('❌ Ошибка отмены сделки');
+        }
+    }
+
+    async function viewDealDetails(dealId) {
+        try {
+            const response = await fetch(`${API_URL}/api/deals/${dealId}`);
+            const result = await response.json();
+            
+            if (result.success && result.deal) {
+                const deal = result.deal;
+                alert(`
+                    📄 Детали сделки:
+                    
+                    Название: ${deal.title}
+                    Описание: ${deal.description}
+                    Сумма: ${deal.amount} ₽
+                    Срок: ${deal.period}
+                    Качество: ${deal.quality}
+                    
+                    Статус: ${deal.status === 'pending' ? 'Ожидает подписи' : 
+                             deal.status === 'active' ? 'Активна' :
+                             deal.status === 'completed' ? 'Завершена' : 'Отменена'}
+                    
+                    Клиент: ${deal.clientName}
+                    Мастер: ${deal.masterName}
+                    
+                    Создано: ${new Date(deal.createdAt).toLocaleDateString()}
+                `);
+            } else {
+                alert('❌ Не удалось загрузить детали сделки');
+            }
+        } catch (error) {
+            console.error('❌ Ошибка загрузки деталей сделки:', error);
+            alert('❌ Ошибка загрузки деталей сделки');
+        }
+    }
 
     window.shareToFriend = function() {
         const referralLink = `https://t.me/share/url?url=${encodeURIComponent(TELEGRAM_BOT_URL + '?start=' + currentUserId)}&text=${encodeURIComponent('Привет! Я использую отличное приложение для поиска мастеров - Umeyka. Попробуй и ты! Получи +1 звезду за регистрацию! ✨')}`;
