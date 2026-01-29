@@ -2018,50 +2018,100 @@
         completedDeals: 0
     };
 
-    // ========== СИНХРОНИЗАЦИЯ СДЕЛОК ==========
+    // ========== API ДЛЯ СДЕЛОК ==========
     
-    // Глобальное хранилище сделок (симулируем серверное хранение)
-    function getGlobalDeals() {
-        return getLocalStorage('umeyka_global_deals') || [];
-    }
-    
-    function setGlobalDeals(deals) {
-        return setLocalStorage('umeyka_global_deals', deals);
-    }
-    
-    // Получить сделки пользователя (и как клиента, и как мастера)
-    function getUserDeals(userId) {
-        const globalDeals = getGlobalDeals();
-        return globalDeals.filter(deal => 
-            deal.clientId === userId || deal.masterId === userId
-        );
-    }
-    
-    // Добавить сделку в глобальное хранилище
-    function addGlobalDeal(deal) {
-        const globalDeals = getGlobalDeals();
-        globalDeals.push(deal);
-        setGlobalDeals(globalDeals);
-        return deal;
-    }
-    
-    // Обновить сделку в глобальном хранилище
-    function updateGlobalDeal(dealId, updates) {
-        const globalDeals = getGlobalDeals();
-        const dealIndex = globalDeals.findIndex(deal => deal.id === dealId);
-        
-        if (dealIndex !== -1) {
-            globalDeals[dealIndex] = { ...globalDeals[dealIndex], ...updates };
-            setGlobalDeals(globalDeals);
-            return globalDeals[dealIndex];
+    // Создать сделку на сервере
+    async function createDealOnServer(dealData) {
+        try {
+            console.log('📤 Создание сделки на сервере:', dealData);
+            
+            const response = await fetch(`${API_URL}/api/deals`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dealData)
+            });
+            
+            const result = await response.json();
+            console.log('📱 Ответ сервера при создании сделки:', result);
+            
+            if (result.success) {
+                return result.deal;
+            } else {
+                throw new Error(result.error || 'Ошибка создания сделки');
+            }
+        } catch (error) {
+            console.error('❌ Ошибка создания сделки на сервере:', error);
+            throw error;
         }
-        return null;
     }
     
-    // Получить сделку по ID
-    function getDealById(dealId) {
-        const globalDeals = getGlobalDeals();
-        return globalDeals.find(deal => deal.id === dealId);
+    // Получить сделки пользователя с сервера
+    async function getUserDealsFromServer(userId) {
+        try {
+            console.log(`📥 Загрузка сделок пользователя ${userId} с сервера...`);
+            
+            const response = await fetch(`${API_URL}/api/deals/user/${userId}`);
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log(`✅ Загружено ${result.deals.length} сделок`);
+                return result.deals;
+            } else {
+                console.error('❌ Ошибка загрузки сделок:', result.error);
+                return [];
+            }
+        } catch (error) {
+            console.error('❌ Ошибка соединения с сервером сделок:', error);
+            return [];
+        }
+    }
+    
+    // Обновить сделку на сервере
+    async function updateDealOnServer(dealId, updates) {
+        try {
+            console.log(`📤 Обновление сделки ${dealId}:`, updates);
+            
+            const response = await fetch(`${API_URL}/api/deals/${dealId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updates)
+            });
+            
+            const result = await response.json();
+            console.log('📱 Ответ сервера при обновлении сделки:', result);
+            
+            if (result.success) {
+                return result.deal;
+            } else {
+                throw new Error(result.error || 'Ошибка обновления сделки');
+            }
+        } catch (error) {
+            console.error('❌ Ошибка обновления сделки на сервере:', error);
+            throw error;
+        }
+    }
+    
+    // Получить сделку по ID с сервера
+    async function getDealByIdFromServer(dealId) {
+        try {
+            console.log(`📥 Загрузка сделки ${dealId} с сервера...`);
+            
+            const response = await fetch(`${API_URL}/api/deals/${dealId}`);
+            const result = await response.json();
+            
+            if (result.success) {
+                return result.deal;
+            } else {
+                throw new Error(result.error || 'Сделка не найдена');
+            }
+        } catch (error) {
+            console.error('❌ Ошибка загрузки сделки с сервера:', error);
+            throw error;
+        }
     }
 
     // ========== ФУНКЦИЯ СЖАТИЯ ИЗОБРАЖЕНИЙ ==========
@@ -3369,21 +3419,199 @@
 
     // ========== ФУНКЦИИ ДЛЯ СДЕЛОК ==========
 
-    // Генератор уникальных ID для сделок
-    function generateDealId() {
-        return 'deal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    // Создание сделки из карточки мастера
+    window.createDealFromSkill = function(skillId, skillName, masterName, masterId, masterContact) {
+        console.log('📝 Создание сделки с мастером:', {
+            skillId, skillName, masterName, masterId, masterContact
+        });
+        
+        // Сохраняем данные мастера для формы сделки
+        currentDealMaster = {
+            skillId: skillId,
+            skillName: skillName,
+            masterName: masterName,
+            masterId: masterId,
+            masterContact: masterContact
+        };
+        
+        // Получаем данные пользователя
+        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+        const clientName = userData.firstName || 'Клиент';
+        
+        // Заполняем скрытые поля в форме сделки
+        document.getElementById('dealMasterId').value = masterId;
+        document.getElementById('dealMasterName').value = masterName;
+        document.getElementById('dealMasterSkill').value = skillName;
+        document.getElementById('dealMasterContact').value = masterContact;
+        
+        // Автоматически заполняем заголовок и описание сделки
+        document.getElementById('dealTitle').value = `${skillName} - ${masterName}`;
+        document.getElementById('dealDescription').value = `Сделка между ${clientName} (клиент) и ${masterName} (мастер) на услугу "${skillName}"`;
+        
+        // Показываем форму создания сделки
+        showSection('createDealSection');
+    };
+
+    window.selectQuality = function(quality) {
+        selectedQuality = quality;
+        
+        document.querySelectorAll('.quality-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        document.getElementById('quality' + quality.charAt(0).toUpperCase() + quality.slice(1)).classList.add('selected');
+        
+        updateDealCommission();
+    };
+
+    window.toggleOption = function(option) {
+        const element = document.getElementById('option' + option.charAt(0).toUpperCase() + option.slice(1));
+        
+        if (element.classList.contains('selected')) {
+            element.classList.remove('selected');
+            selectedOptions = selectedOptions.filter(item => item !== option);
+        } else {
+            if (selectedOptions.length >= 2) {
+                alert('❌ Вы можете выбрать только 2 дополнительных условия');
+                return;
+            }
+            element.classList.add('selected');
+            selectedOptions.push(option);
+        }
+        
+        updateDealCommission();
+    };
+
+    function updateDealCommission() {
+        const dealAmount = document.getElementById('dealAmount').value || 0;
+        
+        if (dealAmount > 0) {
+            const commission = dealAmount * 0.05;
+            const total = parseInt(dealAmount) + commission;
+            
+            document.getElementById('dealAmountDisplay').textContent = dealAmount;
+            document.getElementById('commissionAmount').textContent = Math.round(commission);
+            document.getElementById('totalAmount').textContent = Math.round(total);
+            document.getElementById('dealCommission').style.display = 'block';
+        } else {
+            document.getElementById('dealCommission').style.display = 'none';
+        }
     }
 
+    document.getElementById('dealAmount')?.addEventListener('input', updateDealCommission);
+
+    window.createDeal = async function() {
+        try {
+            const title = document.getElementById('dealTitle').value.trim();
+            const description = document.getElementById('dealDescription').value.trim();
+            const period = document.getElementById('dealPeriod').value.trim();
+            const amount = document.getElementById('dealAmount').value;
+            
+            // Получаем данные мастера из скрытых полей
+            const masterId = document.getElementById('dealMasterId').value;
+            const masterName = document.getElementById('dealMasterName').value;
+            const masterSkill = document.getElementById('dealMasterSkill').value;
+            const masterContact = document.getElementById('dealMasterContact').value;
+            
+            // Получаем данные клиента
+            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+            const clientName = userData.firstName || 'Клиент';
+            
+            if (!title || !description || !period || !amount) {
+                alert('❌ Заполните все обязательные поля (отмечены *)');
+                return;
+            }
+            
+            if (!selectedQuality) {
+                alert('❌ Выберите уровень качества');
+                return;
+            }
+            
+            if (selectedOptions.length !== 2) {
+                alert('❌ Выберите 2 дополнительных условия');
+                return;
+            }
+            
+            // Проверяем, есть ли данные мастера
+            if (!masterId || !masterName) {
+                alert('❌ Ошибка: данные мастера не найдены');
+                return;
+            }
+            
+            console.log('📤 Создаю сделку с мастером:', {
+                masterId, masterName, masterSkill, masterContact
+            });
+            
+            // Создаем данные сделки для отправки на сервер
+            const dealData = {
+                title: title,
+                description: description,
+                period: period,
+                amount: parseInt(amount),
+                quality: selectedQuality,
+                options: [...selectedOptions],
+                commission: Math.round(amount * 0.05),
+                total: Math.round(amount * 1.05),
+                status: 'pending',
+                clientSigned: false,
+                masterSigned: false,
+                clientId: currentUserId,
+                clientName: clientName,
+                masterId: masterId,
+                masterName: masterName,
+                masterSkill: masterSkill,
+                masterContact: masterContact,
+                skillId: currentDealMaster?.skillId || null
+            };
+            
+            console.log('📤 Отправляю данные сделки на сервер:', dealData);
+            
+            // Отправляем сделку на сервер
+            const createdDeal = await createDealOnServer(dealData);
+            
+            console.log('✅ Сделка создана на сервере:', createdDeal);
+            
+            // Сбрасываем форму
+            document.getElementById('dealTitle').value = '';
+            document.getElementById('dealDescription').value = '';
+            document.getElementById('dealPeriod').value = '';
+            document.getElementById('dealAmount').value = '';
+            selectedQuality = '';
+            selectedOptions = [];
+            
+            document.querySelectorAll('.quality-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('.option-checkbox').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            document.getElementById('dealCommission').style.display = 'none';
+            
+            alert('✅ Сделка успешно создана! Теперь её должен подписать мастер.');
+            
+            // Показываем профиль и переходим на вкладку сделок
+            showProfileSection();
+            showProfileTab('deals');
+            showDealsTab('pending');
+            
+        } catch (error) {
+            console.error('❌ Ошибка создания сделки:', error);
+            alert('❌ Ошибка создания сделки: ' + error.message);
+        }
+    };
+
     // Загрузка сделок пользователя
-    function loadDeals() {
+    async function loadDeals() {
         try {
             const dealsList = document.getElementById('dealsList');
             if (!dealsList) return;
             
             dealsList.innerHTML = '<div class="loading">📄 Загрузка сделок...</div>';
             
-            // Получаем сделки пользователя из глобального хранилища
-            const userDeals = getUserDeals(currentUserId);
+            // Получаем сделки пользователя с сервера
+            const userDeals = await getUserDealsFromServer(currentUserId);
             
             // Фильтруем сделки по текущей вкладке
             let filteredDeals = [];
@@ -3530,18 +3758,18 @@
                         
                         <div class="deal-actions">
                             ${showSignButton ? `
-                                <button class="deal-button sign-button" onclick="signDeal('${deal.id}')">
+                                <button class="deal-button sign-button" onclick="signDeal('${deal._id}')">
                                     ✍️ Подписать сделку
                                 </button>
                             ` : ''}
                             
                             ${showCompleteButton ? `
-                                <button class="deal-button complete-button" onclick="completeDeal('${deal.id}')">
+                                <button class="deal-button complete-button" onclick="completeDeal('${deal._id}')">
                                     ✅ Завершить сделку
                                 </button>
                             ` : ''}
                             
-                            <button class="deal-button view-button" onclick="viewDealDetails('${deal.id}')">
+                            <button class="deal-button view-button" onclick="viewDealDetails('${deal._id}')">
                                 👁️ Подробнее
                             </button>
                         </div>
@@ -3560,198 +3788,10 @@
         }
     }
 
-    // Создание сделки из карточки мастера
-    window.createDealFromSkill = function(skillId, skillName, masterName, masterId, masterContact) {
-        console.log('📝 Создание сделки с мастером:', {
-            skillId, skillName, masterName, masterId, masterContact
-        });
-        
-        // Сохраняем данные мастера для формы сделки
-        currentDealMaster = {
-            skillId: skillId,
-            skillName: skillName,
-            masterName: masterName,
-            masterId: masterId,
-            masterContact: masterContact
-        };
-        
-        // Получаем данные пользователя
-        const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-        const clientName = userData.firstName || 'Клиент';
-        
-        // Заполняем скрытые поля в форме сделки
-        document.getElementById('dealMasterId').value = masterId;
-        document.getElementById('dealMasterName').value = masterName;
-        document.getElementById('dealMasterSkill').value = skillName;
-        document.getElementById('dealMasterContact').value = masterContact;
-        
-        // Автоматически заполняем заголовок и описание сделки
-        document.getElementById('dealTitle').value = `${skillName} - ${masterName}`;
-        document.getElementById('dealDescription').value = `Сделка между ${clientName} (клиент) и ${masterName} (мастер) на услугу "${skillName}"`;
-        
-        // Показываем форму создания сделки
-        showSection('createDealSection');
-    };
-
-    window.selectQuality = function(quality) {
-        selectedQuality = quality;
-        
-        document.querySelectorAll('.quality-option').forEach(option => {
-            option.classList.remove('selected');
-        });
-        
-        document.getElementById('quality' + quality.charAt(0).toUpperCase() + quality.slice(1)).classList.add('selected');
-        
-        updateDealCommission();
-    };
-
-    window.toggleOption = function(option) {
-        const element = document.getElementById('option' + option.charAt(0).toUpperCase() + option.slice(1));
-        
-        if (element.classList.contains('selected')) {
-            element.classList.remove('selected');
-            selectedOptions = selectedOptions.filter(item => item !== option);
-        } else {
-            if (selectedOptions.length >= 2) {
-                alert('❌ Вы можете выбрать только 2 дополнительных условия');
-                return;
-            }
-            element.classList.add('selected');
-            selectedOptions.push(option);
-        }
-        
-        updateDealCommission();
-    };
-
-    function updateDealCommission() {
-        const dealAmount = document.getElementById('dealAmount').value || 0;
-        
-        if (dealAmount > 0) {
-            const commission = dealAmount * 0.05;
-            const total = parseInt(dealAmount) + commission;
-            
-            document.getElementById('dealAmountDisplay').textContent = dealAmount;
-            document.getElementById('commissionAmount').textContent = Math.round(commission);
-            document.getElementById('totalAmount').textContent = Math.round(total);
-            document.getElementById('dealCommission').style.display = 'block';
-        } else {
-            document.getElementById('dealCommission').style.display = 'none';
-        }
-    }
-
-    document.getElementById('dealAmount')?.addEventListener('input', updateDealCommission);
-
-    window.createDeal = function() {
-        try {
-            const title = document.getElementById('dealTitle').value.trim();
-            const description = document.getElementById('dealDescription').value.trim();
-            const period = document.getElementById('dealPeriod').value.trim();
-            const amount = document.getElementById('dealAmount').value;
-            
-            // Получаем данные мастера из скрытых полей
-            const masterId = document.getElementById('dealMasterId').value;
-            const masterName = document.getElementById('dealMasterName').value;
-            const masterSkill = document.getElementById('dealMasterSkill').value;
-            const masterContact = document.getElementById('dealMasterContact').value;
-            
-            // Получаем данные клиента
-            const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-            const clientName = userData.firstName || 'Клиент';
-            
-            if (!title || !description || !period || !amount) {
-                alert('❌ Заполните все обязательные поля (отмечены *)');
-                return;
-            }
-            
-            if (!selectedQuality) {
-                alert('❌ Выберите уровень качества');
-                return;
-            }
-            
-            if (selectedOptions.length !== 2) {
-                alert('❌ Выберите 2 дополнительных условия');
-                return;
-            }
-            
-            // Проверяем, есть ли данные мастера
-            if (!masterId || !masterName) {
-                alert('❌ Ошибка: данные мастера не найдены');
-                return;
-            }
-            
-            console.log('📤 Создаю сделку с мастером:', {
-                masterId, masterName, masterSkill, masterContact
-            });
-            
-            // Создаем новую сделку
-            const newDeal = {
-                id: generateDealId(),
-                title: title,
-                description: description,
-                period: period,
-                amount: parseInt(amount),
-                quality: selectedQuality,
-                options: [...selectedOptions],
-                commission: Math.round(amount * 0.05),
-                total: Math.round(amount * 1.05),
-                status: 'pending',
-                clientSigned: false,
-                masterSigned: false,
-                createdAt: new Date().toISOString(),
-                clientId: currentUserId,
-                clientName: clientName,
-                masterId: masterId,
-                masterName: masterName,
-                masterSkill: masterSkill,
-                masterContact: masterContact,
-                skillId: currentDealMaster?.skillId || null
-            };
-            
-            console.log('✅ Создана сделка:', newDeal);
-            
-            // Добавляем сделку в глобальное хранилище
-            addGlobalDeal(newDeal);
-            
-            // Обновляем статистику пользователя
-            if (!userData.dealsCount) userData.dealsCount = 0;
-            userData.dealsCount++;
-            setLocalStorage(`user_${currentUserId}`, userData);
-            
-            // Сбрасываем форму
-            document.getElementById('dealTitle').value = '';
-            document.getElementById('dealDescription').value = '';
-            document.getElementById('dealPeriod').value = '';
-            document.getElementById('dealAmount').value = '';
-            selectedQuality = '';
-            selectedOptions = [];
-            
-            document.querySelectorAll('.quality-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            
-            document.querySelectorAll('.option-checkbox').forEach(option => {
-                option.classList.remove('selected');
-            });
-            
-            document.getElementById('dealCommission').style.display = 'none';
-            
-            alert('✅ Сделка успешно создана! Теперь её должен подписать мастер.');
-            
-            // Показываем профиль и переходим на вкладку сделок
-            showProfileSection();
-            showProfileTab('deals');
-            showDealsTab('pending');
-            
-        } catch (error) {
-            console.error('❌ Ошибка создания сделки:', error);
-            alert('❌ Ошибка создания сделки: ' + error.message);
-        }
-    };
-
     // Функция подписи сделки
-    window.signDeal = function(dealId) {
+    window.signDeal = async function(dealId) {
         try {
-            const deal = getDealById(dealId);
+            const deal = await getDealByIdFromServer(dealId);
             if (!deal) {
                 alert('❌ Сделка не найдена');
                 return;
@@ -3768,8 +3808,10 @@
             const updates = {};
             if (isClient) {
                 updates.clientSigned = true;
+                alert('✅ Вы успешно подписали сделку как клиент! Ожидайте подписи мастера.');
             } else if (isMaster) {
                 updates.masterSigned = true;
+                alert('✅ Вы успешно подписали сделку как мастер! Ожидайте подписи клиента.');
             }
             
             // Если обе стороны подписали, меняем статус на активный
@@ -3779,12 +3821,10 @@
             if (clientSigned && masterSigned) {
                 updates.status = 'active';
                 alert('🎉 Обе стороны подписали сделку! Сделка теперь активна.');
-            } else {
-                alert('✅ Вы успешно подписали сделку! Ожидайте подписи второй стороны.');
             }
             
-            // Обновляем сделку в глобальном хранилище
-            updateGlobalDeal(dealId, updates);
+            // Обновляем сделку на сервере
+            await updateDealOnServer(dealId, updates);
             
             // Обновляем список сделок
             loadDeals();
@@ -3796,10 +3836,10 @@
     };
 
     // Функция завершения сделки
-    window.completeDeal = function(dealId) {
+    window.completeDeal = async function(dealId) {
         if (confirm('✅ Завершить сделку? После завершения сделка будет перемещена в архив и вы сможете оставить отзыв мастеру.')) {
             try {
-                const deal = getDealById(dealId);
+                const deal = await getDealByIdFromServer(dealId);
                 if (!deal) {
                     alert('❌ Сделка не найдена');
                     return;
@@ -3817,7 +3857,7 @@
                 }
                 
                 // Меняем статус сделки
-                updateGlobalDeal(dealId, {
+                await updateDealOnServer(dealId, {
                     status: 'completed',
                     completedAt: new Date().toISOString()
                 });
@@ -3828,13 +3868,6 @@
                 userData.completedDeals++;
                 userData.rating = (userData.rating || 0) + 0.5; // Добавляем 0.5 к рейтингу
                 setLocalStorage(`user_${currentUserId}`, userData);
-                
-                // Обновляем статистику мастера (если есть)
-                const masterData = getLocalStorage(`user_${deal.masterId}`) || demoUserData;
-                if (!masterData.completedDeals) masterData.completedDeals = 0;
-                masterData.completedDeals++;
-                masterData.rating = (masterData.rating || 0) + 0.5;
-                setLocalStorage(`user_${deal.masterId}`, masterData);
                 
                 alert('✅ Сделка успешно завершена! Благодарим за сотрудничество.');
                 
@@ -3850,9 +3883,9 @@
     };
 
     // Функция просмотра деталей сделки
-    window.viewDealDetails = function(dealId) {
+    window.viewDealDetails = async function(dealId) {
         try {
-            const deal = getDealById(dealId);
+            const deal = await getDealByIdFromServer(dealId);
             
             if (!deal) {
                 alert('❌ Сделка не найдена');
