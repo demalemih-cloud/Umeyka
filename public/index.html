@@ -2018,12 +2018,67 @@
         completedDeals: 0
     };
 
-    // ========== API ФУНКЦИИ ДЛЯ СДЕЛОК ==========
+    // ========== API ДЛЯ СДЕЛОК ==========
     
-    // Создать сделку
-    async function createDealAPI(dealData) {
+    // Проверка доступности API сделок
+    async function checkDealsAPI() {
         try {
-            console.log('📤 Создаю сделку на сервере:', dealData);
+            console.log('🔍 Проверяю доступность API сделок...');
+            const response = await fetch(`${API_URL}/api/deals/health`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                console.log('✅ API сделок доступен');
+                return true;
+            } else {
+                console.warn('⚠️ API сделок недоступен, используем localStorage');
+                return false;
+            }
+        } catch (error) {
+            console.warn('⚠️ API сделок недоступен, используем localStorage:', error);
+            return false;
+        }
+    }
+    
+    // Получить сделки пользователя с сервера
+    async function getUserDealsFromAPI(userId) {
+        try {
+            console.log(`📥 Запрашиваю сделки пользователя ${userId}...`);
+            const response = await fetch(`${API_URL}/api/deals/user/${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log(`✅ Получено ${result.deals?.length || 0} сделок с сервера`);
+                return result.deals || [];
+            } else {
+                console.error('❌ Ошибка получения сделок:', result.error);
+                return [];
+            }
+        } catch (error) {
+            console.error('❌ Ошибка получения сделок с сервера:', error);
+            // Возвращаем сделки из localStorage как запасной вариант
+            return getLocalStorage(`deals_${userId}`) || [];
+        }
+    }
+    
+    // Создать сделку на сервере
+    async function createDealOnAPI(dealData) {
+        try {
+            console.log('📤 Отправляю сделку на сервер:', dealData);
             
             const response = await fetch(`${API_URL}/api/deals`, {
                 method: 'POST',
@@ -2033,72 +2088,29 @@
                 body: JSON.stringify(dealData)
             });
             
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
+            }
+            
             const result = await response.json();
-            console.log('📱 Ответ сервера при создании сделки:', result);
             
             if (result.success) {
+                console.log('✅ Сделка успешно создана на сервере:', result.deal);
                 return result.deal;
             } else {
-                throw new Error(result.error || 'Неизвестная ошибка');
+                console.error('❌ Ошибка создания сделки:', result.error);
+                return null;
             }
         } catch (error) {
             console.error('❌ Ошибка создания сделки на сервере:', error);
-            
-            // Фоллбэк на локальное хранилище, если сервер недоступен
-            console.log('🔄 Использую локальное хранилище как запасной вариант');
-            return createDealLocal(dealData);
+            return null;
         }
     }
     
-    // Локальное создание сделки (фоллбэк)
-    function createDealLocal(dealData) {
-        const deals = getLocalStorage('umeyka_deals') || [];
-        const newDeal = {
-            ...dealData,
-            id: 'deal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-            createdAt: new Date().toISOString()
-        };
-        deals.push(newDeal);
-        setLocalStorage('umeyka_deals', deals);
-        return newDeal;
-    }
-    
-    // Получить сделки пользователя
-    async function getUserDealsAPI(userId) {
+    // Обновить сделку на сервере
+    async function updateDealOnAPI(dealId, updates) {
         try {
-            console.log(`📥 Загружаю сделки пользователя ${userId} с сервера`);
-            
-            const response = await fetch(`${API_URL}/api/deals/user/${userId}`);
-            const result = await response.json();
-            
-            console.log('📱 Ответ сервера при загрузке сделок:', result);
-            
-            if (result.success) {
-                return result.deals || [];
-            } else {
-                throw new Error(result.error || 'Неизвестная ошибка');
-            }
-        } catch (error) {
-            console.error('❌ Ошибка загрузки сделок с сервера:', error);
-            
-            // Фоллбэк на локальное хранилище
-            console.log('🔄 Использую локальное хранилище как запасной вариант');
-            return getUserDealsLocal(userId);
-        }
-    }
-    
-    // Локальная загрузка сделок (фоллбэк)
-    function getUserDealsLocal(userId) {
-        const deals = getLocalStorage('umeyka_deals') || [];
-        return deals.filter(deal => 
-            deal.clientId === userId || deal.masterId === userId
-        );
-    }
-    
-    // Обновить сделку
-    async function updateDealAPI(dealId, updates) {
-        try {
-            console.log(`📤 Обновляю сделку ${dealId} на сервере:`, updates);
+            console.log(`🔄 Обновляю сделку ${dealId}:`, updates);
             
             const response = await fetch(`${API_URL}/api/deals/${dealId}`, {
                 method: 'PUT',
@@ -2108,34 +2120,231 @@
                 body: JSON.stringify(updates)
             });
             
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
+            }
+            
             const result = await response.json();
-            console.log('📱 Ответ сервера при обновлении сделки:', result);
             
             if (result.success) {
+                console.log('✅ Сделка успешно обновлена:', result.deal);
                 return result.deal;
             } else {
-                throw new Error(result.error || 'Неизвестная ошибка');
+                console.error('❌ Ошибка обновления сделки:', result.error);
+                return null;
             }
         } catch (error) {
             console.error('❌ Ошибка обновления сделки на сервере:', error);
-            
-            // Фоллбэк на локальное хранилище
-            console.log('🔄 Использую локальное хранилище как запасной вариант');
-            return updateDealLocal(dealId, updates);
+            return null;
         }
     }
     
-    // Локальное обновление сделки (фоллбэк)
-    function updateDealLocal(dealId, updates) {
-        const deals = getLocalStorage('umeyka_deals') || [];
-        const dealIndex = deals.findIndex(deal => deal.id === dealId);
-        
-        if (dealIndex !== -1) {
-            deals[dealIndex] = { ...deals[dealIndex], ...updates };
-            setLocalStorage('umeyka_deals', deals);
-            return deals[dealIndex];
+    // Получить сделку по ID с сервера
+    async function getDealFromAPI(dealId) {
+        try {
+            console.log(`📥 Запрашиваю сделку ${dealId}...`);
+            
+            const response = await fetch(`${API_URL}/api/deals/${dealId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Ошибка сервера: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log('✅ Получена сделка:', result.deal);
+                return result.deal;
+            } else {
+                console.error('❌ Ошибка получения сделки:', result.error);
+                return null;
+            }
+        } catch (error) {
+            console.error('❌ Ошибка получения сделки с сервера:', error);
+            return null;
         }
-        return null;
+    }
+
+    // ========== СИНХРОНИЗИРОВАННОЕ ХРАНИЛИЩЕ СДЕЛОК ==========
+    
+    // Получить все сделки пользователя (сначала пробуем API, потом localStorage)
+    async function getUserDeals(userId) {
+        try {
+            // Пробуем получить с сервера
+            const apiDeals = await getUserDealsFromAPI(userId);
+            if (apiDeals.length > 0) {
+                console.log(`✅ Используем ${apiDeals.length} сделок с сервера`);
+                return apiDeals;
+            }
+            
+            // Если на сервере нет, пробуем из localStorage
+            const localDeals = getLocalStorage(`deals_${userId}`) || [];
+            console.log(`📁 Используем ${localDeals.length} сделок из localStorage`);
+            return localDeals;
+        } catch (error) {
+            console.error('❌ Ошибка получения сделок:', error);
+            return getLocalStorage(`deals_${userId}`) || [];
+        }
+    }
+    
+    // Создать сделку (пробуем на сервер, потом в localStorage)
+    async function createDealSync(dealData) {
+        try {
+            // Пробуем создать на сервере
+            const apiDeal = await createDealOnAPI(dealData);
+            if (apiDeal) {
+                console.log('✅ Сделка создана на сервере');
+                
+                // Сохраняем также в localStorage для быстрого доступа
+                const userId = currentUserId;
+                const userDeals = getLocalStorage(`deals_${userId}`) || [];
+                userDeals.push(apiDeal);
+                setLocalStorage(`deals_${userId}`, userDeals);
+                
+                // Также сохраняем для мастера
+                if (dealData.masterId && dealData.masterId !== userId) {
+                    const masterDeals = getLocalStorage(`deals_${dealData.masterId}`) || [];
+                    masterDeals.push(apiDeal);
+                    setLocalStorage(`deals_${dealData.masterId}`, masterDeals);
+                }
+                
+                return apiDeal;
+            }
+            
+            // Если сервер недоступен, создаем в localStorage
+            console.log('⚠️ Создаю сделку в localStorage');
+            const userId = currentUserId;
+            const userDeals = getLocalStorage(`deals_${userId}`) || [];
+            userDeals.push(dealData);
+            setLocalStorage(`deals_${userId}`, userDeals);
+            
+            // Также сохраняем для мастера
+            if (dealData.masterId && dealData.masterId !== userId) {
+                const masterDeals = getLocalStorage(`deals_${dealData.masterId}`) || [];
+                masterDeals.push(dealData);
+                setLocalStorage(`deals_${dealData.masterId}`, masterDeals);
+            }
+            
+            return dealData;
+        } catch (error) {
+            console.error('❌ Ошибка создания сделки:', error);
+            
+            // Создаем в localStorage как запасной вариант
+            const userId = currentUserId;
+            const userDeals = getLocalStorage(`deals_${userId}`) || [];
+            userDeals.push(dealData);
+            setLocalStorage(`deals_${userId}`, userDeals);
+            
+            // Также сохраняем для мастера
+            if (dealData.masterId && dealData.masterId !== userId) {
+                const masterDeals = getLocalStorage(`deals_${dealData.masterId}`) || [];
+                masterDeals.push(dealData);
+                setLocalStorage(`deals_${dealData.masterId}`, masterDeals);
+            }
+            
+            return dealData;
+        }
+    }
+    
+    // Обновить сделку (пробуем на сервер, потом в localStorage)
+    async function updateDealSync(dealId, updates) {
+        try {
+            // Пробуем обновить на сервере
+            const apiDeal = await updateDealOnAPI(dealId, updates);
+            if (apiDeal) {
+                console.log('✅ Сделка обновлена на сервере');
+                
+                // Обновляем в localStorage для всех пользователей
+                updateDealInAllLocalStorages(dealId, updates);
+                
+                return apiDeal;
+            }
+            
+            // Если сервер недоступен, обновляем в localStorage
+            console.log('⚠️ Обновляю сделку в localStorage');
+            updateDealInAllLocalStorages(dealId, updates);
+            
+            return { id: dealId, ...updates };
+        } catch (error) {
+            console.error('❌ Ошибка обновления сделки:', error);
+            
+            // Обновляем в localStorage как запасной вариант
+            updateDealInAllLocalStorages(dealId, updates);
+            
+            return { id: dealId, ...updates };
+        }
+    }
+    
+    // Обновить сделку во всех localStorage пользователей
+    function updateDealInAllLocalStorages(dealId, updates) {
+        try {
+            // Получаем всех пользователей из localStorage
+            const allUsers = Object.keys(localStorage)
+                .filter(key => key.startsWith('user_'))
+                .map(key => key.replace('user_', ''));
+            
+            // Добавляем текущего пользователя
+            if (currentUserId && !allUsers.includes(currentUserId)) {
+                allUsers.push(currentUserId);
+            }
+            
+            // Обновляем сделку у всех пользователей
+            allUsers.forEach(userId => {
+                const userDeals = getLocalStorage(`deals_${userId}`) || [];
+                const dealIndex = userDeals.findIndex(deal => deal.id === dealId);
+                
+                if (dealIndex !== -1) {
+                    userDeals[dealIndex] = { ...userDeals[dealIndex], ...updates };
+                    setLocalStorage(`deals_${userId}`, userDeals);
+                }
+            });
+            
+            console.log(`✅ Сделка обновлена у ${allUsers.length} пользователей в localStorage`);
+        } catch (error) {
+            console.error('❌ Ошибка обновления сделки в localStorage:', error);
+        }
+    }
+    
+    // Получить сделку по ID (сначала с сервера, потом из localStorage)
+    async function getDealById(dealId) {
+        try {
+            // Пробуем получить с сервера
+            const apiDeal = await getDealFromAPI(dealId);
+            if (apiDeal) {
+                return apiDeal;
+            }
+            
+            // Если сервер недоступен, ищем в localStorage текущего пользователя
+            const userDeals = getLocalStorage(`deals_${currentUserId}`) || [];
+            const localDeal = userDeals.find(deal => deal.id === dealId);
+            
+            if (localDeal) {
+                return localDeal;
+            }
+            
+            // Если не нашли у текущего пользователя, ищем у всех пользователей
+            const allUsers = Object.keys(localStorage)
+                .filter(key => key.startsWith('deals_'))
+                .map(key => key.replace('deals_', ''));
+            
+            for (const userId of allUsers) {
+                const userDeals = getLocalStorage(`deals_${userId}`) || [];
+                const deal = userDeals.find(deal => deal.id === dealId);
+                if (deal) {
+                    return deal;
+                }
+            }
+            
+            return null;
+        } catch (error) {
+            console.error('❌ Ошибка получения сделки:', error);
+            return null;
+        }
     }
 
     // ========== ФУНКЦИЯ СЖАТИЯ ИЗОБРАЖЕНИЙ ==========
@@ -2446,7 +2655,7 @@
                 return [];
             }
         } catch (error) {
-            console.error('❌ Ошибка соединения с сервером:', error);
+            console.error('❌ Ошибка соединения с сервера:', error);
             return [];
         }
     }
@@ -3216,6 +3425,15 @@
                 console.log('👤 User data:', user);
             }
         }
+        
+        // Проверяем доступность API сделок при загрузке
+        checkDealsAPI().then(isAvailable => {
+            if (isAvailable) {
+                console.log('✅ API сделок доступен, используем серверное хранилище');
+            } else {
+                console.log('⚠️ API сделок недоступен, используем localStorage');
+            }
+        });
     });
 
     // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
@@ -3443,6 +3661,11 @@
 
     // ========== ФУНКЦИИ ДЛЯ СДЕЛОК ==========
 
+    // Генератор уникальных ID для сделок
+    function generateDealId() {
+        return 'deal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
     // Загрузка сделок пользователя
     async function loadDeals() {
         try {
@@ -3451,8 +3674,8 @@
             
             dealsList.innerHTML = '<div class="loading">📄 Загрузка сделок...</div>';
             
-            // Получаем сделки пользователя с сервера
-            const userDeals = await getUserDealsAPI(currentUserId);
+            // Получаем сделки пользователя (синхронизированно)
+            const userDeals = await getUserDeals(currentUserId);
             
             // Фильтруем сделки по текущей вкладке
             let filteredDeals = [];
@@ -3496,6 +3719,9 @@
                 `;
                 return;
             }
+            
+            // Сортируем сделки по дате создания (новые сверху)
+            filteredDeals.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             
             // Отображаем сделки
             dealsList.innerHTML = filteredDeals.map(deal => {
@@ -3599,18 +3825,18 @@
                         
                         <div class="deal-actions">
                             ${showSignButton ? `
-                                <button class="deal-button sign-button" onclick="signDeal('${deal.id || deal._id}')">
+                                <button class="deal-button sign-button" onclick="signDeal('${deal.id}')">
                                     ✍️ Подписать сделку
                                 </button>
                             ` : ''}
                             
                             ${showCompleteButton ? `
-                                <button class="deal-button complete-button" onclick="completeDeal('${deal.id || deal._id}')">
+                                <button class="deal-button complete-button" onclick="completeDeal('${deal.id}')">
                                     ✅ Завершить сделку
                                 </button>
                             ` : ''}
                             
-                            <button class="deal-button view-button" onclick="viewDealDetails('${deal.id || deal._id}')">
+                            <button class="deal-button view-button" onclick="viewDealDetails('${deal.id}')">
                                 👁️ Подробнее
                             </button>
                         </div>
@@ -3752,8 +3978,9 @@
                 masterId, masterName, masterSkill, masterContact
             });
             
-            // Создаем объект сделки
-            const dealData = {
+            // Создаем новую сделку
+            const newDeal = {
+                id: generateDealId(),
                 title: title,
                 description: description,
                 period: period,
@@ -3765,6 +3992,7 @@
                 status: 'pending',
                 clientSigned: false,
                 masterSigned: false,
+                createdAt: new Date().toISOString(),
                 clientId: currentUserId,
                 clientName: clientName,
                 masterId: masterId,
@@ -3774,44 +4002,40 @@
                 skillId: currentDealMaster?.skillId || null
             };
             
-            console.log('✅ Создана сделка:', dealData);
+            console.log('✅ Создана сделка:', newDeal);
             
-            // Отправляем сделку на сервер
-            const createdDeal = await createDealAPI(dealData);
+            // Сохраняем сделку синхронизированно
+            const createdDeal = await createDealSync(newDeal);
             
-            if (createdDeal) {
-                // Обновляем статистику пользователя
-                if (!userData.dealsCount) userData.dealsCount = 0;
-                userData.dealsCount++;
-                setLocalStorage(`user_${currentUserId}`, userData);
-                
-                // Сбрасываем форму
-                document.getElementById('dealTitle').value = '';
-                document.getElementById('dealDescription').value = '';
-                document.getElementById('dealPeriod').value = '';
-                document.getElementById('dealAmount').value = '';
-                selectedQuality = '';
-                selectedOptions = [];
-                
-                document.querySelectorAll('.quality-option').forEach(option => {
-                    option.classList.remove('selected');
-                });
-                
-                document.querySelectorAll('.option-checkbox').forEach(option => {
-                    option.classList.remove('selected');
-                });
-                
-                document.getElementById('dealCommission').style.display = 'none';
-                
-                alert('✅ Сделка успешно создана! Теперь её должен подписать мастер.');
-                
-                // Показываем профиль и переходим на вкладку сделок
-                showProfileSection();
-                showProfileTab('deals');
-                showDealsTab('pending');
-            } else {
-                alert('❌ Ошибка создания сделки');
-            }
+            // Обновляем статистику пользователя
+            if (!userData.dealsCount) userData.dealsCount = 0;
+            userData.dealsCount++;
+            setLocalStorage(`user_${currentUserId}`, userData);
+            
+            // Сбрасываем форму
+            document.getElementById('dealTitle').value = '';
+            document.getElementById('dealDescription').value = '';
+            document.getElementById('dealPeriod').value = '';
+            document.getElementById('dealAmount').value = '';
+            selectedQuality = '';
+            selectedOptions = [];
+            
+            document.querySelectorAll('.quality-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('.option-checkbox').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            document.getElementById('dealCommission').style.display = 'none';
+            
+            alert('✅ Сделка успешно создана! Теперь её должен подписать мастер.');
+            
+            // Показываем профиль и переходим на вкладку сделок
+            showProfileSection();
+            showProfileTab('deals');
+            showDealsTab('pending');
             
         } catch (error) {
             console.error('❌ Ошибка создания сделки:', error);
@@ -3822,9 +4046,7 @@
     // Функция подписи сделки
     window.signDeal = async function(dealId) {
         try {
-            const userDeals = await getUserDealsAPI(currentUserId);
-            const deal = userDeals.find(d => d.id === dealId || d._id === dealId);
-            
+            const deal = await getDealById(dealId);
             if (!deal) {
                 alert('❌ Сделка не найдена');
                 return;
@@ -3856,15 +4078,11 @@
                 alert('✅ Вы успешно подписали сделку! Ожидайте подписи второй стороны.');
             }
             
-            // Обновляем сделку на сервере
-            const updatedDeal = await updateDealAPI(dealId, updates);
+            // Обновляем сделку синхронизированно
+            await updateDealSync(dealId, updates);
             
-            if (updatedDeal) {
-                // Обновляем список сделок
-                loadDeals();
-            } else {
-                alert('❌ Ошибка обновления сделки');
-            }
+            // Обновляем список сделок
+            loadDeals();
             
         } catch (error) {
             console.error('❌ Ошибка подписи сделки:', error);
@@ -3876,9 +4094,7 @@
     window.completeDeal = async function(dealId) {
         if (confirm('✅ Завершить сделку? После завершения сделка будет перемещена в архив и вы сможете оставить отзыв мастеру.')) {
             try {
-                const userDeals = await getUserDealsAPI(currentUserId);
-                const deal = userDeals.find(d => d.id === dealId || d._id === dealId);
-                
+                const deal = await getDealById(dealId);
                 if (!deal) {
                     alert('❌ Сделка не найдена');
                     return;
@@ -3895,28 +4111,31 @@
                     return;
                 }
                 
-                // Обновляем сделку на сервере
-                const updatedDeal = await updateDealAPI(dealId, {
+                // Меняем статус сделки
+                await updateDealSync(dealId, {
                     status: 'completed',
                     completedAt: new Date().toISOString()
                 });
                 
-                if (updatedDeal) {
-                    // Обновляем статистику пользователя
-                    const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
-                    if (!userData.completedDeals) userData.completedDeals = 0;
-                    userData.completedDeals++;
-                    userData.rating = (userData.rating || 0) + 0.5; // Добавляем 0.5 к рейтингу
-                    setLocalStorage(`user_${currentUserId}`, userData);
-                    
-                    alert('✅ Сделка успешно завершена! Благодарим за сотрудничество.');
-                    
-                    // Обновляем список сделок и статистику
-                    loadDeals();
-                    loadUserProfile();
-                } else {
-                    alert('❌ Ошибка завершения сделки');
-                }
+                // Обновляем статистику пользователя
+                const userData = getLocalStorage(`user_${currentUserId}`) || demoUserData;
+                if (!userData.completedDeals) userData.completedDeals = 0;
+                userData.completedDeals++;
+                userData.rating = (userData.rating || 0) + 0.5; // Добавляем 0.5 к рейтингу
+                setLocalStorage(`user_${currentUserId}`, userData);
+                
+                // Обновляем статистику мастера (если есть)
+                const masterData = getLocalStorage(`user_${deal.masterId}`) || demoUserData;
+                if (!masterData.completedDeals) masterData.completedDeals = 0;
+                masterData.completedDeals++;
+                masterData.rating = (masterData.rating || 0) + 0.5;
+                setLocalStorage(`user_${deal.masterId}`, masterData);
+                
+                alert('✅ Сделка успешно завершена! Благодарим за сотрудничество.');
+                
+                // Обновляем список сделок и статистику
+                loadDeals();
+                loadUserProfile();
                 
             } catch (error) {
                 console.error('❌ Ошибка завершения сделки:', error);
@@ -3928,8 +4147,7 @@
     // Функция просмотра деталей сделки
     window.viewDealDetails = async function(dealId) {
         try {
-            const userDeals = await getUserDealsAPI(currentUserId);
-            const deal = userDeals.find(d => d.id === dealId || d._id === dealId);
+            const deal = await getDealById(dealId);
             
             if (!deal) {
                 alert('❌ Сделка не найдена');
