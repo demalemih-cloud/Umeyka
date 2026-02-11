@@ -443,53 +443,6 @@
             font-weight: bold;
         }
 
-        .chat-item {
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-            padding: 15px;
-            margin: 8px 0;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .chat-item:hover {
-            background: rgba(255,255,255,1);
-            transform: translateX(5px);
-        }
-
-        .chat-partner {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .chat-preview {
-            font-size: 14px;
-            color: #666;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .chat-time {
-            font-size: 12px;
-            color: #999;
-            text-align: right;
-        }
-
-        .unread-badge {
-            background: #e53e3e;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            margin-left: auto;
-        }
-
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -696,24 +649,6 @@
         .option-checkbox.selected {
             border-color: #48bb78;
             background: rgba(72, 187, 120, 0.1);
-        }
-
-        .chat-message-sender {
-            font-size: 12px;
-            color: #667eea;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-
-        .my-message .chat-message-sender {
-            color: #48bb78;
-            text-align: right;
-        }
-
-        /* Стили для звездной системы */
-        .level-achieved {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            border: 2px solid #10b981;
         }
 
         /* ОБНОВЛЕННЫЕ СТИЛИ РЕФЕРАЛЬНОЙ ПРОГРАММЫ */
@@ -1109,75 +1044,6 @@
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             border: 2px solid rgba(255,255,255,0.5);
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
-        }
-
-        /* Стили для сообщений чата */
-        .chat-message {
-            margin-bottom: 15px;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .my-message {
-            text-align: right;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        #chatMessages {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 15px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 15px;
-            min-height: 300px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        #messageInput {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid #667eea;
-            border-radius: 12px;
-            font-size: 16px;
-            background: white;
-            transition: all 0.3s ease;
-        }
-        
-        #messageInput:focus {
-            outline: none;
-            border-color: #764ba2;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        /* Кнопка отправки сообщения */
-        #chatWindow .submit-button {
-            width: auto;
-            padding: 15px 25px;
-            font-size: 16px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        #chatWindow .submit-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
-        
-        /* Заголовок чата */
-        #chatTitle {
-            color: #2d3748;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
         }
 
         /* Стили для фото в карточке */
@@ -1672,9 +1538,6 @@
                     <button class="tab-button" onclick="showProfileTab('referral')" id="referralTab">
                         🎁 Реферальная программа
                     </button>
-                    <button class="tab-button" onclick="showProfileTab('chats')" id="chatsTab">
-                        💬 Чаты
-                    </button>
                 </div>
                 
                 <!-- Статистика -->
@@ -1808,12 +1671,6 @@
                     </div>
                 </div>
                 
-                <!-- Мои чаты -->
-                <div id="profileChats" class="profile-tab" style="display: none;">
-                    <h3 style="margin-bottom: 15px;">💬 Активные чаты</h3>
-                    <div id="userChatsList"></div>
-                </div>
-
                 <!-- Ссылки на каналы -->
                 <div class="channel-links">
                     <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank">
@@ -2008,24 +1865,6 @@
                             <div class="channel-description">Официальный канал проекта</div>
                         </div>
                     </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- ОКНО ЧАТА -->
-        <div id="chatWindow" class="section">
-            <button class="back-button" onclick="closeChat()">← Назад к чатам</button>
-            
-            <div class="form-section">
-                <h2 id="chatTitle" style="margin-bottom: 20px; text-align: center;">💬 Чат</h2>
-                
-                <div id="chatMessages" style="height: 300px; overflow-y: auto; margin-bottom: 20px; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px;">
-                    <!-- Сообщения чата -->
-                </div>
-                
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="messageInput" class="input-field" placeholder="Введите сообщение..." style="flex: 1;">
-                    <button class="submit-button" onclick="sendChatMessage()" style="width: auto; padding: 15px 20px;">📤</button>
                 </div>
             </div>
         </div>
@@ -3379,7 +3218,6 @@
         document.getElementById('editProfileSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
-        document.getElementById('chatWindow').style.display = 'none';
         document.querySelector('.map-section').classList.remove('map-active');
     };
     
@@ -3395,7 +3233,6 @@
         document.getElementById('editProfileSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
-        document.getElementById('chatWindow').style.display = 'none';
         document.getElementById(sectionId).style.display = 'block';
         
         if (sectionId === 'masterSection') {
@@ -3691,7 +3528,6 @@
         document.getElementById('profileSkills').style.display = 'none';
         document.getElementById('profileDeals').style.display = 'none';
         document.getElementById('profileReferral').style.display = 'none';
-        document.getElementById('profileChats').style.display = 'none';
         
         // Удаляем активный класс со всех кнопок
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -3701,7 +3537,6 @@
         document.getElementById('profileSkills').style.display = tabName === 'skills' ? 'block' : 'none';
         document.getElementById('profileDeals').style.display = tabName === 'deals' ? 'block' : 'none';
         document.getElementById('profileReferral').style.display = tabName === 'referral' ? 'block' : 'none';
-        document.getElementById('profileChats').style.display = tabName === 'chats' ? 'block' : 'none';
         
         // Добавляем активный класс к нужной кнопке
         document.getElementById(tabName + 'Tab').classList.add('active');
@@ -3713,8 +3548,6 @@
             loadDeals();
         } else if (tabName === 'referral') {
             updateReferralStats();
-        } else if (tabName === 'chats') {
-            loadChats();
         }
     };
 
@@ -4301,41 +4134,6 @@
         document.getElementById('dealMasterContact').value = '';
         
         showSection('createDealSection');
-    };
-
-    window.closeChat = function() {
-        showProfileSection();
-    };
-
-    function loadChats() {
-        document.getElementById('userChatsList').innerHTML = `
-            <div style="text-align: center; color: #666; padding: 40px;">
-                <div style="font-size: 50px; margin-bottom: 20px;">💬</div>
-                <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет активных чатов</div>
-                <div style="opacity: 0.7;">Начните общение в рамках сделки</div>
-            </div>
-        `;
-    }
-
-    window.sendChatMessage = function() {
-        const messageInput = document.getElementById('messageInput');
-        const message = messageInput.value.trim();
-        
-        if (!message) return;
-        
-        const chatMessages = document.getElementById('chatMessages');
-        const messageElement = document.createElement('div');
-        messageElement.className = 'chat-message my-message';
-        messageElement.innerHTML = `
-            <div class="chat-message-sender">Вы</div>
-            <div>${message}</div>
-            <div style="font-size: 12px; color: #999; text-align: right; margin-top: 5px;">Только что</div>
-        `;
-        
-        chatMessages.appendChild(messageElement);
-        messageInput.value = '';
-        
-        chatMessages.scrollTop = chatMessages.scrollHeight;
     };
 
     window.setProjectRating = function(rating) {
