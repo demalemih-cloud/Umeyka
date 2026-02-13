@@ -443,6 +443,53 @@
             font-weight: bold;
         }
 
+        .chat-item {
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+            padding: 15px;
+            margin: 8px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-item:hover {
+            background: rgba(255,255,255,1);
+            transform: translateX(5px);
+        }
+
+        .chat-partner {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .chat-preview {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+        }
+
+        .unread-badge {
+            background: #e53e3e;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-left: auto;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -651,12 +698,25 @@
             background: rgba(72, 187, 120, 0.1);
         }
 
+        .chat-message-sender {
+            font-size: 12px;
+            color: #667eea;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .my-message .chat-message-sender {
+            color: #48bb78;
+            text-align: right;
+        }
+
+        /* Стили для звездной системы */
         .level-achieved {
             background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
             border: 2px solid #10b981;
         }
 
-        /* ОБНОВЛЕННЫЕ СТИЛИ РЕФЕРАЛЬНОЙ ПРОГРАММЫ - ЗВЕЗДА ВМЕСТО SVG */
+        /* ОБНОВЛЕННЫЕ СТИЛИ РЕФЕРАЛЬНОЙ ПРОГРАММЫ */
         .referral-section {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
             padding: 25px 20px;
@@ -671,7 +731,7 @@
             backdrop-filter: blur(10px);
         }
 
-        /* ЗАМЕНА: сложный SVG-паттерн на одну большую звезду ✨ в правом верхнем углу */
+        /* ИСПРАВЛЕНИЕ: Замена сложного узора на одну звезду */
         .referral-section::before {
             content: '✨';
             position: absolute;
@@ -681,7 +741,6 @@
             color: white;
             opacity: 0.1;
             background: none;
-            z-index: 0;
         }
 
         .referral-title {
@@ -1051,6 +1110,75 @@
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             border: 2px solid rgba(255,255,255,0.5);
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
+        }
+
+        /* Стили для сообщений чата */
+        .chat-message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .my-message {
+            text-align: right;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        #chatMessages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 15px;
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        #messageInput:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Кнопка отправки сообщения */
+        #chatWindow .submit-button {
+            width: auto;
+            padding: 15px 25px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #chatWindow .submit-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+        
+        /* Заголовок чата */
+        #chatTitle {
+            color: #2d3748;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
         }
 
         /* Стили для фото в карточке */
@@ -1425,7 +1553,7 @@
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
             <div class="header">
-                <button class="about-button" onclick="showAboutSection(); triggerHapticFeedback();">ℹ️ О проекте</button>
+                <button class="about-button" onclick="showAboutSection(); triggerHapticFeedback()">ℹ️ О проекте</button>
                 <div class="logo">🤝✨</div>
                 <div class="app-title">Umeyka</div>
                 <div class="app-description">Мастера на все руки рядом с вами</div>
@@ -1436,15 +1564,15 @@
             </div>
             
             <div class="main-buttons">
-                <button class="main-button button-master" onclick="showSection('masterSection'); triggerHapticFeedback();">
+                <button class="main-button button-master" onclick="showSection('masterSection'); triggerHapticFeedback()">
                     <span class="button-icon">✨</span>
                     Я умейка
                 </button>
-                <button class="main-button button-client" onclick="showSection('clientSection'); triggerHapticFeedback();">
+                <button class="main-button button-client" onclick="showSection('clientSection'); triggerHapticFeedback()">
                     <span class="button-icon">🔍</span>
                     Я ищу
                 </button>
-                <button class="main-button" onclick="showProfileSection(); triggerHapticFeedback();" 
+                <button class="main-button" onclick="showProfileSection(); triggerHapticFeedback()" 
                         style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">
                     <span class="button-icon">👤</span>
                     Личный кабинет
@@ -1452,7 +1580,7 @@
             </div>
             
             <div class="map-section">
-                <button class="map-button" onclick="openMap(); triggerHapticFeedback();">
+                <button class="map-button" onclick="openMap(); triggerHapticFeedback()">
                     🗺️ Поиск по карте
                 </button>
                 <div id="map"></div>
@@ -1461,7 +1589,7 @@
 
         <!-- СЕКЦИЯ МАСТЕРА -->
         <div id="masterSection" class="section">
-            <button class="back-button" onclick="showMainScreen(); triggerHapticFeedback();">← Назад</button>
+            <button class="back-button" onclick="showMainScreen(); triggerHapticFeedback()">← Назад</button>
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
                 
@@ -1472,7 +1600,7 @@
                 <!-- Загрузка фото для умейки -->
                 <div style="margin: 15px 0;">
                     <div style="color: white; margin-bottom: 10px;">📸 Фото вашей работы (максимум 1 фото, размер до 1MB)</div>
-                    <div class="photo-upload-area" onclick="document.getElementById('skillPhotoInput').click(); triggerHapticFeedback();">
+                    <div class="photo-upload-area" onclick="document.getElementById('skillPhotoInput').click(); triggerHapticFeedback()">
                         <div class="photo-upload-icon">📷</div>
                         <div style="color: #2d3748; margin-bottom: 5px;">Нажмите для загрузки фото</div>
                         <div class="photo-info">JPG, PNG до 1MB</div>
@@ -1481,7 +1609,7 @@
                     
                     <div id="skillPhotoPreview" class="photo-preview" style="display: none;">
                         <img id="skillPhotoImg" src="" alt="Фото работы">
-                        <button class="photo-remove" onclick="removeSkillPhoto(); triggerHapticFeedback();">×</button>
+                        <button class="photo-remove" onclick="removeSkillPhoto(); triggerHapticFeedback()">×</button>
                     </div>
                     
                     <div id="photoCompressionStatus" style="color: #48bb78; font-size: 12px; text-align: center; margin-top: 5px; display: none;">
@@ -1489,7 +1617,7 @@
                     </div>
                 </div>
                 
-                <button class="submit-button" onclick="addSkill(); triggerHapticFeedback();">✅ Опубликовать умейку</button>
+                <button class="submit-button" onclick="addSkill(); triggerHapticFeedback()">✅ Опубликовать умейку</button>
                 
                 <div id="mySkillsList" style="margin-top: 20px;"></div>
             </div>
@@ -1497,12 +1625,12 @@
 
         <!-- СЕКЦИЯ КЛИЕНТА -->
         <div id="clientSection" class="section">
-            <button class="back-button" onclick="showMainScreen(); triggerHapticFeedback();">← Назад</button>
+            <button class="back-button" onclick="showMainScreen(); triggerHapticFeedback()">← Назад</button>
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">🔍 Найти мастера</h2>
                 
                 <input type="text" id="searchInput" class="input-field" placeholder="🔎 Что ищем? (например: сантехник, электрик)">
-                <button class="submit-button" onclick="searchSkills(); triggerHapticFeedback();">Найти мастеров</button>
+                <button class="submit-button" onclick="searchSkills(); triggerHapticFeedback()">Найти мастеров</button>
                 
                 <div id="searchResults" style="margin-top: 20px;"></div>
             </div>
@@ -1510,7 +1638,7 @@
 
         <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА -->
         <div id="profileSection" class="section">
-            <button class="back-button" onclick="showMainScreen(); triggerHapticFeedback();">← Назад</button>
+            <button class="back-button" onclick="showMainScreen(); triggerHapticFeedback()">← Назад</button>
             
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
@@ -1526,23 +1654,23 @@
                         <div id="userBadges" style="margin: 10px 0;"></div>
                     </div>
                     
-                    <button class="main-button" onclick="editProfile(); triggerHapticFeedback();" style="margin-bottom: 15px;">
+                    <button class="main-button" onclick="editProfile(); triggerHapticFeedback()" style="margin-bottom: 15px;">
                         ✏️ Редактировать профиль
                     </button>
                 </div>
                 
-                <!-- Вкладки личного кабинета -->
+                <!-- Вкладки личного кабинета (ЧАТЫ УДАЛЕНЫ) -->
                 <div class="tab-buttons">
-                    <button class="tab-button active" onclick="showProfileTab('stats'); triggerHapticFeedback();" id="statsTab">
+                    <button class="tab-button active" onclick="showProfileTab('stats'); triggerHapticFeedback()" id="statsTab">
                         📊 Статистика
                     </button>
-                    <button class="tab-button" onclick="showProfileTab('skills'); triggerHapticFeedback();" id="skillsTab">
+                    <button class="tab-button" onclick="showProfileTab('skills'); triggerHapticFeedback()" id="skillsTab">
                         ✨ Мои умейки
                     </button>
-                    <button class="tab-button" onclick="showProfileTab('deals'); triggerHapticFeedback();" id="dealsTab">
+                    <button class="tab-button" onclick="showProfileTab('deals'); triggerHapticFeedback()" id="dealsTab">
                         📝 Сделки
                     </button>
-                    <button class="tab-button" onclick="showProfileTab('referral'); triggerHapticFeedback();" id="referralTab">
+                    <button class="tab-button" onclick="showProfileTab('referral'); triggerHapticFeedback()" id="referralTab">
                         🎁 Реферальная программа
                     </button>
                 </div>
@@ -1558,7 +1686,7 @@
                     <h3 style="margin-bottom: 15px;">✨ Мои умейки</h3>
                     <div id="profileSkillsList"></div>
                     
-                    <button class="main-button button-master" onclick="showSection('masterSection'); triggerHapticFeedback();" style="margin-top: 15px;">
+                    <button class="main-button button-master" onclick="showSection('masterSection'); triggerHapticFeedback()" style="margin-top: 15px;">
                         ➕ Добавить новую умейку
                     </button>
                 </div>
@@ -1569,19 +1697,19 @@
                     
                     <!-- Вкладки сделок -->
                     <div class="deals-tab-buttons">
-                        <button class="deals-tab-button active" onclick="showDealsTab('pending'); triggerHapticFeedback();" id="pendingDealsTab">
+                        <button class="deals-tab-button active" onclick="showDealsTab('pending'); triggerHapticFeedback()" id="pendingDealsTab">
                             ✍️ Ожидают подписи
                         </button>
-                        <button class="deals-tab-button" onclick="showDealsTab('active'); triggerHapticFeedback();" id="activeDealsTab">
+                        <button class="deals-tab-button" onclick="showDealsTab('active'); triggerHapticFeedback()" id="activeDealsTab">
                             ✅ Активные
                         </button>
-                        <button class="deals-tab-button" onclick="showDealsTab('completed'); triggerHapticFeedback();" id="completedDealsTab">
+                        <button class="deals-tab-button" onclick="showDealsTab('completed'); triggerHapticFeedback()" id="completedDealsTab">
                             📋 Завершенные
                         </button>
                     </div>
                     
                     <!-- Кнопка создания сделки -->
-                    <button class="main-button" onclick="showCreateDealSection(); triggerHapticFeedback();" 
+                    <button class="main-button" onclick="showCreateDealSection(); triggerHapticFeedback()" 
                             style="margin-bottom: 20px; background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);">
                         ➕ Создать сделку
                     </button>
@@ -1635,11 +1763,11 @@
                         </div>
                         
                         <div class="referral-buttons">
-                            <button class="share-button" onclick="shareReferralLink(); triggerHapticFeedback();">
+                            <button class="share-button" onclick="shareReferralLink(); triggerHapticFeedback()">
                                 📤 Поделиться в Telegram
                             </button>
                             
-                            <button class="copy-button" onclick="copyReferralLink(); triggerHapticFeedback();">
+                            <button class="copy-button" onclick="copyReferralLink(); triggerHapticFeedback()">
                                 📋 Скопировать ссылку
                             </button>
                         </div>
@@ -1665,7 +1793,7 @@
                 
                 <!-- Ссылки на каналы -->
                 <div class="channel-links">
-                    <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
+                    <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank" onclick="triggerHapticFeedback()">
                         <div class="channel-icon">🎯</div>
                         <div class="channel-info">
                             <div class="channel-name">Мотивация</div>
@@ -1673,7 +1801,7 @@
                         </div>
                     </a>
                     
-                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
+                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback()">
                         <div class="channel-icon">✨</div>
                         <div class="channel-info">
                             <div class="channel-name">Umeyka</div>
@@ -1686,14 +1814,14 @@
 
         <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
         <div id="editProfileSection" class="section">
-            <button class="back-button" onclick="showProfileSection(); triggerHapticFeedback();">← Назад</button>
+            <button class="back-button" onclick="showProfileSection(); triggerHapticFeedback()">← Назад</button>
     
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
         
                 <!-- Аватар -->
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <div id="avatarPreview" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; cursor: pointer;" onclick="changeAvatar(); triggerHapticFeedback();">
+                    <div id="avatarPreview" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; cursor: pointer;" onclick="changeAvatar(); triggerHapticFeedback()">
                         👤
                     </div>
                     <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Нажмите на аватар для выбора</div>
@@ -1707,13 +1835,13 @@
                 <input type="text" id="editContact" class="input-field" placeholder="Контактная информация (телефон, Telegram)">
                 <textarea id="editBio" class="input-field" placeholder="О себе (расскажите о ваших навыках и опыте) *" style="height: 120px; resize: vertical;" required></textarea>
         
-                <button class="submit-button" onclick="saveProfile(); triggerHapticFeedback();">💾 Сохранить профиль</button>
+                <button class="submit-button" onclick="saveProfile(); triggerHapticFeedback()">💾 Сохранить профиль</button>
             </div>
         </div>
 
         <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
         <div id="createDealSection" class="section">
-            <button class="back-button" onclick="showProfileSection(); triggerHapticFeedback();">← Назад</button>
+            <button class="back-button" onclick="showProfileSection(); triggerHapticFeedback()">← Назад</button>
             
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📄 Создание сделки</h2>
@@ -1734,13 +1862,13 @@
                 <div>
                     <label style="color: white; display: block; margin-bottom: 10px;">⭐ Уровень качества *</label>
                     <div class="quality-options">
-                        <div class="quality-option" onclick="selectQuality('premium'); triggerHapticFeedback();" id="qualityPremium">
+                        <div class="quality-option" onclick="selectQuality('premium'); triggerHapticFeedback()" id="qualityPremium">
                             Премиум
                         </div>
-                        <div class="quality-option" onclick="selectQuality('standard'); triggerHapticFeedback();" id="qualityStandard">
+                        <div class="quality-option" onclick="selectQuality('standard'); triggerHapticFeedback()" id="qualityStandard">
                             Стандарт
                         </div>
-                        <div class="quality-option" onclick="selectQuality('economy'); triggerHapticFeedback();" id="qualityEconomy">
+                        <div class="quality-option" onclick="selectQuality('economy'); triggerHapticFeedback()" id="qualityEconomy">
                             Эконом
                         </div>
                     </div>
@@ -1750,13 +1878,13 @@
                 <div>
                     <label style="color: white; display: block; margin-bottom: 10px;">✅ Дополнительные условия (выберите 2)</label>
                     <div class="additional-options">
-                        <div class="option-checkbox" onclick="toggleOption('quality'); triggerHapticFeedback();" id="optionQuality">
+                        <div class="option-checkbox" onclick="toggleOption('quality'); triggerHapticFeedback()" id="optionQuality">
                             ⭐ Качество
                         </div>
-                        <div class="option-checkbox" onclick="toggleOption('price'); triggerHapticFeedback();" id="optionPrice">
+                        <div class="option-checkbox" onclick="toggleOption('price'); triggerHapticFeedback()" id="optionPrice">
                             💰 Цена
                         </div>
-                        <div class="option-checkbox" onclick="toggleOption('timeRange'); triggerHapticFeedback();" id="optionTimeRange">
+                        <div class="option-checkbox" onclick="toggleOption('timeRange'); triggerHapticFeedback()" id="optionTimeRange">
                             ⏱️ Диапазон Времени
                         </div>
                     </div>
@@ -1769,13 +1897,13 @@
                     <div style="font-weight: bold; margin-top: 5px;">Итого: <span id="totalAmount">0</span> ₽</div>
                 </div>
                 
-                <button class="submit-button" onclick="createDeal(); triggerHapticFeedback();">📝 Создать сделку</button>
+                <button class="submit-button" onclick="createDeal(); triggerHapticFeedback()">📝 Создать сделку</button>
             </div>
         </div>
 
         <!-- РАЗДЕЛ "О ПРОЕКТЕ" -->
         <div id="aboutSection" class="section">
-            <button class="back-button" onclick="showMainScreen(); triggerHapticFeedback();">← Назад</button>
+            <button class="back-button" onclick="showMainScreen(); triggerHapticFeedback()">← Назад</button>
             
             <div class="form-section">
                 <div class="about-section">
@@ -1827,22 +1955,22 @@
                     
                     <div style="text-align: center; margin-bottom: 15px;">
                         <div class="rating-stars" id="projectRatingStars">
-                            <span style="cursor: pointer;" onclick="setProjectRating(1); triggerHapticFeedback();">☆</span>
-                            <span style="cursor: pointer;" onclick="setProjectRating(2); triggerHapticFeedback();">☆</span>
-                            <span style="cursor: pointer;" onclick="setProjectRating(3); triggerHapticFeedback();">☆</span>
-                            <span style="cursor: pointer;" onclick="setProjectRating(4); triggerHapticFeedback();">☆</span>
-                            <span style="cursor: pointer;" onclick="setProjectRating(5); triggerHapticFeedback();">☆</span>
+                            <span style="cursor: pointer;" onclick="setProjectRating(1); triggerHapticFeedback()">☆</span>
+                            <span style="cursor: pointer;" onclick="setProjectRating(2); triggerHapticFeedback()">☆</span>
+                            <span style="cursor: pointer;" onclick="setProjectRating(3); triggerHapticFeedback()">☆</span>
+                            <span style="cursor: pointer;" onclick="setProjectRating(4); triggerHapticFeedback()">☆</span>
+                            <span style="cursor: pointer;" onclick="setProjectRating(5); triggerHapticFeedback()">☆</span>
                         </div>
                     </div>
                     
                     <textarea id="projectReviewComment" class="input-field" placeholder="Ваш отзыв о проекте..." style="height: 100px; resize: vertical; background: white;"></textarea>
                     
-                    <button class="submit-button" onclick="submitProjectReview(); triggerHapticFeedback();">📤 Отправить отзыв</button>
+                    <button class="submit-button" onclick="submitProjectReview(); triggerHapticFeedback()">📤 Отправить отзыв</button>
                 </div>
 
                 <!-- Ссылки на каналы -->
                 <div class="channel-links">
-                    <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
+                    <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank" onclick="triggerHapticFeedback()">
                         <div class="channel-icon">🎯</div>
                         <div class="channel-info">
                             <div class="channel-name">Мотивация</div>
@@ -1850,7 +1978,7 @@
                         </div>
                     </a>
                     
-                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
+                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback()">
                         <div class="channel-icon">✨</div>
                         <div class="channel-info">
                             <div class="channel-name">Umeyka</div>
@@ -1860,12 +1988,15 @@
                 </div>
             </div>
         </div>
+
+        <!-- ОКНО ЧАТА (удалено, но оставлен пустой div для обратной совместимости, если где-то остались ссылки) -->
+        <div id="chatWindow" class="section" style="display: none;"></div>
     </div>
 
     <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ УМЕЙКИ -->
     <div id="editSkillModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeEditSkillModal(); triggerHapticFeedback();">×</button>
+            <button class="modal-close" onclick="closeEditSkillModal(); triggerHapticFeedback()">×</button>
             <div class="modal-title">✏️ Редактировать умейку</div>
             
             <input type="hidden" id="editSkillId">
@@ -1877,7 +2008,7 @@
             <!-- Загрузка фото для редактирования -->
             <div style="margin: 15px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📸 Фото вашей работы</div>
-                <div class="photo-upload-area" onclick="document.getElementById('editSkillPhotoInput').click(); triggerHapticFeedback();">
+                <div class="photo-upload-area" onclick="document.getElementById('editSkillPhotoInput').click(); triggerHapticFeedback()">
                     <div class="photo-upload-icon">📷</div>
                     <div style="color: #2d3748; margin-bottom: 5px;">Нажмите для загрузки нового фото</div>
                     <div class="photo-info">JPG, PNG до 1MB</div>
@@ -1886,7 +2017,7 @@
                 
                 <div id="editSkillPhotoPreview" class="photo-preview" style="display: none;">
                     <img id="editSkillPhotoImg" src="" alt="Фото работы">
-                    <button class="photo-remove" onclick="removeEditSkillPhoto(); triggerHapticFeedback();">×</button>
+                    <button class="photo-remove" onclick="removeEditSkillPhoto(); triggerHapticFeedback()">×</button>
                 </div>
                 
                 <div id="editPhotoCompressionStatus" style="color: #48bb78; font-size: 12px; text-align: center; margin-top: 5px; display: none;">
@@ -1895,8 +2026,8 @@
             </div>
             
             <div class="modal-buttons">
-                <button class="modal-button modal-save" onclick="saveEditedSkill(); triggerHapticFeedback();">💾 Сохранить</button>
-                <button class="modal-button modal-cancel" onclick="closeEditSkillModal(); triggerHapticFeedback();">Отмена</button>
+                <button class="modal-button modal-save" onclick="saveEditedSkill(); triggerHapticFeedback()">💾 Сохранить</button>
+                <button class="modal-button modal-cancel" onclick="closeEditSkillModal(); triggerHapticFeedback()">Отмена</button>
             </div>
         </div>
     </div>
@@ -1904,7 +2035,7 @@
     <!-- МОДАЛЬНОЕ ОКНО КОНТАКТОВ МАСТЕРА -->
     <div id="contactModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeContactModal(); triggerHapticFeedback();">×</button>
+            <button class="modal-close" onclick="closeContactModal(); triggerHapticFeedback()">×</button>
             <div class="modal-title">📞 Контакты мастера</div>
             
             <div id="contactInfo" class="contact-info">
@@ -1912,15 +2043,15 @@
             </div>
             
             <div class="contact-buttons">
-                <a id="callButton" class="call-button" href="#" target="_blank" onclick="triggerHapticFeedback();">
+                <a id="callButton" class="call-button" href="#" target="_blank" onclick="triggerHapticFeedback()">
                     📞 Позвонить
                 </a>
-                <a id="telegramButton" class="telegram-button" href="#" target="_blank" onclick="triggerHapticFeedback();">
+                <a id="telegramButton" class="telegram-button" href="#" target="_blank" onclick="triggerHapticFeedback()">
                     ✈️ Написать в Telegram
                 </a>
             </div>
             
-            <button class="modal-button modal-cancel" onclick="closeContactModal(); triggerHapticFeedback();" style="margin-top: 15px;">
+            <button class="modal-button modal-cancel" onclick="closeContactModal(); triggerHapticFeedback()" style="margin-top: 15px;">
                 Закрыть
             </button>
         </div>
@@ -2411,7 +2542,6 @@
 
     window.addSkill = async function() {
         triggerHapticFeedback();
-        
         try {
             const skillName = document.getElementById('skillName').value;
             const skillExperience = document.getElementById('skillExperience').value;
@@ -2612,10 +2742,10 @@
                             ` : ''}
                             
                             <div style="display: flex; gap: 10px; margin-top: 15px;">
-                                <button class="edit-button" onclick="openEditSkillModal('${skill._id}'); triggerHapticFeedback();">
+                                <button class="edit-button" onclick="openEditSkillModal('${skill._id}'); triggerHapticFeedback()">
                                     ✏️ Редактировать
                                 </button>
-                                <button class="delete-button" onclick="deleteSkill('${skill._id}'); triggerHapticFeedback();">
+                                <button class="delete-button" onclick="deleteSkill('${skill._id}'); triggerHapticFeedback()">
                                     🗑️ Удалить
                                 </button>
                             </div>
@@ -2626,7 +2756,7 @@
                         <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
                             <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
                             <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
-                            <button class="main-button" onclick="showSection('masterSection'); triggerHapticFeedback();" style="padding: 15px; margin-top: 10px;">
+                            <button class="main-button" onclick="showSection('masterSection'); triggerHapticFeedback()" style="padding: 15px; margin-top: 10px;">
                                 ✨ Добавить первую умейку
                             </button>
                         </div>
@@ -2698,10 +2828,10 @@
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
                         <div class="skill-actions">
-                            <button class="edit-button" onclick="openEditSkillModal('${skill._id}'); triggerHapticFeedback();" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
+                            <button class="edit-button" onclick="openEditSkillModal('${skill._id}'); triggerHapticFeedback()" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
                                 ✏️
                             </button>
-                            <button class="delete-button" onclick="deleteSkill('${skill._id}'); triggerHapticFeedback();" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
+                            <button class="delete-button" onclick="deleteSkill('${skill._id}'); triggerHapticFeedback()" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
                                 🗑️
                             </button>
                         </div>
@@ -2719,7 +2849,6 @@
 
     window.openEditSkillModal = async function(skillId) {
         triggerHapticFeedback();
-        
         try {
             console.log('📱 Загрузка умейки для редактирования:', skillId);
             
@@ -2756,7 +2885,6 @@
     };
 
     window.closeEditSkillModal = function() {
-        triggerHapticFeedback();
         document.getElementById('editSkillModal').style.display = 'none';
         currentEditingSkill = null;
         editSkillPhoto = null;
@@ -2772,7 +2900,6 @@
 
     window.saveEditedSkill = async function() {
         triggerHapticFeedback();
-        
         try {
             const skillId = document.getElementById('editSkillId').value;
             const skillName = document.getElementById('editSkillName').value;
@@ -2842,11 +2969,8 @@
 
     window.deleteSkill = async function(skillId) {
         triggerHapticFeedback();
-        
         if (confirm('❌ Удалить эту умейку?')) {
-            try {
-                triggerHapticFeedback();
-                
+            try {                
                 let deleteSuccess = false;
                 
                 try {
@@ -3148,7 +3272,7 @@
                 <div class="contact-item">
                     <div class="contact-icon">📞</div>
                     <div class="contact-text">${phone}</div>
-                    <button class="copy-contact" onclick="copyToClipboard('${phone}'); triggerHapticFeedback();">Копировать</button>
+                    <button class="copy-contact" onclick="copyToClipboard('${phone}'); triggerHapticFeedback()">Копировать</button>
                 </div>
             `;
             callButton.href = `tel:${phone.replace(/\s/g, '')}`;
@@ -3162,7 +3286,7 @@
                 <div class="contact-item">
                     <div class="contact-icon">✍️</div>
                     <div class="contact-text">${telegram}</div>
-                    <button class="copy-contact" onclick="copyToClipboard('${telegram}'); triggerHapticFeedback();">Копировать</button>
+                    <button class="copy-contact" onclick="copyToClipboard('${telegram}'); triggerHapticFeedback()">Копировать</button>
                 </div>
             `;
             telegramButton.href = `https://t.me/${telegram.replace('@', '')}`;
@@ -3180,7 +3304,6 @@
     };
 
     window.closeContactModal = function() {
-        triggerHapticFeedback();
         document.getElementById('contactModal').style.display = 'none';
     };
 
@@ -3199,9 +3322,10 @@
         triggerHapticFeedback();
         
         const referralLink = generateReferralLink();
-        
-        // ОБНОВЛЕННЫЙ ТЕКСТ РЕФЕРАЛЬНОГО СООБЩЕНИЯ
-        const shareText = `Привет! Хочу порекомендовать полезное приложение — Umeyka .  Umeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
+        // ИСПРАВЛЕНИЕ: Обновлён текст сообщения
+        const shareText = `Привет! Хочу порекомендовать полезное приложение — Umeyka .  Umeyka — сервис для поиска мастеров на все руки. 
+Быстро, надёжно, рядом с вами.
+${referralLink}`;
         
         const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
         
@@ -3226,7 +3350,6 @@
     // ========== ОСНОВНЫЕ ФУНКЦИИ НАВИГАЦИИ ==========
 
     window.showMainScreen = function() {
-        triggerHapticFeedback();
         stopMapAutoRefresh();
         
         document.getElementById('mainScreen').style.display = 'block';
@@ -3236,12 +3359,12 @@
         document.getElementById('editProfileSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
+        document.getElementById('chatWindow').style.display = 'none';
         document.querySelector('.map-section').classList.remove('map-active');
     };
     
     window.showSection = function(sectionId) {
         triggerHapticFeedback();
-        
         if (!document.querySelector('.map-active') && mapRefreshInterval) {
             stopMapAutoRefresh();
         }
@@ -3253,6 +3376,7 @@
         document.getElementById('editProfileSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
+        document.getElementById('chatWindow').style.display = 'none';
         document.getElementById(sectionId).style.display = 'block';
         
         if (sectionId === 'masterSection') {
@@ -3355,7 +3479,6 @@
 
     window.searchSkills = async function() {
         triggerHapticFeedback();
-        
         const searchQuery = document.getElementById('searchInput').value.trim();
         const searchResults = document.getElementById('searchResults');
         
@@ -3399,11 +3522,11 @@
                             👤 ${skill.username}
                         </div>
                         
-                        <button class="chat-button" onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', ''); triggerHapticFeedback();">
+                        <button class="chat-button" onclick="openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', ''); triggerHapticFeedback()">
                             📞 Подробные контакты
                         </button>
                         
-                        <button class="create-deal-button" onclick="createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.userId}', '${skill.experience || ''}'); triggerHapticFeedback();">
+                        <button class="create-deal-button" onclick="createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.userId}', '${skill.experience || ''}'); triggerHapticFeedback()">
                             📝 Составить сделку
                         </button>
                     </div>
@@ -3495,7 +3618,6 @@
 
     window.saveProfile = function() {
         triggerHapticFeedback();
-        
         const firstName = document.getElementById('editFirstName').value.trim();
         const bio = document.getElementById('editBio').value.trim();
         
@@ -3560,6 +3682,7 @@
         document.getElementById('profileSkills').style.display = 'none';
         document.getElementById('profileDeals').style.display = 'none';
         document.getElementById('profileReferral').style.display = 'none';
+        // ЧАТЫ УДАЛЕНЫ
         
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
         
@@ -3567,6 +3690,7 @@
         document.getElementById('profileSkills').style.display = tabName === 'skills' ? 'block' : 'none';
         document.getElementById('profileDeals').style.display = tabName === 'deals' ? 'block' : 'none';
         document.getElementById('profileReferral').style.display = tabName === 'referral' ? 'block' : 'none';
+        // ЧАТЫ УДАЛЕНЫ
         
         document.getElementById(tabName + 'Tab').classList.add('active');
         
@@ -3577,6 +3701,7 @@
         } else if (tabName === 'referral') {
             updateReferralStats();
         }
+        // ЧАТЫ УДАЛЕНЫ
     };
 
     window.showDealsTab = function(tabName) {
@@ -3749,18 +3874,18 @@
                         
                         <div class="deal-actions">
                             ${showSignButton ? `
-                                <button class="deal-button sign-button" onclick="signDeal('${deal.id}'); triggerHapticFeedback();">
+                                <button class="deal-button sign-button" onclick="signDeal('${deal.id}'); triggerHapticFeedback()">
                                     ✍️ Подписать сделку
                                 </button>
                             ` : ''}
                             
                             ${showCompleteButton ? `
-                                <button class="deal-button complete-button" onclick="completeDeal('${deal.id}'); triggerHapticFeedback();">
+                                <button class="deal-button complete-button" onclick="completeDeal('${deal.id}'); triggerHapticFeedback()">
                                     ✅ Завершить сделку
                                 </button>
                             ` : ''}
                             
-                            <button class="deal-button view-button" onclick="viewDealDetails('${deal.id}'); triggerHapticFeedback();">
+                            <button class="deal-button view-button" onclick="viewDealDetails('${deal.id}'); triggerHapticFeedback()">
                                 👁️ Подробнее
                             </button>
                         </div>
@@ -3862,7 +3987,6 @@
 
     window.createDeal = function() {
         triggerHapticFeedback();
-        
         try {
             const title = document.getElementById('dealTitle').value.trim();
             const description = document.getElementById('dealDescription').value.trim();
@@ -3965,9 +4089,9 @@
     };
 
     window.signDeal = function(dealId) {
-        triggerHapticFeedback();
-        
         try {
+            triggerHapticFeedback();
+            
             const deal = getDealById(dealId);
             if (!deal) {
                 alert('❌ Сделка не найдена');
@@ -4010,8 +4134,6 @@
     };
 
     window.completeDeal = function(dealId) {
-        triggerHapticFeedback();
-        
         if (confirm('✅ Завершить сделку? После завершения сделка будет перемещена в архив и вы сможете оставить отзыв мастеру.')) {
             try {
                 triggerHapticFeedback();
@@ -4063,9 +4185,8 @@
     };
 
     window.viewDealDetails = function(dealId) {
-        triggerHapticFeedback();
-        
         try {
+            triggerHapticFeedback();
             const deal = getDealById(dealId);
             
             if (!deal) {
@@ -4148,6 +4269,24 @@
         showSection('createDealSection');
     };
 
+    window.closeChat = function() {
+        showProfileSection();
+    };
+
+    // Функция loadChats удалена, так как раздел "Чаты" убран
+
+    window.sendChatMessage = function() {
+        // Функция больше не используется, но оставлена для совместимости
+        const messageInput = document.getElementById('messageInput');
+        if (!messageInput) return;
+        
+        const message = messageInput.value.trim();
+        if (!message) return;
+        
+        // Сообщаем, что чаты отключены
+        alert('Функция чатов временно недоступна');
+    };
+
     window.setProjectRating = function(rating) {
         triggerHapticFeedback();
         projectRating = rating;
@@ -4156,14 +4295,13 @@
         
         for (let i = 1; i <= 5; i++) {
             stars.innerHTML += i <= rating ? 
-                '<span style="cursor: pointer; color: #FFD700;" onclick="setProjectRating(' + i + '); triggerHapticFeedback();">★</span>' :
-                '<span style="cursor: pointer;" onclick="setProjectRating(' + i + '); triggerHapticFeedback();">☆</span>';
+                '<span style="cursor: pointer; color: #FFD700;" onclick="setProjectRating(' + i + '); triggerHapticFeedback()">★</span>' :
+                '<span style="cursor: pointer;" onclick="setProjectRating(' + i + '); triggerHapticFeedback()">☆</span>';
         }
     };
 
     window.submitProjectReview = function() {
         triggerHapticFeedback();
-        
         const comment = document.getElementById('projectReviewComment').value.trim();
         
         if (projectRating === 0) {
@@ -4182,14 +4320,6 @@
         document.getElementById('projectReviewComment').value = '';
         setProjectRating(0);
     };
-
-    // Добавляем обработчик для поля суммы сделки
-    document.addEventListener('DOMContentLoaded', function() {
-        const dealAmount = document.getElementById('dealAmount');
-        if (dealAmount) {
-            dealAmount.addEventListener('input', updateDealCommission);
-        }
-    });
 
     </script>
 </body>
