@@ -222,6 +222,59 @@
             transition: all 0.3s ease;
         }
         
+        /* ========== НОВЫЕ СТИЛИ ДЛЯ СТАТУСА МАСТЕРА ========== */
+        .master-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 10px 0;
+            width: fit-content;
+        }
+        
+        .status-ready {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .status-busy {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .status-toggle {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .status-toggle-button {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .status-toggle-button.active {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.3);
+        }
+        
+        .status-toggle-button.busy.active {
+            border-color: #f56565;
+            background: rgba(245, 101, 101, 0.3);
+        }
+        
         .skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -263,76 +316,9 @@
             margin: 15px 0;
         }
         
-        /* НОВЫЙ СТИЛЬ ДЛЯ СТАТУСА МАСТЕРА - вместо контактов */
-        .master-status {
-            margin: 15px 0;
-            padding: 12px;
-            background: rgba(102, 126, 234, 0.08);
-            border-radius: 10px;
-            font-size: 15px;
-            color: #2d3748;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .status-ready {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            color: #155724;
-            border-color: #28a745;
-        }
-
-        .status-ready .status-icon {
-            color: #28a745;
-            font-size: 18px;
-            margin-right: 8px;
-        }
-
-        .status-busy {
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-            color: #721c24;
-            border-color: #dc3545;
-        }
-
-        .status-busy .status-icon {
-            color: #dc3545;
-            font-size: 18px;
-            margin-right: 8px;
-        }
-
-        .status-toggle {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            justify-content: center;
-        }
-
-        .status-toggle-button {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 10px;
-            background: rgba(255,255,255,0.15);
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .status-toggle-button.active {
-            background: rgba(255,255,255,0.3);
-            border-color: white;
-        }
-
-        .status-toggle-button.ready.active {
-            background: #28a745;
-        }
-
-        .status-toggle-button.busy.active {
-            background: #dc3545;
-        }
-        
-        .skill-contact-info {
+        /* ========== ОБНОВЛЕННЫЙ БЛОК КОНТАКТОВ ========== */
+        /* Теперь здесь только статус, контакты скрыты */
+        .skill-status-info {
             margin: 15px 0;
             padding: 12px;
             background: rgba(102, 126, 234, 0.08);
@@ -342,7 +328,7 @@
             border: 1px solid rgba(102, 126, 234, 0.1);
         }
 
-        .skill-contact-info .contact-item {
+        .skill-status-info .status-item {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -353,20 +339,19 @@
             border: 1px solid #e2e8f0;
         }
 
-        .skill-contact-info .contact-icon {
+        .skill-status-info .status-icon {
             font-size: 18px;
             min-width: 24px;
             color: #667eea;
         }
 
-        .skill-contact-info .contact-text {
-            word-break: break-all;
+        .skill-status-info .status-text {
             flex: 1;
             font-size: 14px;
             font-weight: 500;
         }
 
-        .skill-contact-info .contact-label {
+        .skill-status-info .status-label {
             font-weight: 600;
             color: #667eea;
             margin-bottom: 5px;
@@ -1538,6 +1523,15 @@
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
                 
+                <!-- Статус мастера (только для просмотра при создании) -->
+                <div class="skill-status-info" style="display: none;">
+                    <div class="status-label">🔄 Статус</div>
+                    <div class="status-item">
+                        <span class="status-icon" id="masterStatusIcon">🟢</span>
+                        <span class="status-text" id="masterStatusText">готов</span>
+                    </div>
+                </div>
+                
                 <!-- Загрузка фото для умейки -->
                 <div style="margin: 15px 0;">
                     <div style="color: white; margin-bottom: 10px;">📸 Фото вашей работы (максимум 1 фото, размер до 1MB)</div>
@@ -1592,6 +1586,12 @@
                         </div>
                         <h3 id="userName">Пользователь</h3>
                         <p id="userBio" style="opacity: 0.8; margin: 10px 0;">Расскажите о себе...</p>
+                        
+                        <!-- СТАТУС МАСТЕРА В ПРОФИЛЕ -->
+                        <div id="profileMasterStatus" class="master-status status-ready" style="margin: 15px auto;">
+                            🟢 Готов к работе
+                        </div>
+                        
                         <div id="userBadges" style="margin: 10px 0;"></div>
                     </div>
                     
@@ -1625,6 +1625,23 @@
                 <!-- Мои умейки -->
                 <div id="profileSkills" class="profile-tab" style="display: none;">
                     <h3 style="margin-bottom: 15px;">✨ Мои умейки</h3>
+                    
+                    <!-- ПЕРЕКЛЮЧАТЕЛЬ СТАТУСА МАСТЕРА -->
+                    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                        <div style="color: white; margin-bottom: 15px; font-weight: 600;">🔄 Мой статус:</div>
+                        <div class="status-toggle">
+                            <button class="status-toggle-button active" onclick="setMasterStatus('ready')" id="statusReadyBtn">
+                                🟢 Готов
+                            </button>
+                            <button class="status-toggle-button busy" onclick="setMasterStatus('busy')" id="statusBusyBtn">
+                                🔴 Занят
+                            </button>
+                        </div>
+                        <div style="color: rgba(255,255,255,0.7); font-size: 12px; text-align: center; margin-top: 10px;">
+                            Статус отображается в карточках ваших умейок
+                        </div>
+                    </div>
+                    
                     <div id="profileSkillsList"></div>
                     
                     <button class="main-button button-master" onclick="triggerHapticFeedback(); showSection('masterSection');" style="margin-top: 15px;">
@@ -1943,14 +1960,16 @@
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
-            <!-- Статус мастера -->
-            <div style="margin: 20px 0;">
-                <div style="color: #2d3748; font-weight: 600; margin-bottom: 10px;">🔄 Статус мастера</div>
-                <div class="status-toggle">
-                    <button class="status-toggle-button ready" onclick="triggerHapticFeedback(); setMasterStatus('ready');" id="statusReadyBtn">✅ Готов</button>
-                    <button class="status-toggle-button busy" onclick="triggerHapticFeedback(); setMasterStatus('busy');" id="statusBusyBtn">⏳ Занят</button>
+            <!-- Статус мастера (только для просмотра) -->
+            <div class="skill-status-info">
+                <div class="status-label">🔄 Текущий статус</div>
+                <div class="status-item">
+                    <span class="status-icon" id="editMasterStatusIcon">🟢</span>
+                    <span class="status-text" id="editMasterStatusText">готов</span>
                 </div>
-                <input type="hidden" id="editSkillStatus" value="ready">
+                <div style="font-size: 12px; color: #666; margin-top: 5px; text-align: center;">
+                    Статус можно изменить в личном кабинете
+                </div>
             </div>
             
             <!-- Загрузка фото для редактирования -->
@@ -2025,19 +2044,18 @@
     let currentEditingSkill = null;
     let currentDealMaster = null;
 
+    // ========== НОВАЯ ПЕРЕМЕННАЯ ДЛЯ СТАТУСА МАСТЕРА ==========
+    let masterStatus = 'ready'; // 'ready' или 'busy'
+
     // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ВИБРАЦИИ ==========
-    // Улучшенная функция с множественными попытками и визуальным фидбеком
     function triggerHapticFeedback() {
         console.log('📳 Попытка вибрации...');
         
-        // СПОСОБ 1: Telegram WebApp HapticFeedback (основной)
         try {
             if (window.Telegram?.WebApp?.HapticFeedback) {
-                // Пробуем разные типы вибрации для надежности
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                 console.log('✅ Вибрация Telegram (impact) сработала');
                 
-                // Добавляем небольшую задержку для второго типа вибрации
                 setTimeout(() => {
                     try {
                         window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
@@ -2050,10 +2068,9 @@
             console.log('❌ Ошибка Telegram HapticFeedback:', error);
         }
         
-        // СПОСОБ 2: Vibration API (для браузера и десктопа)
         try {
             if (navigator.vibrate) {
-                navigator.vibrate(20); // Короткая вибрация 20ms
+                navigator.vibrate(20);
                 console.log('✅ Вибрация браузера (Vibration API) сработала');
                 return;
             }
@@ -2061,10 +2078,8 @@
             console.log('❌ Ошибка Vibration API:', error);
         }
         
-        // СПОСОБ 3: Альтернативный метод Telegram (если предыдущие не сработали)
         try {
             if (window.Telegram?.WebApp) {
-                // Пробуем вызвать через другой метод
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                 console.log('✅ Вибрация Telegram (light) сработала');
                 return;
@@ -2073,9 +2088,7 @@
             console.log('❌ Ошибка альтернативной вибрации Telegram:', error);
         }
         
-        // СПОСОБ 4: Визуальный фидбек (всегда работает)
         try {
-            // Создаем временный элемент для визуального эффекта
             const feedback = document.createElement('div');
             feedback.style.cssText = `
                 position: fixed;
@@ -2091,7 +2104,6 @@
                 animation: ripple 0.3s ease-out;
             `;
             
-            // Добавляем анимацию
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes ripple {
@@ -2113,37 +2125,92 @@
         }
     }
 
-    // Делаем функцию глобальной и доступной везде
     window.triggerHapticFeedback = triggerHapticFeedback;
 
     // ========== НОВЫЕ ФУНКЦИИ ДЛЯ СТАТУСА МАСТЕРА ==========
-    function setMasterStatus(status) {
+    
+    // Загрузка статуса из localStorage
+    function loadMasterStatus() {
+        const savedStatus = getLocalStorage(`masterStatus_${currentUserId}`);
+        if (savedStatus) {
+            masterStatus = savedStatus;
+        }
+        updateMasterStatusUI();
+        return masterStatus;
+    }
+    
+    // Сохранение статуса в localStorage
+    function saveMasterStatus(status) {
+        masterStatus = status;
+        setLocalStorage(`masterStatus_${currentUserId}`, status);
+        updateMasterStatusUI();
+    }
+    
+    // Обновление UI статуса
+    function updateMasterStatusUI() {
+        // Обновление в профиле
+        const profileStatus = document.getElementById('profileMasterStatus');
+        if (profileStatus) {
+            if (masterStatus === 'ready') {
+                profileStatus.className = 'master-status status-ready';
+                profileStatus.innerHTML = '🟢 Готов к работе';
+            } else {
+                profileStatus.className = 'master-status status-busy';
+                profileStatus.innerHTML = '🔴 Занят';
+            }
+        }
+        
+        // Обновление кнопок переключателя
         const readyBtn = document.getElementById('statusReadyBtn');
         const busyBtn = document.getElementById('statusBusyBtn');
-        const statusInput = document.getElementById('editSkillStatus');
+        if (readyBtn && busyBtn) {
+            if (masterStatus === 'ready') {
+                readyBtn.classList.add('active');
+                busyBtn.classList.remove('active');
+            } else {
+                readyBtn.classList.remove('active');
+                busyBtn.classList.add('active');
+            }
+        }
         
-        if (status === 'ready') {
-            readyBtn.classList.add('active');
-            busyBtn.classList.remove('active');
-            statusInput.value = 'ready';
-        } else {
-            busyBtn.classList.add('active');
-            readyBtn.classList.remove('active');
-            statusInput.value = 'busy';
+        // Обновление в модальном окне редактирования
+        const editStatusIcon = document.getElementById('editMasterStatusIcon');
+        const editStatusText = document.getElementById('editMasterStatusText');
+        if (editStatusIcon && editStatusText) {
+            if (masterStatus === 'ready') {
+                editStatusIcon.textContent = '🟢';
+                editStatusText.textContent = 'готов';
+            } else {
+                editStatusIcon.textContent = '🔴';
+                editStatusText.textContent = 'занят';
+            }
+        }
+        
+        // Обновление в форме создания умейки (если нужно)
+        const masterStatusIcon = document.getElementById('masterStatusIcon');
+        const masterStatusText = document.getElementById('masterStatusText');
+        if (masterStatusIcon && masterStatusText) {
+            if (masterStatus === 'ready') {
+                masterStatusIcon.textContent = '🟢';
+                masterStatusText.textContent = 'готов';
+            } else {
+                masterStatusIcon.textContent = '🔴';
+                masterStatusText.textContent = 'занят';
+            }
         }
     }
-
-    function getMasterStatusText(status) {
-        return status === 'ready' ? '✅ Готов к работе' : '⏳ Временно занят';
-    }
-
-    function getMasterStatusClass(status) {
-        return status === 'ready' ? 'status-ready' : 'status-busy';
-    }
-
-    function getMasterStatusIcon(status) {
-        return status === 'ready' ? '✅' : '⏳';
-    }
+    
+    // Функция установки статуса (вызывается из кнопок)
+    window.setMasterStatus = function(status) {
+        triggerHapticFeedback();
+        saveMasterStatus(status);
+        showNotification(`Статус изменён на: ${status === 'ready' ? '🟢 Готов' : '🔴 Занят'}`);
+        
+        // Обновляем все карточки умейок на странице
+        if (map) {
+            loadSkillsOnMap();
+        }
+    };
 
     // ========== ФУНКЦИИ ДЛЯ МОНЕТ ==========
     function getCoinsData() {
@@ -2627,12 +2694,12 @@
 
             const skillData = {
                 skill: skillName.trim(),
-                experience: skillExperience.trim(),
+                experience: skillExperience.trim(), // Контакт сохраняем для модального окна
                 price: parseInt(skillPrice),
                 userId: userId,
                 username: userData.firstName || 'Аноним',
                 location: location,
-                status: 'ready' // Статус по умолчанию
+                status: masterStatus // Добавляем статус мастера
             };
 
             console.log('📤 Отправляю данные на сервер:');
@@ -2776,8 +2843,11 @@
                     console.log(`✅ Найдено ${result.skills.length} моих умейок`);
                     
                     skillsList.innerHTML = result.skills.map(skill => {
-                        const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
-                        const statusText = skill.status === 'ready' ? '✅ Готов' : '⏳ Занят';
+                        // Определяем статус мастера (если нет - по умолчанию готов)
+                        const skillStatus = skill.status || 'ready';
+                        const statusIcon = skillStatus === 'ready' ? '🟢' : '🔴';
+                        const statusText = skillStatus === 'ready' ? 'готов' : 'занят';
+                        
                         return `
                         <div class="skill-card">
                             <div class="skill-header">
@@ -2787,10 +2857,13 @@
                             
                             <div class="skill-price">${skill.price} ₽</div>
                             
-                            <!-- НОВЫЙ СТАТУС ВМЕСТО КОНТАКТОВ -->
-                            <div class="master-status ${statusClass}">
-                                <span class="status-icon">${skill.status === 'ready' ? '✅' : '⏳'}</span>
-                                ${statusText}
+                            <!-- ВМЕСТО КОНТАКТОВ ПОКАЗЫВАЕМ СТАТУС -->
+                            <div class="skill-status-info">
+                                <div class="status-label">🔄 Статус</div>
+                                <div class="status-item">
+                                    <span class="status-icon">${statusIcon}</span>
+                                    <span class="status-text">${statusText}</span>
+                                </div>
                             </div>
                             
                             <div style="color: #666; margin: 15px 0 20px;">
@@ -2811,6 +2884,11 @@
                                     🗑️ Удалить
                                 </button>
                             </div>
+                            
+                            <!-- КНОПКА КОНТАКТОВ (ТЕПЕРЬ ТОЛЬКО ЗДЕСЬ) -->
+                            <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');" style="margin-top: 10px;">
+                                📞 Подробные контакты
+                            </button>
                         </div>
                     `}).join('');
                 } else {
@@ -2866,8 +2944,11 @@
             
             if (result.success && result.skills.length > 0) {
                 skillsList.innerHTML = result.skills.map(skill => {
-                    const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
-                    const statusText = skill.status === 'ready' ? '✅ Готов' : '⏳ Занят';
+                    // Определяем статус мастера
+                    const skillStatus = skill.status || 'ready';
+                    const statusIcon = skillStatus === 'ready' ? '🟢' : '🔴';
+                    const statusText = skillStatus === 'ready' ? 'готов' : 'занят';
+                    
                     return `
                     <div class="profile-skill-card">
                         <div class="profile-skill-header">
@@ -2875,10 +2956,12 @@
                             <div class="skill-price">${skill.price} ₽</div>
                         </div>
                         
-                        <!-- НОВЫЙ СТАТУС В ПРОФИЛЕ -->
-                        <div class="master-status ${statusClass}" style="margin: 10px 0;">
-                            <span class="status-icon">${skill.status === 'ready' ? '✅' : '⏳'}</span>
-                            ${statusText}
+                        <!-- СТАТУС В ПРОФИЛЕ -->
+                        <div class="skill-status-info">
+                            <div class="status-item" style="background: ${skillStatus === 'ready' ? 'rgba(72, 187, 120, 0.1)' : 'rgba(245, 101, 101, 0.1)'};">
+                                <span class="status-icon">${statusIcon}</span>
+                                <span class="status-text">${statusText}</span>
+                            </div>
                         </div>
                         
                         ${skill.photo ? `
@@ -2928,10 +3011,19 @@
                 document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
                 
-                // Устанавливаем статус
-                const currentStatus = skill.status || 'ready';
-                document.getElementById('editSkillStatus').value = currentStatus;
-                setMasterStatus(currentStatus);
+                // Обновляем статус в модальном окне
+                const skillStatus = skill.status || masterStatus;
+                const editStatusIcon = document.getElementById('editMasterStatusIcon');
+                const editStatusText = document.getElementById('editMasterStatusText');
+                if (editStatusIcon && editStatusText) {
+                    if (skillStatus === 'ready') {
+                        editStatusIcon.textContent = '🟢';
+                        editStatusText.textContent = 'готов';
+                    } else {
+                        editStatusIcon.textContent = '🔴';
+                        editStatusText.textContent = 'занят';
+                    }
+                }
                 
                 editSkillPhoto = null;
                 const preview = document.getElementById('editSkillPhotoPreview');
@@ -2976,7 +3068,6 @@
             const skillName = document.getElementById('editSkillName').value;
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
-            const skillStatus = document.getElementById('editSkillStatus').value;
             
             if (!skillId) {
                 alert('❌ Ошибка: не указан ID умейки');
@@ -2992,7 +3083,7 @@
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
-                status: skillStatus
+                status: masterStatus // Сохраняем текущий статус
             };
             
             console.log('📤 Сохраняю изменения умейки:', skillData);
@@ -3246,8 +3337,9 @@
 
     function createMapSkillPopup(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
-        const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
-        const statusText = skill.status === 'ready' ? '✅ Готов к работе' : '⏳ Временно занят';
+        const skillStatus = skill.status || 'ready';
+        const statusIcon = skillStatus === 'ready' ? '🟢' : '🔴';
+        const statusText = skillStatus === 'ready' ? 'Готов' : 'Занят';
         
         return `
             <div class="map-popup-content">
@@ -3266,10 +3358,13 @@
                         ${skill.price} руб.
                     </p>
                     
-                    <!-- НОВЫЙ СТАТУС НА КАРТЕ -->
-                    <div class="master-status ${statusClass}" style="margin: 10px 0;">
-                        <span class="status-icon">${skill.status === 'ready' ? '✅' : '⏳'}</span>
-                        ${statusText}
+                    <!-- СТАТУС НА КАРТЕ -->
+                    <div style="margin: 10px 0; padding: 10px; background: ${skillStatus === 'ready' ? 'rgba(72, 187, 120, 0.1)' : 'rgba(245, 101, 101, 0.1)'}; border-radius: 8px; border: 1px solid ${skillStatus === 'ready' ? '#48bb78' : '#f56565'};">
+                        <div style="font-weight: 600; color: #667eea; margin-bottom: 5px; font-size: 14px;">🔄 Статус:</div>
+                        <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding: 8px; background: white; border-radius: 6px;">
+                            <span style="font-size:18px;">${statusIcon}</span>
+                            <span style="font-size: 14px; font-weight: 500; flex: 1;">${statusText}</span>
+                        </div>
                     </div>
                     
                     <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
@@ -3460,6 +3555,7 @@
         triggerHapticFeedback();
         showSection('profileSection');
         loadUserProfile();
+        loadMasterStatus(); // Загружаем статус при открытии профиля
     };
 
     window.showAboutSection = function() {
@@ -3533,6 +3629,9 @@
         
         processReferralLink();
         
+        // Загружаем статус мастера
+        loadMasterStatus();
+        
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -3574,8 +3673,11 @@
             
             if (result.success && result.skills.length > 0) {
                 searchResults.innerHTML = result.skills.map(skill => {
-                    const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
-                    const statusText = skill.status === 'ready' ? '✅ Готов' : '⏳ Занят';
+                    // Определяем статус мастера
+                    const skillStatus = skill.status || 'ready';
+                    const statusIcon = skillStatus === 'ready' ? '🟢' : '🔴';
+                    const statusText = skillStatus === 'ready' ? 'готов' : 'занят';
+                    
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
@@ -3585,10 +3687,13 @@
                         
                         <div class="skill-price">${skill.price} ₽</div>
                         
-                        <!-- НОВЫЙ СТАТУС В РЕЗУЛЬТАТАХ ПОИСКА -->
-                        <div class="master-status ${statusClass}">
-                            <span class="status-icon">${skill.status === 'ready' ? '✅' : '⏳'}</span>
-                            ${statusText}
+                        <!-- ВМЕСТО КОНТАКТОВ ПОКАЗЫВАЕМ СТАТУС -->
+                        <div class="skill-status-info">
+                            <div class="status-label">🔄 Статус</div>
+                            <div class="status-item">
+                                <span class="status-icon">${statusIcon}</span>
+                                <span class="status-text">${statusText}</span>
+                            </div>
                         </div>
                         
                         ${skill.photo ? `
