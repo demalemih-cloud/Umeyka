@@ -222,68 +222,200 @@
             transition: all 0.3s ease;
         }
         
-        /* НОВЫЕ СТИЛИ ДЛЯ СТАТУСОВ МАСТЕРОВ */
-        .master-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin: 10px 0;
+        .skill-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .gold-card {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #744210;
+            border: 3px solid #FFD700;
         }
         
-        .status-ready {
-            background: #48bb78;
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        
-        .status-busy {
-            background: #ed8936;
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        
-        .status-selector {
+        .skill-header {
             display: flex;
-            gap: 15px;
-            margin: 20px 0;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .skill-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+        
+        .skill-rating {
+            color: #FFD700;
+            font-size: 14px;
+        }
+        
+        .skill-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #48bb78;
+            margin: 15px 0;
+        }
+        
+        /* НОВЫЙ СТИЛЬ ДЛЯ СТАТУСА МАСТЕРА - вместо контактов */
+        .master-status {
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 10px;
+            font-size: 15px;
+            color: #2d3748;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status-ready {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border-color: #28a745;
+        }
+
+        .status-ready .status-icon {
+            color: #28a745;
+            font-size: 18px;
+            margin-right: 8px;
+        }
+
+        .status-busy {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border-color: #dc3545;
+        }
+
+        .status-busy .status-icon {
+            color: #dc3545;
+            font-size: 18px;
+            margin-right: 8px;
+        }
+
+        .status-toggle {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
             justify-content: center;
         }
-        
-        .status-option {
+
+        .status-toggle-button {
             flex: 1;
             padding: 15px;
             border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.15);
             color: white;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        
-        .status-option.selected {
+
+        .status-toggle-button.active {
+            background: rgba(255,255,255,0.3);
             border-color: white;
-            background: rgba(255,255,255,0.2);
-            transform: scale(1.02);
+        }
+
+        .status-toggle-button.ready.active {
+            background: #28a745;
+        }
+
+        .status-toggle-button.busy.active {
+            background: #dc3545;
         }
         
-        .status-option[data-status="ready"]:hover {
-            background: #48bb78;
+        .skill-contact-info {
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 10px;
+            font-size: 15px;
+            color: #2d3748;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .skill-contact-info .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .skill-contact-info .contact-icon {
+            font-size: 18px;
+            min-width: 24px;
+            color: #667eea;
+        }
+
+        .skill-contact-info .contact-text {
+            word-break: break-all;
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .skill-contact-info .contact-label {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+            display: block;
+            font-size: 16px;
         }
         
-        .status-option[data-status="busy"]:hover {
-            background: #ed8936;
+        .chat-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
-        .skill-card .master-status {
+        #map {
+            height: 400px;
+            border-radius: 15px;
+            margin-top: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .map-active #map {
+            display: block;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+        }
+        
+        .error-message {
+            background: rgba(255,0,0,0.1);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 10px;
             margin: 10px 0;
+            text-align: center;
+            border: 1px solid rgba(255,0,0,0.2);
         }
-        
+
         /* Стили для личного кабинета */
         .profile-skill-card {
             background: rgba(255,255,255,0.95);
@@ -406,6 +538,52 @@
             color: #666;
         }
 
+        .rating-stars {
+            color: #FFD700;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .rating-details {
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .rating-label {
+            width: 100px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .rating-value {
+            width: 40px;
+            text-align: right;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .rating-progress {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .rating-progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            border-radius: 4px;
+        }
+
         /* Стили для сделок */
         .deal-card {
             background: rgba(255,255,255,0.95);
@@ -493,6 +671,456 @@
         .sign-button { background: #48bb78; color: white; }
         .view-button { background: #4299e1; color: white; }
         .complete-button { background: #ed8936; color: white; }
+
+        /* Стили для формы создания сделки */
+        .quality-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .quality-option {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .quality-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .additional-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .option-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .option-checkbox.selected {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .level-achieved {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+        }
+
+        /* ОБНОВЛЕННЫЕ СТИЛИ РЕФЕРАЛЬНОЙ ПРОГРАММЫ - ЗВЕЗДА ВМЕСТО SVG */
+        .referral-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            padding: 25px 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            color: white;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        /* ЗАМЕНА: сложный SVG-паттерн на одну большую звезду ✨ в правом верхнем углу */
+        .referral-section::before {
+            content: '✨';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 40px;
+            color: white;
+            opacity: 0.1;
+            background: none;
+            z-index: 0;
+        }
+
+        .referral-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .referral-description {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .referral-benefits {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .referral-benefit {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 200px;
+            justify-content: center;
+        }
+
+        .referral-link-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px dashed #667eea;
+            position: relative;
+            z-index: 1;
+        }
+
+        .referral-link {
+            color: #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            word-break: break-all;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+        }
+
+        .referral-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .referral-stat {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .referral-stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .referral-stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .referral-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .share-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 18px;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .share-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4aa0 100%);
+        }
+
+        .copy-button {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #667eea;
+            padding: 18px;
+            border-radius: 15px;
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .copy-button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .referral-note {
+            font-size: 14px;
+            opacity: 0.8;
+            text-align: center;
+            line-height: 1.4;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .referral-bonus {
+            display: inline-block;
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* Кнопка реферальной программы в ЛК */
+        .referral-tab-button {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .referral-tab-button:hover {
+            background: linear-gradient(135deg, #8c6bcf 0%, #6f48c7 100%) !important;
+        }
+
+        /* Стили для раздела "О проекте" */
+        .about-section {
+            background: rgba(255,255,255,0.9);
+            padding: 25px;
+            border-radius: 20px;
+            color: #2d3748;
+            margin: 20px 0;
+        }
+
+        .about-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .channel-links {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .channel-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .channel-link:active {
+            transform: scale(0.98);
+        }
+
+        .channel-icon {
+            font-size: 30px;
+        }
+
+        .channel-info {
+            flex: 1;
+        }
+
+        .channel-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .channel-description {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Стили для кастомизации */
+        .customization-section {
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            color: #2d3748;
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-option.selected {
+            border-color: #2d3748;
+            transform: scale(1.1);
+        }
+
+        .premium-badge {
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .top-master-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Новые стили для улучшенного дизайна */
+        .section-header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .back-button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .back-button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+             
+        /* Стили для кнопок вкладок сделок (столбиком) */
+        .deals-tab-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 0 0 20px 0;
+            padding: 0 20px;
+        }
+
+        .deals-tab-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .deals-tab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+
+        .deals-tab-button:active {
+            transform: translateY(0);
+        }
+
+        .deals-tab-button.active {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: 2px solid rgba(255,255,255,0.5);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
+        }
 
         /* Стили для фото в карточке */
         .skill-photo {
@@ -858,211 +1486,6 @@
         .create-deal-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
-        }
-
-        /* Стили для реферальной программы */
-        .referral-section {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
-            padding: 25px 20px;
-            border-radius: 20px;
-            margin: 20px 0;
-            color: white;
-            text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        .referral-section::before {
-            content: '✨';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 40px;
-            color: white;
-            opacity: 0.1;
-            background: none;
-            z-index: 0;
-        }
-
-        .referral-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-description {
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-benefits {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-benefit {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 12px 15px;
-            border-radius: 12px;
-            font-size: 14px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
-            min-width: 200px;
-            justify-content: center;
-        }
-
-        .referral-link-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            border: 2px dashed #667eea;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-link {
-            color: #667eea;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            font-weight: bold;
-            word-break: break-all;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 8px;
-        }
-
-        .referral-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-stat {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .referral-stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .referral-stat-label {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
-        .referral-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 20px 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .share-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 18px;
-            border-radius: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .share-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4aa0 100%);
-        }
-
-        .copy-button {
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid #667eea;
-            padding: 18px;
-            border-radius: 15px;
-            color: #667eea;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .copy-button:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .referral-note {
-            font-size: 14px;
-            opacity: 0.8;
-            text-align: center;
-            line-height: 1.4;
-            margin-top: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-bonus {
-            display: inline-block;
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            color: #744210;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 5px;
         }
     </style>
 </head>
@@ -1520,16 +1943,12 @@
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
-            <!-- НОВЫЙ СЕЛЕКТОР СТАТУСА -->
+            <!-- Статус мастера -->
             <div style="margin: 20px 0;">
-                <div style="color: #2d3748; margin-bottom: 15px; font-weight: 600; text-align: center;">📊 Ваш статус</div>
-                <div class="status-selector">
-                    <div class="status-option" data-status="ready" onclick="triggerHapticFeedback(); selectMasterStatus('ready');" id="statusReady">
-                        🟢 Готов
-                    </div>
-                    <div class="status-option" data-status="busy" onclick="triggerHapticFeedback(); selectMasterStatus('busy');" id="statusBusy">
-                        🔴 Занят
-                    </div>
+                <div style="color: #2d3748; font-weight: 600; margin-bottom: 10px;">🔄 Статус мастера</div>
+                <div class="status-toggle">
+                    <button class="status-toggle-button ready" onclick="triggerHapticFeedback(); setMasterStatus('ready');" id="statusReadyBtn">✅ Готов</button>
+                    <button class="status-toggle-button busy" onclick="triggerHapticFeedback(); setMasterStatus('busy');" id="statusBusyBtn">⏳ Занят</button>
                 </div>
                 <input type="hidden" id="editSkillStatus" value="ready">
             </div>
@@ -1605,60 +2024,125 @@
     let mapRefreshInterval = null;
     let currentEditingSkill = null;
     let currentDealMaster = null;
-    let currentSkillStatus = 'ready'; // НОВАЯ ПЕРЕМЕННАЯ ДЛЯ СТАТУСА
 
     // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ВИБРАЦИИ ==========
+    // Улучшенная функция с множественными попытками и визуальным фидбеком
     function triggerHapticFeedback() {
         console.log('📳 Попытка вибрации...');
         
+        // СПОСОБ 1: Telegram WebApp HapticFeedback (основной)
         try {
             if (window.Telegram?.WebApp?.HapticFeedback) {
+                // Пробуем разные типы вибрации для надежности
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                console.log('✅ Вибрация Telegram сработала');
+                console.log('✅ Вибрация Telegram (impact) сработала');
+                
+                // Добавляем небольшую задержку для второго типа вибрации
+                setTimeout(() => {
+                    try {
+                        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                    } catch (e) {}
+                }, 10);
+                
                 return;
             }
         } catch (error) {
             console.log('❌ Ошибка Telegram HapticFeedback:', error);
         }
         
+        // СПОСОБ 2: Vibration API (для браузера и десктопа)
         try {
             if (navigator.vibrate) {
-                navigator.vibrate(20);
-                console.log('✅ Вибрация браузера сработала');
+                navigator.vibrate(20); // Короткая вибрация 20ms
+                console.log('✅ Вибрация браузера (Vibration API) сработала');
                 return;
             }
         } catch (error) {
             console.log('❌ Ошибка Vibration API:', error);
         }
+        
+        // СПОСОБ 3: Альтернативный метод Telegram (если предыдущие не сработали)
+        try {
+            if (window.Telegram?.WebApp) {
+                // Пробуем вызвать через другой метод
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                console.log('✅ Вибрация Telegram (light) сработала');
+                return;
+            }
+        } catch (error) {
+            console.log('❌ Ошибка альтернативной вибрации Telegram:', error);
+        }
+        
+        // СПОСОБ 4: Визуальный фидбек (всегда работает)
+        try {
+            // Создаем временный элемент для визуального эффекта
+            const feedback = document.createElement('div');
+            feedback.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 100px;
+                height: 100px;
+                background: rgba(255,255,255,0.3);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 99999;
+                animation: ripple 0.3s ease-out;
+            `;
+            
+            // Добавляем анимацию
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ripple {
+                    0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+                    100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                document.body.removeChild(feedback);
+                document.head.removeChild(style);
+            }, 300);
+            
+            console.log('✅ Визуальный фидбек сработал');
+        } catch (error) {
+            console.log('❌ Ошибка визуального фидбека:', error);
+        }
     }
 
+    // Делаем функцию глобальной и доступной везде
     window.triggerHapticFeedback = triggerHapticFeedback;
 
     // ========== НОВЫЕ ФУНКЦИИ ДЛЯ СТАТУСА МАСТЕРА ==========
-    
-    // Функция выбора статуса при редактировании
-    window.selectMasterStatus = function(status) {
-        currentSkillStatus = status;
+    function setMasterStatus(status) {
+        const readyBtn = document.getElementById('statusReadyBtn');
+        const busyBtn = document.getElementById('statusBusyBtn');
+        const statusInput = document.getElementById('editSkillStatus');
         
-        // Обновляем визуальное выделение
-        document.getElementById('statusReady').classList.remove('selected');
-        document.getElementById('statusBusy').classList.remove('selected');
-        document.getElementById('status' + status.charAt(0).toUpperCase() + status.slice(1)).classList.add('selected');
-        
-        // Сохраняем в скрытое поле
-        document.getElementById('editSkillStatus').value = status;
-        
-        console.log('📊 Выбран статус:', status);
-    };
-
-    // Функция получения статуса для отображения
-    function getStatusHtml(status) {
         if (status === 'ready') {
-            return '<div class="master-status status-ready">🟢 Готов к работе</div>';
-        } else if (status === 'busy') {
-            return '<div class="master-status status-busy">🔴 Занят</div>';
+            readyBtn.classList.add('active');
+            busyBtn.classList.remove('active');
+            statusInput.value = 'ready';
+        } else {
+            busyBtn.classList.add('active');
+            readyBtn.classList.remove('active');
+            statusInput.value = 'busy';
         }
-        return '<div class="master-status status-ready">🟢 Готов к работе</div>'; // По умолчанию
+    }
+
+    function getMasterStatusText(status) {
+        return status === 'ready' ? '✅ Готов к работе' : '⏳ Временно занят';
+    }
+
+    function getMasterStatusClass(status) {
+        return status === 'ready' ? 'status-ready' : 'status-busy';
+    }
+
+    function getMasterStatusIcon(status) {
+        return status === 'ready' ? '✅' : '⏳';
     }
 
     // ========== ФУНКЦИИ ДЛЯ МОНЕТ ==========
@@ -2148,10 +2632,11 @@
                 userId: userId,
                 username: userData.firstName || 'Аноним',
                 location: location,
-                status: 'ready' // НОВОЕ ПОЛЕ - статус по умолчанию
+                status: 'ready' // Статус по умолчанию
             };
 
-            console.log('📤 Отправляю данные на сервер:', skillData);
+            console.log('📤 Отправляю данные на сервер:');
+            console.log('Все данные:', skillData);
 
             if (currentSkillPhoto) {
                 const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
@@ -2291,7 +2776,8 @@
                     console.log(`✅ Найдено ${result.skills.length} моих умейок`);
                     
                     skillsList.innerHTML = result.skills.map(skill => {
-                        const statusHtml = getStatusHtml(skill.status || 'ready');
+                        const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
+                        const statusText = skill.status === 'ready' ? '✅ Готов' : '⏳ Занят';
                         return `
                         <div class="skill-card">
                             <div class="skill-header">
@@ -2299,9 +2785,13 @@
                                 <div class="skill-rating">${'⭐'.repeat(5)}</div>
                             </div>
                             
-                            ${statusHtml} <!-- НОВОЕ: отображение статуса вместо контакта -->
-                            
                             <div class="skill-price">${skill.price} ₽</div>
+                            
+                            <!-- НОВЫЙ СТАТУС ВМЕСТО КОНТАКТОВ -->
+                            <div class="master-status ${statusClass}">
+                                <span class="status-icon">${skill.status === 'ready' ? '✅' : '⏳'}</span>
+                                ${statusText}
+                            </div>
                             
                             <div style="color: #666; margin: 15px 0 20px;">
                                 👤 ${skill.username}
@@ -2321,11 +2811,6 @@
                                     🗑️ Удалить
                                 </button>
                             </div>
-                            
-                            <!-- Кнопка подробных контактов теперь отдельно -->
-                            <button class="chat-button" style="margin-top: 15px;" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');">
-                                📞 Подробные контакты
-                            </button>
                         </div>
                     `}).join('');
                 } else {
@@ -2381,7 +2866,8 @@
             
             if (result.success && result.skills.length > 0) {
                 skillsList.innerHTML = result.skills.map(skill => {
-                    const statusHtml = getStatusHtml(skill.status || 'ready');
+                    const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
+                    const statusText = skill.status === 'ready' ? '✅ Готов' : '⏳ Занят';
                     return `
                     <div class="profile-skill-card">
                         <div class="profile-skill-header">
@@ -2389,7 +2875,11 @@
                             <div class="skill-price">${skill.price} ₽</div>
                         </div>
                         
-                        ${statusHtml} <!-- НОВОЕ: статус вместо контакта -->
+                        <!-- НОВЫЙ СТАТУС В ПРОФИЛЕ -->
+                        <div class="master-status ${statusClass}" style="margin: 10px 0;">
+                            <span class="status-icon">${skill.status === 'ready' ? '✅' : '⏳'}</span>
+                            ${statusText}
+                        </div>
                         
                         ${skill.photo ? `
                             <div class="skill-photo" style="height: 150px; margin: 15px 0;">
@@ -2398,7 +2888,7 @@
                         ` : ''}
                         <div style="color: #666; margin: 15px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
                         <div style="color: #48bb78; font-size: 12px; margin: 15px 0;">
-                            👁️ ${skill.views || 0} просмотров
+                            👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
                         <div class="skill-actions">
                             <button class="edit-button" onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
@@ -2408,9 +2898,6 @@
                                 🗑️
                             </button>
                         </div>
-                        <button class="chat-button" style="margin-top: 10px;" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');">
-                            📞 Контакты
-                        </button>
                     </div>
                 `}).join('');
             } else {
@@ -2441,18 +2928,10 @@
                 document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
                 
-                // НОВОЕ: устанавливаем текущий статус
-                currentSkillStatus = skill.status || 'ready';
-                document.getElementById('editSkillStatus').value = currentSkillStatus;
-                
-                // Обновляем визуальное выделение статуса
-                document.getElementById('statusReady').classList.remove('selected');
-                document.getElementById('statusBusy').classList.remove('selected');
-                if (currentSkillStatus === 'ready') {
-                    document.getElementById('statusReady').classList.add('selected');
-                } else {
-                    document.getElementById('statusBusy').classList.add('selected');
-                }
+                // Устанавливаем статус
+                const currentStatus = skill.status || 'ready';
+                document.getElementById('editSkillStatus').value = currentStatus;
+                setMasterStatus(currentStatus);
                 
                 editSkillPhoto = null;
                 const preview = document.getElementById('editSkillPhotoPreview');
@@ -2484,7 +2963,6 @@
         document.getElementById('editSkillName').value = '';
         document.getElementById('editSkillExperience').value = '';
         document.getElementById('editSkillPrice').value = '';
-        document.getElementById('editSkillStatus').value = 'ready';
         
         const preview = document.getElementById('editSkillPhotoPreview');
         preview.style.display = 'none';
@@ -2498,7 +2976,7 @@
             const skillName = document.getElementById('editSkillName').value;
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
-            const skillStatus = document.getElementById('editSkillStatus').value; // НОВОЕ: получаем статус
+            const skillStatus = document.getElementById('editSkillStatus').value;
             
             if (!skillId) {
                 alert('❌ Ошибка: не указан ID умейки');
@@ -2514,7 +2992,7 @@
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
-                status: skillStatus // НОВОЕ: добавляем статус в данные для обновления
+                status: skillStatus
             };
             
             console.log('📤 Сохраняю изменения умейки:', skillData);
@@ -2768,7 +3246,8 @@
 
     function createMapSkillPopup(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
-        const statusHtml = getStatusHtml(skill.status || 'ready');
+        const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
+        const statusText = skill.status === 'ready' ? '✅ Готов к работе' : '⏳ Временно занят';
         
         return `
             <div class="map-popup-content">
@@ -2782,12 +3261,16 @@
                     </div>
                 </div>
                 
-                ${statusHtml} <!-- НОВОЕ: статус в попапе карты -->
-                
                 <div style="margin: 10px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
                     <p style="margin: 8px 0; font-weight: bold; color: #48bb78;">
                         ${skill.price} руб.
                     </p>
+                    
+                    <!-- НОВЫЙ СТАТУС НА КАРТЕ -->
+                    <div class="master-status ${statusClass}" style="margin: 10px 0;">
+                        <span class="status-icon">${skill.status === 'ready' ? '✅' : '⏳'}</span>
+                        ${statusText}
+                    </div>
                     
                     <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
                         <span style="color:#667eea;">⭐</span> 
@@ -2913,6 +3396,7 @@
         
         const referralLink = generateReferralLink();
         
+        // ОБНОВЛЕННЫЙ ТЕКСТ РЕФЕРАЛЬНОГО СООБЩЕНИЯ
         const shareText = `Привет! Хочу порекомендовать полезное приложение — Umeyka .  Umeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
         
         const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
@@ -3090,7 +3574,8 @@
             
             if (result.success && result.skills.length > 0) {
                 searchResults.innerHTML = result.skills.map(skill => {
-                    const statusHtml = getStatusHtml(skill.status || 'ready');
+                    const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
+                    const statusText = skill.status === 'ready' ? '✅ Готов' : '⏳ Занят';
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
@@ -3098,9 +3583,13 @@
                             <div class="skill-rating">${'⭐'.repeat(5)}</div>
                         </div>
                         
-                        ${statusHtml} <!-- НОВОЕ: статус вместо контакта -->
-                        
                         <div class="skill-price">${skill.price} ₽</div>
+                        
+                        <!-- НОВЫЙ СТАТУС В РЕЗУЛЬТАТАХ ПОИСКА -->
+                        <div class="master-status ${statusClass}">
+                            <span class="status-icon">${skill.status === 'ready' ? '✅' : '⏳'}</span>
+                            ${statusText}
+                        </div>
                         
                         ${skill.photo ? `
                             <div class="skill-photo">
