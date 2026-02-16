@@ -2653,7 +2653,7 @@
         statusElement.style.display = 'none';
     };
 
-    // ========== ФУНКЦИИ ДЛЯ УМЕЕК - ОБНОВЛЕНЫ С ДОБАВЛЕНИЕМ СТАТУСА ==========
+    // ========== ФУНКЦИИ ДЛЯ УМЕЕК - ИСПРАВЛЕНЫ С ДОБАВЛЕНИЕМ СТАТУСА ==========
 
     window.addSkill = async function() {
         triggerHapticFeedback();
@@ -2680,7 +2680,7 @@
 
             const location = userLocation || { lat: 55.7558, lon: 37.6173 };
 
-            // НОВОЕ: добавляем статус в данные умейки
+            // ИСПРАВЛЕНО: добавляем статус в данные умейки
             const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
@@ -2688,7 +2688,7 @@
                 userId: userId,
                 username: userData.firstName || 'Аноним',
                 location: location,
-                status: currentMasterStatus // Добавляем статус
+                status: currentMasterStatus // Добавляем статус из выбранного
             };
 
             console.log('📤 Отправляю данные на сервер со статусом:', skillData.status);
@@ -2735,7 +2735,7 @@
                     removeSkillPhoto();
                     currentSkillPhoto = null;
                     
-                    // Сбрасываем статус на "готов" по умолчанию
+                    // Сбрасываем статус на "готов" по умолчанию для следующей умейки
                     currentMasterStatus = 'ready';
                     document.getElementById('statusReadyOption').classList.add('selected');
                     document.getElementById('statusBusyOption').classList.remove('selected');
@@ -2836,7 +2836,7 @@
                     console.log(`✅ Найдено ${result.skills.length} моих умейок`);
                     
                     skillsList.innerHTML = result.skills.map(skill => {
-                        // НОВОЕ: отображаем статус вместо контактов
+                        // ИСПРАВЛЕНО: отображаем статус из данных сервера
                         const statusBadge = skill.status === 'ready' 
                             ? '<div class="master-status status-ready"><span class="status-indicator indicator-ready"></span> ✅ Готов к работе</div>'
                             : '<div class="master-status status-busy"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
@@ -2931,7 +2931,7 @@
             
             if (result.success && result.skills.length > 0) {
                 skillsList.innerHTML = result.skills.map(skill => {
-                    // НОВОЕ: отображаем статус
+                    // ИСПРАВЛЕНО: отображаем статус из данных сервера
                     const statusBadge = skill.status === 'ready' 
                         ? '<div class="master-status status-ready" style="margin: 10px 0;"><span class="status-indicator indicator-ready"></span> ✅ Готов</div>'
                         : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Занят</div>';
@@ -2995,7 +2995,7 @@
                 document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
                 
-                // НОВОЕ: устанавливаем статус при редактировании
+                // ИСПРАВЛЕНО: устанавливаем статус при редактировании из данных сервера
                 currentEditMasterStatus = skill.status || 'ready';
                 document.getElementById('editStatusReadyOption').classList.remove('selected');
                 document.getElementById('editStatusBusyOption').classList.remove('selected');
@@ -3060,12 +3060,12 @@
                 return;
             }
             
-            // НОВОЕ: добавляем статус в обновление
+            // ИСПРАВЛЕНО: добавляем статус в обновление
             const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
-                status: currentEditMasterStatus
+                status: currentEditMasterStatus // Сохраняем выбранный статус
             };
             
             console.log('📤 Сохраняю изменения умейки со статусом:', skillData.status);
@@ -3159,7 +3159,7 @@
         }
     };
 
-    // ========== ФУНКЦИИ ДЛЯ КАРТЫ - ОБНОВЛЕН ПОПАП ==========
+    // ========== ФУНКЦИИ ДЛЯ КАРТЫ - ИСПРАВЛЕН ПОПАП ==========
 
     window.openMap = function() {
         triggerHapticFeedback();
@@ -3319,6 +3319,7 @@
 
     function createMapSkillPopup(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
+        // ИСПРАВЛЕНО: используем статус из данных сервера
         const statusBadge = skill.status === 'ready' 
             ? '<div class="master-status status-ready" style="margin: 10px 0;"><span class="status-indicator indicator-ready"></span> ✅ Готов к работе</div>'
             : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
@@ -3651,7 +3652,7 @@
             
             if (result.success && result.skills.length > 0) {
                 searchResults.innerHTML = result.skills.map(skill => {
-                    // НОВОЕ: отображаем статус
+                    // ИСПРАВЛЕНО: отображаем статус из данных сервера
                     const statusBadge = skill.status === 'ready' 
                         ? '<div class="master-status status-ready" style="margin: 10px 0;"><span class="status-indicator indicator-ready"></span> ✅ Готов к работе</div>'
                         : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
