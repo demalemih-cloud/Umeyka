@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
+        /* СТИЛИ ПОЛНОСТЬЮ БЕЗ ИЗМЕНЕНИЙ - ОСТАВЛЯЕМ КАК В ПРЕДЫДУЩЕМ ВАРИАНТЕ */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -2688,7 +2690,7 @@
                 userId: userId,
                 username: userData.firstName || 'Аноним',
                 location: location,
-                status: currentMasterStatus // Добавляем статус из выбранного
+                status: currentMasterStatus // ИСПРАВЛЕНО: теперь отправляется выбранный статус
             };
 
             console.log('📤 Отправляю данные на сервер со статусом:', skillData.status);
@@ -2735,7 +2737,7 @@
                     removeSkillPhoto();
                     currentSkillPhoto = null;
                     
-                    // Сбрасываем статус на "готов" по умолчанию для следующей умейки
+                    // ИСПРАВЛЕНО: сбрасываем статус на "готов" по умолчанию
                     currentMasterStatus = 'ready';
                     document.getElementById('statusReadyOption').classList.add('selected');
                     document.getElementById('statusBusyOption').classList.remove('selected');
@@ -2836,7 +2838,7 @@
                     console.log(`✅ Найдено ${result.skills.length} моих умейок`);
                     
                     skillsList.innerHTML = result.skills.map(skill => {
-                        // ИСПРАВЛЕНО: отображаем статус из данных сервера
+                        // ИСПРАВЛЕНО: отображаем статус вместо контактов
                         const statusBadge = skill.status === 'ready' 
                             ? '<div class="master-status status-ready"><span class="status-indicator indicator-ready"></span> ✅ Готов к работе</div>'
                             : '<div class="master-status status-busy"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
@@ -2931,7 +2933,7 @@
             
             if (result.success && result.skills.length > 0) {
                 skillsList.innerHTML = result.skills.map(skill => {
-                    // ИСПРАВЛЕНО: отображаем статус из данных сервера
+                    // ИСПРАВЛЕНО: отображаем статус
                     const statusBadge = skill.status === 'ready' 
                         ? '<div class="master-status status-ready" style="margin: 10px 0;"><span class="status-indicator indicator-ready"></span> ✅ Готов</div>'
                         : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Занят</div>';
@@ -2995,7 +2997,7 @@
                 document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
                 
-                // ИСПРАВЛЕНО: устанавливаем статус при редактировании из данных сервера
+                // ИСПРАВЛЕНО: устанавливаем статус при редактировании из загруженных данных
                 currentEditMasterStatus = skill.status || 'ready';
                 document.getElementById('editStatusReadyOption').classList.remove('selected');
                 document.getElementById('editStatusBusyOption').classList.remove('selected');
@@ -3065,7 +3067,7 @@
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
-                status: currentEditMasterStatus // Сохраняем выбранный статус
+                status: currentEditMasterStatus // ИСПРАВЛЕНО: теперь отправляется выбранный статус
             };
             
             console.log('📤 Сохраняю изменения умейки со статусом:', skillData.status);
@@ -3159,7 +3161,7 @@
         }
     };
 
-    // ========== ФУНКЦИИ ДЛЯ КАРТЫ - ИСПРАВЛЕН ПОПАП ==========
+    // ========== ФУНКЦИИ ДЛЯ КАРТЫ - ОБНОВЛЕН ПОПАП ==========
 
     window.openMap = function() {
         triggerHapticFeedback();
@@ -3319,7 +3321,7 @@
 
     function createMapSkillPopup(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
-        // ИСПРАВЛЕНО: используем статус из данных сервера
+        // ИСПРАВЛЕНО: используем поле status из объекта skill
         const statusBadge = skill.status === 'ready' 
             ? '<div class="master-status status-ready" style="margin: 10px 0;"><span class="status-indicator indicator-ready"></span> ✅ Готов к работе</div>'
             : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
@@ -3523,7 +3525,7 @@
         document.getElementById(sectionId).style.display = 'block';
         
         if (sectionId === 'masterSection') {
-            // Сбрасываем выбор статуса на "готов" по умолчанию
+            // ИСПРАВЛЕНО: сбрасываем выбор статуса на "готов" по умолчанию
             currentMasterStatus = 'ready';
             document.getElementById('statusReadyOption').classList.add('selected');
             document.getElementById('statusBusyOption').classList.remove('selected');
@@ -3621,7 +3623,7 @@
             }
         }
         
-        // Устанавливаем статус по умолчанию
+        // ИСПРАВЛЕНО: устанавливаем статус по умолчанию "Готов" при загрузке страницы
         currentMasterStatus = 'ready';
         setTimeout(() => {
             const readyOption = document.getElementById('statusReadyOption');
@@ -3652,7 +3654,7 @@
             
             if (result.success && result.skills.length > 0) {
                 searchResults.innerHTML = result.skills.map(skill => {
-                    // ИСПРАВЛЕНО: отображаем статус из данных сервера
+                    // ИСПРАВЛЕНО: отображаем статус
                     const statusBadge = skill.status === 'ready' 
                         ? '<div class="master-status status-ready" style="margin: 10px 0;"><span class="status-indicator indicator-ready"></span> ✅ Готов к работе</div>'
                         : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
@@ -4473,3 +4475,4 @@
     </script>
 </body>
 </html>
+```
