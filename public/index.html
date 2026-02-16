@@ -232,7 +232,6 @@
             font-weight: 600;
             margin: 10px 0;
             width: fit-content;
-            transition: all 0.3s ease;
         }
         
         .status-ready {
@@ -318,17 +317,6 @@
             box-shadow: 0 0 10px #f56565;
         }
         
-        /* Анимация изменения статуса */
-        @keyframes statusPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .status-changed {
-            animation: statusPulse 0.3s ease;
-        }
-        
         /* Стили для карточки умейки - обновленные */
         .skill-card {
             background: rgba(255,255,255,0.95);
@@ -365,6 +353,7 @@
             margin: 15px 0;
         }
         
+        /* УБРАЛИ КОНТАКТЫ ИЗ ОСНОВНОЙ КАРТОЧКИ - ТЕПЕРЬ ТОЛЬКО СТАТУС */
         .skill-status-info {
             margin: 15px 0;
             padding: 12px;
@@ -375,6 +364,7 @@
             justify-content: space-between;
         }
 
+        /* Стили для кнопки подробных контактов */
         .details-button {
             width: 100%;
             padding: 15px;
@@ -413,6 +403,7 @@
             object-fit: cover;
         }
 
+        /* Остальные стили без изменений */
         .gold-card {
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             color: #744210;
@@ -2209,63 +2200,6 @@
         }
     }
 
-    // НОВАЯ ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ УВЕДОМЛЕНИЙ С АНИМАЦИЕЙ
-    function showStatusNotification(newStatus) {
-        const statusText = newStatus === 'ready' ? 'Готов' : 'Занят';
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, ${newStatus === 'ready' ? '#48bb78' : '#f56565'} 0%, ${newStatus === 'ready' ? '#38a169' : '#e53e3e'} 100%);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-size: 20px;
-            font-weight: 700;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 10000;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.3);
-            animation: slideDown 0.3s ease;
-        `;
-        notification.textContent = `✅ Статус изменен на: ${statusText}`;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'fadeOut 0.3s ease';
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 2000);
-    }
-
-    // НОВАЯ ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ ВСЕХ КАРТОЧЕК ПОСЛЕ ИЗМЕНЕНИЯ СТАТУСА
-    async function refreshAllSkillCards() {
-        console.log('🔄 Обновление всех карточек умейок...');
-        
-        // Обновляем карточки на странице мастера
-        await loadMySkills();
-        
-        // Обновляем карточки в личном кабинете
-        await loadProfileSkills();
-        
-        // Обновляем результаты поиска
-        const searchQuery = document.getElementById('searchInput').value.trim();
-        if (searchQuery) {
-            await searchSkills();
-        }
-        
-        // Обновляем маркеры на карте
-        if (map && document.querySelector('.map-active')) {
-            await loadSkillsOnMap();
-        }
-        
-        console.log('✅ Все карточки обновлены');
-    }
-
     // ========== ФУНКЦИИ ДЛЯ МОНЕТ ==========
     function getCoinsData() {
         const data = getLocalStorage(`coins_${currentUserId}`);
@@ -2908,7 +2842,7 @@
                             : '<div class="master-status status-busy"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
                         
                         return `
-                        <div class="skill-card" data-skill-id="${skill._id}">
+                        <div class="skill-card">
                             <div class="skill-header">
                                 <div class="skill-title">${skill.skill}</div>
                                 <div class="skill-rating">${'⭐'.repeat(5)}</div>
@@ -3003,7 +2937,7 @@
                         : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Занят</div>';
                     
                     return `
-                    <div class="profile-skill-card" data-skill-id="${skill._id}">
+                    <div class="profile-skill-card">
                         <div class="profile-skill-header">
                             <div class="skill-title">${skill.skill}</div>
                             <div class="skill-price">${skill.price} ₽</div>
@@ -3107,7 +3041,6 @@
         preview.style.display = 'none';
     };
 
-    // ИЗМЕНЕННАЯ ФУНКЦИЯ: сохраняет статус и обновляет все карточки
     window.saveEditedSkill = async function() {
         triggerHapticFeedback();
         
@@ -3161,17 +3094,15 @@
             const result = await response.json();
             
             if (result.success) {
-                // НОВОЕ: показываем уведомление об изменении статуса
-                showStatusNotification(currentEditMasterStatus);
-                
-                // НОВОЕ: добавляем анимацию к карточкам
-                animateStatusChange(skillId);
-                
                 alert('✅ Умейка успешно обновлена!');
                 closeEditSkillModal();
                 
-                // НОВОЕ: обновляем все карточки динамически
-                await refreshAllSkillCards();
+                loadMySkills();
+                loadProfileSkills();
+                
+                if (map) {
+                    loadSkillsOnMap();
+                }
             } else {
                 alert('❌ Ошибка обновления: ' + (result.error || 'Неизвестная ошибка'));
             }
@@ -3179,32 +3110,8 @@
         } catch (error) {
             console.error('❌ Ошибка сохранения умейки:', error);
             alert('❌ Ошибка сохранения умейки');
-            
-            // Fallback: если сервер недоступен, показываем предупреждение и обновляем локально
-            showNotification('⚠️ Сервер недоступен. Изменения могут не сохраниться.');
-            showStatusNotification(currentEditMasterStatus);
-            animateStatusChange(skillId);
-            closeEditSkillModal();
-            await refreshAllSkillCards();
         }
     };
-
-    // НОВАЯ ФУНКЦИЯ: добавляет анимацию к карточкам с измененным статусом
-    function animateStatusChange(skillId) {
-        // Анимация для карточек на странице мастера
-        const masterCards = document.querySelectorAll(`#mySkillsList .skill-card[data-skill-id="${skillId}"] .master-status`);
-        masterCards.forEach(card => {
-            card.classList.add('status-changed');
-            setTimeout(() => card.classList.remove('status-changed'), 300);
-        });
-        
-        // Анимация для карточек в профиле
-        const profileCards = document.querySelectorAll(`#profileSkillsList .profile-skill-card[data-skill-id="${skillId}"] .master-status`);
-        profileCards.forEach(card => {
-            card.classList.add('status-changed');
-            setTimeout(() => card.classList.remove('status-changed'), 300);
-        });
-    }
 
     window.deleteSkill = async function(skillId) {
         triggerHapticFeedback();
@@ -3417,7 +3324,7 @@
             : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
         
         return `
-            <div class="map-popup-content" data-skill-id="${skill._id}">
+            <div class="map-popup-content">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                     <div style="width: 50px; height: 50px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">
                         ${isUserSkill ? '👤' : '🔧'}
@@ -3750,7 +3657,7 @@
                         : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
                     
                     return `
-                    <div class="skill-card" data-skill-id="${skill._id}">
+                    <div class="skill-card">
                         <div class="skill-header">
                             <div class="skill-title">${skill.skill}</div>
                             <div class="skill-rating">${'⭐'.repeat(5)}</div>
