@@ -2069,7 +2069,7 @@
     let currentEditingSkill = null;
     let currentDealMaster = null;
     
-    // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ СТАТУСОВ
+    // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ СТАТУСОВ - ПО УМОЛЧАНИЮ "ГОТОВ"
     let currentMasterStatus = 'ready'; // По умолчанию "готов"
     let currentEditMasterStatus = 'ready';
 
@@ -2680,7 +2680,7 @@
 
             const location = userLocation || { lat: 55.7558, lon: 37.6173 };
 
-            // НОВОЕ: добавляем статус в данные умейки
+            // НОВОЕ: добавляем статус в данные умейки - по умолчанию ready
             const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
@@ -3620,12 +3620,16 @@
             }
         }
         
-        // Устанавливаем статус по умолчанию
+        // Устанавливаем статус по умолчанию - ВАЖНО: добавляем класс selected
         currentMasterStatus = 'ready';
         setTimeout(() => {
             const readyOption = document.getElementById('statusReadyOption');
+            const busyOption = document.getElementById('statusBusyOption');
             if (readyOption) {
                 readyOption.classList.add('selected');
+            }
+            if (busyOption) {
+                busyOption.classList.remove('selected');
             }
         }, 100);
     });
