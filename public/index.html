@@ -1581,7 +1581,7 @@
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                     <div class="status-selector">
-                        <div class="status-option ready-option" onclick="triggerHapticFeedback(); selectMasterStatus('ready');" id="statusReadyOption">
+                        <div class="status-option ready-option selected" onclick="triggerHapticFeedback(); selectMasterStatus('ready');" id="statusReadyOption">
                             ✅ Готов
                         </div>
                         <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectMasterStatus('busy');" id="statusBusyOption">
@@ -2156,38 +2156,47 @@
     // ========== НОВЫЕ ФУНКЦИИ ДЛЯ СТАТУСОВ ==========
     
     function selectMasterStatus(status) {
+        console.log('🔄 Выбор статуса мастера:', status);
         currentMasterStatus = status;
         
         // Обновляем визуальное выделение
-        document.getElementById('statusReadyOption').classList.remove('selected');
-        document.getElementById('statusBusyOption').classList.remove('selected');
+        const readyOption = document.getElementById('statusReadyOption');
+        const busyOption = document.getElementById('statusBusyOption');
+        
+        if (readyOption) readyOption.classList.remove('selected');
+        if (busyOption) busyOption.classList.remove('selected');
         
         if (status === 'ready') {
-            document.getElementById('statusReadyOption').classList.add('selected');
+            if (readyOption) readyOption.classList.add('selected');
         } else {
-            document.getElementById('statusBusyOption').classList.add('selected');
+            if (busyOption) busyOption.classList.add('selected');
         }
         
-        console.log('✅ Выбран статус мастера:', status);
+        console.log('✅ Выбран статус мастера:', status, 'currentMasterStatus:', currentMasterStatus);
     }
     
     function selectEditMasterStatus(status) {
+        console.log('🔄 Выбор статуса при редактировании:', status);
         currentEditMasterStatus = status;
         
-        document.getElementById('editStatusReadyOption').classList.remove('selected');
-        document.getElementById('editStatusBusyOption').classList.remove('selected');
+        const readyOption = document.getElementById('editStatusReadyOption');
+        const busyOption = document.getElementById('editStatusBusyOption');
+        
+        if (readyOption) readyOption.classList.remove('selected');
+        if (busyOption) busyOption.classList.remove('selected');
         
         if (status === 'ready') {
-            document.getElementById('editStatusReadyOption').classList.add('selected');
+            if (readyOption) readyOption.classList.add('selected');
         } else {
-            document.getElementById('editStatusBusyOption').classList.add('selected');
+            if (busyOption) busyOption.classList.add('selected');
         }
         
-        console.log('✅ Выбран статус при редактировании:', status);
+        console.log('✅ Выбран статус при редактировании:', status, 'currentEditMasterStatus:', currentEditMasterStatus);
     }
     
     function getStatusBadge(status) {
-        if (status === 'ready') {
+        // Если статус не определен или 'ready', показываем "Готов"
+        if (!status || status === 'ready') {
             return `<div class="master-status status-ready">
                         <span class="status-indicator indicator-ready"></span>
                         ✅ Готов к работе
@@ -2672,6 +2681,7 @@
         
             const userId = currentUserId;
             console.log('👤 Добавляю умейку для User ID:', userId);
+            console.log('📊 Текущий статус мастера:', currentMasterStatus);
         
             if (!userId || userId === 'null' || userId === 'undefined') {
                 alert('❌ Ошибка: не определен ID пользователя. Перезагрузите страницу.');
@@ -2691,7 +2701,7 @@
                 status: currentMasterStatus // Добавляем статус
             };
 
-            console.log('📤 Отправляю данные на сервер со статусом:', skillData.status);
+            console.log('📤 Отправляю данные на сервер:', skillData);
 
             if (currentSkillPhoto) {
                 const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
@@ -2737,8 +2747,7 @@
                     
                     // Сбрасываем статус на "готов" по умолчанию
                     currentMasterStatus = 'ready';
-                    document.getElementById('statusReadyOption').classList.add('selected');
-                    document.getElementById('statusBusyOption').classList.remove('selected');
+                    selectMasterStatus('ready');
                 
                     setTimeout(() => {
                         loadMySkills();
@@ -2836,10 +2845,8 @@
                     console.log(`✅ Найдено ${result.skills.length} моих умейок`);
                     
                     skillsList.innerHTML = result.skills.map(skill => {
-                        // НОВОЕ: отображаем статус вместо контактов
-                        const statusBadge = skill.status === 'ready' 
-                            ? '<div class="master-status status-ready"><span class="status-indicator indicator-ready"></span> ✅ Готов к работе</div>'
-                            : '<div class="master-status status-busy"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
+                        // ИСПРАВЛЕНО: правильное отображение статуса
+                        const statusBadge = getStatusBadge(skill.status);
                         
                         return `
                         <div class="skill-card">
@@ -2931,10 +2938,8 @@
             
             if (result.success && result.skills.length > 0) {
                 skillsList.innerHTML = result.skills.map(skill => {
-                    // НОВОЕ: отображаем статус
-                    const statusBadge = skill.status === 'ready' 
-                        ? '<div class="master-status status-ready" style="margin: 10px 0;"><span class="status-indicator indicator-ready"></span> ✅ Готов</div>'
-                        : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Занят</div>';
+                    // ИСПРАВЛЕНО: правильное отображение статуса
+                    const statusBadge = getStatusBadge(skill.status);
                     
                     return `
                     <div class="profile-skill-card">
@@ -2995,16 +3000,10 @@
                 document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
                 
-                // НОВОЕ: устанавливаем статус при редактировании
-                currentEditMasterStatus = skill.status || 'ready';
-                document.getElementById('editStatusReadyOption').classList.remove('selected');
-                document.getElementById('editStatusBusyOption').classList.remove('selected');
-                
-                if (currentEditMasterStatus === 'ready') {
-                    document.getElementById('editStatusReadyOption').classList.add('selected');
-                } else {
-                    document.getElementById('editStatusBusyOption').classList.add('selected');
-                }
+                // ИСПРАВЛЕНО: правильная установка статуса при редактировании
+                const skillStatus = skill.status || 'ready';
+                console.log('📊 Загружен статус умейки:', skillStatus);
+                selectEditMasterStatus(skillStatus);
                 
                 editSkillPhoto = null;
                 const preview = document.getElementById('editSkillPhotoPreview');
@@ -3060,7 +3059,7 @@
                 return;
             }
             
-            // НОВОЕ: добавляем статус в обновление
+            // ИСПРАВЛЕНО: добавляем статус в обновление
             const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
@@ -3068,7 +3067,8 @@
                 status: currentEditMasterStatus
             };
             
-            console.log('📤 Сохраняю изменения умейки со статусом:', skillData.status);
+            console.log('📤 Сохраняю изменения умейки:', skillData);
+            console.log('📊 Статус для сохранения:', currentEditMasterStatus);
             
             if (editSkillPhoto) {
                 const estimatedSize = (editSkillPhoto.length * 0.75) / 1024;
@@ -3319,9 +3319,8 @@
 
     function createMapSkillPopup(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
-        const statusBadge = skill.status === 'ready' 
-            ? '<div class="master-status status-ready" style="margin: 10px 0;"><span class="status-indicator indicator-ready"></span> ✅ Готов к работе</div>'
-            : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
+        // ИСПРАВЛЕНО: используем getStatusBadge для консистентности
+        const statusBadge = getStatusBadge(skill.status);
         
         return `
             <div class="map-popup-content">
@@ -3467,7 +3466,7 @@
         
         const referralLink = generateReferralLink();
         
-        const shareText = `Привет! Хочу порекомендовать полезное приложение — Umeyka .  Umeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
+        const shareText = `Привет! Хочу порекомендовать полезное приложение — Umeyka. Umeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
         
         const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
         
@@ -3522,10 +3521,9 @@
         document.getElementById(sectionId).style.display = 'block';
         
         if (sectionId === 'masterSection') {
-            // Сбрасываем выбор статуса на "готов" по умолчанию
+            // ИСПРАВЛЕНО: гарантируем, что статус "готов" выбран по умолчанию
             currentMasterStatus = 'ready';
-            document.getElementById('statusReadyOption').classList.add('selected');
-            document.getElementById('statusBusyOption').classList.remove('selected');
+            selectMasterStatus('ready');
             loadMySkills();
         }
     };
@@ -3620,13 +3618,17 @@
             }
         }
         
-        // Устанавливаем статус по умолчанию
+        // ИСПРАВЛЕНО: гарантируем правильную инициализацию статуса
         currentMasterStatus = 'ready';
+        currentEditMasterStatus = 'ready';
+        
+        // Устанавливаем визуальное выделение для статуса "готов"
         setTimeout(() => {
             const readyOption = document.getElementById('statusReadyOption');
-            if (readyOption) {
-                readyOption.classList.add('selected');
-            }
+            const busyOption = document.getElementById('statusBusyOption');
+            if (readyOption) readyOption.classList.add('selected');
+            if (busyOption) busyOption.classList.remove('selected');
+            console.log('✅ Статус инициализирован: ready');
         }, 100);
     });
 
@@ -3651,10 +3653,8 @@
             
             if (result.success && result.skills.length > 0) {
                 searchResults.innerHTML = result.skills.map(skill => {
-                    // НОВОЕ: отображаем статус
-                    const statusBadge = skill.status === 'ready' 
-                        ? '<div class="master-status status-ready" style="margin: 10px 0;"><span class="status-indicator indicator-ready"></span> ✅ Готов к работе</div>'
-                        : '<div class="master-status status-busy" style="margin: 10px 0;"><span class="status-indicator indicator-busy"></span> ⏰ Временно занят</div>';
+                    // ИСПРАВЛЕНО: используем getStatusBadge для консистентности
+                    const statusBadge = getStatusBadge(skill.status);
                     
                     return `
                     <div class="skill-card">
