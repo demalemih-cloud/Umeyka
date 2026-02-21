@@ -222,7 +222,7 @@
             transition: all 0.3s ease;
         }
         
-        /* СТИЛИ ДЛЯ СТАТУСОВ МАСТЕРА */
+        /* НОВЫЕ СТИЛИ ДЛЯ СТАТУСОВ МАСТЕРА */
         .master-status {
             display: inline-flex;
             align-items: center;
@@ -288,12 +288,23 @@
             border-color: white;
         }
         
+        .master-status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            width: fit-content;
+        }
+        
         .status-indicator {
             width: 10px;
             height: 10px;
             border-radius: 50%;
             display: inline-block;
-            margin-right: 8px;
         }
         
         .indicator-ready {
@@ -306,7 +317,7 @@
             box-shadow: 0 0 10px #f56565;
         }
         
-        /* Стили для карточки умейки */
+        /* Стили для карточки умейки - обновленные */
         .skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -342,6 +353,18 @@
             margin: 15px 0;
         }
         
+        /* УБРАЛИ КОНТАКТЫ ИЗ ОСНОВНОЙ КАРТОЧКИ - ТЕПЕРЬ ТОЛЬКО СТАТУС */
+        .skill-status-info {
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Стили для кнопки подробных контактов */
         .details-button {
             width: 100%;
             padding: 15px;
@@ -379,7 +402,7 @@
             height: 100%;
             object-fit: cover;
         }
-        
+
         .edit-button {
             background: #4299e1;
             color: white;
@@ -495,6 +518,15 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
+        .rating-badge {
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -519,6 +551,52 @@
         .stat-label {
             font-size: 12px;
             color: #666;
+        }
+
+        .rating-stars {
+            color: #FFD700;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .rating-details {
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .rating-label {
+            width: 100px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .rating-value {
+            width: 40px;
+            text-align: right;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .rating-progress {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .rating-progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            border-radius: 4px;
         }
 
         /* Стили для сделок */
@@ -657,6 +735,11 @@
             background: rgba(72, 187, 120, 0.1);
         }
 
+        .level-achieved {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+        }
+
         /* Реферальная программа */
         .referral-section {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
@@ -680,6 +763,8 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .referral-description {
@@ -687,6 +772,33 @@
             line-height: 1.5;
             margin-bottom: 20px;
             opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .referral-benefits {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .referral-benefit {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 200px;
+            justify-content: center;
         }
 
         .referral-link-container {
@@ -695,6 +807,8 @@
             border-radius: 15px;
             margin: 20px 0;
             border: 2px dashed #667eea;
+            position: relative;
+            z-index: 1;
         }
 
         .referral-link {
@@ -714,6 +828,8 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             margin: 20px 0;
+            position: relative;
+            z-index: 1;
         }
 
         .referral-stat {
@@ -729,11 +845,24 @@
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
         .referral-stat-label {
             font-size: 12px;
             opacity: 0.9;
+        }
+
+        .referral-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
         }
 
         .share-button {
@@ -752,8 +881,6 @@
             justify-content: center;
             gap: 10px;
             border: 2px solid rgba(255, 255, 255, 0.3);
-            width: 100%;
-            margin-bottom: 10px;
         }
 
         .copy-button {
@@ -770,7 +897,6 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            width: 100%;
         }
 
         .about-section {
@@ -825,6 +951,74 @@
             font-size: 14px;
             opacity: 0.9;
         }
+
+        .customization-section {
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            color: #2d3748;
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .color-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-option.selected {
+            border-color: #2d3748;
+            transform: scale(1.1);
+        }
+
+        .premium-badge {
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .top-master-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .section-header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .back-button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 0 20px;
+        }
              
         .deals-tab-buttons {
             display: flex;
@@ -857,6 +1051,23 @@
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             border: 2px solid rgba(255,255,255,0.5);
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
+        }
+
+        .upload-photo-button {
+            width: 100%;
+            padding: 12px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
         }
 
         .modal-overlay {
@@ -1122,7 +1333,7 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ МАСТЕРА -->
+        <!-- СЕКЦИЯ МАСТЕРА - ДОБАВЛЕН ВЫБОР СТАТУСА -->
         <div id="masterSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
             <div class="form-section">
@@ -1132,7 +1343,7 @@
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
                 
-                <!-- ВЫБОР СТАТУСА МАСТЕРА -->
+                <!-- НОВЫЙ БЛОК: ВЫБОР СТАТУСА МАСТЕРА -->
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                     <div class="status-selector">
@@ -1149,7 +1360,7 @@
                     </div>
                 </div>
                 
-                <!-- Загрузка фото -->
+                <!-- Загрузка фото для умейки -->
                 <div style="margin: 15px 0;">
                     <div style="color: white; margin-bottom: 10px;">📸 Фото вашей работы</div>
                     <div class="photo-upload-area" onclick="triggerHapticFeedback(); document.getElementById('skillPhotoInput').click();">
@@ -1175,7 +1386,7 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ КЛИЕНТА -->
+        <!-- СЕКЦИЯ КЛИЕНТА - ОБНОВЛЕНО ОТОБРАЖЕНИЕ -->
         <div id="clientSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
             <div class="form-section">
@@ -1431,7 +1642,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ УМЕЙКИ -->
+    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ УМЕЙКИ - ДОБАВЛЕН ВЫБОР СТАТУСА -->
     <div id="editSkillModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeEditSkillModal();">×</button>
@@ -1443,7 +1654,7 @@
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
-            <!-- ВЫБОР СТАТУСА ПРИ РЕДАКТИРОВАНИИ -->
+            <!-- НОВЫЙ БЛОК: ВЫБОР СТАТУСА ПРИ РЕДАКТИРОВАНИИ -->
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                 <div class="status-selector">
@@ -1521,7 +1732,7 @@
     let currentDealMaster = null;
     
     // ПЕРЕМЕННЫЕ ДЛЯ СТАТУСОВ
-    let currentMasterStatus = 'ready';
+    let currentMasterStatus = 'ready'; // По умолчанию "готов"
     let currentEditMasterStatus = 'ready';
 
     // ========== ВИБРАЦИЯ (ПОЛНАЯ ВЕРСИЯ) ==========
@@ -2698,6 +2909,18 @@
         // Устанавливаем начальные значения статусов
         currentMasterStatus = 'ready';
         currentEditMasterStatus = 'ready';
+        
+        // Убеждаемся, что визуально статус "Готов" выбран
+        setTimeout(() => {
+            const readyOption = document.getElementById('statusReadyOption');
+            if (readyOption) {
+                readyOption.classList.add('selected');
+            }
+            const busyOption = document.getElementById('statusBusyOption');
+            if (busyOption) {
+                busyOption.classList.remove('selected');
+            }
+        }, 100);
         
         showMainScreen();
         loadUserProfile();
