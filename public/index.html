@@ -1890,7 +1890,6 @@
             
             const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
             
-            // Проверяем, что ответ успешный
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -2009,13 +2008,13 @@
         }
     }
 
-    // ИСПРАВЛЕННОЕ РЕДАКТИРОВАНИЕ - загружаем из списка, а не с сервера
+    // ИСПРАВЛЕННОЕ РЕДАКТИРОВАНИЕ - используем правильный эндпоинт
     window.openEditSkillModal = async function(skillId) {
         triggerHapticFeedback();
         
         try {
-            // Загружаем список умейек пользователя и находим нужную
-            const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
+            // Загружаем конкретную умейку по ID
+            const response = await fetch(`${API_URL}/api/skills/${skillId}`);
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -2023,18 +2022,12 @@
             
             const result = await response.json();
             
-            if (!result.success || !result.skills) {
+            if (!result.success || !result.skill) {
                 alert('❌ Не удалось загрузить данные умейки');
                 return;
             }
             
-            const skill = result.skills.find(s => s._id === skillId);
-            
-            if (!skill) {
-                alert('❌ Умейка не найдена');
-                return;
-            }
-            
+            const skill = result.skill;
             currentEditingSkill = skill;
             
             // Заполняем поля
@@ -2108,6 +2101,7 @@
             };
             
             console.log('📤 Сохранение умейки со статусом:', currentEditMasterStatus);
+            console.log('📤 Skill ID:', skillId);
 
             if (editSkillPhoto) {
                 skillData.photo = editSkillPhoto;
