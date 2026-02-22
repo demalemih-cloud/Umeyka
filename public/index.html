@@ -2054,6 +2054,7 @@
         editSkillPhoto = null;
     };
 
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ
     window.saveEditedSkill = async function() {
         triggerHapticFeedback();
         
@@ -2072,10 +2073,12 @@
                 skill: skillName,
                 experience: skillExperience,
                 price: parseInt(skillPrice),
-                status: currentEditMasterStatus
+                status: currentEditMasterStatus,
+                userId: currentUserId
             };
             
             console.log('📤 Сохранение умейки со статусом:', currentEditMasterStatus);
+            console.log('📤 ID умейки:', skillId);
 
             if (editSkillPhoto) {
                 skillData.photo = editSkillPhoto;
@@ -2083,11 +2086,18 @@
                 skillData.photo = currentEditingSkill.photo;
             }
             
+            // Используем POST запрос вместо PUT, так как сервер может не поддерживать PUT
             const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
-                method: 'PUT',
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(skillData)
             });
+            
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('❌ Ответ сервера:', text);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             
             const result = await response.json();
             
@@ -2107,7 +2117,7 @@
             
         } catch (error) {
             console.error('❌ Ошибка сохранения умейки:', error);
-            alert('❌ Ошибка сохранения умейки');
+            alert('❌ Ошибка сохранения умейки. Пожалуйста, попробуйте еще раз.');
         }
     };
 
