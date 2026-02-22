@@ -2050,7 +2050,7 @@
         editSkillPhoto = null;
     };
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ - используем POST с id в теле запроса
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ - используем PUT с id в URL
     window.saveEditedSkill = async function() {
         triggerHapticFeedback();
         
@@ -2065,14 +2065,13 @@
                 return;
             }
             
-            // Формируем данные для отправки - включаем id в тело запроса
+            // Формируем данные для отправки
             const skillData = {
-                id: skillId,  // Важно: id в теле запроса, а не в URL
                 skill: skillName,
                 experience: skillExperience,
                 price: parseInt(skillPrice),
                 status: currentEditMasterStatus,
-                userId: currentUserId  // Добавляем для идентификации
+                userId: currentUserId
             };
 
             if (editSkillPhoto) {
@@ -2081,53 +2080,63 @@
                 skillData.photo = currentEditingSkill.photo;
             }
             
-            console.log('📤 Отправка данных на сервер (POST /api/skills/update):', skillData);
+            console.log('📤 Попытка сохранения умейки:', skillId, skillData);
             
-            // Используем единственный правильный эндпоинт - POST с id в body
-            const response = await fetch(`${API_URL}/api/skills/update`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(skillData)
-            });
+            // Пробуем разные эндпоинты последовательно
+            const endpoints = [
+                { method: 'PUT', url: `${API_URL}/api/skills/${skillId}` },
+                { method: 'PATCH', url: `${API_URL}/api/skills/${skillId}` },
+                { method: 'POST', url: `${API_URL}/api/skills/${skillId}` }
+            ];
             
-            console.log('📥 Ответ сервера:', response.status, response.statusText);
+            let lastError = null;
             
-            if (!response.ok) {
-                // Если 404, возможно сервер ожидает другой формат
-                if (response.status === 404) {
-                    throw new Error('Эндпоинт не найден. Проверьте URL сервера.');
+            for (const endpoint of endpoints) {
+                try {
+                    console.log(`🔄 Пробуем ${endpoint.method} ${endpoint.url}`);
+                    
+                    const response = await fetch(endpoint.url, {
+                        method: endpoint.method,
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(skillData)
+                    });
+                    
+                    console.log(`📥 Ответ ${endpoint.method}:`, response.status);
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            alert('✅ Умейка успешно обновлена на сервере!');
+                            closeEditSkillModal();
+                            loadMySkills();
+                            loadProfileSkills();
+                            if (map) loadSkillsOnMap();
+                            return;
+                        }
+                    }
+                    
+                    // Если не 2xx, запоминаем ошибку и пробуем следующий
+                    lastError = new Error(`${endpoint.method} ${response.status}`);
+                    
+                } catch (e) {
+                    console.log(`❌ Ошибка с ${endpoint.method}:`, e.message);
+                    lastError = e;
                 }
-                throw new Error(`Ошибка сервера: ${response.status}`);
             }
             
-            const result = await response.json();
-            console.log('📥 Данные ответа:', result);
-            
-            if (result.success) {
-                alert('✅ Умейка успешно обновлена на сервере!');
-                closeEditSkillModal();
-                
-                // Обновляем списки
-                loadMySkills();
-                loadProfileSkills();
-                
-                if (map) {
-                    loadSkillsOnMap();
-                }
-            } else {
-                throw new Error(result.error || 'Неизвестная ошибка сервера');
-            }
+            // Если ничего не сработало
+            throw new Error('Все методы обновления вернули ошибку. Проверьте консоль для деталей.');
             
         } catch (error) {
             console.error('❌ Ошибка сохранения умейки:', error);
-            alert('❌ Ошибка сохранения: ' + error.message + '\n\nПроверьте консоль для деталей.');
+            alert('❌ Ошибка сохранения: ' + error.message);
         }
     };
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ - используем POST с id в body
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ
     window.deleteSkill = async function(skillId) {
         triggerHapticFeedback();
         
@@ -2136,34 +2145,7 @@
         try {
             console.log('🗑️ Удаление умейки:', skillId);
             
-            // Используем POST с id в body вместо DELETE
-            const response = await fetch(`${API_URL}/api/skills/delete`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    id: skillId,
-                    userId: currentUserId 
-                })
-            });
-            
-            console.log('📥 Ответ сервера на удаление:', response.status);
-            
-            if (response.ok) {
-                const result = await response.json();
-                if (result.success) {
-                    alert('✅ Умейка удалена!');
-                    loadMySkills();
-                    loadProfileSkills();
-                    if (map) loadSkillsOnMap();
-                    return;
-                }
-            }
-            
-            // Если не сработало, пробуем альтернативный метод
-            console.log('⚠️ Пробуем альтернативный метод удаления...');
+            // Пробуем DELETE сначала
             const deleteResponse = await fetch(`${API_URL}/api/skills/${skillId}`, {
                 method: 'DELETE',
                 headers: {
@@ -2173,6 +2155,28 @@
             
             if (deleteResponse.ok) {
                 const result = await deleteResponse.json();
+                if (result.success) {
+                    alert('✅ Умейка удалена!');
+                    loadMySkills();
+                    loadProfileSkills();
+                    if (map) loadSkillsOnMap();
+                    return;
+                }
+            }
+            
+            // Если DELETE не сработал, пробуем POST на delete
+            console.log('⚠️ DELETE не сработал, пробуем POST...');
+            const postResponse = await fetch(`${API_URL}/api/skills/delete`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ id: skillId, userId: currentUserId })
+            });
+            
+            if (postResponse.ok) {
+                const result = await postResponse.json();
                 if (result.success) {
                     alert('✅ Умейка удалена!');
                     loadMySkills();
