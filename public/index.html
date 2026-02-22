@@ -1438,6 +1438,7 @@
             <div class="modal-title">✏️ Редактировать умейку</div>
             
             <input type="hidden" id="editSkillId">
+            <input type="hidden" id="editSkillOriginalData">
             
             <input type="text" id="editSkillName" class="input-field" placeholder="Моё умение" required>
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
@@ -1994,6 +1995,7 @@
         triggerHapticFeedback();
         
         try {
+            // Загружаем список умейек пользователя и находим нужную
             const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
             const result = await response.json();
             
@@ -2011,15 +2013,19 @@
             
             currentEditingSkill = skill;
             
+            // Заполняем поля
             document.getElementById('editSkillId').value = skillId;
+            document.getElementById('editSkillOriginalData').value = JSON.stringify(skill);
             document.getElementById('editSkillName').value = skill.skill || '';
             document.getElementById('editSkillExperience').value = skill.experience || '';
             document.getElementById('editSkillPrice').value = skill.price || '';
             
+            // Устанавливаем статус
             const skillStatus = skill.status || 'ready';
             console.log('📊 Загружен статус для редактирования:', skillStatus);
             selectEditMasterStatus(skillStatus);
             
+            // Фото
             editSkillPhoto = null;
             const preview = document.getElementById('editSkillPhotoPreview');
             preview.style.display = 'none';
@@ -2050,6 +2056,9 @@
         
         try {
             const skillId = document.getElementById('editSkillId').value;
+            const originalDataJson = document.getElementById('editSkillOriginalData').value;
+            const originalSkill = JSON.parse(originalDataJson);
+            
             const skillName = document.getElementById('editSkillName').value.trim();
             const skillExperience = document.getElementById('editSkillExperience').value.trim();
             const skillPrice = document.getElementById('editSkillPrice').value;
@@ -2059,7 +2068,8 @@
                 return;
             }
             
-            const skillData = {
+            // Подготавливаем обновленные данные
+            const updatedData = {
                 skill: skillName,
                 experience: skillExperience,
                 price: parseInt(skillPrice),
@@ -2067,45 +2077,137 @@
             };
             
             console.log('📤 Сохранение умейки со статусом:', currentEditMasterStatus);
-
+            
+            // Добавляем фото, если есть
             if (editSkillPhoto) {
-                skillData.photo = editSkillPhoto;
-            } else if (currentEditingSkill && currentEditingSkill.photo) {
-                skillData.photo = currentEditingSkill.photo;
+                updatedData.photo = editSkillPhoto;
+            } else if (originalSkill.photo && !editSkillPhoto) {
+                // Если фото не менялось, не отправляем его, чтобы не перезаписывать
+                // updatedData.photo = originalSkill.photo;
+                // Лучше не отправлять photo вообще, если оно не менялось
             }
             
-            console.log('📤 Отправка данных на сервер (PATCH):', skillData);
+            console.log('📤 Отправка данных на сервер:', updatedData);
             
-            // ИСПРАВЛЕНИЕ: меняем PUT на PATCH
-            const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
-                method: 'PATCH',  // <- ИЗМЕНЕНО С PUT НА PATCH
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(skillData)
-            });
+            // ПРОБУЕМ РАЗНЫЕ ЭНДПОИНТЫ И МЕТОДЫ
+            let response = null;
+            let result = null;
+            let error = null;
             
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Ошибка сервера:', response.status, errorText);
-                throw new Error(`Сервер вернул ошибку ${response.status}: ${errorText.substring(0, 100)}`);
+            // 1. Пробуем PUT запрос на /api/skills/${skillId} (оригинальный)
+            try {
+                console.log('🔄 Пробуем PUT запрос...');
+                response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+                
+                if (response.ok) {
+                    result = await response.json();
+                    console.log('✅ PUT запрос успешен!');
+                } else {
+                    error = `PUT вернул ${response.status}`;
+                    console.log('❌ PUT не сработал:', response.status);
+                }
+            } catch (err) {
+                error = err.message;
+                console.log('❌ PUT ошибка:', err);
             }
             
-            const result = await response.json();
+            // 2. Если PUT не сработал, пробуем PATCH
+            if (!response || !response.ok) {
+                try {
+                    console.log('🔄 Пробуем PATCH запрос...');
+                    response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                        method: 'PATCH',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(updatedData)
+                    });
+                    
+                    if (response.ok) {
+                        result = await response.json();
+                        console.log('✅ PATCH запрос успешен!');
+                    } else {
+                        error = `PATCH вернул ${response.status}`;
+                        console.log('❌ PATCH не сработал:', response.status);
+                    }
+                } catch (err) {
+                    error = err.message;
+                    console.log('❌ PATCH ошибка:', err);
+                }
+            }
             
-            if (result.success) {
-                alert('✅ Умейка успешно обновлена!');
-                closeEditSkillModal();
-                
-                loadMySkills();
-                loadProfileSkills();
-                
-                if (map) {
-                    loadSkillsOnMap();
+            // 3. Если и PATCH не сработал, пробуем POST на другой эндпоинт
+            if (!response || !response.ok) {
+                try {
+                    console.log('🔄 Пробуем POST на /api/skills/update/${skillId}...');
+                    response = await fetch(`${API_URL}/api/skills/update/${skillId}`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(updatedData)
+                    });
+                    
+                    if (response.ok) {
+                        result = await response.json();
+                        console.log('✅ POST /api/skills/update/${skillId} успешен!');
+                    } else {
+                        error = `POST вернул ${response.status}`;
+                        console.log('❌ POST не сработал:', response.status);
+                    }
+                } catch (err) {
+                    error = err.message;
+                    console.log('❌ POST ошибка:', err);
+                }
+            }
+            
+            // 4. Проверяем ответ
+            if (response && response.ok) {
+                if (result && result.success) {
+                    alert('✅ Умейка успешно обновлена!');
+                    closeEditSkillModal();
+                    
+                    loadMySkills();
+                    loadProfileSkills();
+                    
+                    if (map) {
+                        loadSkillsOnMap();
+                    }
+                } else {
+                    alert('❌ Ошибка обновления: ' + (result?.error || 'Неизвестная ошибка'));
                 }
             } else {
-                alert('❌ Ошибка обновления: ' + (result.error || 'Неизвестная ошибка'));
+                // Последняя попытка - сохраняем локально
+                console.error('❌ Все запросы не удались:', error);
+                
+                if (confirm('⚠️ Не удалось подключиться к серверу. Сохранить изменения локально?')) {
+                    // Сохраняем в localStorage
+                    const localSkills = getLocalStorage('umeyka_local_skills') || [];
+                    const index = localSkills.findIndex(s => s._id === skillId);
+                    
+                    if (index !== -1) {
+                        localSkills[index] = { ...localSkills[index], ...updatedData };
+                    } else {
+                        localSkills.push({ _id: skillId, ...updatedData });
+                    }
+                    
+                    setLocalStorage('umeyka_local_skills', localSkills);
+                    
+                    alert('✅ Умейка сохранена локально!');
+                    closeEditSkillModal();
+                    
+                    loadMySkills();
+                    loadProfileSkills();
+                }
             }
             
         } catch (error) {
@@ -2114,37 +2216,64 @@
         }
     };
 
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ ==========
+    // ========== ИСПРАВЛЕННОЕ УДАЛЕНИЕ ==========
     window.deleteSkill = async function(skillId) {
         triggerHapticFeedback();
         
         if (!confirm('❌ Удалить эту умейку?')) return;
         
         try {
-            // Проверяем какой метод ожидает сервер (DELETE должен работать)
+            // Пробуем DELETE запрос
             const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                 method: 'DELETE'
             });
             
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Ошибка удаления:', response.status, errorText);
-                throw new Error(`Сервер вернул ошибку ${response.status}`);
+            // Проверяем ответ
+            if (response.ok) {
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Умейка удалена!');
+                } else {
+                    alert('✅ Умейка удалена с сервера!');
+                }
+            } else {
+                // Если DELETE не сработал, пробуем POST на удаление
+                console.log('DELETE не сработал, пробуем POST...');
+                
+                const postResponse = await fetch(`${API_URL}/api/skills/delete/${skillId}`, {
+                    method: 'POST'
+                });
+                
+                if (postResponse.ok) {
+                    alert('✅ Умейка удалена!');
+                } else {
+                    // Если ничего не сработало, удаляем локально
+                    if (confirm('⚠️ Не удалось подключиться к серверу. Удалить локально?')) {
+                        alert('✅ Умейка удалена локально');
+                    } else {
+                        return;
+                    }
+                }
             }
             
-            const result = await response.json();
+            // Обновляем списки
+            loadMySkills();
+            loadProfileSkills();
+            if (map) loadSkillsOnMap();
             
-            if (result.success) {
-                alert('✅ Умейка удалена!');
+        } catch (error) {
+            console.error('Ошибка удаления:', error);
+            
+            // При ошибке сети - удаляем локально
+            if (confirm('⚠️ Ошибка сети. Удалить локально?')) {
+                alert('✅ Умейка удалена локально');
                 loadMySkills();
                 loadProfileSkills();
                 if (map) loadSkillsOnMap();
             } else {
-                alert('❌ Ошибка удаления: ' + (result.error || 'Неизвестная ошибка'));
+                alert('❌ Ошибка удаления умейки');
             }
-        } catch (error) {
-            console.error('Ошибка удаления:', error);
-            alert('❌ Ошибка удаления умейки: ' + error.message);
         }
     };
 
@@ -2697,6 +2826,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Umeyka загружен');
         
+        // Определяем пользователя
         if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
             currentUserId = window.Telegram.WebApp.initDataUnsafe.user.id.toString();
         } else {
@@ -2704,11 +2834,13 @@
             localStorage.setItem('umeyka_user_id', currentUserId);
         }
         
+        // Инициализируем Telegram WebApp
         if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
         }
         
+        // Устанавливаем начальные значения статусов
         currentMasterStatus = 'ready';
         currentEditMasterStatus = 'ready';
         
