@@ -2064,6 +2064,7 @@
             }
             
             const skillData = {
+                skillId: skillId,
                 skill: skillName,
                 experience: skillExperience,
                 price: parseInt(skillPrice),
@@ -2083,6 +2084,12 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(skillData)
             });
+            
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('❌ Сервер вернул ошибку:', text);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             
             const result = await response.json();
             
