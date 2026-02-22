@@ -1889,11 +1889,6 @@
             skillsList.innerHTML = '<div class="loading">⏳ Загрузка...</div>';
             
             const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
             const result = await response.json();
             
             if (result.success && result.skills && result.skills.length > 0) {
@@ -1945,21 +1940,12 @@
             }
         } catch (error) {
             console.error('Ошибка загрузки умейок:', error);
-            const skillsList = document.getElementById('mySkillsList');
-            if (skillsList) {
-                skillsList.innerHTML = '<div class="error-message">❌ Ошибка загрузки умейок</div>';
-            }
         }
     }
 
     async function loadProfileSkills() {
         try {
             const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
             const result = await response.json();
             
             const skillsList = document.getElementById('profileSkillsList');
@@ -2001,33 +1987,30 @@
             }
         } catch (error) {
             console.error('Ошибка загрузки умейок:', error);
-            const skillsList = document.getElementById('profileSkillsList');
-            if (skillsList) {
-                skillsList.innerHTML = '<div class="error-message">❌ Ошибка загрузки умейок</div>';
-            }
         }
     }
 
-    // ИСПРАВЛЕННОЕ РЕДАКТИРОВАНИЕ - используем правильный эндпоинт
+    // ИСПРАВЛЕННОЕ РЕДАКТИРОВАНИЕ - загружаем из списка, а не с сервера
     window.openEditSkillModal = async function(skillId) {
         triggerHapticFeedback();
         
         try {
-            // Загружаем конкретную умейку по ID
-            const response = await fetch(`${API_URL}/api/skills/${skillId}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
+            // Загружаем список умейек пользователя и находим нужную
+            const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
             const result = await response.json();
             
-            if (!result.success || !result.skill) {
+            if (!result.success || !result.skills) {
                 alert('❌ Не удалось загрузить данные умейки');
                 return;
             }
             
-            const skill = result.skill;
+            const skill = result.skills.find(s => s._id === skillId);
+            
+            if (!skill) {
+                alert('❌ Умейка не найдена');
+                return;
+            }
+            
             currentEditingSkill = skill;
             
             // Заполняем поля
@@ -2039,20 +2022,7 @@
             // Устанавливаем статус
             const skillStatus = skill.status || 'ready';
             console.log('📊 Загружен статус для редактирования:', skillStatus);
-            currentEditMasterStatus = skillStatus;
-            
-            // Обновляем UI статуса
-            const readyOption = document.getElementById('editStatusReadyOption');
-            const busyOption = document.getElementById('editStatusBusyOption');
-            
-            if (readyOption) readyOption.classList.remove('selected');
-            if (busyOption) busyOption.classList.remove('selected');
-            
-            if (skillStatus === 'ready') {
-                if (readyOption) readyOption.classList.add('selected');
-            } else {
-                if (busyOption) busyOption.classList.add('selected');
-            }
+            selectEditMasterStatus(skillStatus);
             
             // Фото
             editSkillPhoto = null;
@@ -2101,7 +2071,6 @@
             };
             
             console.log('📤 Сохранение умейки со статусом:', currentEditMasterStatus);
-            console.log('📤 Skill ID:', skillId);
 
             if (editSkillPhoto) {
                 skillData.photo = editSkillPhoto;
@@ -2114,13 +2083,6 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(skillData)
             });
-            
-            // Проверяем, что ответ успешный
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Ошибка сервера:', errorText);
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
             
             const result = await response.json();
             
@@ -2140,7 +2102,7 @@
             
         } catch (error) {
             console.error('❌ Ошибка сохранения умейки:', error);
-            alert('❌ Ошибка сохранения умейки: ' + error.message);
+            alert('❌ Ошибка сохранения умейки');
         }
     };
 
@@ -2153,10 +2115,6 @@
             const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                 method: 'DELETE'
             });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
             
             const result = await response.json();
             
@@ -2215,11 +2173,6 @@
     async function loadSkillsOnMap() {
         try {
             const response = await fetch(`${API_URL}/api/skills`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
             const result = await response.json();
             
             if (result.success) {
@@ -2279,11 +2232,6 @@
         
         try {
             const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
             const result = await response.json();
             
             if (result.success && result.skills.length > 0) {
