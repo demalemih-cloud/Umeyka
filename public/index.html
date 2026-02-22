@@ -1997,6 +1997,11 @@
         try {
             // Загружаем список умейек пользователя и находим нужную
             const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const result = await response.json();
             
             if (!result.success || !result.skills) {
