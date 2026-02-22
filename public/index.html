@@ -1524,27 +1524,41 @@
     let currentMasterStatus = 'ready';
     let currentEditMasterStatus = 'ready';
 
-    // ========== ВИБРАЦИЯ (ПОЛНАЯ ВЕРСИЯ) ==========
+    // ========== ВИБРАЦИЯ (БЕЗ ОШИБОК) ==========
     function triggerHapticFeedback() {
         console.log('📳 Попытка вибрации...');
         
-        try {
-            if (window.Telegram?.WebApp?.HapticFeedback) {
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-                console.log('✅ Вибрация Telegram (impact) сработала');
+        // Проверяем поддерживается ли HapticFeedback
+        if (window.Telegram?.WebApp?.HapticFeedback) {
+            try {
+                // Проверяем версию Telegram
+                const version = window.Telegram.WebApp.version || '6.0';
+                const versionNum = parseFloat(version);
                 
-                setTimeout(() => {
-                    try {
-                        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                    } catch (e) {}
-                }, 10);
-                
-                return;
+                if (versionNum >= 6.1) {
+                    // Используем impactOccurred для новых версий
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                    console.log('✅ Вибрация Telegram (impact) сработала');
+                    
+                    // Добавляем небольшую задержку для notificationOccurred
+                    setTimeout(() => {
+                        try {
+                            window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                        } catch (e) {
+                            console.log('ℹ️ Notification feedback не поддерживается');
+                        }
+                    }, 10);
+                    
+                    return;
+                } else {
+                    console.log('ℹ️ HapticFeedback не поддерживается в версии', version);
+                }
+            } catch (error) {
+                console.log('❌ Ошибка Telegram HapticFeedback:', error);
             }
-        } catch (error) {
-            console.log('❌ Ошибка Telegram HapticFeedback:', error);
         }
         
+        // Альтернатива - вибрация через Vibration API
         try {
             if (navigator.vibrate) {
                 navigator.vibrate(20);
@@ -1555,16 +1569,7 @@
             console.log('❌ Ошибка Vibration API:', error);
         }
         
-        try {
-            if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                console.log('✅ Вибрация Telegram (light) сработала');
-                return;
-            }
-        } catch (error) {
-            console.log('❌ Ошибка альтернативной вибрации Telegram:', error);
-        }
-        
+        // Визуальный фидбек как последний вариант
         try {
             const feedback = document.createElement('div');
             feedback.style.cssText = `
@@ -1581,6 +1586,7 @@
                 animation: ripple 0.3s ease-out;
             `;
             
+            // Добавляем стили для анимации
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes ripple {
@@ -1588,12 +1594,17 @@
                     100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
                 }
             `;
+            
             document.head.appendChild(style);
             document.body.appendChild(feedback);
             
             setTimeout(() => {
-                document.body.removeChild(feedback);
-                document.head.removeChild(style);
+                if (document.body.contains(feedback)) {
+                    document.body.removeChild(feedback);
+                }
+                if (document.head.contains(style)) {
+                    document.head.removeChild(style);
+                }
             }, 300);
             
             console.log('✅ Визуальный фидбек сработал');
@@ -1990,7 +2001,7 @@
         }
     }
 
-    // ИСПРАВЛЕННОЕ РЕДАКТИРОВАНИЕ - загружаем из списка, а не с сервера
+    // ИСПРАВЛЕННОЕ ОТКРЫТИЕ МОДАЛЬНОГО ОКНА РЕДАКТИРОВАНИЯ
     window.openEditSkillModal = async function(skillId) {
         triggerHapticFeedback();
         
@@ -2049,7 +2060,7 @@
         editSkillPhoto = null;
     };
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ - используем PATCH вместо PUT
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ - используем правильный эндпоинт
     window.saveEditedSkill = async function() {
         triggerHapticFeedback();
         
@@ -2061,6 +2072,12 @@
             
             if (!skillId || !skillName || !skillExperience || !skillPrice) {
                 alert('❌ Заполните все обязательные поля');
+                return;
+            }
+            
+            // Проверяем, что ID не пустой и имеет правильный формат
+            if (!skillId || skillId.length < 5) {
+                alert('❌ Некорректный ID умейки');
                 return;
             }
             
@@ -2079,72 +2096,61 @@
                 skillData.photo = currentEditingSkill.photo;
             }
             
-            console.log('📤 Отправка данных на сервер (PATCH):', skillData);
+            console.log('📤 Отправка данных на сервер:', skillData);
+            console.log('📤 ID умейки:', skillId);
             
-            // Пробуем сначала PATCH, так как это стандартный метод для частичного обновления
-            const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
-                method: 'PATCH',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(skillData)
-            });
+            // Пробуем разные варианты эндпоинтов
+            const endpoints = [
+                { url: `${API_URL}/api/skills/${skillId}`, method: 'PUT' },
+                { url: `${API_URL}/api/skills/${skillId}`, method: 'PATCH' },
+                { url: `${API_URL}/api/skills/update/${skillId}`, method: 'POST' },
+                { url: `${API_URL}/api/skills/edit/${skillId}`, method: 'POST' },
+                { url: `${API_URL}/api/skills?id=${skillId}`, method: 'PUT' }
+            ];
             
-            // Проверяем статус ответа
-            if (!response.ok) {
-                console.log('⚠️ PATCH не сработал, пробуем PUT...');
-                
-                // Если PATCH не сработал, пробуем PUT
-                const putResponse = await fetch(`${API_URL}/api/skills/${skillId}`, {
-                    method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(skillData)
-                });
-                
-                if (!putResponse.ok) {
-                    const errorText = await putResponse.text();
-                    console.error('❌ Ошибка сервера (PUT):', putResponse.status, errorText);
-                    throw new Error(`Сервер вернул ошибку ${putResponse.status}: ${errorText.substring(0, 100)}`);
-                }
-                
-                const putResult = await putResponse.json();
-                
-                if (putResult.success) {
-                    alert('✅ Умейка успешно обновлена!');
-                    closeEditSkillModal();
+            let lastError = null;
+            
+            for (const endpoint of endpoints) {
+                try {
+                    console.log(`🔄 Пробуем ${endpoint.method} ${endpoint.url}`);
                     
-                    loadMySkills();
-                    loadProfileSkills();
+                    const response = await fetch(endpoint.url, {
+                        method: endpoint.method,
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(skillData)
+                    });
                     
-                    if (map) {
-                        loadSkillsOnMap();
+                    if (response.ok) {
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            alert('✅ Умейка успешно обновлена!');
+                            closeEditSkillModal();
+                            
+                            loadMySkills();
+                            loadProfileSkills();
+                            
+                            if (map) {
+                                loadSkillsOnMap();
+                            }
+                            
+                            return;
+                        }
                     }
-                } else {
-                    alert('❌ Ошибка обновления: ' + (putResult.error || 'Неизвестная ошибка'));
+                    
+                    console.log(`⚠️ ${endpoint.method} ${endpoint.url} вернул ${response.status}`);
+                    
+                } catch (error) {
+                    console.log(`❌ Ошибка при ${endpoint.method} ${endpoint.url}:`, error.message);
+                    lastError = error;
                 }
-                
-                return;
             }
             
-            const result = await response.json();
-            
-            if (result.success) {
-                alert('✅ Умейка успешно обновлена!');
-                closeEditSkillModal();
-                
-                loadMySkills();
-                loadProfileSkills();
-                
-                if (map) {
-                    loadSkillsOnMap();
-                }
-            } else {
-                alert('❌ Ошибка обновления: ' + (result.error || 'Неизвестная ошибка'));
-            }
+            // Если ничего не сработало, показываем сообщение об ошибке
+            throw new Error('Не удалось обновить умейку. Проверьте соединение с сервером.');
             
         } catch (error) {
             console.error('❌ Ошибка сохранения умейки:', error);
@@ -2159,44 +2165,40 @@
         if (!confirm('❌ Удалить эту умейку?')) return;
         
         try {
-            const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
-                method: 'DELETE'
-            });
+            // Пробуем разные варианты эндпоинтов для удаления
+            const deleteEndpoints = [
+                { url: `${API_URL}/api/skills/${skillId}`, method: 'DELETE' },
+                { url: `${API_URL}/api/skills/delete/${skillId}`, method: 'POST' },
+                { url: `${API_URL}/api/skills/remove/${skillId}`, method: 'POST' }
+            ];
             
-            if (!response.ok) {
-                // Пробуем альтернативный эндпоинт если первый не сработал
-                const altResponse = await fetch(`${API_URL}/api/skills/delete/${skillId}`, {
-                    method: 'POST'
-                });
-                
-                if (!altResponse.ok) {
-                    throw new Error(`Ошибка удаления: ${altResponse.status}`);
+            for (const endpoint of deleteEndpoints) {
+                try {
+                    console.log(`🔄 Пробуем удалить через ${endpoint.method} ${endpoint.url}`);
+                    
+                    const response = await fetch(endpoint.url, {
+                        method: endpoint.method,
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            alert('✅ Умейка удалена!');
+                            loadMySkills();
+                            loadProfileSkills();
+                            if (map) loadSkillsOnMap();
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.log(`❌ Ошибка при удалении через ${endpoint.url}:`, error.message);
                 }
-                
-                const altResult = await altResponse.json();
-                
-                if (altResult.success) {
-                    alert('✅ Умейка удалена!');
-                    loadMySkills();
-                    loadProfileSkills();
-                    if (map) loadSkillsOnMap();
-                } else {
-                    alert('❌ Ошибка удаления');
-                }
-                
-                return;
             }
             
-            const result = await response.json();
+            throw new Error('Не удалось удалить умейку');
             
-            if (result.success) {
-                alert('✅ Умейка удалена!');
-                loadMySkills();
-                loadProfileSkills();
-                if (map) loadSkillsOnMap();
-            } else {
-                alert('❌ Ошибка удаления');
-            }
         } catch (error) {
             console.error('Ошибка удаления:', error);
             alert('❌ Ошибка удаления умейки');
