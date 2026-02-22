@@ -2064,7 +2064,6 @@
             }
             
             const skillData = {
-                skillId: skillId,
                 skill: skillName,
                 experience: skillExperience,
                 price: parseInt(skillPrice),
@@ -2079,16 +2078,22 @@
                 skillData.photo = currentEditingSkill.photo;
             }
             
+            console.log('📤 Отправка данных на сервер:', skillData);
+            
             const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify(skillData)
             });
             
+            // Проверяем статус ответа
             if (!response.ok) {
-                const text = await response.text();
-                console.error('❌ Сервер вернул ошибку:', text);
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorText = await response.text();
+                console.error('❌ Ошибка сервера:', response.status, errorText);
+                throw new Error(`Сервер вернул ошибку ${response.status}: ${errorText.substring(0, 100)}`);
             }
             
             const result = await response.json();
@@ -2109,7 +2114,7 @@
             
         } catch (error) {
             console.error('❌ Ошибка сохранения умейки:', error);
-            alert('❌ Ошибка сохранения умейки');
+            alert('❌ Ошибка сохранения умейки: ' + error.message);
         }
     };
 
