@@ -2050,7 +2050,7 @@
         editSkillPhoto = null;
     };
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ - используем PUT с id в URL
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ - пробуем стандартные REST эндпоинты Express.js
     window.saveEditedSkill = async function() {
         triggerHapticFeedback();
         
@@ -2082,11 +2082,26 @@
             
             console.log('📤 Попытка сохранения умейки:', skillId, skillData);
             
-            // Пробуем разные эндпоинты последовательно
+            // Пробуем стандартные REST эндпоинты Express.js + MongoDB
             const endpoints = [
-                { method: 'PUT', url: `${API_URL}/api/skills/${skillId}` },
-                { method: 'PATCH', url: `${API_URL}/api/skills/${skillId}` },
-                { method: 'POST', url: `${API_URL}/api/skills/${skillId}` }
+                // Стандартный PUT /api/skills/:id
+                {
+                    url: `${API_URL}/api/skills/${skillId}`,
+                    method: 'PUT',
+                    body: skillData
+                },
+                // Стандартный PATCH /api/skills/:id
+                {
+                    url: `${API_URL}/api/skills/${skillId}`,
+                    method: 'PATCH',
+                    body: skillData
+                },
+                // POST с id в body
+                {
+                    url: `${API_URL}/api/skills`,
+                    method: 'POST',
+                    body: { ...skillData, _id: skillId, id: skillId }
+                }
             ];
             
             let lastError = null;
@@ -2101,42 +2116,47 @@
                             'Content-Type': 'application/json',
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify(skillData)
+                        body: JSON.stringify(endpoint.body)
                     });
                     
                     console.log(`📥 Ответ ${endpoint.method}:`, response.status);
                     
                     if (response.ok) {
                         const result = await response.json();
-                        if (result.success) {
-                            alert('✅ Умейка успешно обновлена на сервере!');
-                            closeEditSkillModal();
-                            loadMySkills();
-                            loadProfileSkills();
-                            if (map) loadSkillsOnMap();
-                            return;
+                        console.log(`✅ Успех с ${endpoint.method}:`, result);
+                        
+                        alert('✅ Умейка успешно обновлена!');
+                        closeEditSkillModal();
+                        
+                        // Обновляем списки
+                        loadMySkills();
+                        loadProfileSkills();
+                        
+                        if (map) {
+                            loadSkillsOnMap();
                         }
+                        return; // Выходим при успехе
+                    } else {
+                        const errorText = await response.text();
+                        console.log(`❌ Ошибка ${endpoint.method}:`, errorText);
+                        lastError = new Error(`${endpoint.method} ${response.status}: ${errorText}`);
                     }
-                    
-                    // Если не 2xx, запоминаем ошибку и пробуем следующий
-                    lastError = new Error(`${endpoint.method} ${response.status}`);
-                    
                 } catch (e) {
-                    console.log(`❌ Ошибка с ${endpoint.method}:`, e.message);
+                    console.log(`❌ Исключение с ${endpoint.method}:`, e.message);
                     lastError = e;
                 }
             }
             
             // Если ничего не сработало
-            throw new Error('Все методы обновления вернули ошибку. Проверьте консоль для деталей.');
+            throw lastError || new Error('Все эндпоинты недоступны');
             
         } catch (error) {
             console.error('❌ Ошибка сохранения умейки:', error);
-            alert('❌ Ошибка сохранения: ' + error.message);
+            alert('❌ Ошибка сохранения: ' + error.message + '\n\nПроверьте консоль (F12) для деталей.');
         }
     };
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ - пробуем стандартные REST эндпоинты
     window.deleteSkill = async function(skillId) {
         triggerHapticFeedback();
         
@@ -2145,48 +2165,69 @@
         try {
             console.log('🗑️ Удаление умейки:', skillId);
             
-            // Пробуем DELETE сначала
-            const deleteResponse = await fetch(`${API_URL}/api/skills/${skillId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-            
-            if (deleteResponse.ok) {
-                const result = await deleteResponse.json();
-                if (result.success) {
-                    alert('✅ Умейка удалена!');
-                    loadMySkills();
-                    loadProfileSkills();
-                    if (map) loadSkillsOnMap();
-                    return;
-                }
-            }
-            
-            // Если DELETE не сработал, пробуем POST на delete
-            console.log('⚠️ DELETE не сработал, пробуем POST...');
-            const postResponse = await fetch(`${API_URL}/api/skills/delete`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+            // Пробуем стандартные REST эндпоинты
+            const endpoints = [
+                // Стандартный DELETE /api/skills/:id
+                {
+                    url: `${API_URL}/api/skills/${skillId}`,
+                    method: 'DELETE'
                 },
-                body: JSON.stringify({ id: skillId, userId: currentUserId })
-            });
+                // DELETE с userId в query
+                {
+                    url: `${API_URL}/api/skills/${skillId}?userId=${currentUserId}`,
+                    method: 'DELETE'
+                },
+                // POST на delete эндпоинт
+                {
+                    url: `${API_URL}/api/skills/delete`,
+                    method: 'POST',
+                    body: { id: skillId, userId: currentUserId }
+                }
+            ];
             
-            if (postResponse.ok) {
-                const result = await postResponse.json();
-                if (result.success) {
-                    alert('✅ Умейка удалена!');
-                    loadMySkills();
-                    loadProfileSkills();
-                    if (map) loadSkillsOnMap();
-                    return;
+            let lastError = null;
+            
+            for (const endpoint of endpoints) {
+                try {
+                    console.log(`🔄 Пробуем удалить через ${endpoint.method} ${endpoint.url}`);
+                    
+                    const options = {
+                        method: endpoint.method,
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    };
+                    
+                    if (endpoint.body) {
+                        options.body = JSON.stringify(endpoint.body);
+                    }
+                    
+                    const response = await fetch(endpoint.url, options);
+                    
+                    console.log(`📥 Ответ удаления ${endpoint.method}:`, response.status);
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            alert('✅ Умейка удалена!');
+                            loadMySkills();
+                            loadProfileSkills();
+                            if (map) loadSkillsOnMap();
+                            return;
+                        }
+                    } else {
+                        const errorText = await response.text();
+                        console.log(`❌ Ошибка удаления ${endpoint.method}:`, errorText);
+                        lastError = new Error(errorText);
+                    }
+                } catch (e) {
+                    console.log(`❌ Исключение удаления ${endpoint.method}:`, e.message);
+                    lastError = e;
                 }
             }
             
-            throw new Error('Не удалось удалить умейку');
+            throw lastError || new Error('Не удалось удалить умейку');
             
         } catch (error) {
             console.error('❌ Ошибка удаления:', error);
