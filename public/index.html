@@ -369,6 +369,102 @@
             gap: 8px;
         }
 
+        /* Стили для статуса мастера */
+        .status-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        
+        .status-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+        
+        .status-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid transparent;
+        }
+        
+        .status-button.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .status-button.ready.active {
+            background: #48bb78;
+            border-color: white;
+        }
+        
+        .status-button.busy.active {
+            background: #f56565;
+            border-color: white;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status-ready {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .status-ready::before {
+            content: "⚪";
+            font-size: 8px;
+            animation: pulse-green 1.5s infinite;
+        }
+        
+        .status-busy {
+            background: #f56565;
+            color: white;
+        }
+        
+        .status-busy::before {
+            content: "🔴";
+            font-size: 8px;
+            animation: pulse-red 1.5s infinite;
+        }
+        
+        @keyframes pulse-green {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes pulse-red {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .skill-status {
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
         /* Стили для кнопок вкладок */
         .tab-buttons {
             display: flex;
@@ -1469,6 +1565,18 @@
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
                 
+                <!-- Кнопки выбора статуса -->
+                <div class="status-container">
+                    <div class="status-buttons">
+                        <button type="button" class="status-button ready active" onclick="selectMasterStatus('ready')">
+                            <span>✅</span> Готов
+                        </button>
+                        <button type="button" class="status-button busy" onclick="selectMasterStatus('busy')">
+                            <span>⛔</span> Занят
+                        </button>
+                    </div>
+                </div>
+                
                 <!-- Загрузка фото для умейки -->
                 <div style="margin: 15px 0;">
                     <div style="color: white; margin-bottom: 10px;">📸 Фото вашей работы (максимум 1 фото, размер до 1MB)</div>
@@ -1874,6 +1982,18 @@
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
+            <!-- Кнопки выбора статуса в модальном окне -->
+            <div class="status-container">
+                <div class="status-buttons">
+                    <button type="button" class="status-button ready" onclick="selectEditMasterStatus('ready')">
+                        <span>✅</span> Готов
+                    </button>
+                    <button type="button" class="status-button busy" onclick="selectEditMasterStatus('busy')">
+                        <span>⛔</span> Занят
+                    </button>
+                </div>
+            </div>
+            
             <!-- Загрузка фото для редактирования -->
             <div style="margin: 15px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📸 Фото вашей работы</div>
@@ -1945,6 +2065,7 @@
     let mapRefreshInterval = null;
     let currentEditingSkill = null;
     let currentDealMaster = null;
+    let currentMasterStatus = 'ready'; // Статус по умолчанию - "Готов"
 
     // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ВИБРАЦИИ ==========
     // Улучшенная функция с множественными попытками и визуальным фидбеком
@@ -2036,6 +2157,46 @@
 
     // Делаем функцию глобальной и доступной везде
     window.triggerHapticFeedback = triggerHapticFeedback;
+
+    // ========== ФУНКЦИИ ДЛЯ ВЫБОРА СТАТУСА ==========
+    window.selectMasterStatus = function(status) {
+        triggerHapticFeedback();
+        currentMasterStatus = status;
+        
+        // Обновляем визуальное состояние кнопок
+        document.querySelectorAll('.status-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        if (status === 'ready') {
+            document.querySelector('.status-button.ready').classList.add('active');
+        } else {
+            document.querySelector('.status-button.busy').classList.add('active');
+        }
+        
+        console.log('📊 Выбран статус:', status);
+    };
+
+    window.selectEditMasterStatus = function(status) {
+        triggerHapticFeedback();
+        
+        if (currentEditingSkill) {
+            currentEditingSkill.status = status;
+        }
+        
+        // Обновляем визуальное состояние кнопок в модальном окне
+        document.querySelectorAll('#editSkillModal .status-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        if (status === 'ready') {
+            document.querySelector('#editSkillModal .status-button.ready').classList.add('active');
+        } else {
+            document.querySelector('#editSkillModal .status-button.busy').classList.add('active');
+        }
+        
+        console.log('📊 Выбран статус при редактировании:', status);
+    };
 
     // ========== ФУНКЦИИ ДЛЯ МОНЕТ ==========
     function getCoinsData() {
@@ -2523,10 +2684,11 @@
                 price: parseInt(skillPrice),
                 userId: userId,
                 username: userData.firstName || 'Аноним',
-                location: location
+                location: location,
+                status: currentMasterStatus // Добавляем выбранный статус
             };
 
-            console.log('📤 Отправляю данные на сервер:');
+            console.log('📤 Отправляю данные на сервер со статусом:', currentMasterStatus);
             console.log('Все данные:', skillData);
 
             if (currentSkillPhoto) {
@@ -2570,6 +2732,13 @@
                     document.getElementById('skillPrice').value = '';
                     removeSkillPhoto();
                     currentSkillPhoto = null;
+                    
+                    // Сбрасываем статус на "Готов" после успешной публикации
+                    currentMasterStatus = 'ready';
+                    document.querySelectorAll('.status-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    document.querySelector('.status-button.ready').classList.add('active');
                 
                     setTimeout(() => {
                         loadMySkills();
@@ -2667,6 +2836,9 @@
                     console.log(`✅ Найдено ${result.skills.length} моих умейок`);
                     
                     skillsList.innerHTML = result.skills.map(skill => {
+                        const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
+                        const statusText = skill.status === 'ready' ? 'Готов' : 'Занят';
+                        
                         return `
                         <div class="skill-card">
                             <div class="skill-header">
@@ -2675,6 +2847,10 @@
                             </div>
                             
                             <div class="skill-price">${skill.price} ₽</div>
+                            
+                            <div class="skill-status">
+                                <span class="status-indicator ${statusClass}">${statusText}</span>
+                            </div>
                             
                             <div class="skill-contact-info">
                                 <div class="contact-label">📞 Контакты:</div>
@@ -2757,11 +2933,18 @@
             
             if (result.success && result.skills.length > 0) {
                 skillsList.innerHTML = result.skills.map(skill => {
+                    const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
+                    const statusText = skill.status === 'ready' ? 'Готов' : 'Занят';
+                    
                     return `
                     <div class="profile-skill-card">
                         <div class="profile-skill-header">
                             <div class="skill-title">${skill.skill}</div>
                             <div class="skill-price">${skill.price} ₽</div>
+                        </div>
+                        
+                        <div class="skill-status">
+                            <span class="status-indicator ${statusClass}">${statusText}</span>
                         </div>
                         
                         <div class="skill-contact-info">
@@ -2818,6 +3001,18 @@
                 document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
                 
+                // Устанавливаем активный статус в модальном окне
+                const status = skill.status || 'ready';
+                document.querySelectorAll('#editSkillModal .status-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                if (status === 'ready') {
+                    document.querySelector('#editSkillModal .status-button.ready').classList.add('active');
+                } else {
+                    document.querySelector('#editSkillModal .status-button.busy').classList.add('active');
+                }
+                
                 editSkillPhoto = null;
                 const preview = document.getElementById('editSkillPhotoPreview');
                 preview.style.display = 'none';
@@ -2862,6 +3057,12 @@
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
             
+            // Получаем выбранный статус из модального окна
+            let selectedStatus = 'ready';
+            if (document.querySelector('#editSkillModal .status-button.busy.active')) {
+                selectedStatus = 'busy';
+            }
+            
             if (!skillId) {
                 alert('❌ Ошибка: не указан ID умейки');
                 return;
@@ -2875,10 +3076,11 @@
             const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
-                price: parseInt(skillPrice)
+                price: parseInt(skillPrice),
+                status: selectedStatus // Добавляем статус при редактировании
             };
             
-            console.log('📤 Сохраняю изменения умейки:', skillData);
+            console.log('📤 Сохраняю изменения умейки со статусом:', selectedStatus);
             
             if (editSkillPhoto) {
                 const estimatedSize = (editSkillPhoto.length * 0.75) / 1024;
@@ -3081,10 +3283,13 @@
                     const rating = skill.rating?.average || 5.0;
                     const isUserSkill = skill.userId === currentUserId;
                     
+                    // Определяем цвет маркера по статусу
+                    const statusColor = skill.status === 'ready' ? '#48bb78' : '#f56565';
+                    
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
                         icon: L.divIcon({
                             className: 'umeyka-marker',
-                            html: `<div style="color: ${getMarkerColor(rating)}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
+                            html: `<div style="color: ${statusColor}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
                             iconSize: [30, 30],
                             iconAnchor: [15, 30]
                         })
@@ -3129,6 +3334,8 @@
 
     function createMapSkillPopup(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
+        const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
+        const statusText = skill.status === 'ready' ? 'Готов' : 'Занят';
         
         return `
             <div class="map-popup-content">
@@ -3140,6 +3347,10 @@
                         <h3 style="margin: 0; color: #2d3748; font-size: 18px;">${skill.skill}</h3>
                         <p style="margin: 4px 0 0; color: #666; font-size: 14px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
                     </div>
+                </div>
+                
+                <div style="margin: 10px 0;">
+                    <span class="status-indicator ${statusClass}">${statusText}</span>
                 </div>
                 
                 <div style="margin: 10px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
@@ -3154,10 +3365,6 @@
                             <span style="font-size: 14px; font-weight: 500; flex: 1;">${skill.experience || 'Не указано'}</span>
                         </div>
                     </div>
-                    
-                    <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
-                        <span style="color:#667eea;">📞</span> ${skill.experience || 'Контакт не указан'}
-                    </p>
                     
                     <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
                         <span style="color:#667eea;">⭐</span> 
@@ -3461,6 +3668,9 @@
             
             if (result.success && result.skills.length > 0) {
                 searchResults.innerHTML = result.skills.map(skill => {
+                    const statusClass = skill.status === 'ready' ? 'status-ready' : 'status-busy';
+                    const statusText = skill.status === 'ready' ? 'Готов' : 'Занят';
+                    
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
@@ -3469,6 +3679,10 @@
                         </div>
                         
                         <div class="skill-price">${skill.price} ₽</div>
+                        
+                        <div class="skill-status">
+                            <span class="status-indicator ${statusClass}">${statusText}</span>
+                        </div>
                         
                         <div class="skill-contact-info">
                             <div class="contact-label">📞 Контакты:</div>
@@ -4277,6 +4491,10 @@
         if (dealAmount) {
             dealAmount.addEventListener('input', updateDealCommission);
         }
+        
+        // Устанавливаем статус "Готов" по умолчанию при загрузке страницы
+        currentMasterStatus = 'ready';
+        document.querySelector('.status-button.ready').classList.add('active');
     });
 
     </script>
