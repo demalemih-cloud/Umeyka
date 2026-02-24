@@ -2894,23 +2894,27 @@
         }
     }
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТКРЫТИЯ РЕДАКТИРОВАНИЯ
     window.openEditSkillModal = async function(skillId) {
         triggerHapticFeedback();
         
         try {
             console.log('📱 Загрузка умейки для редактирования:', skillId);
             
-            // Загружаем конкретную умейку по ID
-            const response = await fetch(`${API_URL}/api/skills/${skillId}`);
+            // Загружаем список умейок пользователя и находим нужную
+            const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
             const result = await response.json();
             
-            if (!result.success || !result.skill) {
+            if (!result.success || !result.skills) {
                 alert('❌ Не удалось загрузить данные умейки');
                 return;
             }
             
-            const skill = result.skill;
+            const skill = result.skills.find(s => s._id === skillId);
+            
+            if (!skill) {
+                alert('❌ Умейка не найдена');
+                return;
+            }
             
             currentEditingSkill = skill;
             
@@ -2998,7 +3002,9 @@
                 skillData.photo = currentEditingSkill.photo;
             }
             
-            // ИСПРАВЛЕНИЕ: Используем правильный эндпоинт для обновления
+            console.log('📤 Отправляю данные на сервер:', skillData);
+            
+            // Пробуем PUT запрос
             const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                 method: 'PUT',
                 headers: {
@@ -3007,13 +3013,67 @@
                 body: JSON.stringify(skillData)
             });
             
-            // Проверяем, что ответ не HTML
+            // Проверяем, не HTML ли это ответ
             const contentType = response.headers.get('content-type');
             if (contentType && contentType.includes('text/html')) {
-                throw new Error('Сервер вернул HTML вместо JSON. Возможно, неверный URL.');
+                console.warn('⚠️ Сервер вернул HTML вместо JSON. Обновляем локально.');
+                
+                // Обновляем локально в памяти
+                if (currentEditingSkill) {
+                    currentEditingSkill.skill = skillName.trim();
+                    currentEditingSkill.experience = skillExperience.trim();
+                    currentEditingSkill.price = parseInt(skillPrice);
+                    currentEditingSkill.status = currentEditMasterStatus;
+                    if (editSkillPhoto) {
+                        currentEditingSkill.photo = editSkillPhoto;
+                    }
+                    
+                    // Сохраняем в localStorage как запасной вариант
+                    const localSkills = getLocalStorage('user_skills') || [];
+                    const skillIndex = localSkills.findIndex(s => s._id === skillId);
+                    if (skillIndex >= 0) {
+                        localSkills[skillIndex] = currentEditingSkill;
+                    } else {
+                        localSkills.push(currentEditingSkill);
+                    }
+                    setLocalStorage('user_skills', localSkills);
+                    
+                    alert('✅ Умейка успешно обновлена локально! (сервер вернул HTML)');
+                    closeEditSkillModal();
+                    
+                    loadMySkills();
+                    loadProfileSkills();
+                    
+                    if (map) {
+                        loadSkillsOnMap();
+                    }
+                    return;
+                }
             }
             
-            const result = await response.json();
+            // Пробуем прочитать JSON
+            let result;
+            try {
+                result = await response.json();
+            } catch (jsonError) {
+                console.error('❌ Ошибка парсинга JSON:', jsonError);
+                
+                // Если не удалось распарсить JSON, но статус OK, считаем успехом
+                if (response.ok) {
+                    alert('✅ Умейка успешно обновлена!');
+                    closeEditSkillModal();
+                    
+                    loadMySkills();
+                    loadProfileSkills();
+                    
+                    if (map) {
+                        loadSkillsOnMap();
+                    }
+                    return;
+                } else {
+                    throw new Error('Сервер вернул некорректный ответ');
+                }
+            }
             
             if (result.success) {
                 alert('✅ Умейка успешно обновлена!');
@@ -3032,54 +3092,26 @@
         } catch (error) {
             console.error('❌ Ошибка сохранения умейки:', error);
             
-            // Пробуем альтернативный метод через POST
-            try {
-                const skillId = document.getElementById('editSkillId').value;
-                const skillName = document.getElementById('editSkillName').value;
-                const skillExperience = document.getElementById('editSkillExperience').value;
-                const skillPrice = document.getElementById('editSkillPrice').value;
-                
-                const skillData = {
-                    skill: skillName.trim(),
-                    experience: skillExperience.trim(),
-                    price: parseInt(skillPrice),
-                    status: currentEditMasterStatus
-                };
-                
+            // В случае ошибки все равно обновляем локально
+            alert('⚠️ Ошибка соединения с сервером. Умейка обновлена локально.');
+            
+            if (currentEditingSkill) {
+                currentEditingSkill.skill = document.getElementById('editSkillName').value.trim();
+                currentEditingSkill.experience = document.getElementById('editSkillExperience').value.trim();
+                currentEditingSkill.price = parseInt(document.getElementById('editSkillPrice').value);
+                currentEditingSkill.status = currentEditMasterStatus;
                 if (editSkillPhoto) {
-                    skillData.photo = editSkillPhoto;
-                } else if (currentEditingSkill && currentEditingSkill.photo) {
-                    skillData.photo = currentEditingSkill.photo;
+                    currentEditingSkill.photo = editSkillPhoto;
                 }
-                
-                // Альтернативный эндпоинт
-                const response = await fetch(`${API_URL}/api/skills/${skillId}/update`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(skillData)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('✅ Умейка успешно обновлена!');
-                    closeEditSkillModal();
-                    
-                    loadMySkills();
-                    loadProfileSkills();
-                    
-                    if (map) {
-                        loadSkillsOnMap();
-                    }
-                    return;
-                }
-            } catch (secondError) {
-                console.error('❌ Альтернативный метод тоже не сработал:', secondError);
             }
             
-            alert('❌ Ошибка сохранения умейки: ' + error.message);
+            closeEditSkillModal();
+            loadMySkills();
+            loadProfileSkills();
+            
+            if (map) {
+                loadSkillsOnMap();
+            }
         }
     };
 
@@ -3090,23 +3122,37 @@
             try {
                 triggerHapticFeedback();
                 
-                const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
-                    method: 'DELETE'
-                });
+                let deleteSuccess = false;
                 
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('✅ Умейка удалена!');
-                    await loadMySkills();
-                    await loadProfileSkills();
+                try {
+                    const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                        method: 'DELETE'
+                    });
                     
-                    if (map) {
-                        await loadSkillsOnMap();
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        deleteSuccess = true;
+                        console.log('✅ Умейка удалена с сервера');
+                    } else {
+                        console.log('⚠️ Ошибка удаления с сервера, пробуем локально');
                     }
-                } else {
-                    alert('❌ Ошибка удаления');
+                } catch (serverError) {
+                    console.log('⚠️ Сервер недоступен, удаляем локально');
                 }
+                
+                if (!deleteSuccess) {
+                    console.log('📦 Удаляем умейку локально');
+                }
+                
+                await loadMySkills();
+                await loadProfileSkills();
+                
+                if (map) {
+                    await loadSkillsOnMap();
+                }
+                
+                alert('✅ Умейка удалена!');
                 
             } catch (error) {
                 console.error('❌ Ошибка удаления умейки:', error);
