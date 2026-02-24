@@ -305,7 +305,8 @@
             background: #f56565;
             box-shadow: 0 0 10px #f56565;
         }
-        
+
+        /* Стили для карточки умейки */
         .skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -316,12 +317,6 @@
             border-left: 4px solid #667eea;
         }
 
-        .gold-card {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #744210;
-            border: 3px solid #FFD700;
-        }
-        
         .skill-header {
             display: flex;
             justify-content: space-between;
@@ -402,24 +397,6 @@
             transition: all 0.3s ease;
         }
         
-        .details-button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
         #map {
             height: 400px;
             border-radius: 15px;
@@ -471,7 +448,6 @@
             gap: 8px;
         }
 
-        /* Стили для кнопок вкладок */
         .tab-buttons {
             display: flex;
             gap: 10px;
@@ -758,7 +734,7 @@
             border: 2px solid #10b981;
         }
 
-        /* РЕФЕРАЛЬНАЯ ПРОГРАММА */
+        /* Реферальная программа */
         .referral-section {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
             padding: 25px 20px;
@@ -781,6 +757,7 @@
             font-size: 40px;
             color: white;
             opacity: 0.1;
+            background: none;
             z-index: 0;
         }
 
@@ -967,11 +944,6 @@
             border: 1px solid rgba(255, 255, 255, 0.3) !important;
         }
 
-        .referral-tab-button:hover {
-            background: linear-gradient(135deg, #8c6bcf 0%, #6f48c7 100%) !important;
-        }
-
-        /* Раздел "О проекте" */
         .about-section {
             background: rgba(255,255,255,0.9);
             padding: 25px;
@@ -1029,7 +1001,6 @@
             opacity: 0.9;
         }
 
-        /* Стили для кастомизации */
         .customization-section {
             background: rgba(255,255,255,0.9);
             padding: 20px;
@@ -1097,16 +1068,6 @@
             margin-bottom: 20px;
             padding: 0 20px;
         }
-
-        .back-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        }
-
-        .back-button:active {
-            transform: translateY(0);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
              
         .deals-tab-buttons {
             display: flex;
@@ -1135,15 +1096,6 @@
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
 
-        .deals-tab-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
-
-        .deals-tab-button:active {
-            transform: translateY(0);
-        }
-
         .deals-tab-button.active {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             border: 2px solid rgba(255,255,255,0.5);
@@ -1168,11 +1120,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-
-        .skill-photo:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .upload-photo-button {
@@ -1281,11 +1228,6 @@
         .modal-cancel {
             background: #e2e8f0;
             color: #4a5568;
-        }
-
-        .modal-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .map-popup-content {
@@ -1576,7 +1518,7 @@
                     </div>
                 </div>
                 
-                <!-- Загрузка фото -->
+                <!-- Загрузка фото для умейки -->
                 <div style="margin: 15px 0;">
                     <div style="color: white; margin-bottom: 10px;">📸 Фото вашей работы (максимум 1 фото, размер до 1MB)</div>
                     <div class="photo-upload-area" onclick="triggerHapticFeedback(); document.getElementById('skillPhotoInput').click();">
@@ -2074,11 +2016,14 @@
     function triggerHapticFeedback() {
         console.log('📳 Попытка вибрации...');
         
+        // СПОСОБ 1: Telegram WebApp HapticFeedback (основной)
         try {
             if (window.Telegram?.WebApp?.HapticFeedback) {
+                // Пробуем разные типы вибрации для надежности
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                 console.log('✅ Вибрация Telegram (impact) сработала');
                 
+                // Добавляем небольшую задержку для второго типа вибрации
                 setTimeout(() => {
                     try {
                         window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
@@ -2091,9 +2036,10 @@
             console.log('❌ Ошибка Telegram HapticFeedback:', error);
         }
         
+        // СПОСОБ 2: Vibration API (для браузера и десктопа)
         try {
             if (navigator.vibrate) {
-                navigator.vibrate(20);
+                navigator.vibrate(20); // Короткая вибрация 20ms
                 console.log('✅ Вибрация браузера (Vibration API) сработала');
                 return;
             }
@@ -2101,8 +2047,10 @@
             console.log('❌ Ошибка Vibration API:', error);
         }
         
+        // СПОСОБ 3: Альтернативный метод Telegram (если предыдущие не сработали)
         try {
             if (window.Telegram?.WebApp) {
+                // Пробуем вызвать через другой метод
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                 console.log('✅ Вибрация Telegram (light) сработала');
                 return;
@@ -2111,7 +2059,9 @@
             console.log('❌ Ошибка альтернативной вибрации Telegram:', error);
         }
         
+        // СПОСОБ 4: Визуальный фидбек (всегда работает)
         try {
+            // Создаем временный элемент для визуального эффекта
             const feedback = document.createElement('div');
             feedback.style.cssText = `
                 position: fixed;
@@ -2127,6 +2077,7 @@
                 animation: ripple 0.3s ease-out;
             `;
             
+            // Добавляем анимацию
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes ripple {
@@ -2167,6 +2118,8 @@
         } else {
             if (busyOption) busyOption.classList.add('selected');
         }
+        
+        console.log('✅ Текущий статус:', currentMasterStatus);
     }
     
     function selectEditMasterStatus(status) {
@@ -2184,6 +2137,8 @@
         } else {
             if (busyOption) busyOption.classList.add('selected');
         }
+        
+        console.log('✅ Текущий статус редактирования:', currentEditMasterStatus);
     }
     
     function getStatusBadge(status) {
@@ -2249,6 +2204,9 @@
         document.getElementById('referralLinkText').textContent = referralLink;
         
         updateReferralFriendsList(data.invitedFriends);
+        
+        const userData = getOrCreateUserProfile(currentUserId);
+        setLocalStorage(`user_${currentUserId}`, userData);
     }
 
     function generateReferralLink() {
@@ -2363,6 +2321,7 @@
     }
 
     // ========== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ==========
+
     function getLocalStorage(key) {
         try {
             const data = localStorage.getItem(key);
@@ -2412,6 +2371,7 @@
         return globalDeals.filter(deal => {
             const isClient = deal.clientId === userId;
             const isMaster = deal.masterId === userId;
+            console.log(`   Сделка ${deal.id}: clientId=${deal.clientId}, masterId=${deal.masterId}, isClient=${isClient}, isMaster=${isMaster}`);
             return isClient || isMaster;
         });
     }
@@ -2685,7 +2645,7 @@
                 status: currentMasterStatus
             };
 
-            console.log('📤 Отправляю данные на сервер со статусом:', currentMasterStatus);
+            console.log('📤 Отправляю данные на сервер со статусом:', skillData.status);
 
             if (currentSkillPhoto) {
                 const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
@@ -2699,6 +2659,8 @@
                 skillData.photo = currentSkillPhoto;
                 skillData.photoTimestamp = new Date().toISOString();
             }
+
+            console.log('📤 Итоговые данные для отправки:', skillData);
 
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -2727,6 +2689,7 @@
                     removeSkillPhoto();
                     currentSkillPhoto = null;
                     
+                    // Сброс статуса на "Готов"
                     currentMasterStatus = 'ready';
                     selectMasterStatus('ready');
                 
@@ -2864,10 +2827,6 @@
                                     🗑️ Удалить
                                 </button>
                             </div>
-                            
-                            <button class="details-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');">
-                                📞 Подробные контакты
-                            </button>
                         </div>
                     `}).join('');
                 } else {
@@ -2933,6 +2892,13 @@
                         </div>
                         
                         ${statusBadge}
+                        
+                        <div class="skill-contact-info">
+                            <div class="contact-item">
+                                <span class="contact-icon">📱</span>
+                                <span class="contact-text">${skill.experience || 'Не указано'}</span>
+                            </div>
+                        </div>
                         
                         ${skill.photo ? `
                             <div class="skill-photo" style="height: 150px; margin: 15px 0;">
@@ -3214,82 +3180,12 @@
         }
     }
 
-    async function loadSkillsOnMap() {
-        try {
-            console.log('🗺️ Загрузка умейок с сервера для карты');
-            
-            const skills = await loadAllSkillsFromServer();
-            
-            console.log('📊 Получено умейок с сервера:', skills.length);
-            
-            const userData = getOrCreateUserProfile(currentUserId);
-            
-            if (markers.length > 0) {
-                markers.forEach(marker => map.removeLayer(marker));
-                markers = [];
-            }
-            
-            if (userLocation) {
-                const userMarker = L.marker([userLocation.lat, userLocation.lon], {
-                    icon: L.divIcon({
-                        className: 'user-marker',
-                        html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
-                        iconSize: [16, 16],
-                        iconAnchor: [8, 16]
-                    })
-                })
-                .addTo(map)
-                .bindPopup(`📍 <b>${userData.firstName || 'Вы'}</b><br>Ваше местоположение`)
-                .openPopup();
-                
-                markers.push(userMarker);
-            }
-            
-            skills.forEach(skill => {
-                if (skill.location && skill.location.lat && skill.location.lon) {
-                    const rating = skill.rating?.average || 5.0;
-                    const isUserSkill = skill.userId === currentUserId;
-                    
-                    // Цвет маркера в зависимости от статуса
-                    const markerColor = skill.status === 'busy' ? '#f56565' : '#48bb78';
-                    
-                    const marker = L.marker([skill.location.lat, skill.location.lon], {
-                        icon: L.divIcon({
-                            className: 'umeyka-marker',
-                            html: `<div style="color: ${markerColor}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
-                            iconSize: [30, 30],
-                            iconAnchor: [15, 30]
-                        })
-                    })
-                    .addTo(map)
-                    .bindPopup(createMapSkillPopup(skill, isUserSkill));
-                    
-                    marker.on('popupopen', async () => {
-                        try {
-                            await fetch(`${API_URL}/api/skills/${skill._id}/view`, {
-                                method: 'POST'
-                            });
-                        } catch (error) {
-                            console.error('❌ Ошибка обновления просмотров:', error);
-                        }
-                    });
-                    
-                    markers.push(marker);
-                }
-            });
-            
-            console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров');
-            
-        } catch (error) {
-            console.error('❌ Ошибка загрузки карты:', error);
-            
-            if (map) {
-                L.popup()
-                    .setLatLng([55.7558, 37.6173])
-                    .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
-                    .openOn(map);
-            }
-        }
+    function getMarkerColor(rating, status) {
+        if (status === 'busy') return '#f56565';
+        if (rating >= 4.5) return '#22c55e';
+        if (rating >= 4.0) return '#8b5cf6';  
+        if (rating >= 3.5) return '#eab308';
+        return '#6b7280';
     }
 
     function createMapSkillPopup(skill, isUserSkill) {
@@ -3355,6 +3251,82 @@
                 </div>
             </div>
         `;
+    }
+
+    async function loadSkillsOnMap() {
+        try {
+            console.log('🗺️ Загрузка умейок с сервера для карты');
+            
+            const skills = await loadAllSkillsFromServer();
+            
+            console.log('📊 Получено умейок с сервера:', skills.length);
+            
+            const userData = getOrCreateUserProfile(currentUserId);
+            
+            if (markers.length > 0) {
+                markers.forEach(marker => map.removeLayer(marker));
+                markers = [];
+            }
+            
+            if (userLocation) {
+                const userMarker = L.marker([userLocation.lat, userLocation.lon], {
+                    icon: L.divIcon({
+                        className: 'user-marker',
+                        html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
+                        iconSize: [16, 16],
+                        iconAnchor: [8, 16]
+                    })
+                })
+                .addTo(map)
+                .bindPopup(`📍 <b>${userData.firstName || 'Вы'}</b><br>Ваше местоположение`)
+                .openPopup();
+                
+                markers.push(userMarker);
+            }
+            
+            skills.forEach(skill => {
+                if (skill.location && skill.location.lat && skill.location.lon) {
+                    const rating = skill.rating?.average || 5.0;
+                    const isUserSkill = skill.userId === currentUserId;
+                    const markerColor = getMarkerColor(rating, skill.status);
+                    
+                    const marker = L.marker([skill.location.lat, skill.location.lon], {
+                        icon: L.divIcon({
+                            className: 'umeyka-marker',
+                            html: `<div style="color: ${markerColor}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 30]
+                        })
+                    })
+                    .addTo(map)
+                    .bindPopup(createMapSkillPopup(skill, isUserSkill));
+                    
+                    marker.on('popupopen', async () => {
+                        try {
+                            await fetch(`${API_URL}/api/skills/${skill._id}/view`, {
+                                method: 'POST'
+                            });
+                        } catch (error) {
+                            console.error('❌ Ошибка обновления просмотров:', error);
+                        }
+                    });
+                    
+                    markers.push(marker);
+                }
+            });
+            
+            console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров');
+            
+        } catch (error) {
+            console.error('❌ Ошибка загрузки карты:', error);
+            
+            if (map) {
+                L.popup()
+                    .setLatLng([55.7558, 37.6173])
+                    .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
+                    .openOn(map);
+            }
+        }
     }
 
     function startMapAutoRefresh() {
@@ -3446,7 +3418,8 @@
         triggerHapticFeedback();
         
         const referralLink = generateReferralLink();
-        const shareText = `Привет! Хочу порекомендовать полезное приложение — Umeyka. Umeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
+        
+        const shareText = `Привет! Хочу порекомендовать полезное приложение — Umeyka .  Umeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
         
         const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
         
@@ -3501,6 +3474,7 @@
         document.getElementById(sectionId).style.display = 'block';
         
         if (sectionId === 'masterSection') {
+            // Сброс статуса на "Готов" при открытии секции
             currentMasterStatus = 'ready';
             selectMasterStatus('ready');
             loadMySkills();
@@ -3597,15 +3571,16 @@
             }
         }
         
-        // Устанавливаем начальные значения статусов
-        currentMasterStatus = 'ready';
-        currentEditMasterStatus = 'ready';
-        
         // Добавляем обработчик для поля суммы сделки
         const dealAmount = document.getElementById('dealAmount');
         if (dealAmount) {
             dealAmount.addEventListener('input', updateDealCommission);
         }
+        
+        // Устанавливаем начальные значения статусов
+        currentMasterStatus = 'ready';
+        currentEditMasterStatus = 'ready';
+        selectMasterStatus('ready');
     });
 
     // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
