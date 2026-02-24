@@ -222,7 +222,7 @@
             transition: all 0.3s ease;
         }
         
-        /* СТИЛИ ДЛЯ СТАТУСОВ МАСТЕРА (ИЗ ВТОРОГО КОДА) */
+        /* СТИЛИ ДЛЯ СТАТУСОВ МАСТЕРА */
         .master-status {
             display: inline-flex;
             align-items: center;
@@ -402,6 +402,24 @@
             transition: all 0.3s ease;
         }
         
+        .details-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
         #map {
             height: 400px;
             border-radius: 15px;
@@ -431,6 +449,7 @@
             border: 1px solid rgba(255,0,0,0.2);
         }
 
+        /* Стили для личного кабинета */
         .profile-skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -452,6 +471,7 @@
             gap: 8px;
         }
 
+        /* Стили для кнопок вкладок */
         .tab-buttons {
             display: flex;
             gap: 10px;
@@ -597,7 +617,7 @@
             border-radius: 4px;
         }
 
-        /* Стили для сделок (ИЗ ПЕРВОГО КОДА) */
+        /* Стили для сделок */
         .deal-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -685,6 +705,7 @@
         .view-button { background: #4299e1; color: white; }
         .complete-button { background: #ed8936; color: white; }
 
+        /* Стили для формы создания сделки */
         .quality-options {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -737,7 +758,7 @@
             border: 2px solid #10b981;
         }
 
-        /* Реферальная программа (ИЗ ПЕРВОГО КОДА) */
+        /* РЕФЕРАЛЬНАЯ ПРОГРАММА */
         .referral-section {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
             padding: 25px 20px;
@@ -760,7 +781,6 @@
             font-size: 40px;
             color: white;
             opacity: 0.1;
-            background: none;
             z-index: 0;
         }
 
@@ -942,6 +962,16 @@
             margin-left: 5px;
         }
 
+        .referral-tab-button {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .referral-tab-button:hover {
+            background: linear-gradient(135deg, #8c6bcf 0%, #6f48c7 100%) !important;
+        }
+
+        /* Раздел "О проекте" */
         .about-section {
             background: rgba(255,255,255,0.9);
             padding: 25px;
@@ -999,6 +1029,7 @@
             opacity: 0.9;
         }
 
+        /* Стили для кастомизации */
         .customization-section {
             background: rgba(255,255,255,0.9);
             padding: 20px;
@@ -1528,7 +1559,7 @@
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
                 
-                <!-- ВЫБОР СТАТУСА МАСТЕРА (ИЗ ВТОРОГО КОДА) -->
+                <!-- ВЫБОР СТАТУСА МАСТЕРА -->
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                     <div class="status-selector">
@@ -1639,7 +1670,7 @@
                     </button>
                 </div>
                 
-                <!-- Сделки (ИЗ ПЕРВОГО КОДА) -->
+                <!-- Сделки -->
                 <div id="profileDeals" class="profile-tab" style="display: none;">
                     <h3 style="margin-bottom: 15px;">📝 Мои сделки</h3>
                     
@@ -1666,7 +1697,7 @@
                     <div id="dealsList"></div>
                 </div>
                 
-                <!-- РЕФЕРАЛЬНАЯ ПРОГРАММА (ИЗ ПЕРВОГО КОДА) -->
+                <!-- РЕФЕРАЛЬНАЯ ПРОГРАММА -->
                 <div id="profileReferral" class="profile-tab" style="display: none;">
                     <div class="referral-section">
                         <div class="referral-title">
@@ -1787,7 +1818,7 @@
             </div>
         </div>
 
-        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ (ИЗ ПЕРВОГО КОДА) -->
+        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
         <div id="createDealSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showProfileSection();">← Назад</button>
             
@@ -1950,7 +1981,7 @@
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
-            <!-- ВЫБОР СТАТУСА ПРИ РЕДАКТИРОВАНИИ (ИЗ ВТОРОГО КОДА) -->
+            <!-- ВЫБОР СТАТУСА ПРИ РЕДАКТИРОВАНИИ -->
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                 <div class="status-selector">
@@ -2035,22 +2066,19 @@
     let currentEditingSkill = null;
     let currentDealMaster = null;
     
-    // ПЕРЕМЕННЫЕ ДЛЯ СТАТУСОВ (ИЗ ВТОРОГО КОДА)
+    // ПЕРЕМЕННЫЕ ДЛЯ СТАТУСОВ
     let currentMasterStatus = 'ready';
     let currentEditMasterStatus = 'ready';
 
-    // ========== ФУНКЦИЯ ВИБРАЦИИ (ИЗ ПЕРВОГО КОДА, ПОЛНАЯ ВЕРСИЯ) ==========
+    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ВИБРАЦИИ ==========
     function triggerHapticFeedback() {
         console.log('📳 Попытка вибрации...');
         
-        // СПОСОБ 1: Telegram WebApp HapticFeedback (основной)
         try {
             if (window.Telegram?.WebApp?.HapticFeedback) {
-                // Пробуем разные типы вибрации для надежности
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
                 console.log('✅ Вибрация Telegram (impact) сработала');
                 
-                // Добавляем небольшую задержку для второго типа вибрации
                 setTimeout(() => {
                     try {
                         window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
@@ -2063,10 +2091,9 @@
             console.log('❌ Ошибка Telegram HapticFeedback:', error);
         }
         
-        // СПОСОБ 2: Vibration API (для браузера и десктопа)
         try {
             if (navigator.vibrate) {
-                navigator.vibrate(20); // Короткая вибрация 20ms
+                navigator.vibrate(20);
                 console.log('✅ Вибрация браузера (Vibration API) сработала');
                 return;
             }
@@ -2074,10 +2101,8 @@
             console.log('❌ Ошибка Vibration API:', error);
         }
         
-        // СПОСОБ 3: Альтернативный метод Telegram (если предыдущие не сработали)
         try {
             if (window.Telegram?.WebApp) {
-                // Пробуем вызвать через другой метод
                 window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                 console.log('✅ Вибрация Telegram (light) сработала');
                 return;
@@ -2086,9 +2111,7 @@
             console.log('❌ Ошибка альтернативной вибрации Telegram:', error);
         }
         
-        // СПОСОБ 4: Визуальный фидбек (всегда работает)
         try {
-            // Создаем временный элемент для визуального эффекта
             const feedback = document.createElement('div');
             feedback.style.cssText = `
                 position: fixed;
@@ -2104,7 +2127,6 @@
                 animation: ripple 0.3s ease-out;
             `;
             
-            // Добавляем анимацию
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes ripple {
@@ -2126,10 +2148,59 @@
         }
     }
 
-    // Делаем функцию глобальной и доступной везде
     window.triggerHapticFeedback = triggerHapticFeedback;
 
-    // ========== ФУНКЦИИ ДЛЯ МОНЕТ (ИЗ ПЕРВОГО КОДА) ==========
+    // ========== ФУНКЦИИ ДЛЯ СТАТУСОВ ==========
+    
+    function selectMasterStatus(status) {
+        console.log('🔄 Выбор статуса (создание):', status);
+        currentMasterStatus = status;
+        
+        const readyOption = document.getElementById('statusReadyOption');
+        const busyOption = document.getElementById('statusBusyOption');
+        
+        if (readyOption) readyOption.classList.remove('selected');
+        if (busyOption) busyOption.classList.remove('selected');
+        
+        if (status === 'ready') {
+            if (readyOption) readyOption.classList.add('selected');
+        } else {
+            if (busyOption) busyOption.classList.add('selected');
+        }
+    }
+    
+    function selectEditMasterStatus(status) {
+        console.log('🔄 Выбор статуса (редактирование):', status);
+        currentEditMasterStatus = status;
+        
+        const readyOption = document.getElementById('editStatusReadyOption');
+        const busyOption = document.getElementById('editStatusBusyOption');
+        
+        if (readyOption) readyOption.classList.remove('selected');
+        if (busyOption) busyOption.classList.remove('selected');
+        
+        if (status === 'ready') {
+            if (readyOption) readyOption.classList.add('selected');
+        } else {
+            if (busyOption) busyOption.classList.add('selected');
+        }
+    }
+    
+    function getStatusBadge(status) {
+        if (!status || status === 'ready') {
+            return `<div class="master-status status-ready">
+                        <span class="status-indicator indicator-ready"></span>
+                        ✅ Готов к работе
+                    </div>`;
+        } else {
+            return `<div class="master-status status-busy">
+                        <span class="status-indicator indicator-busy"></span>
+                        ⏰ Временно занят
+                    </div>`;
+        }
+    }
+
+    // ========== ФУНКЦИИ ДЛЯ МОНЕТ ==========
     function getCoinsData() {
         const data = getLocalStorage(`coins_${currentUserId}`);
         return data || 0;
@@ -2153,61 +2224,7 @@
         return newCoins;
     }
 
-    // ========== ФУНКЦИИ ДЛЯ СТАТУСОВ (ИЗ ВТОРОГО КОДА) ==========
-    
-    function selectMasterStatus(status) {
-        console.log('🔄 Выбор статуса (создание):', status);
-        currentMasterStatus = status;
-        
-        const readyOption = document.getElementById('statusReadyOption');
-        const busyOption = document.getElementById('statusBusyOption');
-        
-        if (readyOption) readyOption.classList.remove('selected');
-        if (busyOption) busyOption.classList.remove('selected');
-        
-        if (status === 'ready') {
-            if (readyOption) readyOption.classList.add('selected');
-        } else {
-            if (busyOption) busyOption.classList.add('selected');
-        }
-        
-        console.log('✅ Текущий статус:', currentMasterStatus);
-    }
-    
-    function selectEditMasterStatus(status) {
-        console.log('🔄 Выбор статуса (редактирование):', status);
-        currentEditMasterStatus = status;
-        
-        const readyOption = document.getElementById('editStatusReadyOption');
-        const busyOption = document.getElementById('editStatusBusyOption');
-        
-        if (readyOption) readyOption.classList.remove('selected');
-        if (busyOption) busyOption.classList.remove('selected');
-        
-        if (status === 'ready') {
-            if (readyOption) readyOption.classList.add('selected');
-        } else {
-            if (busyOption) busyOption.classList.add('selected');
-        }
-        
-        console.log('✅ Текущий статус редактирования:', currentEditMasterStatus);
-    }
-    
-    function getStatusBadge(status) {
-        if (!status || status === 'ready') {
-            return `<div class="master-status status-ready">
-                        <span class="status-indicator indicator-ready"></span>
-                        ✅ Готов к работе
-                    </div>`;
-        } else {
-            return `<div class="master-status status-busy">
-                        <span class="status-indicator indicator-busy"></span>
-                        ⏰ Временно занят
-                    </div>`;
-        }
-    }
-
-    // ========== РЕФЕРАЛЬНАЯ ПРОГРАММА (ИЗ ПЕРВОГО КОДА) ==========
+    // ========== РЕФЕРАЛЬНАЯ ПРОГРАММА ==========
     function getReferralData() {
         const data = getLocalStorage(`referral_${currentUserId}`);
         return data || {
@@ -2232,9 +2249,6 @@
         document.getElementById('referralLinkText').textContent = referralLink;
         
         updateReferralFriendsList(data.invitedFriends);
-        
-        const userData = getOrCreateUserProfile(currentUserId);
-        setLocalStorage(`user_${currentUserId}`, userData);
     }
 
     function generateReferralLink() {
@@ -2349,7 +2363,6 @@
     }
 
     // ========== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ==========
-
     function getLocalStorage(key) {
         try {
             const data = localStorage.getItem(key);
@@ -2383,7 +2396,7 @@
         dealsCount: 0
     };
 
-    // ========== СИНХРОНИЗАЦИЯ СДЕЛОК (ИЗ ПЕРВОГО КОДА) ==========
+    // ========== СИНХРОНИЗАЦИЯ СДЕЛОК ==========
     
     function getGlobalDeals() {
         return getLocalStorage('umeyka_global_deals') || [];
@@ -2399,7 +2412,6 @@
         return globalDeals.filter(deal => {
             const isClient = deal.clientId === userId;
             const isMaster = deal.masterId === userId;
-            console.log(`   Сделка ${deal.id}: clientId=${deal.clientId}, masterId=${deal.masterId}, isClient=${isClient}, isMaster=${isMaster}`);
             return isClient || isMaster;
         });
     }
@@ -2636,7 +2648,7 @@
         statusElement.style.display = 'none';
     };
 
-    // ========== ФУНКЦИИ ДЛЯ УМЕЕК (ОБЪЕДИНЕННЫЕ) ==========
+    // ========== ФУНКЦИИ ДЛЯ УМЕЕК ==========
 
     window.addSkill = async function() {
         triggerHapticFeedback();
@@ -2670,10 +2682,10 @@
                 userId: userId,
                 username: userData.firstName || 'Аноним',
                 location: location,
-                status: currentMasterStatus // ДОБАВЛЯЕМ СТАТУС ИЗ ВТОРОГО КОДА
+                status: currentMasterStatus
             };
 
-            console.log('📤 Отправляю данные на сервер со статусом:', skillData.status);
+            console.log('📤 Отправляю данные на сервер со статусом:', currentMasterStatus);
 
             if (currentSkillPhoto) {
                 const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
@@ -2687,8 +2699,6 @@
                 skillData.photo = currentSkillPhoto;
                 skillData.photoTimestamp = new Date().toISOString();
             }
-
-            console.log('📤 Итоговые данные для отправки:', skillData);
 
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000);
@@ -2717,7 +2727,6 @@
                     removeSkillPhoto();
                     currentSkillPhoto = null;
                     
-                    // Сбрасываем статус на готов по умолчанию
                     currentMasterStatus = 'ready';
                     selectMasterStatus('ready');
                 
@@ -2827,7 +2836,6 @@
                             </div>
                             
                             <div class="skill-price">${skill.price} ₽</div>
-                            
                             ${statusBadge}
                             
                             <div class="skill-contact-info">
@@ -2856,6 +2864,10 @@
                                     🗑️ Удалить
                                 </button>
                             </div>
+                            
+                            <button class="details-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');">
+                                📞 Подробные контакты
+                            </button>
                         </div>
                     `}).join('');
                 } else {
@@ -2922,13 +2934,6 @@
                         
                         ${statusBadge}
                         
-                        <div class="skill-contact-info">
-                            <div class="contact-item">
-                                <span class="contact-icon">📱</span>
-                                <span class="contact-text">${skill.experience || 'Не указано'}</span>
-                            </div>
-                        </div>
-                        
                         ${skill.photo ? `
                             <div class="skill-photo" style="height: 150px; margin: 15px 0;">
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
@@ -2976,7 +2981,7 @@
                 document.getElementById('editSkillExperience').value = skill.experience || '';
                 document.getElementById('editSkillPrice').value = skill.price || '';
                 
-                // Устанавливаем статус из данных умейки
+                // Устанавливаем статус
                 const skillStatus = skill.status || 'ready';
                 console.log('📊 Загружен статус для редактирования:', skillStatus);
                 selectEditMasterStatus(skillStatus);
@@ -3039,10 +3044,10 @@
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
-                status: currentEditMasterStatus // ДОБАВЛЯЕМ СТАТУС ИЗ ВТОРОГО КОДА
+                status: currentEditMasterStatus
             };
             
-            console.log('📤 Сохраняю изменения умейки со статусом:', skillData.status);
+            console.log('📤 Сохраняю изменения умейки со статусом:', currentEditMasterStatus);
             
             if (editSkillPhoto) {
                 const estimatedSize = (editSkillPhoto.length * 0.75) / 1024;
@@ -3209,18 +3214,6 @@
         }
     }
 
-    function getMarkerColor(rating, status) {
-        // Сначала проверяем статус, если занят - красный маркер
-        if (status === 'busy') {
-            return '#f56565';
-        }
-        // Иначе цвет по рейтингу
-        if (rating >= 4.5) return '#22c55e';
-        if (rating >= 4.0) return '#8b5cf6';  
-        if (rating >= 3.5) return '#eab308';
-        return '#6b7280';
-    }
-
     async function loadSkillsOnMap() {
         try {
             console.log('🗺️ Загрузка умейок с сервера для карты');
@@ -3256,12 +3249,14 @@
                 if (skill.location && skill.location.lat && skill.location.lon) {
                     const rating = skill.rating?.average || 5.0;
                     const isUserSkill = skill.userId === currentUserId;
-                    const status = skill.status || 'ready';
+                    
+                    // Цвет маркера в зависимости от статуса
+                    const markerColor = skill.status === 'busy' ? '#f56565' : '#48bb78';
                     
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
                         icon: L.divIcon({
                             className: 'umeyka-marker',
-                            html: `<div style="color: ${getMarkerColor(rating, status)}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
+                            html: `<div style="color: ${markerColor}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
                             iconSize: [30, 30],
                             iconAnchor: [15, 30]
                         })
@@ -3451,8 +3446,7 @@
         triggerHapticFeedback();
         
         const referralLink = generateReferralLink();
-        
-        const shareText = `Привет! Хочу порекомендовать полезное приложение — Umeyka .  Umeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
+        const shareText = `Привет! Хочу порекомендовать полезное приложение — Umeyka. Umeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
         
         const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
         
@@ -3507,7 +3501,6 @@
         document.getElementById(sectionId).style.display = 'block';
         
         if (sectionId === 'masterSection') {
-            // Сбрасываем статус на готов по умолчанию
             currentMasterStatus = 'ready';
             selectMasterStatus('ready');
             loadMySkills();
@@ -3604,15 +3597,15 @@
             }
         }
         
+        // Устанавливаем начальные значения статусов
+        currentMasterStatus = 'ready';
+        currentEditMasterStatus = 'ready';
+        
         // Добавляем обработчик для поля суммы сделки
         const dealAmount = document.getElementById('dealAmount');
         if (dealAmount) {
             dealAmount.addEventListener('input', updateDealCommission);
         }
-        
-        // Устанавливаем начальные значения статусов
-        currentMasterStatus = 'ready';
-        currentEditMasterStatus = 'ready';
     });
 
     // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
@@ -3646,7 +3639,6 @@
                         </div>
                         
                         <div class="skill-price">${skill.price} ₽</div>
-                        
                         ${statusBadge}
                         
                         <div class="skill-contact-info">
@@ -3859,7 +3851,7 @@
         loadDeals();
     };
 
-    // ========== ФУНКЦИИ ДЛЯ СДЕЛОК (ИЗ ПЕРВОГО КОДА) ==========
+    // ========== ФУНКЦИИ ДЛЯ СДЕЛОК ==========
 
     function generateDealId() {
         return 'deal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -4449,15 +4441,6 @@
         document.getElementById('projectReviewComment').value = '';
         setProjectRating(0);
     };
-
-    // Добавляем обработчик для поля суммы сделки
-    document.addEventListener('DOMContentLoaded', function() {
-        const dealAmount = document.getElementById('dealAmount');
-        if (dealAmount) {
-            dealAmount.addEventListener('input', updateDealCommission);
-        }
-    });
-
     </script>
 </body>
 </html>
