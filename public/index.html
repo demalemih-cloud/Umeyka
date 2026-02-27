@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* Все стили остаются без изменений */
+        /* Все стили из первой версии + стили статусов из второй */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -223,7 +223,7 @@
             transition: all 0.3s ease;
         }
 
-        /* СТИЛИ ДЛЯ СТАТУСОВ МАСТЕРА */
+        /* СТИЛИ ДЛЯ СТАТУСОВ МАСТЕРА (из второй версии) */
         .master-status {
             display: inline-flex;
             align-items: center;
@@ -307,6 +307,7 @@
             box-shadow: 0 0 10px #f56565;
         }
         
+        /* Остальные стили из первой версии */
         .skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -432,6 +433,7 @@
             border: 1px solid rgba(255,0,0,0.2);
         }
 
+        /* Стили для личного кабинета */
         .profile-skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -453,6 +455,7 @@
             gap: 8px;
         }
 
+        /* Стили для кнопок вкладок */
         .tab-buttons {
             display: flex;
             gap: 10px;
@@ -598,6 +601,7 @@
             border-radius: 4px;
         }
 
+        /* Стили для сделок (из первой версии) */
         .deal-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -685,6 +689,7 @@
         .view-button { background: #4299e1; color: white; }
         .complete-button { background: #ed8936; color: white; }
 
+        /* Стили для формы создания сделки */
         .quality-options {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -737,6 +742,7 @@
             border: 2px solid #10b981;
         }
 
+        /* Реферальная программа (из первой версии) */
         .referral-section {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
             padding: 25px 20px;
@@ -940,6 +946,7 @@
             margin-left: 5px;
         }
 
+        /* Кнопка реферальной программы в ЛК */
         .referral-tab-button {
             background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%) !important;
             border: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -949,6 +956,7 @@
             background: linear-gradient(135deg, #8c6bcf 0%, #6f48c7 100%) !important;
         }
 
+        /* Стили для раздела "О проекте" */
         .about-section {
             background: rgba(255,255,255,0.9);
             padding: 25px;
@@ -1006,6 +1014,7 @@
             opacity: 0.9;
         }
 
+        /* Стили для кнопок вкладок сделок */
         .deals-tab-buttons {
             display: flex;
             flex-direction: column;
@@ -1048,6 +1057,7 @@
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
         }
 
+        /* Стили для фото в карточке */
         .skill-photo {
             width: 100%;
             height: 200px;
@@ -1100,6 +1110,7 @@
             height: 100%;
         }
 
+        /* Стили для модального окна редактирования */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1186,6 +1197,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
+        /* Стили для карточки в карте */
         .map-popup-content {
             min-width: 300px;
             max-width: 300px;
@@ -1244,6 +1256,7 @@
             color: white;
         }
 
+        /* Стили для загрузки фото */
         .photo-upload-area {
             border: 2px dashed #667eea;
             border-radius: 10px;
@@ -1302,6 +1315,7 @@
             margin-top: 5px;
         }
 
+        /* Стили для кнопок связи */
         .contact-buttons {
             display: flex;
             flex-direction: column;
@@ -1343,6 +1357,7 @@
             text-align: center;
         }
 
+        /* Стили для отображения контактов */
         .contact-info {
             background: #f7fafc;
             padding: 12px;
@@ -1384,6 +1399,7 @@
             cursor: pointer;
         }
 
+        /* Стили для кнопки "Составить сделку" */
         .create-deal-button {
             background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
             color: white;
@@ -1405,6 +1421,25 @@
         .create-deal-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
+        }
+
+        /* Стили для уведомлений */
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
         }
     </style>
 </head>
@@ -1874,7 +1909,6 @@
             <div class="modal-title">✏️ Редактировать умейку</div>
             
             <input type="hidden" id="editSkillId">
-            <input type="hidden" id="editSkillOldId">
             
             <input type="text" id="editSkillName" class="input-field" placeholder="Моё умение" required>
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
@@ -1969,10 +2003,35 @@
     let currentMasterStatus = 'ready';
     let currentEditMasterStatus = 'ready';
 
-    // ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ УМЕЕК (кеш)
-    let localSkillsCache = {};
+    // ========== ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ УМЕЕК (FALLBACK) ==========
+    function getLocalSkills() {
+        const skills = localStorage.getItem('umeyka_local_skills');
+        return skills ? JSON.parse(skills) : [];
+    }
 
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ВИБРАЦИИ ==========
+    function saveLocalSkills(skills) {
+        localStorage.setItem('umeyka_local_skills', JSON.stringify(skills));
+    }
+
+    function updateLocalSkill(skillId, updatedData) {
+        const skills = getLocalSkills();
+        const index = skills.findIndex(s => s._id === skillId);
+        if (index !== -1) {
+            skills[index] = { ...skills[index], ...updatedData };
+            saveLocalSkills(skills);
+            return true;
+        }
+        return false;
+    }
+
+    function deleteLocalSkill(skillId) {
+        const skills = getLocalSkills();
+        const filtered = skills.filter(s => s._id !== skillId);
+        saveLocalSkills(filtered);
+        return filtered.length !== skills.length;
+    }
+
+    // ========== ФУНКЦИЯ ВИБРАЦИИ ==========
     function triggerHapticFeedback() {
         console.log('📳 Попытка вибрации...');
         
@@ -2559,73 +2618,7 @@
         statusElement.style.display = 'none';
     };
 
-    // ========== ИСПРАВЛЕННЫЕ ФУНКЦИИ ДЛЯ УМЕЕК ==========
-
-    // Функция для проверки доступности API
-    async function checkApiHealth() {
-        try {
-            const response = await fetch(`${API_URL}/health`);
-            return response.ok;
-        } catch (error) {
-            console.warn('⚠️ API недоступен, используем локальное хранилище');
-            return false;
-        }
-    }
-
-    // Сохранение умейки в локальный кеш
-    function saveSkillToLocalCache(skill) {
-        if (!currentUserId) return;
-        
-        if (!localSkillsCache[currentUserId]) {
-            localSkillsCache[currentUserId] = [];
-        }
-        
-        // Проверяем, есть ли уже такая умейка (по ID или временному ID)
-        const existingIndex = localSkillsCache[currentUserId].findIndex(s => 
-            s._id === skill._id || s.tempId === skill.tempId
-        );
-        
-        if (existingIndex !== -1) {
-            localSkillsCache[currentUserId][existingIndex] = skill;
-        } else {
-            localSkillsCache[currentUserId].push(skill);
-        }
-        
-        // Сохраняем в localStorage
-        setLocalStorage(`skills_cache_${currentUserId}`, localSkillsCache[currentUserId]);
-        console.log('💾 Умейка сохранена в локальный кеш:', skill);
-    }
-
-    // Загрузка умейок из локального кеша
-    function loadSkillsFromLocalCache() {
-        if (!currentUserId) return [];
-        
-        const cached = getLocalStorage(`skills_cache_${currentUserId}`);
-        if (cached) {
-            localSkillsCache[currentUserId] = cached;
-            console.log(`📦 Загружено ${cached.length} умейок из локального кеша`);
-            return cached;
-        }
-        
-        return [];
-    }
-
-    // Удаление умейки из локального кеша
-    function removeSkillFromLocalCache(skillId) {
-        if (!currentUserId || !localSkillsCache[currentUserId]) return false;
-        
-        const initialLength = localSkillsCache[currentUserId].length;
-        localSkillsCache[currentUserId] = localSkillsCache[currentUserId].filter(s => s._id !== skillId);
-        
-        setLocalStorage(`skills_cache_${currentUserId}`, localSkillsCache[currentUserId]);
-        
-        const removed = initialLength > localSkillsCache[currentUserId].length;
-        if (removed) {
-            console.log(`🗑️ Умейка ${skillId} удалена из локального кеша`);
-        }
-        
-        return removed;
-    }
+    // ========== ФУНКЦИИ ДЛЯ УМЕЕК (ИСПРАВЛЕННЫЕ) ==========
 
     window.addSkill = async function() {
         triggerHapticFeedback();
@@ -2681,80 +2674,59 @@
 
             console.log('📤 Итоговые данные для отправки:', skillData);
 
-            // Проверяем доступность API
-            const apiAvailable = await checkApiHealth();
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+            try {
+                const response = await fetch(`${API_URL}/api/skills`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(skillData),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                const result = await response.json();
+                console.log('📱 Ответ сервера при добавлении:', result);
             
-            if (apiAvailable) {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-                    const response = await fetch(`${API_URL}/api/skills`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(skillData),
-                        signal: controller.signal
-                    });
-
-                    clearTimeout(timeoutId);
-
-                    const result = await response.json();
-                    console.log('📱 Ответ сервера при добавлении:', result);
+                if (result.success) {
+                    // Сохраняем в локальное хранилище как резервную копию
+                    const localSkills = getLocalSkills();
+                    localSkills.push({ ...skillData, _id: result.skillId || 'local_' + Date.now() });
+                    saveLocalSkills(localSkills);
+                    
+                    alert('✅ Умейка успешно опубликована!');
                 
-                    if (result.success) {
-                        // Сохраняем полученный ID от сервера
-                        skillData._id = result.skillId || result._id;
-                        saveSkillToLocalCache(skillData);
-                        
-                        alert('✅ Умейка успешно опубликована!');
-                    } else {
-                        // Если сервер вернул ошибку, сохраняем локально с временным ID
-                        skillData._id = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                        skillData.localOnly = true;
-                        saveSkillToLocalCache(skillData);
-                        
-                        alert('✅ Умейка сохранена локально (сервер недоступен)');
+                    document.getElementById('skillName').value = '';
+                    document.getElementById('skillExperience').value = '';
+                    document.getElementById('skillPrice').value = '';
+                    removeSkillPhoto();
+                    currentSkillPhoto = null;
+                    
+                    currentMasterStatus = 'ready';
+                    selectMasterStatus('ready');
+                
+                    setTimeout(() => {
+                        loadMySkills();
+                        loadProfileSkills();
+                    }, 500);
+                
+                    if (map) {
+                        setTimeout(() => loadSkillsOnMap(), 1000);
                     }
-                } catch (fetchError) {
-                    console.error('❌ Ошибка отправки на сервер:', fetchError);
-                    
-                    // Сохраняем локально при ошибке сети
-                    skillData._id = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    skillData.localOnly = true;
-                    saveSkillToLocalCache(skillData);
-                    
-                    alert('✅ Умейка сохранена локально (сервер недоступен)');
+                } else {
+                    alert('❌ Ошибка: ' + (result.error || 'Неизвестная ошибка'));
                 }
-            } else {
-                // Сохраняем локально, если API недоступен
-                skillData._id = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                skillData.localOnly = true;
-                saveSkillToLocalCache(skillData);
-                
-                alert('✅ Умейка сохранена локально (сервер недоступен)');
-            }
-            
-            // Очищаем форму
-            document.getElementById('skillName').value = '';
-            document.getElementById('skillExperience').value = '';
-            document.getElementById('skillPrice').value = '';
-            removeSkillPhoto();
-            currentSkillPhoto = null;
-            
-            // Сбрасываем статус на готов
-            currentMasterStatus = 'ready';
-            selectMasterStatus('ready');
-        
-            // Обновляем отображение
-            setTimeout(() => {
-                loadMySkills();
-                loadProfileSkills();
-            }, 500);
-        
-            if (map) {
-                setTimeout(() => loadSkillsOnMap(), 1000);
+            } catch (fetchError) {
+                clearTimeout(timeoutId);
+                if (fetchError.name === 'AbortError') {
+                    alert('❌ Время ожидания истекло. Попробуйте еще раз.');
+                } else {
+                    throw fetchError;
+                }
             }
         
         } catch (error) {
@@ -2762,6 +2734,26 @@
             alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету.');
         }
     };
+
+    async function loadAllSkillsFromServer() {
+        try {
+            console.log('📡 Загрузка умейок с сервера...');
+            
+            const response = await fetch(`${API_URL}/api/skills`);
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log(`✅ Загружено ${result.skills.length} умейок`);
+                return result.skills;
+            } else {
+                console.error('❌ Ошибка загрузки умейок:', result.error);
+                return getLocalSkills(); // Возвращаем локальные как fallback
+            }
+        } catch (error) {
+            console.error('❌ Ошибка соединения с сервером:', error);
+            return getLocalSkills(); // Возвращаем локальные как fallback
+        }
+    }
 
     async function loadMySkills() {
         try {
@@ -2778,16 +2770,21 @@
             const userId = currentUserId || 'demo-user';
             console.log('🆔 Используем User ID:', userId);
             
-            // Сначала загружаем из локального кеша
-            const cachedSkills = loadSkillsFromLocalCache();
-            let allSkills = [...cachedSkills];
+            let skills = [];
+            let serverAvailable = false;
             
-            // Проверяем доступность API
-            const apiAvailable = await checkApiHealth();
+            try {
+                const testResponse = await fetch(`${API_URL}/health`);
+                if (testResponse.ok) {
+                    serverAvailable = true;
+                }
+            } catch (testError) {
+                console.log('⚠️ Сервер не отвечает, используем локальные данные');
+            }
             
-            if (apiAvailable) {
+            if (serverAvailable) {
                 try {
-                    console.log(`📥 Загружаем умейки пользователя ${userId} с сервера...`);
+                    console.log(`📥 Загружаем умейки пользователя ${userId}...`);
                     const response = await fetch(`${API_URL}/api/skills/user/${userId}`);
                     
                     if (response.ok) {
@@ -2795,16 +2792,8 @@
                         console.log('📱 Ответ сервера:', result);
                         
                         if (result.success && result.skills && result.skills.length > 0) {
-                            console.log(`✅ Найдено ${result.skills.length} умейок на сервере`);
-                            
-                            // Объединяем с локальными, удаляя дубликаты
-                            const serverSkillIds = new Set(result.skills.map(s => s._id));
-                            const filteredLocal = allSkills.filter(s => !serverSkillIds.has(s._id) && !s.localOnly);
-                            
-                            allSkills = [...result.skills, ...filteredLocal];
-                            
-                            // Обновляем кеш серверными данными
-                            result.skills.forEach(skill => saveSkillToLocalCache(skill));
+                            skills = result.skills;
+                            console.log(`✅ Найдено ${skills.length} моих умейок`);
                         }
                     }
                 } catch (fetchError) {
@@ -2812,17 +2801,21 @@
                 }
             }
             
-            console.log(`📊 Всего умейок для отображения: ${allSkills.length}`);
+            // Если сервер не дал результатов, используем локальные
+            if (skills.length === 0) {
+                const localSkills = getLocalSkills();
+                skills = localSkills.filter(s => s.userId === userId);
+                console.log(`📦 Загружено ${skills.length} умейок из локального хранилища`);
+            }
             
-            if (allSkills.length > 0) {
-                skillsList.innerHTML = allSkills.map(skill => {
+            if (skills.length > 0) {
+                skillsList.innerHTML = skills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
-                    const localOnlyTag = skill.localOnly ? '<span style="background: #ed8936; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 10px;">📦 Локально</span>' : '';
                     
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
-                            <div class="skill-title">${skill.skill} ${localOnlyTag}</div>
+                            <div class="skill-title">${skill.skill}</div>
                             <div class="skill-rating">${'⭐'.repeat(5)}</div>
                         </div>
                         
@@ -2895,39 +2888,30 @@
             
             const skillsList = document.getElementById('profileSkillsList');
             
-            // Используем тот же метод загрузки
-            const cachedSkills = loadSkillsFromLocalCache();
-            let allSkills = [...cachedSkills];
+            let skills = [];
             
-            const apiAvailable = await checkApiHealth();
-            
-            if (apiAvailable) {
-                try {
-                    const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
-                    
-                    if (response.ok) {
-                        const result = await response.json();
-                        
-                        if (result.success && result.skills.length > 0) {
-                            const serverSkillIds = new Set(result.skills.map(s => s._id));
-                            const filteredLocal = allSkills.filter(s => !serverSkillIds.has(s._id) && !s.localOnly);
-                            allSkills = [...result.skills, ...filteredLocal];
-                        }
+            try {
+                const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        skills = result.skills;
                     }
-                } catch (error) {
-                    console.error('❌ Ошибка загрузки с сервера:', error);
                 }
+            } catch (error) {
+                console.log('⚠️ Сервер недоступен, используем локальные данные');
+                const localSkills = getLocalSkills();
+                skills = localSkills.filter(s => s.userId === currentUserId);
             }
             
-            if (allSkills.length > 0) {
-                skillsList.innerHTML = allSkills.map(skill => {
+            if (skills.length > 0) {
+                skillsList.innerHTML = skills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
-                    const localOnlyTag = skill.localOnly ? '<span style="background: #ed8936; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 10px;">📦</span>' : '';
                     
                     return `
                     <div class="profile-skill-card">
                         <div class="profile-skill-header">
-                            <div class="skill-title">${skill.skill} ${localOnlyTag}</div>
+                            <div class="skill-title">${skill.skill}</div>
                             <div class="skill-price">${skill.price} ₽</div>
                         </div>
                         
@@ -2965,7 +2949,7 @@
             
         } catch (error) {
             console.error('Ошибка загрузки умейок:', error);
-            document.getElementById('profileSkillsList').innerHTML = '<div class="error-message">Ошибка загрузки умейок</div>';
+            skillsList.innerHTML = '<div class="error-message">Ошибка загрузки умейок</div>';
         }
     }
 
@@ -2975,29 +2959,25 @@
         try {
             console.log('📱 Загрузка умейки для редактирования:', skillId);
             
-            // Ищем умейку в локальном кеше
-            const cachedSkills = loadSkillsFromLocalCache();
-            let skill = cachedSkills.find(s => s._id === skillId);
+            let skill = null;
             
-            // Если не нашли в кеше, пробуем загрузить с сервера
-            if (!skill) {
-                const apiAvailable = await checkApiHealth();
-                if (apiAvailable) {
-                    try {
-                        const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
-                        const result = await response.json();
-                        
-                        if (result.success && result.skills) {
-                            skill = result.skills.find(s => s._id === skillId);
-                            if (skill) {
-                                // Сохраняем в кеш
-                                saveSkillToLocalCache(skill);
-                            }
-                        }
-                    } catch (error) {
-                        console.error('❌ Ошибка загрузки с сервера:', error);
+            // Сначала пробуем загрузить с сервера
+            try {
+                const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.skills) {
+                        skill = result.skills.find(s => s._id === skillId);
                     }
                 }
+            } catch (error) {
+                console.log('⚠️ Сервер недоступен, ищем в локальном хранилище');
+            }
+            
+            // Если не нашли на сервере, ищем локально
+            if (!skill) {
+                const localSkills = getLocalSkills();
+                skill = localSkills.find(s => s._id === skillId);
             }
             
             if (!skill) {
@@ -3008,12 +2988,10 @@
             currentEditingSkill = skill;
             
             document.getElementById('editSkillId').value = skillId;
-            document.getElementById('editSkillOldId').value = skillId;
             document.getElementById('editSkillName').value = skill.skill || '';
             document.getElementById('editSkillExperience').value = skill.experience || '';
             document.getElementById('editSkillPrice').value = skill.price || '';
             
-            // Устанавливаем статус
             const skillStatus = skill.status || 'ready';
             console.log('📊 Загружен статус для редактирования:', skillStatus);
             selectEditMasterStatus(skillStatus);
@@ -3042,7 +3020,6 @@
         editSkillPhoto = null;
         
         document.getElementById('editSkillId').value = '';
-        document.getElementById('editSkillOldId').value = '';
         document.getElementById('editSkillName').value = '';
         document.getElementById('editSkillExperience').value = '';
         document.getElementById('editSkillPrice').value = '';
@@ -3051,16 +3028,17 @@
         preview.style.display = 'none';
     };
 
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ - без дублирования
     window.saveEditedSkill = async function() {
         triggerHapticFeedback();
         
         try {
-            const oldSkillId = document.getElementById('editSkillOldId').value;
+            const skillId = document.getElementById('editSkillId').value;
             const skillName = document.getElementById('editSkillName').value;
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
             
-            if (!oldSkillId) {
+            if (!skillId) {
                 alert('❌ Ошибка: не указан ID умейки');
                 return;
             }
@@ -3070,25 +3048,14 @@
                 return;
             }
             
-            const userData = getOrCreateUserProfile(currentUserId);
-            
-            const location = userLocation || { lat: 55.7558, lon: 37.6173 };
-            
-            // Создаем обновленные данные
-            const updatedSkillData = {
+            const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
-                userId: currentUserId,
-                username: userData.firstName || 'Аноним',
-                location: location,
-                status: currentEditMasterStatus,
-                createdAt: new Date().toISOString(),
-                originalId: oldSkillId // Сохраняем старый ID для синхронизации
+                status: currentEditMasterStatus
             };
             
-            console.log('📤 Сохраняю изменения умейки со статусом:', updatedSkillData.status);
-            console.log('📤 Старая умейка ID:', oldSkillId);
+            console.log('📤 Сохраняю изменения умейки со статусом:', skillData.status);
             
             if (editSkillPhoto) {
                 const estimatedSize = (editSkillPhoto.length * 0.75) / 1024;
@@ -3097,81 +3064,67 @@
                     return;
                 }
                 
-                updatedSkillData.photo = editSkillPhoto;
-                updatedSkillData.photoTimestamp = new Date().toISOString();
+                skillData.photo = editSkillPhoto;
+                skillData.photoTimestamp = new Date().toISOString();
             } else if (currentEditingSkill && currentEditingSkill.photo) {
-                updatedSkillData.photo = currentEditingSkill.photo;
+                skillData.photo = currentEditingSkill.photo;
             }
             
-            // Проверяем доступность API
-            const apiAvailable = await checkApiHealth();
-            let newSkillId = null;
+            let updateSuccess = false;
             
-            if (apiAvailable) {
-                try {
-                    // Пытаемся удалить старую умейку (игнорируем ошибку 404)
-                    try {
-                        await fetch(`${API_URL}/api/skills/${oldSkillId}`, {
-                            method: 'DELETE'
-                        });
-                        console.log('✅ Старая умейка удалена с сервера');
-                    } catch (deleteError) {
-                        console.log('⚠️ Не удалось удалить старую умейку (возможно, её нет на сервере)');
-                    }
-                    
-                    // Создаем новую умейку
-                    const response = await fetch(`${API_URL}/api/skills`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(updatedSkillData)
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        newSkillId = result.skillId || result._id;
-                        updatedSkillData._id = newSkillId;
-                        console.log('✅ Новая умейка создана на сервере с ID:', newSkillId);
-                    } else {
-                        console.warn('⚠️ Сервер не вернул success при создании:', result);
-                    }
-                } catch (error) {
-                    console.error('❌ Ошибка при обновлении на сервере:', error);
+            // Пробуем обновить на сервере
+            try {
+                const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(skillData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateSuccess = true;
+                    console.log('✅ Умейка обновлена на сервере');
+                } else {
+                    console.log('⚠️ Ошибка обновления на сервере, пробуем локально');
+                }
+            } catch (serverError) {
+                console.log('⚠️ Сервер недоступен, обновляем локально');
+            }
+            
+            // Если сервер не доступен, обновляем локально
+            if (!updateSuccess) {
+                const updated = updateLocalSkill(skillId, skillData);
+                if (updated) {
+                    updateSuccess = true;
+                    console.log('✅ Умейка обновлена в локальном хранилище');
                 }
             }
             
-            // Удаляем старую умейку из локального кеша
-            removeSkillFromLocalCache(oldSkillId);
-            
-            // Сохраняем обновленную умейку в кеш
-            if (!newSkillId) {
-                updatedSkillData._id = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                updatedSkillData.localOnly = true;
-            }
-            
-            saveSkillToLocalCache(updatedSkillData);
-            
-            alert('✅ Умейка успешно обновлена!');
-            closeEditSkillModal();
-            
-            // Обновляем отображение
-            setTimeout(() => {
-                loadMySkills();
-                loadProfileSkills();
-            }, 500);
-            
-            if (map) {
-                setTimeout(() => loadSkillsOnMap(), 1000);
+            if (updateSuccess) {
+                alert('✅ Умейка успешно обновлена!');
+                closeEditSkillModal();
+                
+                // Обновляем все представления
+                await loadMySkills();
+                await loadProfileSkills();
+                
+                if (map) {
+                    await loadSkillsOnMap();
+                }
+            } else {
+                alert('❌ Не удалось обновить умейку. Попробуйте позже.');
             }
             
         } catch (error) {
             console.error('❌ Ошибка сохранения умейки:', error);
-            alert('❌ Ошибка сохранения умейки: ' + error.message);
+            alert('❌ Ошибка сохранения умейки');
         }
     };
 
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ
     window.deleteSkill = async function(skillId) {
         triggerHapticFeedback();
         
@@ -3179,32 +3132,46 @@
             try {
                 triggerHapticFeedback();
                 
-                // Пытаемся удалить с сервера
-                const apiAvailable = await checkApiHealth();
+                let deleteSuccess = false;
                 
-                if (apiAvailable) {
-                    try {
-                        await fetch(`${API_URL}/api/skills/${skillId}`, {
-                            method: 'DELETE'
-                        });
-                        console.log('✅ Умейка удалена с сервера');
-                    } catch (serverError) {
-                        console.log('⚠️ Ошибка удаления с сервера:', serverError);
+                // Пробуем удалить с сервера
+                try {
+                    const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            deleteSuccess = true;
+                            console.log('✅ Умейка удалена с сервера');
+                        }
+                    }
+                } catch (serverError) {
+                    console.log('⚠️ Сервер недоступен, удаляем локально');
+                }
+                
+                // Если сервер не доступен, удаляем локально
+                if (!deleteSuccess) {
+                    deleteSuccess = deleteLocalSkill(skillId);
+                    if (deleteSuccess) {
+                        console.log('✅ Умейка удалена из локального хранилища');
                     }
                 }
                 
-                // Удаляем из локального кеша
-                removeSkillFromLocalCache(skillId);
-                
-                // Обновляем отображение
-                await loadMySkills();
-                await loadProfileSkills();
-                
-                if (map) {
-                    await loadSkillsOnMap();
+                if (deleteSuccess) {
+                    // Обновляем все представления
+                    await loadMySkills();
+                    await loadProfileSkills();
+                    
+                    if (map) {
+                        await loadSkillsOnMap();
+                    }
+                    
+                    alert('✅ Умейка удалена!');
+                } else {
+                    alert('❌ Не удалось найти умейку для удаления');
                 }
-                
-                alert('✅ Умейка удалена!');
                 
             } catch (error) {
                 console.error('❌ Ошибка удаления умейки:', error);
@@ -3212,40 +3179,6 @@
             }
         }
     };
-
-    async function loadAllSkillsFromServer() {
-        try {
-            console.log('📡 Загрузка умейок с сервера...');
-            
-            const apiAvailable = await checkApiHealth();
-            
-            if (!apiAvailable) {
-                console.log('⚠️ API недоступен, используем локальные данные');
-                return loadSkillsFromLocalCache();
-            }
-            
-            const response = await fetch(`${API_URL}/api/skills`);
-            const result = await response.json();
-            
-            if (result.success) {
-                console.log(`✅ Загружено ${result.skills.length} умейок с сервера`);
-                
-                // Обновляем кеш для своих умейок
-                if (currentUserId) {
-                    const userSkills = result.skills.filter(s => s.userId === currentUserId);
-                    userSkills.forEach(skill => saveSkillToLocalCache(skill));
-                }
-                
-                return result.skills;
-            } else {
-                console.error('❌ Ошибка загрузки умейок:', result.error);
-                return loadSkillsFromLocalCache();
-            }
-        } catch (error) {
-            console.error('❌ Ошибка соединения с сервером:', error);
-            return loadSkillsFromLocalCache();
-        }
-    }
 
     // ========== ФУНКЦИИ ДЛЯ КАРТЫ ==========
 
@@ -3330,11 +3263,11 @@
 
     async function loadSkillsOnMap() {
         try {
-            console.log('🗺️ Загрузка умейок для карты');
+            console.log('🗺️ Загрузка умейок с сервера для карты');
             
             const skills = await loadAllSkillsFromServer();
             
-            console.log('📊 Получено умейок для карты:', skills.length);
+            console.log('📊 Получено умейок с сервера:', skills.length);
             
             const userData = getOrCreateUserProfile(currentUserId);
             
@@ -3407,7 +3340,6 @@
     function createMapSkillPopup(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
         const statusBadge = getStatusBadge(skill.status);
-        const localOnlyTag = skill.localOnly ? '<span style="background: #ed8936; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 5px;">📦 Локально</span>' : '';
         
         return `
             <div class="map-popup-content">
@@ -3416,7 +3348,7 @@
                         ${isUserSkill ? '👤' : '🔧'}
                     </div>
                     <div>
-                        <h3 style="margin: 0; color: #2d3748; font-size: 18px;">${skill.skill} ${localOnlyTag}</h3>
+                        <h3 style="margin: 0; color: #2d3748; font-size: 18px;">${skill.skill}</h3>
                         <p style="margin: 4px 0 0; color: #666; font-size: 14px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
                     </div>
                 </div>
@@ -3444,7 +3376,7 @@
                 
                 ${skill.photo ? `
                     <div class="map-skill-photo">
-                        <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+                        <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
                     </div>
                 ` : ''}
                 
@@ -3636,23 +3568,7 @@
 
     function showNotification(message) {
         const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 10000;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.3);
-        `;
+        notification.className = 'notification';
         notification.textContent = message;
         document.body.appendChild(notification);
         
@@ -3684,9 +3600,6 @@
         if (currentUserId) {
             localStorage.setItem('umeyka_user_id', currentUserId);
             console.log('💾 User ID сохранен в localStorage:', currentUserId);
-            
-            // Загружаем кеш умейок для этого пользователя
-            loadSkillsFromLocalCache();
         }
         
         return currentUserId;
@@ -3696,7 +3609,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Umeyka app loaded successfully!');
         
-        // Устанавливаем начальные значения статусов
         currentMasterStatus = 'ready';
         currentEditMasterStatus = 'ready';
         
@@ -3719,7 +3631,6 @@
             }
         }
         
-        // Добавляем обработчик для поля суммы сделки
         const dealAmount = document.getElementById('dealAmount');
         if (dealAmount) {
             dealAmount.addEventListener('input', updateDealCommission);
@@ -3742,42 +3653,17 @@
         searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
         
         try {
-            let skills = [];
-            const apiAvailable = await checkApiHealth();
+            const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`);
+            const result = await response.json();
             
-            if (apiAvailable) {
-                try {
-                    const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`);
-                    const result = await response.json();
-                    
-                    if (result.success && result.skills.length > 0) {
-                        skills = result.skills;
-                    }
-                } catch (error) {
-                    console.error('❌ Ошибка поиска на сервере:', error);
-                }
-            }
-            
-            // Если не нашли на сервере или сервер недоступен, ищем в локальном кеше
-            if (skills.length === 0) {
-                const cachedSkills = loadSkillsFromLocalCache();
-                const queryLower = searchQuery.toLowerCase();
-                skills = cachedSkills.filter(s => 
-                    s.skill.toLowerCase().includes(queryLower) || 
-                    (s.experience && s.experience.toLowerCase().includes(queryLower))
-                );
-                console.log(`📦 Найдено ${skills.length} умейок в локальном кеше`);
-            }
-            
-            if (skills.length > 0) {
-                searchResults.innerHTML = skills.map(skill => {
+            if (result.success && result.skills.length > 0) {
+                searchResults.innerHTML = result.skills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
-                    const localOnlyTag = skill.localOnly ? '<span style="background: #ed8936; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 5px;">📦 Локально</span>' : '';
                     
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
-                            <div class="skill-title">${skill.skill} ${localOnlyTag}</div>
+                            <div class="skill-title">${skill.skill}</div>
                             <div class="skill-rating">${'⭐'.repeat(5)}</div>
                         </div>
                         
@@ -3870,7 +3756,7 @@
                 <div class="stat-label">✅ Завершено сделок</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">${localSkillsCache[currentUserId]?.length || 0}</div>
+                <div class="stat-value">${userData.skills?.length || 0}</div>
                 <div class="stat-label">✨ Умейки</div>
             </div>
             <div class="stat-card">
