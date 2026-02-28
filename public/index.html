@@ -2618,7 +2618,7 @@
         statusElement.style.display = 'none';
     };
 
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ УМЕЙКИ ==========
+    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ УМЕЙКИ С ПОДРОБНЫМ ЛОГИРОВАНИЕМ СТАТУСА ==========
     window.saveEditedSkill = async function() {
         triggerHapticFeedback();
         
@@ -2627,6 +2627,12 @@
             const skillName = document.getElementById('editSkillName').value;
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
+            
+            console.log('🔍 ===== НАЧАЛО РЕДАКТИРОВАНИЯ УМЕЙКИ =====');
+            console.log('📋 ID умейки:', skillId);
+            console.log('📋 Название:', skillName);
+            console.log('📋 Контакт:', skillExperience);
+            console.log('📋 Цена:', skillPrice);
             
             if (!skillId) {
                 alert('❌ Ошибка: не указан ID умейки');
@@ -2643,7 +2649,8 @@
             
             // ВАЖНО: Используем выбранный статус из модального окна редактирования
             const selectedStatus = currentEditMasterStatus;
-            console.log('📊 Выбранный статус при сохранении:', selectedStatus);
+            console.log('📊 ВЫБРАННЫЙ СТАТУС ПРИ СОХРАНЕНИИ:', selectedStatus);
+            console.log('📊 Текущий статус редактирования (currentEditMasterStatus):', currentEditMasterStatus);
             
             // Данные для новой умейки (сохраняем все поля из старой + новый статус)
             const newSkillData = {
@@ -2661,7 +2668,7 @@
                 contacts: currentEditingSkill?.contacts || 0
             };
 
-            console.log('📤 Сохраняю умейку с новым статусом:', newSkillData.status);
+            console.log('📤 СОХРАНЯЮ УМЕЙКУ С НОВЫМ СТАТУСОМ:', newSkillData.status);
 
             // Добавляем фото если есть
             if (editSkillPhoto) {
@@ -2672,9 +2679,11 @@
                 }
                 newSkillData.photo = editSkillPhoto;
                 newSkillData.photoTimestamp = new Date().toISOString();
+                console.log('📸 Добавлено новое фото');
             } else if (currentEditingSkill && currentEditingSkill.photo) {
                 newSkillData.photo = currentEditingSkill.photo;
                 newSkillData.photoTimestamp = currentEditingSkill.photoTimestamp;
+                console.log('📸 Сохранено старое фото');
             }
 
             let updateSuccess = false;
@@ -2685,6 +2694,7 @@
             const oldSkillIndex = localSkills.findIndex(s => s._id === skillId);
             
             if (oldSkillIndex !== -1) {
+                console.log('🔄 Помечаем старую умейку как удаленную локально');
                 // Помечаем как удаленную (soft delete)
                 localSkills[oldSkillIndex] = {
                     ...localSkills[oldSkillIndex],
@@ -2714,6 +2724,7 @@
                     newSkillId = result.skillId || 'local_' + Date.now();
                     updateSuccess = true;
                     console.log('✅ Новая умейка создана на сервере с ID:', newSkillId);
+                    console.log('✅ Статус на сервере:', selectedStatus);
                 } else {
                     console.log('⚠️ Ошибка создания на сервере:', result.error);
                 }
@@ -2725,30 +2736,32 @@
             if (!updateSuccess) {
                 newSkillId = 'local_' + Date.now();
                 
-                // Добавляем новую умейку в локальное хранилище
-                localSkills.push({ 
+                // Удаляем старую умейку (физически) и добавляем новую
+                const filteredSkills = localSkills.filter(s => s._id !== skillId);
+                filteredSkills.push({ 
                     ...newSkillData, 
                     _id: newSkillId,
                     synced: false 
                 });
-                
-                // Удаляем старую умейку (физически)
-                const filteredSkills = localSkills.filter(s => s._id !== skillId);
                 saveLocalSkills(filteredSkills);
                 
                 updateSuccess = true;
-                console.log('✅ Умейка создана в локальном хранилище с ID:', newSkillId, 'и статусом:', newSkillData.status);
+                console.log('✅ Умейка создана в локальном хранилище с ID:', newSkillId);
+                console.log('✅ Статус в локальном хранилище:', newSkillData.status);
             }
 
             if (updateSuccess) {
+                console.log('🎉 Умейка успешно обновлена с новым статусом:', selectedStatus);
                 alert('✅ Умейка успешно обновлена!');
                 closeEditSkillModal();
 
                 // Обновляем все представления
+                console.log('🔄 Обновляем представления...');
                 await loadMySkills();
                 await loadProfileSkills();
                 
                 if (map) {
+                    console.log('🔄 Обновляем карту...');
                     await loadSkillsOnMap();
                 }
 
@@ -2768,7 +2781,9 @@
                 setLocalStorage(`user_${currentUserId}`, userData);
 
                 console.log('✅ Все представления обновлены');
+                console.log('🔍 ===== КОНЕЦ РЕДАКТИРОВАНИЯ УМЕЙКИ =====');
             } else {
+                console.error('❌ Не удалось обновить умейку');
                 alert('❌ Не удалось обновить умейку. Попробуйте позже.');
             }
 
@@ -3296,7 +3311,7 @@
             document.getElementById('editSkillPrice').value = skill.price || '';
             
             const skillStatus = skill.status || 'ready';
-            console.log('📊 Загружен статус для редактирования:', skillStatus);
+            console.log('📊 ЗАГРУЖЕН СТАТУС ДЛЯ РЕДАКТИРОВАНИЯ:', skillStatus);
             
             // Устанавливаем выбранный статус в модальном окне
             selectEditMasterStatus(skillStatus);
