@@ -2641,11 +2641,11 @@
             // Получаем данные пользователя
             const userData = getOrCreateUserProfile(currentUserId);
             
-            // ВАЖНО: Используем currentEditMasterStatus для нового статуса
-            const newStatus = currentEditMasterStatus;
-            console.log('📊 Новый статус для умейки:', newStatus);
+            // ВАЖНО: Используем выбранный статус из модального окна редактирования
+            const selectedStatus = currentEditMasterStatus;
+            console.log('📊 Выбранный статус при сохранении:', selectedStatus);
             
-            // Данные для новой умейки (сохраняем все поля из старой)
+            // Данные для новой умейки (сохраняем все поля из старой + новый статус)
             const newSkillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
@@ -2653,7 +2653,7 @@
                 userId: currentUserId,
                 username: userData.firstName || 'Аноним',
                 location: userLocation || { lat: 55.7558, lon: 37.6173 },
-                status: newStatus, // Используем выбранный статус
+                status: selectedStatus, // Используем выбранный статус
                 createdAt: new Date().toISOString(),
                 // Сохраняем старые метаданные если есть
                 rating: currentEditingSkill?.rating || { average: 5.0, count: 0 },
@@ -2661,7 +2661,7 @@
                 contacts: currentEditingSkill?.contacts || 0
             };
 
-            console.log('📤 Сохраняю умейку со статусом:', newSkillData.status);
+            console.log('📤 Сохраняю умейку с новым статусом:', newSkillData.status);
 
             // Добавляем фото если есть
             if (editSkillPhoto) {
@@ -2697,7 +2697,7 @@
 
             // ШАГ 2: Создаем новую умейку через POST
             try {
-                console.log('📤 Создаю новую умейку через POST...');
+                console.log('📤 Создаю новую умейку через POST со статусом:', newSkillData.status);
                 
                 const response = await fetch(`${API_URL}/api/skills`, {
                     method: 'POST',
@@ -2713,7 +2713,7 @@
                 if (result.success) {
                     newSkillId = result.skillId || 'local_' + Date.now();
                     updateSuccess = true;
-                    console.log('✅ Новая умейка создана на сервере с ID:', newSkillId, 'и статусом:', newSkillData.status);
+                    console.log('✅ Новая умейка создана на сервере с ID:', newSkillId);
                 } else {
                     console.log('⚠️ Ошибка создания на сервере:', result.error);
                 }
@@ -2726,13 +2726,15 @@
                 newSkillId = 'local_' + Date.now();
                 
                 // Добавляем новую умейку в локальное хранилище
-                const updatedLocalSkills = getLocalSkills().filter(s => s._id !== skillId);
-                updatedLocalSkills.push({ 
+                localSkills.push({ 
                     ...newSkillData, 
                     _id: newSkillId,
                     synced: false 
                 });
-                saveLocalSkills(updatedLocalSkills);
+                
+                // Удаляем старую умейку (физически)
+                const filteredSkills = localSkills.filter(s => s._id !== skillId);
+                saveLocalSkills(filteredSkills);
                 
                 updateSuccess = true;
                 console.log('✅ Умейка создана в локальном хранилище с ID:', newSkillId, 'и статусом:', newSkillData.status);
@@ -2754,7 +2756,18 @@
                 editSkillPhoto = null;
                 currentEditingSkill = null;
                 
-                console.log('✅ Все представления обновлены со статусом:', newSkillData.status);
+                // Обновляем рейтинг пользователя
+                const userData = getOrCreateUserProfile(currentUserId);
+                userData.skills = userData.skills || [];
+                const skillIndex = userData.skills.findIndex(s => s._id === skillId);
+                if (skillIndex !== -1) {
+                    userData.skills[skillIndex] = { ...newSkillData, _id: newSkillId };
+                } else {
+                    userData.skills.push({ ...newSkillData, _id: newSkillId });
+                }
+                setLocalStorage(`user_${currentUserId}`, userData);
+
+                console.log('✅ Все представления обновлены');
             } else {
                 alert('❌ Не удалось обновить умейку. Попробуйте позже.');
             }
@@ -2857,7 +2870,7 @@
                         // Помечаем как синхронизированную
                         skill.synced = true;
                         skill._id = result.skillId || skill._id;
-                        console.log(`✅ Умейка "${skill.skill}" синхронизирована со статусом:`, skill.status);
+                        console.log(`✅ Умейка "${skill.skill}" синхронизирована`);
                     }
                 } catch (error) {
                     console.log(`⚠️ Не удалось синхронизировать умейку "${skill.skill}":`, error);
@@ -3284,7 +3297,8 @@
             
             const skillStatus = skill.status || 'ready';
             console.log('📊 Загружен статус для редактирования:', skillStatus);
-            // Устанавливаем статус в интерфейсе и в переменную
+            
+            // Устанавливаем выбранный статус в модальном окне
             selectEditMasterStatus(skillStatus);
             
             editSkillPhoto = null;
