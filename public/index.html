@@ -2013,24 +2013,6 @@
         localStorage.setItem('umeyka_local_skills', JSON.stringify(skills));
     }
 
-    function updateLocalSkill(skillId, updatedData) {
-        const skills = getLocalSkills();
-        const index = skills.findIndex(s => s._id === skillId);
-        if (index !== -1) {
-            skills[index] = { ...skills[index], ...updatedData };
-            saveLocalSkills(skills);
-            return true;
-        }
-        return false;
-    }
-
-    function deleteLocalSkill(skillId) {
-        const skills = getLocalSkills();
-        const filtered = skills.filter(s => s._id !== skillId);
-        saveLocalSkills(filtered);
-        return filtered.length !== skills.length;
-    }
-
     // ========== ФУНКЦИЯ ВИБРАЦИИ ==========
     function triggerHapticFeedback() {
         console.log('📳 Попытка вибрации...');
@@ -2651,7 +2633,7 @@
             const selectedStatus = currentEditMasterStatus;
             console.log('📊 ВАЖНО: Итоговый статус для сохранения:', selectedStatus);
             
-            // Данные для новой умейки (сохраняем все поля из старой + новый статус)
+            // Данные для новой умейки
             const newSkillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
@@ -2686,21 +2668,13 @@
             let updateSuccess = false;
             let newSkillId = null;
 
-            // ШАГ 1: Помечаем старую умейку как удаленную в локальном хранилище
+            // Получаем все локальные умейки
             const localSkills = getLocalSkills();
-            const oldSkillIndex = localSkills.findIndex(s => s._id === skillId);
             
-            if (oldSkillIndex !== -1) {
-                console.log('📦 Старая умейка найдена в localStorage:', localSkills[oldSkillIndex]);
-                // Помечаем как удаленную (soft delete)
-                localSkills[oldSkillIndex] = {
-                    ...localSkills[oldSkillIndex],
-                    deleted: true,
-                    deletedAt: new Date().toISOString()
-                };
-                saveLocalSkills(localSkills);
-                console.log('✅ Старая умейка помечена как удаленная локально');
-            }
+            // ШАГ 1: Удаляем старую умейку из локального хранилища (полностью удаляем, не просто помечаем)
+            const filteredSkills = localSkills.filter(s => s._id !== skillId);
+            saveLocalSkills(filteredSkills);
+            console.log('✅ Старая умейка полностью удалена из локального хранилища');
 
             // ШАГ 2: Создаем новую умейку через POST
             try {
@@ -2732,19 +2706,17 @@
             if (!updateSuccess) {
                 newSkillId = 'local_' + Date.now();
                 
-                // Добавляем новую умейку в локальное хранилище
-                localSkills.push({ 
+                // Добавляем новую умейку в локальное хранилище (к уже отфильтрованным без старой)
+                const updatedLocalSkills = [...filteredSkills, { 
                     ...newSkillData, 
                     _id: newSkillId,
                     synced: false 
-                });
-                
-                // Удаляем старую умейку (физически)
-                const filteredSkills = localSkills.filter(s => s._id !== skillId);
-                saveLocalSkills(filteredSkills);
+                }];
+                saveLocalSkills(updatedLocalSkills);
                 
                 updateSuccess = true;
                 console.log('✅ Умейка создана в локальном хранилище с ID:', newSkillId, 'и статусом:', newSkillData.status);
+                console.log('📦 Теперь в хранилище', updatedLocalSkills.length, 'умейок');
             }
 
             if (updateSuccess) {
@@ -2764,15 +2736,13 @@
                 editSkillPhoto = null;
                 currentEditingSkill = null;
                 
-                // Обновляем рейтинг пользователя
+                // Обновляем профиль пользователя
                 const userData = getOrCreateUserProfile(currentUserId);
                 userData.skills = userData.skills || [];
-                const skillIndex = userData.skills.findIndex(s => s._id === skillId);
-                if (skillIndex !== -1) {
-                    userData.skills[skillIndex] = { ...newSkillData, _id: newSkillId };
-                } else {
-                    userData.skills.push({ ...newSkillData, _id: newSkillId });
-                }
+                // Удаляем старую умейку из профиля
+                userData.skills = userData.skills.filter(s => s._id !== skillId);
+                // Добавляем новую
+                userData.skills.push({ ...newSkillData, _id: newSkillId });
                 setLocalStorage(`user_${currentUserId}`, userData);
 
                 console.log('✅ Все представления обновлены');
@@ -2846,72 +2816,6 @@
         }
     };
 
-    // ========== ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ СИНХРОНИЗАЦИИ ==========
-    async function syncLocalSkillsWithServer() {
-        try {
-            console.log('🔄 Синхронизация локальных умейок с сервером...');
-            
-            const localSkills = getLocalSkills();
-            const unsyncedSkills = localSkills.filter(s => !s.synced && !s.deleted);
-            
-            if (unsyncedSkills.length === 0) {
-                console.log('✅ Нет несинхронизированных умейок');
-                return;
-            }
-            
-            console.log(`📤 Найдено ${unsyncedSkills.length} несинхронизированных умейок`);
-            
-            for (const skill of unsyncedSkills) {
-                try {
-                    // Пробуем создать на сервере
-                    const response = await fetch(`${API_URL}/api/skills`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(skill)
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        // Помечаем как синхронизированную
-                        skill.synced = true;
-                        skill._id = result.skillId || skill._id;
-                        console.log(`✅ Умейка "${skill.skill}" синхронизирована`);
-                    }
-                } catch (error) {
-                    console.log(`⚠️ Не удалось синхронизировать умейку "${skill.skill}":`, error);
-                }
-            }
-            
-            // Сохраняем обновленные данные
-            saveLocalSkills(localSkills);
-            
-        } catch (error) {
-            console.error('❌ Ошибка синхронизации:', error);
-        }
-    }
-
-    // ========== ДОПОЛНИТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ПОЛУЧЕНИЯ УМЕЙКИ ПО ID ==========
-    async function getSkillById(skillId) {
-        try {
-            // Сначала пробуем получить с сервера
-            const response = await fetch(`${API_URL}/api/skills/${skillId}`);
-            const result = await response.json();
-            
-            if (result.success && result.skill) {
-                return result.skill;
-            }
-        } catch (error) {
-            console.log('⚠️ Сервер недоступен, ищем локально');
-        }
-        
-        // Если сервер не доступен, ищем локально
-        const localSkills = getLocalSkills();
-        return localSkills.find(s => s._id === skillId && !s.deleted);
-    }
-
     // ========== ОБНОВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ВСЕХ УМЕЕК ==========
     async function loadAllSkillsFromServer() {
         try {
@@ -2925,7 +2829,7 @@
                 const serverSkills = result.skills.filter(s => !s.deleted);
                 console.log(`✅ Загружено ${serverSkills.length} умейок`);
                 
-                // Объединяем с локальными (неудаленными)
+                // Получаем локальные умейки
                 const localSkills = getLocalSkills().filter(s => !s.deleted);
                 
                 // Объединяем, отдавая приоритет серверным
