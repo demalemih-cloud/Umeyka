@@ -1423,24 +1423,21 @@
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
         }
 
-        /* Стили для индикатора синхронизации статуса */
+        /* Индикатор синхронизации статуса */
         .sync-indicator {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(255,255,255,0.95);
-            color: #2d3748;
-            padding: 10px 15px;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 8px 12px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 600;
+            color: #2d3748;
             z-index: 9999;
             display: none;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0,0,0,0.1);
+            gap: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .sync-indicator.active {
@@ -1448,22 +1445,25 @@
         }
 
         .sync-indicator.syncing {
-            color: #667eea;
+            background: #fef3c7;
+            color: #d97706;
         }
 
         .sync-indicator.synced {
-            color: #48bb78;
+            background: #d1fae5;
+            color: #065f46;
         }
 
         .sync-indicator.error {
-            color: #f56565;
+            background: #fee2e2;
+            color: #dc2626;
         }
 
         .sync-spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #e2e8f0;
-            border-top-color: currentColor;
+            width: 12px;
+            height: 12px;
+            border: 2px solid currentColor;
+            border-right-color: transparent;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -1901,7 +1901,7 @@
                 <div class="about-section">
                     <h3 style="margin-bottom: 15px; text-align: center;">💬 Оставьте отзыв о проекте</h3>
                     
-                    <div style="text-align: center; margin-bottom: 15px;">
+                    div style="text-align: center; margin-bottom: 15px;">
                         <div class="rating-stars" id="projectRatingStars">
                             <span style="cursor: pointer;" onclick="triggerHapticFeedback(); setProjectRating(1);">☆</span>
                             <span style="cursor: pointer;" onclick="triggerHapticFeedback(); setProjectRating(2);">☆</span>
@@ -2041,140 +2041,11 @@
     
     // ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ УМЕЕК (как запасной вариант)
     let localSkills = {};
-
-    // ========== СИСТЕМА СИНХРОНИЗАЦИИ СТАТУСОВ ==========
+    
+    // ИНТЕРВАЛЫ СИНХРОНИЗАЦИИ
     let statusSyncInterval = null;
     let lastSyncTime = 0;
-    let isSyncing = false;
-
-    // Показать индикатор синхронизации
-    function showSyncIndicator(status, text) {
-        const indicator = document.getElementById('syncIndicator');
-        const textEl = document.getElementById('syncText');
-        
-        indicator.className = 'sync-indicator active ' + status;
-        textEl.textContent = text;
-        
-        if (status !== 'syncing') {
-            setTimeout(() => {
-                indicator.classList.remove('active');
-            }, 2000);
-        }
-    }
-
-    // Синхронизация статуса с сервером
-    async function syncStatusWithServer(skillId, status) {
-        try {
-            console.log('🔄 Синхронизация статуса:', skillId, status);
-            
-            const response = await fetch(`${API_URL}/api/skills/${skillId}/status`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    status: status,
-                    userId: currentUserId,
-                    timestamp: new Date().toISOString()
-                })
-            });
-            
-            if (response.ok) {
-                console.log('✅ Статус синхронизирован с сервером');
-                showSyncIndicator('synced', 'Статус обновлён!');
-                return true;
-            } else {
-                throw new Error('Ошибка сервера');
-            }
-        } catch (error) {
-            console.log('⚠️ Ошибка синхронизации с сервером:', error);
-            showSyncIndicator('error', 'Ошибка синхронизации');
-            return false;
-        }
-    }
-
-    // Запуск периодической синхронизации статусов
-    function startStatusSync() {
-        // Останавливаем предыдущий интервал если есть
-        if (statusSyncInterval) {
-            clearInterval(statusSyncInterval);
-        }
-        
-        // Синхронизируем каждые 10 секунд
-        statusSyncInterval = setInterval(async () => {
-            if (isSyncing) return;
-            
-            isSyncing = true;
-            try {
-                await refreshAllSkillsStatus();
-            } catch (error) {
-                console.error('❌ Ошибка периодической синхронизации:', error);
-            } finally {
-                isSyncing = false;
-            }
-        }, 10000); // 10 секунд
-        
-        console.log('🔄 Запущена синхронизация статусов каждые 10 сек');
-    }
-
-    // Остановка синхронизации
-    function stopStatusSync() {
-        if (statusSyncInterval) {
-            clearInterval(statusSyncInterval);
-            statusSyncInterval = null;
-            console.log('⏹️ Синхронизация статусов остановлена');
-        }
-    }
-
-    // Обновление статусов всех умейек
-    async function refreshAllSkillsStatus() {
-        try {
-            // Загружаем актуальные данные с сервера
-            const response = await fetch(`${API_URL}/api/skills`);
-            const result = await response.json();
-            
-            if (result.success && result.skills) {
-                const serverSkills = result.skills;
-                
-                // Обновляем локальные данные
-                serverSkills.forEach(serverSkill => {
-                    if (serverSkill.userId === currentUserId) {
-                        // Обновляем в локальном хранилище
-                        updateLocalSkillStatus(serverSkill._id, serverSkill.status);
-                    }
-                });
-                
-                // Обновляем отображение если нужно
-                if (document.getElementById('profileSection').style.display !== 'none') {
-                    loadProfileSkills();
-                }
-                if (document.getElementById('masterSection').style.display !== 'none') {
-                    loadMySkills();
-                }
-                if (map && document.querySelector('.map-active')) {
-                    loadSkillsOnMap();
-                }
-            }
-        } catch (error) {
-            console.log('⚠️ Не удалось обновить статусы с сервера:', error);
-        }
-    }
-
-    // Обновление статуса в локальном хранилище
-    function updateLocalSkillStatus(skillId, newStatus) {
-        const userId = currentUserId || 'demo-user';
-        if (!localSkills[userId]) {
-            localSkills[userId] = loadSkillsFromLocalStorage(userId) || [];
-        }
-        
-        const skillIndex = localSkills[userId].findIndex(s => s._id === skillId);
-        if (skillIndex !== -1) {
-            localSkills[userId][skillIndex].status = newStatus;
-            localSkills[userId][skillIndex].lastStatusUpdate = new Date().toISOString();
-            setLocalStorage(`skills_${userId}`, localSkills[userId]);
-            console.log(`💾 Обновлён статус в localStorage: ${skillId} -> ${newStatus}`);
-        }
-    }
+    const SYNC_INTERVAL = 5000; // Синхронизация каждые 5 секунд
 
     // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ВИБРАЦИИ ==========
     function triggerHapticFeedback() {
@@ -2811,6 +2682,125 @@
         return false;
     }
 
+    // ========== СИНХРОНИЗАЦИЯ СТАТУСА МАСТЕРА ==========
+    
+    // Показать индикатор синхронизации
+    function showSyncIndicator(status, text) {
+        const indicator = document.getElementById('syncIndicator');
+        const textElement = document.getElementById('syncText');
+        
+        if (!indicator || !textElement) return;
+        
+        indicator.className = 'sync-indicator active ' + status;
+        textElement.textContent = text;
+        
+        if (status === 'synced') {
+            setTimeout(() => {
+                indicator.classList.remove('active');
+            }, 2000);
+        }
+    }
+    
+    // Запуск периодической синхронизации статуса
+    function startStatusSync() {
+        if (statusSyncInterval) {
+            clearInterval(statusSyncInterval);
+        }
+        
+        console.log('🔄 Запуск периодической синхронизации статуса...');
+        
+        // Немедленная первая синхронизация
+        syncStatusFromServer();
+        
+        // Периодическая синхронизация каждые 5 секунд
+        statusSyncInterval = setInterval(async () => {
+            await syncStatusFromServer();
+        }, SYNC_INTERVAL);
+    }
+    
+    // Остановка синхронизации
+    function stopStatusSync() {
+        if (statusSyncInterval) {
+            clearInterval(statusSyncInterval);
+            statusSyncInterval = null;
+            console.log('⏹️ Синхронизация статуса остановлена');
+        }
+    }
+    
+    // Синхронизация статуса с сервера
+    async function syncStatusFromServer() {
+        try {
+            showSyncIndicator('syncing', 'Синхронизация...');
+            
+            // Загружаем все умейки с сервера для получения актуальных статусов
+            const response = await fetch(`${API_URL}/api/skills`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Ошибка загрузки данных с сервера');
+            }
+            
+            const result = await response.json();
+            
+            if (result.success && result.skills) {
+                // Обновляем локальные данные статусов
+                result.skills.forEach(serverSkill => {
+                    // Обновляем в локальном хранилище
+                    const localSkill = findLocalSkill(serverSkill._id);
+                    if (localSkill) {
+                        if (localSkill.status !== serverSkill.status) {
+                            console.log(`🔄 Обновление статуса для ${serverSkill._id}: ${localSkill.status} → ${serverSkill.status}`);
+                            localSkill.status = serverSkill.status;
+                            localSkill.lastSync = new Date().toISOString();
+                            saveSkillToLocalStorage(localSkill);
+                        }
+                    } else {
+                        // Если умейки нет локально, добавляем её
+                        saveSkillToLocalStorage({
+                            ...serverSkill,
+                            local: false,
+                            lastSync: new Date().toISOString()
+                        });
+                    }
+                });
+                
+                lastSyncTime = Date.now();
+                showSyncIndicator('synced', 'Синхронизировано');
+                
+                // Обновляем отображение если нужно
+                if (document.getElementById('clientSection').style.display === 'block') {
+                    // Если открыт раздел поиска, обновляем результаты
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput && searchInput.value.trim()) {
+                        await searchSkills();
+                    }
+                }
+                
+                if (document.querySelector('.map-active')) {
+                    // Если открыта карта, обновляем маркеры
+                    await loadSkillsOnMap();
+                }
+                
+                return true;
+            }
+        } catch (error) {
+            console.error('❌ Ошибка синхронизации статуса:', error);
+            showSyncIndicator('error', 'Ошибка синхронизации');
+            return false;
+        }
+    }
+    
+    // Найти умейку в локальном хранилище
+    function findLocalSkill(skillId) {
+        const userId = currentUserId || 'demo-user';
+        const skills = localSkills[userId] || [];
+        return skills.find(s => s._id === skillId);
+    }
+
     window.addSkill = async function() {
         triggerHapticFeedback();
         
@@ -2904,6 +2894,10 @@
                         if (map) {
                             setTimeout(() => loadSkillsOnMap(), 1000);
                         }
+                        
+                        // Запускаем синхронизацию статуса
+                        startStatusSync();
+                        
                         return;
                     }
                 }
@@ -3250,8 +3244,6 @@
                 return;
             }
             
-            showSyncIndicator('syncing', 'Сохранение статуса...');
-            
             const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
@@ -3291,9 +3283,6 @@
                 if (result.success) {
                     updateSuccess = true;
                     console.log('✅ Умейка обновлена на сервере');
-                    
-                    // Синхронизируем статус отдельно для надежности
-                    await syncStatusWithServer(skillId, currentEditMasterStatus);
                 }
             } catch (serverError) {
                 console.log('⚠️ Сервер недоступен для обновления, сохраняем локально');
@@ -3312,7 +3301,6 @@
                 deleteSkillFromLocalStorage(skillId);
                 saveSkillToLocalStorage(updatedSkill);
                 console.log('💾 Умейка обновлена локально');
-                showSyncIndicator('synced', 'Сохранено локально');
             }
             
             alert('✅ Умейка успешно обновлена!');
@@ -3325,9 +3313,11 @@
                 await loadSkillsOnMap();
             }
             
+            // Запускаем синхронизацию для обновления статуса у всех пользователей
+            await syncStatusFromServer();
+            
         } catch (error) {
             console.error('❌ Ошибка сохранения умейки:', error);
-            showSyncIndicator('error', 'Ошибка сохранения');
             alert('❌ Ошибка сохранения умейки');
         }
     };
@@ -3392,7 +3382,8 @@
         }
         
         startMapAutoRefresh();
-        startStatusSync(); // Запускаем синхронизацию статусов
+        // Запускаем синхронизацию статуса при открытии карты
+        startStatusSync();
     };
 
     function initMap() {
@@ -3462,6 +3453,9 @@
     async function loadSkillsOnMap() {
         try {
             console.log('🗺️ Загрузка умейок с сервера для карты');
+            
+            // Сначала синхронизируем статус
+            await syncStatusFromServer();
             
             const skills = await loadAllSkillsFromServer();
             
@@ -3717,7 +3711,7 @@
     window.showMainScreen = function() {
         triggerHapticFeedback();
         stopMapAutoRefresh();
-        stopStatusSync(); // Останавливаем синхронизацию при уходе с карты
+        stopStatusSync(); // Останавливаем синхронизацию при выходе на главный экран
         
         document.getElementById('mainScreen').style.display = 'block';
         document.getElementById('masterSection').style.display = 'none';
@@ -3734,7 +3728,6 @@
         
         if (!document.querySelector('.map-active') && mapRefreshInterval) {
             stopMapAutoRefresh();
-            stopStatusSync();
         }
         
         document.getElementById('mainScreen').style.display = 'none';
@@ -3750,6 +3743,9 @@
             currentMasterStatus = 'ready';
             selectMasterStatus('ready');
             loadMySkills();
+        } else if (sectionId === 'clientSection') {
+            // Запускаем синхронизацию при открытии раздела поиска
+            startStatusSync();
         }
     };
 
@@ -3857,7 +3853,7 @@
             dealAmount.addEventListener('input', updateDealCommission);
         }
         
-        // Запускаем синхронизацию статусов при загрузке
+        // Запускаем начальную синхронизацию
         startStatusSync();
     });
 
@@ -3877,6 +3873,9 @@
         searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
         
         try {
+            // Сначала синхронизируем статус
+            await syncStatusFromServer();
+            
             let skills = [];
             
             // Пробуем найти на сервере
