@@ -2645,7 +2645,7 @@
             const selectedStatus = currentEditMasterStatus;
             console.log('📊 Выбранный статус при сохранении:', selectedStatus);
             
-            // Данные для новой умейки (сохраняем все поля из старой + новый статус)
+            // Данные для новой умейки
             const newSkillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
@@ -2653,9 +2653,8 @@
                 userId: currentUserId,
                 username: userData.firstName || 'Аноним',
                 location: userLocation || { lat: 55.7558, lon: 37.6173 },
-                status: selectedStatus, // Используем выбранный статус
+                status: selectedStatus,
                 createdAt: new Date().toISOString(),
-                // Сохраняем старые метаданные если есть
                 rating: currentEditingSkill?.rating || { average: 5.0, count: 0 },
                 views: currentEditingSkill?.views || 0,
                 contacts: currentEditingSkill?.contacts || 0
@@ -2680,8 +2679,7 @@
             let updateSuccess = false;
             let newSkillId = null;
 
-            // ШАГ 1: ПОЛНОСТЬЮ УДАЛЯЕМ СТАРУЮ УМЕЙКУ ИЗ ЛОКАЛЬНОГО ХРАНИЛИЩА
-            console.log('🗑️ Удаляем старую умейку из локального хранилища:', skillId);
+            // ШАГ 1: Удаляем старую умейку физически из локального хранилища
             const localSkills = getLocalSkills();
             const filteredSkills = localSkills.filter(s => s._id !== skillId);
             saveLocalSkills(filteredSkills);
@@ -2715,17 +2713,13 @@
 
             // ШАГ 3: Если сервер не доступен, создаем локально
             if (!updateSuccess) {
-                newSkillId = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                
-                // Добавляем новую умейку в локальное хранилище
-                const currentLocalSkills = getLocalSkills();
-                currentLocalSkills.push({ 
+                newSkillId = 'local_' + Date.now();
+                filteredSkills.push({ 
                     ...newSkillData, 
                     _id: newSkillId,
                     synced: false 
                 });
-                saveLocalSkills(currentLocalSkills);
-                
+                saveLocalSkills(filteredSkills);
                 updateSuccess = true;
                 console.log('✅ Умейка создана в локальном хранилище с ID:', newSkillId, 'и статусом:', newSkillData.status);
             }
@@ -2746,15 +2740,6 @@
                 editSkillPhoto = null;
                 currentEditingSkill = null;
                 
-                // Обновляем рейтинг пользователя
-                const userData = getOrCreateUserProfile(currentUserId);
-                userData.skills = userData.skills || [];
-                // Удаляем старую умейку из массива навыков пользователя
-                userData.skills = userData.skills.filter(s => s._id !== skillId);
-                // Добавляем новую
-                userData.skills.push({ ...newSkillData, _id: newSkillId });
-                setLocalStorage(`user_${currentUserId}`, userData);
-
                 console.log('✅ Все представления обновлены');
             } else {
                 alert('❌ Не удалось обновить умейку. Попробуйте позже.');
