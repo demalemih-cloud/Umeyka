@@ -2680,20 +2680,12 @@
             let updateSuccess = false;
             let newSkillId = null;
 
-            // ШАГ 1: Помечаем старую умейку как удаленную в локальном хранилище
+            // ШАГ 1: ПОЛНОСТЬЮ УДАЛЯЕМ СТАРУЮ УМЕЙКУ ИЗ ЛОКАЛЬНОГО ХРАНИЛИЩА
+            console.log('🗑️ Удаляем старую умейку из локального хранилища:', skillId);
             const localSkills = getLocalSkills();
-            const oldSkillIndex = localSkills.findIndex(s => s._id === skillId);
-            
-            if (oldSkillIndex !== -1) {
-                // Помечаем как удаленную (soft delete)
-                localSkills[oldSkillIndex] = {
-                    ...localSkills[oldSkillIndex],
-                    deleted: true,
-                    deletedAt: new Date().toISOString()
-                };
-                saveLocalSkills(localSkills);
-                console.log('✅ Старая умейка помечена как удаленная локально');
-            }
+            const filteredSkills = localSkills.filter(s => s._id !== skillId);
+            saveLocalSkills(filteredSkills);
+            console.log('✅ Старая умейка удалена из локального хранилища');
 
             // ШАГ 2: Создаем новую умейку через POST
             try {
@@ -2711,7 +2703,7 @@
                 console.log('📱 Ответ сервера при создании:', result);
 
                 if (result.success) {
-                    newSkillId = result.skillId || 'local_' + Date.now();
+                    newSkillId = result.skillId;
                     updateSuccess = true;
                     console.log('✅ Новая умейка создана на сервере с ID:', newSkillId);
                 } else {
@@ -2723,18 +2715,16 @@
 
             // ШАГ 3: Если сервер не доступен, создаем локально
             if (!updateSuccess) {
-                newSkillId = 'local_' + Date.now();
+                newSkillId = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
                 
                 // Добавляем новую умейку в локальное хранилище
-                localSkills.push({ 
+                const currentLocalSkills = getLocalSkills();
+                currentLocalSkills.push({ 
                     ...newSkillData, 
                     _id: newSkillId,
                     synced: false 
                 });
-                
-                // Удаляем старую умейку (физически)
-                const filteredSkills = localSkills.filter(s => s._id !== skillId);
-                saveLocalSkills(filteredSkills);
+                saveLocalSkills(currentLocalSkills);
                 
                 updateSuccess = true;
                 console.log('✅ Умейка создана в локальном хранилище с ID:', newSkillId, 'и статусом:', newSkillData.status);
@@ -2759,12 +2749,10 @@
                 // Обновляем рейтинг пользователя
                 const userData = getOrCreateUserProfile(currentUserId);
                 userData.skills = userData.skills || [];
-                const skillIndex = userData.skills.findIndex(s => s._id === skillId);
-                if (skillIndex !== -1) {
-                    userData.skills[skillIndex] = { ...newSkillData, _id: newSkillId };
-                } else {
-                    userData.skills.push({ ...newSkillData, _id: newSkillId });
-                }
+                // Удаляем старую умейку из массива навыков пользователя
+                userData.skills = userData.skills.filter(s => s._id !== skillId);
+                // Добавляем новую
+                userData.skills.push({ ...newSkillData, _id: newSkillId });
                 setLocalStorage(`user_${currentUserId}`, userData);
 
                 console.log('✅ Все представления обновлены');
