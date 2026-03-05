@@ -307,6 +307,85 @@
             box-shadow: 0 0 10px #f56565;
         }
         
+        /* СТИЛИ ДЛЯ ВЫБОРА РАДИУСА */
+        .radius-selector {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .radius-option {
+            flex: 1;
+            min-width: 70px;
+            padding: 12px 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .radius-option.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .city-info {
+            background: rgba(255,255,255,0.15);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        .city-autocomplete {
+            position: relative;
+            width: 100%;
+        }
+        
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .autocomplete-item {
+            padding: 12px 15px;
+            color: #2d3748;
+            cursor: pointer;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.2s;
+        }
+        
+        .autocomplete-item:hover {
+            background: #f7fafc;
+        }
+        
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        
         /* Остальные стили из первой версии */
         .skill-card {
             background: rgba(255,255,255,0.95);
@@ -949,7 +1028,7 @@
         /* Кнопка реферальной программы в ЛК */
         .referral-tab-button {
             background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
         }
 
         .referral-tab-button:hover {
@@ -1473,6 +1552,34 @@
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
                 
+                <!-- ПОЛЕ ГОРОДА -->
+                <div class="city-autocomplete">
+                    <input type="text" id="skillCity" class="input-field" placeholder="🏙️ Город (например: Евпатория)*" required autocomplete="off" oninput="handleCityInput(this.value)">
+                    <div id="cityAutocompleteList" class="autocomplete-list"></div>
+                </div>
+                
+                <!-- ВЫБОР РАДИУСА -->
+                <div style="margin: 20px 0;">
+                    <div style="color: white; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
+                    <div class="radius-selector">
+                        <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectRadius(5);">
+                            5 км
+                        </div>
+                        <div class="radius-option selected" data-radius="10" onclick="triggerHapticFeedback(); selectRadius(10);">
+                            10 км
+                        </div>
+                        <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectRadius(25);">
+                            25 км
+                        </div>
+                        <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectRadius(50);">
+                            50 км
+                        </div>
+                    </div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
+                        Выберите радиус, в котором вы готовы работать
+                    </div>
+                </div>
+                
                 <!-- ВЫБОР СТАТУСА МАСТЕРА -->
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
@@ -1523,6 +1630,13 @@
                 <h2 style="margin-bottom: 20px; text-align: center;">🔍 Найти мастера</h2>
                 
                 <input type="text" id="searchInput" class="input-field" placeholder="🔎 Что ищем? (например: сантехник, электрик)">
+                
+                <!-- ПОЛЕ ГОРОДА В ПОИСКЕ -->
+                <div class="city-autocomplete">
+                    <input type="text" id="searchCity" class="input-field" placeholder="🏙️ Город (опционально)" autocomplete="off" oninput="handleSearchCityInput(this.value)">
+                    <div id="searchCityAutocompleteList" class="autocomplete-list"></div>
+                </div>
+                
                 <button class="submit-button" onclick="triggerHapticFeedback(); searchSkills();">Найти мастеров</button>
                 
                 <div id="searchResults" style="margin-top: 20px;"></div>
@@ -1895,10 +2009,35 @@
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
+            <!-- ПОЛЕ ГОРОДА В РЕДАКТИРОВАНИИ -->
+            <div class="city-autocomplete">
+                <input type="text" id="editSkillCity" class="input-field" placeholder="🏙️ Город" required autocomplete="off" oninput="handleEditCityInput(this.value)">
+                <div id="editCityAutocompleteList" class="autocomplete-list"></div>
+            </div>
+            
+            <!-- ВЫБОР РАДИУСА В РЕДАКТИРОВАНИИ -->
+            <div style="margin: 20px 0;">
+                <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
+                <div class="radius-selector" style="background: #f7fafc;">
+                    <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectEditRadius(5);">
+                        5 км
+                    </div>
+                    <div class="radius-option" data-radius="10" onclick="triggerHapticFeedback(); selectEditRadius(10);">
+                        10 км
+                    </div>
+                    <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectEditRadius(25);">
+                        25 км
+                    </div>
+                    <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectEditRadius(50);">
+                        50 км
+                    </div>
+                </div>
+            </div>
+            
             <!-- ВЫБОР СТАТУСА ПРИ РЕДАКТИРОВАНИИ -->
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
-                <div class="status-selector">
+                <div class="status-selector" style="background: #f7fafc;">
                     <div class="status-option ready-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('ready');" id="editStatusReadyOption">
                         ✅ Готов
                     </div>
@@ -1984,11 +2123,168 @@
     let currentMasterStatus = 'ready';
     let currentEditMasterStatus = 'ready';
     
+    // ПЕРЕМЕННЫЕ ДЛЯ РАДИУСА
+    let currentRadius = 10;
+    let currentEditRadius = 10;
+    
     // ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ УМЕЕК (как запасной вариант)
     let localSkills = {};
     
     // ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ СТАТУСОВ МАСТЕРОВ (для синхронизации между пользователями)
     let globalSkillsStatus = {};
+
+    // ========== БАЗА ДАННЫХ ГОРОДОВ ==========
+    const citiesDatabase = {
+        // Крым
+        'Евпатория': { lat: 45.1906, lon: 33.3666 },
+        'Севастополь': { lat: 44.6167, lon: 33.5254 },
+        'Симферополь': { lat: 44.9482, lon: 34.1003 },
+        'Ялта': { lat: 44.4971, lon: 34.1667 },
+        'Алушта': { lat: 44.6764, lon: 34.4100 },
+        'Феодосия': { lat: 45.0328, lon: 35.3823 },
+        'Керчь': { lat: 45.3567, lon: 36.4716 },
+        'Бахчисарай': { lat: 44.7514, lon: 33.8751 },
+        'Джанкой': { lat: 45.7086, lon: 34.3933 },
+        'Судак': { lat: 44.8539, lon: 34.9722 },
+        
+        // Россия
+        'Москва': { lat: 55.7558, lon: 37.6173 },
+        'Санкт-Петербург': { lat: 59.9343, lon: 30.3351 },
+        'Новосибирск': { lat: 54.9833, lon: 82.8964 },
+        'Екатеринбург': { lat: 56.8389, lon: 60.6057 },
+        'Казань': { lat: 55.8304, lon: 49.0661 },
+        'Нижний Новгород': { lat: 56.3269, lon: 44.0059 },
+        'Челябинск': { lat: 55.1644, lon: 61.4368 },
+        'Самара': { lat: 53.2012, lon: 50.1265 },
+        'Омск': { lat: 54.9885, lon: 73.3242 },
+        'Ростов-на-Дону': { lat: 47.2225, lon: 39.7187 },
+        'Уфа': { lat: 54.7388, lon: 55.9721 },
+        'Красноярск': { lat: 56.0153, lon: 92.8932 },
+        'Пермь': { lat: 58.0105, lon: 56.2502 },
+        'Воронеж': { lat: 51.6720, lon: 39.1843 },
+        'Волгоград': { lat: 48.7080, lon: 44.5133 },
+        'Краснодар': { lat: 45.0393, lon: 38.9872 },
+        'Саратов': { lat: 51.5336, lon: 46.0342 },
+        'Тюмень': { lat: 57.1613, lon: 65.5250 },
+        'Тольятти': { lat: 53.5078, lon: 49.4204 },
+        'Ижевск': { lat: 56.8527, lon: 53.2115 }
+    };
+
+    // Список всех городов для автодополнения
+    const allCities = Object.keys(citiesDatabase).sort();
+
+    // ========== ФУНКЦИИ ДЛЯ ГОРОДОВ ==========
+    function getCityCoordinates(cityName) {
+        if (!cityName) return null;
+        const normalizedCity = cityName.trim();
+        return citiesDatabase[normalizedCity] || null;
+    }
+
+    function handleCityInput(value) {
+        const list = document.getElementById('cityAutocompleteList');
+        if (!value || value.length < 2) {
+            list.style.display = 'none';
+            return;
+        }
+        
+        const matches = allCities.filter(city => 
+            city.toLowerCase().includes(value.toLowerCase())
+        ).slice(0, 5);
+        
+        if (matches.length > 0) {
+            list.innerHTML = matches.map(city => `
+                <div class="autocomplete-item" onclick="selectCity('${city}')">${city}</div>
+            `).join('');
+            list.style.display = 'block';
+        } else {
+            list.style.display = 'none';
+        }
+    }
+
+    function handleSearchCityInput(value) {
+        const list = document.getElementById('searchCityAutocompleteList');
+        if (!value || value.length < 2) {
+            list.style.display = 'none';
+            return;
+        }
+        
+        const matches = allCities.filter(city => 
+            city.toLowerCase().includes(value.toLowerCase())
+        ).slice(0, 5);
+        
+        if (matches.length > 0) {
+            list.innerHTML = matches.map(city => `
+                <div class="autocomplete-item" onclick="selectSearchCity('${city}')">${city}</div>
+            `).join('');
+            list.style.display = 'block';
+        } else {
+            list.style.display = 'none';
+        }
+    }
+
+    function handleEditCityInput(value) {
+        const list = document.getElementById('editCityAutocompleteList');
+        if (!value || value.length < 2) {
+            list.style.display = 'none';
+            return;
+        }
+        
+        const matches = allCities.filter(city => 
+            city.toLowerCase().includes(value.toLowerCase())
+        ).slice(0, 5);
+        
+        if (matches.length > 0) {
+            list.innerHTML = matches.map(city => `
+                <div class="autocomplete-item" onclick="selectEditCity('${city}')">${city}</div>
+            `).join('');
+            list.style.display = 'block';
+        } else {
+            list.style.display = 'none';
+        }
+    }
+
+    function selectCity(city) {
+        triggerHapticFeedback();
+        document.getElementById('skillCity').value = city;
+        document.getElementById('cityAutocompleteList').style.display = 'none';
+    }
+
+    function selectSearchCity(city) {
+        triggerHapticFeedback();
+        document.getElementById('searchCity').value = city;
+        document.getElementById('searchCityAutocompleteList').style.display = 'none';
+    }
+
+    function selectEditCity(city) {
+        triggerHapticFeedback();
+        document.getElementById('editSkillCity').value = city;
+        document.getElementById('editCityAutocompleteList').style.display = 'none';
+    }
+
+    // ========== ФУНКЦИИ ДЛЯ РАДИУСА ==========
+    function selectRadius(radius) {
+        console.log('🔄 Выбор радиуса:', radius);
+        currentRadius = radius;
+        
+        document.querySelectorAll('#masterSection .radius-option').forEach(option => {
+            option.classList.remove('selected');
+            if (parseInt(option.dataset.radius) === radius) {
+                option.classList.add('selected');
+            }
+        });
+    }
+
+    function selectEditRadius(radius) {
+        console.log('🔄 Выбор радиуса (редактирование):', radius);
+        currentEditRadius = radius;
+        
+        document.querySelectorAll('#editSkillModal .radius-option').forEach(option => {
+            option.classList.remove('selected');
+            if (parseInt(option.dataset.radius) === radius) {
+                option.classList.add('selected');
+            }
+        });
+    }
 
     // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ВИБРАЦИИ ==========
     function triggerHapticFeedback() {
@@ -2252,7 +2548,7 @@
         const friendIndex = data.invitedFriends.findIndex(f => f.id === friendId);
         if (friendIndex !== -1 && !data.invitedFriends[friendIndex].registered) {
             data.invitedFriends[friendIndex].registered = true;
-            data.invitedFriends[riendIndex].registeredAt = new Date().toISOString();
+            data.invitedFriends[friendIndex].registeredAt = new Date().toISOString();
             
             data.referralCount += 1;
             data.starsEarned += 1;
@@ -2675,9 +2971,16 @@
             const skillName = document.getElementById('skillName').value;
             const skillExperience = document.getElementById('skillExperience').value;
             const skillPrice = document.getElementById('skillPrice').value;
+            const skillCity = document.getElementById('skillCity').value;
             
-            if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
+            if (!skillName.trim() || !skillExperience.trim() || !skillPrice || !skillCity.trim()) {
                 alert('❌ Заполните все обязательные поля (отмечены *)');
+                return;
+            }
+            
+            // Валидация города
+            if (skillCity.trim().length < 2) {
+                alert('❌ Название города должно содержать минимум 2 символа');
                 return;
             }
 
@@ -2686,25 +2989,31 @@
             const userId = currentUserId;
             console.log('👤 Добавляю умейку для User ID:', userId);
             console.log('📊 Статус при создании:', currentMasterStatus);
+            console.log('📍 Город:', skillCity);
+            console.log('📏 Радиус:', currentRadius);
         
             if (!userId || userId === 'null' || userId === 'undefined') {
                 alert('❌ Ошибка: не определен ID пользователя. Перезагрузите страницу.');
                 return;
             }
 
-            const location = userLocation || { lat: 55.7558, lon: 37.6173 };
+            // Получаем координаты города
+            const cityCoords = getCityCoordinates(skillCity);
+            const location = cityCoords || userLocation || { lat: 55.7558, lon: 37.6173 };
 
             const skillData = {
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
+                city: skillCity.trim(),
+                radius: currentRadius,
+                location: location,
                 userId: userId,
                 username: userData.firstName || 'Аноним',
-                location: location,
                 status: currentMasterStatus
             };
 
-            console.log('📤 Отправляю данные на сервер со статусом:', skillData.status);
+            console.log('📤 Отправляю данные на сервер:', skillData);
 
             if (currentSkillPhoto) {
                 const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
@@ -2747,11 +3056,17 @@
                         
                         alert('✅ Умейка успешно опубликована!');
                         
+                        // Очищаем форму
                         document.getElementById('skillName').value = '';
                         document.getElementById('skillExperience').value = '';
                         document.getElementById('skillPrice').value = '';
+                        document.getElementById('skillCity').value = '';
                         removeSkillPhoto();
                         currentSkillPhoto = null;
+                        
+                        // Сбрасываем радиус на дефолтный
+                        currentRadius = 10;
+                        selectRadius(10);
                         
                         currentMasterStatus = 'ready';
                         selectMasterStatus('ready');
@@ -2785,11 +3100,17 @@
             
             alert('✅ Умейка сохранена локально (сервер недоступен)');
             
+            // Очищаем форму
             document.getElementById('skillName').value = '';
             document.getElementById('skillExperience').value = '';
             document.getElementById('skillPrice').value = '';
+            document.getElementById('skillCity').value = '';
             removeSkillPhoto();
             currentSkillPhoto = null;
+            
+            // Сбрасываем радиус на дефолтный
+            currentRadius = 10;
+            selectRadius(10);
             
             currentMasterStatus = 'ready';
             selectMasterStatus('ready');
@@ -2928,6 +3249,7 @@
                 skillsList.innerHTML = skills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                    const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                     
                     return `
                     <div class="skill-card">
@@ -2939,6 +3261,8 @@
                         <div class="skill-price">${skill.price} ₽</div>
                         
                         ${statusBadge}
+                        
+                        ${cityInfo}
                         
                         <div class="skill-contact-info">
                             <div class="contact-label">📞 Контакты:</div>
@@ -3060,6 +3384,7 @@
                 skillsList.innerHTML = skills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                    const cityInfo = skill.city ? `<div class="city-info" style="background: rgba(102,126,234,0.08); margin: 10px 0; padding: 8px 12px; border-radius: 8px; font-size: 14px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                     
                     return `
                     <div class="profile-skill-card">
@@ -3069,6 +3394,8 @@
                         </div>
                         
                         ${statusBadge}
+                        
+                        ${cityInfo}
                         
                         <div class="skill-contact-info">
                             <div class="contact-item">
@@ -3149,6 +3476,11 @@
             document.getElementById('editSkillName').value = skill.skill || '';
             document.getElementById('editSkillExperience').value = skill.experience || '';
             document.getElementById('editSkillPrice').value = skill.price || '';
+            document.getElementById('editSkillCity').value = skill.city || '';
+            
+            // Устанавливаем радиус
+            currentEditRadius = skill.radius || 10;
+            selectEditRadius(currentEditRadius);
             
             const skillStatus = skill.status || 'ready';
             console.log('📊 Загружен статус для редактирования:', skillStatus);
@@ -3181,6 +3513,7 @@
         document.getElementById('editSkillName').value = '';
         document.getElementById('editSkillExperience').value = '';
         document.getElementById('editSkillPrice').value = '';
+        document.getElementById('editSkillCity').value = '';
         
         const preview = document.getElementById('editSkillPhotoPreview');
         preview.style.display = 'none';
@@ -3194,14 +3527,21 @@
             const skillName = document.getElementById('editSkillName').value;
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
+            const skillCity = document.getElementById('editSkillCity').value;
             
             if (!skillId) {
                 alert('❌ Ошибка: не указан ID умейки');
                 return;
             }
             
-            if (!skillName.trim() || !skillExperience.trim() || !skillPrice) {
+            if (!skillName.trim() || !skillExperience.trim() || !skillPrice || !skillCity.trim()) {
                 alert('❌ Заполните все обязательные поля');
+                return;
+            }
+            
+            // Валидация города
+            if (skillCity.trim().length < 2) {
+                alert('❌ Название города должно содержать минимум 2 символа');
                 return;
             }
             
@@ -3209,11 +3549,19 @@
                 skill: skillName.trim(),
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
+                city: skillCity.trim(),
+                radius: currentEditRadius,
                 status: currentEditMasterStatus,
                 updatedAt: new Date().toISOString()
             };
             
-            console.log('📤 Сохраняю изменения умейки со статусом:', skillData.status);
+            // Получаем координаты города
+            const cityCoords = getCityCoordinates(skillCity);
+            if (cityCoords) {
+                skillData.location = cityCoords;
+            }
+            
+            console.log('📤 Сохраняю изменения умейки:', skillData);
             
             if (editSkillPhoto) {
                 const estimatedSize = (editSkillPhoto.length * 0.75) / 1024;
@@ -3454,6 +3802,20 @@
                     const rating = skill.rating?.average || 5.0;
                     const isUserSkill = skill.userId === currentUserId;
                     const status = skill.status || 'ready';
+                    const radius = skill.radius || 10;
+                    
+                    // Цвет круга в зависимости от статуса
+                    const circleColor = (!status || status === 'ready') ? '#22c55e' : '#f56565';
+                    
+                    // Добавляем круг радиуса
+                    const circle = L.circle([skill.location.lat, skill.location.lon], {
+                        color: circleColor,
+                        fillColor: circleColor,
+                        fillOpacity: 0.2,
+                        radius: radius * 1000 // конвертируем км в метры
+                    }).addTo(map);
+                    
+                    markers.push(circle);
                     
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
                         icon: L.divIcon({
@@ -3497,6 +3859,7 @@
     function createMapSkillPopup(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
         const statusBadge = getStatusBadge(skill.status);
+        const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
         
         return `
             <div class="map-popup-content">
@@ -3516,6 +3879,8 @@
                     </p>
                     
                     ${statusBadge}
+                    
+                    ${cityInfo}
                     
                     <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px; border: 1px solid rgba(102,126,234,0.1);">
                         <div style="font-weight: 600; color: #667eea; margin-bottom: 5px; font-size: 14px;">📞 Контакты:</div>
@@ -3706,6 +4071,8 @@
         if (sectionId === 'masterSection') {
             currentMasterStatus = 'ready';
             selectMasterStatus('ready');
+            currentRadius = 10;
+            selectRadius(10);
             loadMySkills();
         }
     };
@@ -3785,9 +4152,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Umeyka app loaded successfully!');
         
-        // Устанавливаем начальные значения статусов
+        // Устанавливаем начальные значения статусов и радиуса
         currentMasterStatus = 'ready';
         currentEditMasterStatus = 'ready';
+        currentRadius = 10;
+        currentEditRadius = 10;
         
         showMainScreen();
         
@@ -3821,10 +4190,11 @@
         triggerHapticFeedback();
         
         const searchQuery = document.getElementById('searchInput').value.trim();
+        const searchCity = document.getElementById('searchCity').value.trim();
         const searchResults = document.getElementById('searchResults');
         
-        if (!searchQuery) {
-            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос</div>';
+        if (!searchQuery && !searchCity) {
+            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос или выберите город</div>';
             return;
         }
         
@@ -3835,7 +4205,12 @@
             
             // Пробуем найти на сервере
             try {
-                const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`);
+                let url = `${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery || '')}`;
+                if (searchCity) {
+                    url += `&city=${encodeURIComponent(searchCity)}`;
+                }
+                
+                const response = await fetch(url);
                 const result = await response.json();
                 
                 if (result.success) {
@@ -3858,10 +4233,20 @@
             
             // Добавляем из глобального хранилища
             const globalSkills = getGlobalSkills();
-            const matchingGlobal = globalSkills.filter(s => 
-                s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
-            );
+            let matchingGlobal = globalSkills;
+            
+            if (searchQuery) {
+                matchingGlobal = matchingGlobal.filter(s => 
+                    s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
+                );
+            }
+            
+            if (searchCity) {
+                matchingGlobal = matchingGlobal.filter(s => 
+                    s.city && s.city.toLowerCase() === searchCity.toLowerCase()
+                );
+            }
             
             // Объединяем, избегая дубликатов
             const existingIds = new Set(skills.map(s => s._id));
@@ -3874,10 +4259,20 @@
             // Добавляем локальные умейки, которые соответствуют запросу
             const userId = currentUserId || 'demo-user';
             const localSkills = loadSkillsFromLocalStorage(userId);
-            const matchingLocal = localSkills.filter(s => 
-                s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
-            );
+            let matchingLocal = localSkills.filter(s => s.local);
+            
+            if (searchQuery) {
+                matchingLocal = matchingLocal.filter(s => 
+                    s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
+                );
+            }
+            
+            if (searchCity) {
+                matchingLocal = matchingLocal.filter(s => 
+                    s.city && s.city.toLowerCase() === searchCity.toLowerCase()
+                );
+            }
             
             skills = [...skills, ...matchingLocal.filter(s => !existingIds.has(s._id))];
             
@@ -3896,6 +4291,7 @@
                 searchResults.innerHTML = skills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                    const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                     
                     return `
                     <div class="skill-card">
@@ -3907,6 +4303,8 @@
                         <div class="skill-price">${skill.price} ₽</div>
                         
                         ${statusBadge}
+                        
+                        ${cityInfo}
                         
                         <div class="skill-contact-info">
                             <div class="contact-label">📞 Контакты:</div>
@@ -3940,7 +4338,7 @@
                     <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
                         <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
                         <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
-                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос</div>
+                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос${searchCity ? ' или выбрать другой город' : ''}</div>
                     </div>
                 `;
             }
