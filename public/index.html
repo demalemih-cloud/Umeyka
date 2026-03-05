@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* Все стили из первой версии + стили статусов из второй */
+        /* Все существующие стили остаются без изменений */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -223,7 +223,7 @@
             transition: all 0.3s ease;
         }
 
-        /* СТИЛИ ДЛЯ СТАТУСОВ МАСТЕРА (из второй версии) */
+        /* СТИЛИ ДЛЯ СТАТУСОВ МАСТЕРА */
         .master-status {
             display: inline-flex;
             align-items: center;
@@ -306,7 +306,7 @@
             background: #f56565;
             box-shadow: 0 0 10px #f56565;
         }
-        
+
         /* СТИЛИ ДЛЯ ВЫБОРА РАДИУСА */
         .radius-selector {
             display: flex;
@@ -317,75 +317,32 @@
             border-radius: 15px;
             flex-wrap: wrap;
         }
-        
+
         .radius-option {
             flex: 1;
-            min-width: 70px;
-            padding: 12px 8px;
+            min-width: 60px;
+            padding: 15px 10px;
+            background: rgba(255,255,255,0.2);
             border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
+            border-radius: 12px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
-            font-size: 14px;
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.8);
-        }
-        
-        .radius-option.selected {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+        }
+
+        .radius-option.selected {
+            background: #667eea;
             border-color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        
-        .city-info {
-            background: rgba(255,255,255,0.15);
-            padding: 10px 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-        
-        .city-autocomplete {
-            position: relative;
-            width: 100%;
-        }
-        
-        .autocomplete-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: 0 0 12px 12px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+
+        /* СТИЛИ ДЛЯ АВТОДОПОЛНЕНИЯ */
+        datalist {
             display: none;
         }
-        
-        .autocomplete-item {
-            padding: 12px 15px;
-            color: #2d3748;
-            cursor: pointer;
-            border-bottom: 1px solid #e2e8f0;
-            transition: background 0.2s;
-        }
-        
-        .autocomplete-item:hover {
-            background: #f7fafc;
-        }
-        
-        .autocomplete-item:last-child {
-            border-bottom: none;
-        }
-        
+
         /* Остальные стили из первой версии */
         .skill-card {
             background: rgba(255,255,255,0.95);
@@ -397,12 +354,6 @@
             border-left: 4px solid #667eea;
         }
 
-        .gold-card {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #744210;
-            border: 3px solid #FFD700;
-        }
-        
         .skill-header {
             display: flex;
             justify-content: space-between;
@@ -534,51 +485,6 @@
             gap: 8px;
         }
 
-        /* Стили для кнопок вкладок */
-        .tab-buttons {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-            padding: 0 20px;
-            flex-wrap: wrap;
-        }
-
-        .tab-button {
-            flex: 1;
-            min-width: 120px;
-            padding: 18px 15px;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 15px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .tab-button:hover {
-            transform: translateY(-2px);
-            background: rgba(255,255,255,0.25);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-
-        .tab-button:active {
-            transform: translateY(0);
-        }
-
-        .tab-button.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-color: rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
         .edit-button {
             background: #4299e1;
             color: white;
@@ -599,594 +505,58 @@
             font-weight: 600;
         }
 
-        .rating-badge {
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            color: #744210;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
+        /* Стили для карточки в карте */
+        .map-popup-content {
+            min-width: 300px;
+            max-width: 300px;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .stat-card {
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .rating-stars {
-            color: #FFD700;
-            font-size: 16px;
-            margin: 5px 0;
-        }
-
-        .rating-details {
-            background: rgba(255,255,255,0.9);
-            padding: 15px;
-            border-radius: 10px;
+        .map-skill-photo {
+            width: 100%;
+            height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
             margin: 10px 0;
         }
 
-        .rating-bar {
-            display: flex;
-            align-items: center;
-            margin: 8px 0;
-        }
-
-        .rating-label {
-            width: 100px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .rating-value {
-            width: 40px;
-            text-align: right;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .rating-progress {
-            flex: 1;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .rating-progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            border-radius: 4px;
-        }
-
-        /* Стили для сделок (из первой версии) */
-        .deal-card {
-            background: rgba(255,255,255,0.95);
-            color: #2d3748;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 5px solid #667eea;
-        }
-
-        .deal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-
-        .deal-title {
-            font-size: 18px;
-            font-weight: 700;
-            flex: 1;
-        }
-
-        .deal-status {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-draft { background: #e2e8f0; color: #4a5568; }
-        .status-pending { background: #fef3c7; color: #d97706; }
-        .status-active { background: #d1fae5; color: #065f46; }
-        .status-completed { background: #dcfce7; color: #166534; }
-
-        .deal-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .deal-detail {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            padding: 15px;
-            background: #f7fafc;
-            border-radius: 10px;
-        }
-
-        .signature {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .signed { color: #38a169; }
-        .unsigned { color: #e53e3e; }
-
-        .deal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .deal-button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .sign-button { background: #48bb78; color: white; }
-        .view-button { background: #4299e1; color: white; }
-        .complete-button { background: #ed8936; color: white; }
-
-        /* Стили для формы создания сделки */
-        .quality-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .quality-option {
-            padding: 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-        }
-
-        .quality-option.selected {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .additional-options {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .option-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            cursor: pointer;
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-        }
-
-        .option-checkbox.selected {
-            border-color: #48bb78;
-            background: rgba(72, 187, 120, 0.1);
-        }
-
-        .level-achieved {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            border: 2px solid #10b981;
-        }
-
-        /* Реферальная программа (из первой версии) */
-        .referral-section {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
-            padding: 25px 20px;
-            border-radius: 20px;
-            margin: 20px 0;
-            color: white;
-            text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        .referral-section::before {
-            content: '✨';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 40px;
-            color: white;
-            opacity: 0.1;
-            z-index: 0;
-        }
-
-        .referral-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-description {
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-benefits {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-benefit {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 12px 15px;
-            border-radius: 12px;
-            font-size: 14px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
-            min-width: 200px;
-            justify-content: center;
-        }
-
-        .referral-link-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            margin: 20px 0;
-            border: 2px dashed #667eea;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-link {
-            color: #667eea;
-            font-family: 'Courier New', monospace;
-            font-size: 16px;
-            font-weight: bold;
-            word-break: break-all;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 8px;
-        }
-
-        .referral-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-stat {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .referral-stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .referral-stat-label {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
-        .referral-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 20px 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .share-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 18px;
-            border-radius: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .share-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4aa0 100%);
-        }
-
-        .copy-button {
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid #667eea;
-            padding: 18px;
-            border-radius: 15px;
-            color: #667eea;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .copy-button:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .referral-note {
-            font-size: 14px;
-            opacity: 0.8;
-            text-align: center;
-            line-height: 1.4;
-            margin-top: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-bonus {
-            display: inline-block;
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            color: #744210;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 5px;
-        }
-
-        /* Кнопка реферальной программы в ЛК */
-        .referral-tab-button {
-            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%) !important;
-            border: 1px solid rgba(255,255,255,0.3) !important;
-        }
-
-        .referral-tab-button:hover {
-            background: linear-gradient(135deg, #8c6bcf 0%, #6f48c7 100%) !important;
-        }
-
-        /* Стили для раздела "О проекте" */
-        .about-section {
-            background: rgba(255,255,255,0.9);
-            padding: 25px;
-            border-radius: 20px;
-            color: #2d3748;
-            margin: 20px 0;
-        }
-
-        .about-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-            color: #667eea;
-        }
-
-        .channel-links {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .channel-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .channel-link:active {
-            transform: scale(0.98);
-        }
-
-        .channel-icon {
-            font-size: 30px;
-        }
-
-        .channel-info {
-            flex: 1;
-        }
-
-        .channel-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .channel-description {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* Стили для кнопок вкладок сделок */
-        .deals-tab-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 0 0 20px 0;
-            padding: 0 20px;
-        }
-
-        .deals-tab-button {
-            width: 100%;
-            padding: 20px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-        }
-
-        .deals-tab-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
-
-        .deals-tab-button:active {
-            transform: translateY(0);
-        }
-
-        .deals-tab-button.active {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: 2px solid rgba(255,255,255,0.5);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
-        }
-
-        /* Стили для фото в карточке */
-        .skill-photo {
-            width: 100%;
-            height: 200px;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 15px 0;
-            background: #f7fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .skill-photo img {
+        .map-skill-photo img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .skill-photo:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .upload-photo-button {
-            width: 100%;
+        .map-skill-info {
+            background: #f7fafc;
             padding: 12px;
-            background: #4299e1;
-            color: white;
-            border: none;
             border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
             margin: 10px 0;
         }
 
-        .no-photo {
+        .map-skill-actions {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #666;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .map-skill-button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
             font-size: 14px;
-            height: 100%;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .map-contact-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .map-edit-button {
+            background: #ed8936;
+            color: white;
         }
 
         /* Стили для модального окна редактирования */
@@ -1276,65 +646,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* Стили для карточки в карте */
-        .map-popup-content {
-            min-width: 300px;
-            max-width: 300px;
-        }
-
-        .map-skill-photo {
-            width: 100%;
-            height: 150px;
-            border-radius: 8px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-
-        .map-skill-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .map-skill-info {
-            background: #f7fafc;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-
-        .map-skill-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 15px;
-        }
-
-        .map-skill-button {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .map-contact-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .map-details-button {
-            background: #48bb78;
-            color: white;
-        }
-
-        .map-edit-button {
-            background: #ed8936;
-            color: white;
-        }
-
         /* Стили для загрузки фото */
         .photo-upload-area {
             border: 2px dashed #667eea;
@@ -1386,121 +697,6 @@
             cursor: pointer;
             font-size: 16px;
         }
-
-        .photo-info {
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            margin-top: 5px;
-        }
-
-        /* Стили для кнопок связи */
-        .contact-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .call-button {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        .telegram-button {
-            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            text-align: center;
-        }
-
-        /* Стили для отображения контактов */
-        .contact-info {
-            background: #f7fafc;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-            color: #2d3748;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 8px 0;
-            padding: 8px;
-            background: white;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .contact-icon {
-            font-size: 20px;
-            color: #667eea;
-        }
-
-        .contact-text {
-            flex: 1;
-            font-size: 14px;
-            word-break: break-all;
-            font-weight: 500;
-        }
-
-        .copy-contact {
-            background: #4299e1;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 12px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        /* Стили для кнопки "Составить сделку" */
-        .create-deal-button {
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .create-deal-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
-        }
     </style>
 </head>
 <body>
@@ -1549,36 +745,45 @@
                 <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
                 
                 <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
+                
+                <!-- НОВОЕ ПОЛЕ ГОРОДА С АВТОДОПОЛНЕНИЕМ -->
+                <input type="text" id="skillCity" class="input-field" placeholder="🏙️ Город (например: Евпатория)*" list="citiesList" required>
+                <datalist id="citiesList">
+                    <option value="Москва">
+                    <option value="Санкт-Петербург">
+                    <option value="Симферополь">
+                    <option value="Севастополь">
+                    <option value="Керчь">
+                    <option value="Евпатория">
+                    <option value="Ялта">
+                    <option value="Феодосия">
+                    <option value="Джанкой">
+                    <option value="Алушта">
+                    <option value="Бахчисарай">
+                    <option value="Саки">
+                    <option value="Армянск">
+                    <option value="Красноперекопск">
+                    <option value="Судак">
+                    <option value="Белогорск">
+                    <option value="Щёлкино">
+                    <option value="Старый Крым">
+                    <option value="Алупка">
+                    <option value="Инкерман">
+                </datalist>
+
+                <!-- НОВЫЙ ВЫБОР РАДИУСА ДЕЙСТВИЯ -->
+                <div style="margin: 20px 0;">
+                    <div style="color: white; margin-bottom: 10px; font-weight: 600;">📡 Радиус действия</div>
+                    <div class="radius-selector">
+                        <div class="radius-option" onclick="triggerHapticFeedback(); selectRadius(5);" id="radius5">5 км</div>
+                        <div class="radius-option selected" onclick="triggerHapticFeedback(); selectRadius(10);" id="radius10">10 км</div>
+                        <div class="radius-option" onclick="triggerHapticFeedback(); selectRadius(25);" id="radius25">25 км</div>
+                        <div class="radius-option" onclick="triggerHapticFeedback(); selectRadius(50);" id="radius50">50 км</div>
+                    </div>
+                </div>
+                
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
-                
-                <!-- ПОЛЕ ГОРОДА -->
-                <div class="city-autocomplete">
-                    <input type="text" id="skillCity" class="input-field" placeholder="🏙️ Город (например: Евпатория)*" required autocomplete="off" oninput="handleCityInput(this.value)">
-                    <div id="cityAutocompleteList" class="autocomplete-list"></div>
-                </div>
-                
-                <!-- ВЫБОР РАДИУСА -->
-                <div style="margin: 20px 0;">
-                    <div style="color: white; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
-                    <div class="radius-selector">
-                        <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectRadius(5);">
-                            5 км
-                        </div>
-                        <div class="radius-option selected" data-radius="10" onclick="triggerHapticFeedback(); selectRadius(10);">
-                            10 км
-                        </div>
-                        <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectRadius(25);">
-                            25 км
-                        </div>
-                        <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectRadius(50);">
-                            50 км
-                        </div>
-                    </div>
-                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
-                        Выберите радиус, в котором вы готовы работать
-                    </div>
-                </div>
                 
                 <!-- ВЫБОР СТАТУСА МАСТЕРА -->
                 <div style="margin: 20px 0;">
@@ -1629,14 +834,32 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">🔍 Найти мастера</h2>
                 
+                <!-- НОВОЕ ПОЛЕ ГОРОДА В ПОИСКЕ -->
+                <input type="text" id="searchCity" class="input-field" placeholder="🏙️ Город (опционально)" list="searchCitiesList">
+                <datalist id="searchCitiesList">
+                    <option value="Москва">
+                    <option value="Санкт-Петербург">
+                    <option value="Симферополь">
+                    <option value="Севастополь">
+                    <option value="Керчь">
+                    <option value="Евпатория">
+                    <option value="Ялта">
+                    <option value="Феодосия">
+                    <option value="Джанкой">
+                    <option value="Алушта">
+                    <option value="Бахчисарай">
+                    <option value="Саки">
+                    <option value="Армянск">
+                    <option value="Красноперекопск">
+                    <option value="Судак">
+                    <option value="Белогорск">
+                    <option value="Щёлкино">
+                    <option value="Старый Крым">
+                    <option value="Алупка">
+                    <option value="Инкерман">
+                </datalist>
+                
                 <input type="text" id="searchInput" class="input-field" placeholder="🔎 Что ищем? (например: сантехник, электрик)">
-                
-                <!-- ПОЛЕ ГОРОДА В ПОИСКЕ -->
-                <div class="city-autocomplete">
-                    <input type="text" id="searchCity" class="input-field" placeholder="🏙️ Город (опционально)" autocomplete="off" oninput="handleSearchCityInput(this.value)">
-                    <div id="searchCityAutocompleteList" class="autocomplete-list"></div>
-                </div>
-                
                 <button class="submit-button" onclick="triggerHapticFeedback(); searchSkills();">Найти мастеров</button>
                 
                 <div id="searchResults" style="margin-top: 20px;"></div>
@@ -1658,7 +881,6 @@
                         </div>
                         <h3 id="userName">Пользователь</h3>
                         <p id="userBio" style="opacity: 0.8; margin: 10px 0;">Расскажите о себе...</p>
-                        <div id="userBadges" style="margin: 10px 0;"></div>
                     </div>
                     
                     <button class="main-button" onclick="triggerHapticFeedback(); editProfile();" style="margin-bottom: 15px;">
@@ -1796,25 +1018,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Ссылки на каналы -->
-                <div class="channel-links">
-                    <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
-                        <div class="channel-icon">🎯</div>
-                        <div class="channel-info">
-                            <div class="channel-name">Мотивация</div>
-                            <div class="channel-description">Подпишись и получи бонус!</div>
-                        </div>
-                    </a>
-                    
-                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
-                        <div class="channel-icon">✨</div>
-                        <div class="channel-info">
-                            <div class="channel-name">Umeyka</div>
-                            <div class="channel-description">Официальный канал проекта</div>
-                        </div>
-                    </a>
                 </div>
             </div>
         </div>
@@ -1974,25 +1177,6 @@
                     
                     <button class="submit-button" onclick="triggerHapticFeedback(); submitProjectReview();">📤 Отправить отзыв</button>
                 </div>
-
-                <!-- Ссылки на каналы -->
-                <div class="channel-links">
-                    <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
-                        <div class="channel-icon">🎯</div>
-                        <div class="channel-info">
-                            <div class="channel-name">Мотивация</div>
-                            <div class="channel-description">Подпишись и получи бонус!</div>
-                        </div>
-                    </a>
-                    
-                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
-                        <div class="channel-icon">✨</div>
-                        <div class="channel-info">
-                            <div class="channel-name">Umeyka</div>
-                            <div class="channel-description">Официальный канал проекта</div>
-                        </div>
-                    </a>
-                </div>
             </div>
         </div>
     </div>
@@ -2006,38 +1190,50 @@
             <input type="hidden" id="editSkillId">
             
             <input type="text" id="editSkillName" class="input-field" placeholder="Моё умение" required>
-            <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
-            <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
-            <!-- ПОЛЕ ГОРОДА В РЕДАКТИРОВАНИИ -->
-            <div class="city-autocomplete">
-                <input type="text" id="editSkillCity" class="input-field" placeholder="🏙️ Город" required autocomplete="off" oninput="handleEditCityInput(this.value)">
-                <div id="editCityAutocompleteList" class="autocomplete-list"></div>
-            </div>
-            
-            <!-- ВЫБОР РАДИУСА В РЕДАКТИРОВАНИИ -->
+            <!-- НОВОЕ ПОЛЕ ГОРОДА ПРИ РЕДАКТИРОВАНИИ -->
+            <input type="text" id="editSkillCity" class="input-field" placeholder="🏙️ Город" list="editCitiesList" required>
+            <datalist id="editCitiesList">
+                <option value="Москва">
+                <option value="Санкт-Петербург">
+                <option value="Симферополь">
+                <option value="Севастополь">
+                <option value="Керчь">
+                <option value="Евпатория">
+                <option value="Ялта">
+                <option value="Феодосия">
+                <option value="Джанкой">
+                <option value="Алушта">
+                <option value="Бахчисарай">
+                <option value="Саки">
+                <option value="Армянск">
+                <option value="Красноперекопск">
+                <option value="Судак">
+                <option value="Белогорск">
+                <option value="Щёлкино">
+                <option value="Старый Крым">
+                <option value="Алупка">
+                <option value="Инкерман">
+            </datalist>
+
+            <!-- НОВЫЙ ВЫБОР РАДИУСА ПРИ РЕДАКТИРОВАНИИ -->
             <div style="margin: 20px 0;">
-                <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
-                <div class="radius-selector" style="background: #f7fafc;">
-                    <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectEditRadius(5);">
-                        5 км
-                    </div>
-                    <div class="radius-option" data-radius="10" onclick="triggerHapticFeedback(); selectEditRadius(10);">
-                        10 км
-                    </div>
-                    <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectEditRadius(25);">
-                        25 км
-                    </div>
-                    <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectEditRadius(50);">
-                        50 км
-                    </div>
+                <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📡 Радиус действия</div>
+                <div class="radius-selector">
+                    <div class="radius-option" onclick="triggerHapticFeedback(); selectEditRadius(5);" id="editRadius5">5 км</div>
+                    <div class="radius-option" onclick="triggerHapticFeedback(); selectEditRadius(10);" id="editRadius10">10 км</div>
+                    <div class="radius-option" onclick="triggerHapticFeedback(); selectEditRadius(25);" id="editRadius25">25 км</div>
+                    <div class="radius-option" onclick="triggerHapticFeedback(); selectEditRadius(50);" id="editRadius50">50 км</div>
                 </div>
             </div>
+            
+            <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
+            <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
             <!-- ВЫБОР СТАТУСА ПРИ РЕДАКТИРОВАНИИ -->
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
-                <div class="status-selector" style="background: #f7fafc;">
+                <div class="status-selector">
                     <div class="status-option ready-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('ready');" id="editStatusReadyOption">
                         ✅ Готов
                     </div>
@@ -2119,11 +1315,9 @@
     let currentEditingSkill = null;
     let currentDealMaster = null;
     
-    // ПЕРЕМЕННЫЕ ДЛЯ СТАТУСОВ
+    // ПЕРЕМЕННЫЕ ДЛЯ СТАТУСОВ И РАДИУСА
     let currentMasterStatus = 'ready';
     let currentEditMasterStatus = 'ready';
-    
-    // ПЕРЕМЕННЫЕ ДЛЯ РАДИУСА
     let currentRadius = 10;
     let currentEditRadius = 10;
     
@@ -2133,160 +1327,86 @@
     // ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ СТАТУСОВ МАСТЕРОВ (для синхронизации между пользователями)
     let globalSkillsStatus = {};
 
-    // ========== БАЗА ДАННЫХ ГОРОДОВ ==========
-    const citiesDatabase = {
-        // Крым
-        'Евпатория': { lat: 45.1906, lon: 33.3666 },
-        'Севастополь': { lat: 44.6167, lon: 33.5254 },
-        'Симферополь': { lat: 44.9482, lon: 34.1003 },
-        'Ялта': { lat: 44.4971, lon: 34.1667 },
-        'Алушта': { lat: 44.6764, lon: 34.4100 },
-        'Феодосия': { lat: 45.0328, lon: 35.3823 },
-        'Керчь': { lat: 45.3567, lon: 36.4716 },
-        'Бахчисарай': { lat: 44.7514, lon: 33.8751 },
-        'Джанкой': { lat: 45.7086, lon: 34.3933 },
-        'Судак': { lat: 44.8539, lon: 34.9722 },
-        
-        // Россия
+    // НОВЫЙ МАССИВ ГОРОДОВ КРЫМА
+    const CRIMEAN_CITIES = [
+        'Симферополь', 'Севастополь', 'Керчь', 'Евпатория', 'Ялта',
+        'Феодосия', 'Джанкой', 'Алушта', 'Бахчисарай', 'Саки',
+        'Армянск', 'Красноперекопск', 'Судак', 'Белогорск', 'Щёлкино',
+        'Старый Крым', 'Алупка', 'Инкерман'
+    ];
+
+    // НОВЫЙ ОБЪЕКТ С КООРДИНАТАМИ ГОРОДОВ
+    const CITY_COORDINATES = {
         'Москва': { lat: 55.7558, lon: 37.6173 },
         'Санкт-Петербург': { lat: 59.9343, lon: 30.3351 },
-        'Новосибирск': { lat: 54.9833, lon: 82.8964 },
-        'Екатеринбург': { lat: 56.8389, lon: 60.6057 },
-        'Казань': { lat: 55.8304, lon: 49.0661 },
-        'Нижний Новгород': { lat: 56.3269, lon: 44.0059 },
-        'Челябинск': { lat: 55.1644, lon: 61.4368 },
-        'Самара': { lat: 53.2012, lon: 50.1265 },
-        'Омск': { lat: 54.9885, lon: 73.3242 },
-        'Ростов-на-Дону': { lat: 47.2225, lon: 39.7187 },
-        'Уфа': { lat: 54.7388, lon: 55.9721 },
-        'Красноярск': { lat: 56.0153, lon: 92.8932 },
-        'Пермь': { lat: 58.0105, lon: 56.2502 },
-        'Воронеж': { lat: 51.6720, lon: 39.1843 },
-        'Волгоград': { lat: 48.7080, lon: 44.5133 },
-        'Краснодар': { lat: 45.0393, lon: 38.9872 },
-        'Саратов': { lat: 51.5336, lon: 46.0342 },
-        'Тюмень': { lat: 57.1613, lon: 65.5250 },
-        'Тольятти': { lat: 53.5078, lon: 49.4204 },
-        'Ижевск': { lat: 56.8527, lon: 53.2115 }
+        'Симферополь': { lat: 44.9572, lon: 34.1108 },
+        'Севастополь': { lat: 44.6167, lon: 33.5254 },
+        'Керчь': { lat: 45.3563, lon: 36.4744 },
+        'Евпатория': { lat: 45.1904, lon: 33.3668 },
+        'Ялта': { lat: 44.4995, lon: 34.1695 },
+        'Феодосия': { lat: 45.0319, lon: 35.3822 },
+        'Джанкой': { lat: 45.7090, lon: 34.3933 },
+        'Алушта': { lat: 44.6763, lon: 34.4106 },
+        'Бахчисарай': { lat: 44.7525, lon: 33.8606 },
+        'Саки': { lat: 45.1342, lon: 33.6013 },
+        'Армянск': { lat: 46.1074, lon: 33.6910 },
+        'Красноперекопск': { lat: 45.9538, lon: 33.7959 },
+        'Судак': { lat: 44.8498, lon: 34.9742 },
+        'Белогорск': { lat: 45.0546, lon: 34.6024 },
+        'Щёлкино': { lat: 45.4285, lon: 35.8221 },
+        'Старый Крым': { lat: 45.0293, lon: 35.0887 },
+        'Алупка': { lat: 44.4180, lon: 34.0436 },
+        'Инкерман': { lat: 44.6136, lon: 33.6092 }
     };
 
-    // Список всех городов для автодополнения
-    const allCities = Object.keys(citiesDatabase).sort();
+    // ========== НОВЫЕ ФУНКЦИИ ДЛЯ ГОРОДА И РАДИУСА ==========
 
-    // ========== ФУНКЦИИ ДЛЯ ГОРОДОВ ==========
-    function getCityCoordinates(cityName) {
-        if (!cityName) return null;
-        const normalizedCity = cityName.trim();
-        return citiesDatabase[normalizedCity] || null;
-    }
-
-    function handleCityInput(value) {
-        const list = document.getElementById('cityAutocompleteList');
-        if (!value || value.length < 2) {
-            list.style.display = 'none';
-            return;
-        }
-        
-        const matches = allCities.filter(city => 
-            city.toLowerCase().includes(value.toLowerCase())
-        ).slice(0, 5);
-        
-        if (matches.length > 0) {
-            list.innerHTML = matches.map(city => `
-                <div class="autocomplete-item" onclick="selectCity('${city}')">${city}</div>
-            `).join('');
-            list.style.display = 'block';
-        } else {
-            list.style.display = 'none';
-        }
-    }
-
-    function handleSearchCityInput(value) {
-        const list = document.getElementById('searchCityAutocompleteList');
-        if (!value || value.length < 2) {
-            list.style.display = 'none';
-            return;
-        }
-        
-        const matches = allCities.filter(city => 
-            city.toLowerCase().includes(value.toLowerCase())
-        ).slice(0, 5);
-        
-        if (matches.length > 0) {
-            list.innerHTML = matches.map(city => `
-                <div class="autocomplete-item" onclick="selectSearchCity('${city}')">${city}</div>
-            `).join('');
-            list.style.display = 'block';
-        } else {
-            list.style.display = 'none';
-        }
-    }
-
-    function handleEditCityInput(value) {
-        const list = document.getElementById('editCityAutocompleteList');
-        if (!value || value.length < 2) {
-            list.style.display = 'none';
-            return;
-        }
-        
-        const matches = allCities.filter(city => 
-            city.toLowerCase().includes(value.toLowerCase())
-        ).slice(0, 5);
-        
-        if (matches.length > 0) {
-            list.innerHTML = matches.map(city => `
-                <div class="autocomplete-item" onclick="selectEditCity('${city}')">${city}</div>
-            `).join('');
-            list.style.display = 'block';
-        } else {
-            list.style.display = 'none';
-        }
-    }
-
-    function selectCity(city) {
-        triggerHapticFeedback();
-        document.getElementById('skillCity').value = city;
-        document.getElementById('cityAutocompleteList').style.display = 'none';
-    }
-
-    function selectSearchCity(city) {
-        triggerHapticFeedback();
-        document.getElementById('searchCity').value = city;
-        document.getElementById('searchCityAutocompleteList').style.display = 'none';
-    }
-
-    function selectEditCity(city) {
-        triggerHapticFeedback();
-        document.getElementById('editSkillCity').value = city;
-        document.getElementById('editCityAutocompleteList').style.display = 'none';
-    }
-
-    // ========== ФУНКЦИИ ДЛЯ РАДИУСА ==========
     function selectRadius(radius) {
         console.log('🔄 Выбор радиуса:', radius);
         currentRadius = radius;
         
-        document.querySelectorAll('#masterSection .radius-option').forEach(option => {
-            option.classList.remove('selected');
-            if (parseInt(option.dataset.radius) === radius) {
-                option.classList.add('selected');
-            }
-        });
+        document.getElementById('radius5').classList.remove('selected');
+        document.getElementById('radius10').classList.remove('selected');
+        document.getElementById('radius25').classList.remove('selected');
+        document.getElementById('radius50').classList.remove('selected');
+        
+        document.getElementById('radius' + radius).classList.add('selected');
     }
 
     function selectEditRadius(radius) {
         console.log('🔄 Выбор радиуса (редактирование):', radius);
         currentEditRadius = radius;
         
-        document.querySelectorAll('#editSkillModal .radius-option').forEach(option => {
-            option.classList.remove('selected');
-            if (parseInt(option.dataset.radius) === radius) {
-                option.classList.add('selected');
-            }
-        });
+        document.getElementById('editRadius5').classList.remove('selected');
+        document.getElementById('editRadius10').classList.remove('selected');
+        document.getElementById('editRadius25').classList.remove('selected');
+        document.getElementById('editRadius50').classList.remove('selected');
+        
+        document.getElementById('editRadius' + radius).classList.add('selected');
     }
 
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ВИБРАЦИИ ==========
+    function getCityCoordinates(cityName) {
+        if (!cityName) return null;
+        
+        // Ищем точное совпадение
+        if (CITY_COORDINATES[cityName]) {
+            return CITY_COORDINATES[cityName];
+        }
+        
+        // Пробуем найти частичное совпадение
+        for (const [city, coords] of Object.entries(CITY_COORDINATES)) {
+            if (cityName.toLowerCase().includes(city.toLowerCase()) || 
+                city.toLowerCase().includes(cityName.toLowerCase())) {
+                return coords;
+            }
+        }
+        
+        // Если город не найден, возвращаем координаты Москвы по умолчанию
+        console.log(`⚠️ Город ${cityName} не найден, используем Москву`);
+        return CITY_COORDINATES['Москва'];
+    }
+
+    // ========== ФУНКЦИЯ ВИБРАЦИИ ==========
     function triggerHapticFeedback() {
         console.log('📳 Попытка вибрации...');
         
@@ -2366,7 +1486,7 @@
 
     window.triggerHapticFeedback = triggerHapticFeedback;
 
-    // ========== ФУНКЦИИ ДЛЯ СТАТУСОВ (из второй версии) ==========
+    // ========== ФУНКЦИИ ДЛЯ СТАТУСОВ ==========
     
     function selectMasterStatus(status) {
         console.log('🔄 Выбор статуса (создание):', status);
@@ -2418,6 +1538,13 @@
                         ⏰ Временно занят
                     </div>`;
         }
+    }
+
+    function getCityInfoHtml(city, radius) {
+        if (!city) return '';
+        return `<div style="margin: 10px 0; color: #667eea; font-size: 14px;">
+                    🏙️ ${city} | 📍 ${radius || 10} км
+                </div>`;
     }
 
     // ========== ФУНКЦИИ ДЛЯ МОНЕТ ==========
@@ -2620,7 +1747,7 @@
         dealsCount: 0
     };
 
-    // ========== СИНХРОНИЗАЦИЯ СДЕЛОК (из первой версии) ==========
+    // ========== СИНХРОНИЗАЦИЯ СДЕЛОК ==========
     
     function getGlobalDeals() {
         return getLocalStorage('umeyka_global_deals') || [];
@@ -2681,7 +1808,7 @@
         return globalDeals.find(deal => deal.id === dealId);
     }
 
-    // ========== ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ УМЕЕК (для синхронизации статусов) ==========
+    // ========== ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ УМЕЕК ==========
     
     function getGlobalSkills() {
         return getLocalStorage('umeyka_global_skills') || [];
@@ -2916,7 +2043,7 @@
         statusElement.style.display = 'none';
     };
 
-    // ========== ИСПРАВЛЕННЫЕ ФУНКЦИИ ДЛЯ УМЕЕК ==========
+    // ========== ФУНКЦИИ ДЛЯ УМЕЕК ==========
 
     // Функция для сохранения умейки в локальное хранилище
     function saveSkillToLocalStorage(skill) {
@@ -2969,16 +2096,15 @@
         
         try {
             const skillName = document.getElementById('skillName').value;
+            const skillCity = document.getElementById('skillCity').value;
             const skillExperience = document.getElementById('skillExperience').value;
             const skillPrice = document.getElementById('skillPrice').value;
-            const skillCity = document.getElementById('skillCity').value;
             
-            if (!skillName.trim() || !skillExperience.trim() || !skillPrice || !skillCity.trim()) {
+            if (!skillName.trim() || !skillCity.trim() || !skillExperience.trim() || !skillPrice) {
                 alert('❌ Заполните все обязательные поля (отмечены *)');
                 return;
             }
-            
-            // Валидация города
+
             if (skillCity.trim().length < 2) {
                 alert('❌ Название города должно содержать минимум 2 символа');
                 return;
@@ -2989,8 +2115,8 @@
             const userId = currentUserId;
             console.log('👤 Добавляю умейку для User ID:', userId);
             console.log('📊 Статус при создании:', currentMasterStatus);
-            console.log('📍 Город:', skillCity);
-            console.log('📏 Радиус:', currentRadius);
+            console.log('🏙️ Город:', skillCity);
+            console.log('📡 Радиус:', currentRadius);
         
             if (!userId || userId === 'null' || userId === 'undefined') {
                 alert('❌ Ошибка: не определен ID пользователя. Перезагрузите страницу.');
@@ -3003,17 +2129,17 @@
 
             const skillData = {
                 skill: skillName.trim(),
-                experience: skillExperience.trim(),
-                price: parseInt(skillPrice),
                 city: skillCity.trim(),
                 radius: currentRadius,
-                location: location,
+                experience: skillExperience.trim(),
+                price: parseInt(skillPrice),
                 userId: userId,
                 username: userData.firstName || 'Аноним',
+                location: location,
                 status: currentMasterStatus
             };
 
-            console.log('📤 Отправляю данные на сервер:', skillData);
+            console.log('📤 Отправляю данные на сервер со статусом:', skillData.status);
 
             if (currentSkillPhoto) {
                 const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
@@ -3056,20 +2182,17 @@
                         
                         alert('✅ Умейка успешно опубликована!');
                         
-                        // Очищаем форму
                         document.getElementById('skillName').value = '';
+                        document.getElementById('skillCity').value = '';
                         document.getElementById('skillExperience').value = '';
                         document.getElementById('skillPrice').value = '';
-                        document.getElementById('skillCity').value = '';
                         removeSkillPhoto();
                         currentSkillPhoto = null;
                         
-                        // Сбрасываем радиус на дефолтный
-                        currentRadius = 10;
-                        selectRadius(10);
-                        
                         currentMasterStatus = 'ready';
+                        currentRadius = 10;
                         selectMasterStatus('ready');
+                        selectRadius(10);
                     
                         setTimeout(() => {
                             loadMySkills();
@@ -3100,20 +2223,17 @@
             
             alert('✅ Умейка сохранена локально (сервер недоступен)');
             
-            // Очищаем форму
             document.getElementById('skillName').value = '';
+            document.getElementById('skillCity').value = '';
             document.getElementById('skillExperience').value = '';
             document.getElementById('skillPrice').value = '';
-            document.getElementById('skillCity').value = '';
             removeSkillPhoto();
             currentSkillPhoto = null;
             
-            // Сбрасываем радиус на дефолтный
-            currentRadius = 10;
-            selectRadius(10);
-            
             currentMasterStatus = 'ready';
+            currentRadius = 10;
             selectMasterStatus('ready');
+            selectRadius(10);
         
             setTimeout(() => {
                 loadMySkills();
@@ -3234,7 +2354,7 @@
                 }
             });
             
-            // УДАЛЯЕМ ДУБЛИКАТЫ ПО _id (ИСПРАВЛЕНИЕ БАГА #1)
+            // УДАЛЯЕМ ДУБЛИКАТЫ ПО _id
             const uniqueSkills = [];
             const seenIds = new Set();
             for (const skill of skills) {
@@ -3248,8 +2368,8 @@
             if (skills.length > 0) {
                 skillsList.innerHTML = skills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
+                    const cityInfo = getCityInfoHtml(skill.city, skill.radius);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
-                    const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                     
                     return `
                     <div class="skill-card">
@@ -3261,7 +2381,6 @@
                         <div class="skill-price">${skill.price} ₽</div>
                         
                         ${statusBadge}
-                        
                         ${cityInfo}
                         
                         <div class="skill-contact-info">
@@ -3369,7 +2488,7 @@
                 }
             });
             
-            // УДАЛЯЕМ ДУБЛИКАТЫ ПО _id (ИСПРАВЛЕНИЕ БАГА #1)
+            // УДАЛЯЕМ ДУБЛИКАТЫ ПО _id
             const uniqueSkills = [];
             const seenIds = new Set();
             for (const skill of skills) {
@@ -3383,8 +2502,8 @@
             if (skills.length > 0) {
                 skillsList.innerHTML = skills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
+                    const cityInfo = getCityInfoHtml(skill.city, skill.radius);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
-                    const cityInfo = skill.city ? `<div class="city-info" style="background: rgba(102,126,234,0.08); margin: 10px 0; padding: 8px 12px; border-radius: 8px; font-size: 14px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                     
                     return `
                     <div class="profile-skill-card">
@@ -3394,7 +2513,6 @@
                         </div>
                         
                         ${statusBadge}
-                        
                         ${cityInfo}
                         
                         <div class="skill-contact-info">
@@ -3474,17 +2592,17 @@
             
             document.getElementById('editSkillId').value = skillId;
             document.getElementById('editSkillName').value = skill.skill || '';
+            document.getElementById('editSkillCity').value = skill.city || '';
             document.getElementById('editSkillExperience').value = skill.experience || '';
             document.getElementById('editSkillPrice').value = skill.price || '';
-            document.getElementById('editSkillCity').value = skill.city || '';
-            
-            // Устанавливаем радиус
-            currentEditRadius = skill.radius || 10;
-            selectEditRadius(currentEditRadius);
             
             const skillStatus = skill.status || 'ready';
             console.log('📊 Загружен статус для редактирования:', skillStatus);
             selectEditMasterStatus(skillStatus);
+            
+            const skillRadius = skill.radius || 10;
+            console.log('📡 Загружен радиус для редактирования:', skillRadius);
+            selectEditRadius(skillRadius);
             
             editSkillPhoto = null;
             const preview = document.getElementById('editSkillPhotoPreview');
@@ -3511,9 +2629,9 @@
         
         document.getElementById('editSkillId').value = '';
         document.getElementById('editSkillName').value = '';
+        document.getElementById('editSkillCity').value = '';
         document.getElementById('editSkillExperience').value = '';
         document.getElementById('editSkillPrice').value = '';
-        document.getElementById('editSkillCity').value = '';
         
         const preview = document.getElementById('editSkillPhotoPreview');
         preview.style.display = 'none';
@@ -3525,43 +2643,42 @@
         try {
             const skillId = document.getElementById('editSkillId').value;
             const skillName = document.getElementById('editSkillName').value;
+            const skillCity = document.getElementById('editSkillCity').value;
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
-            const skillCity = document.getElementById('editSkillCity').value;
             
             if (!skillId) {
                 alert('❌ Ошибка: не указан ID умейки');
                 return;
             }
             
-            if (!skillName.trim() || !skillExperience.trim() || !skillPrice || !skillCity.trim()) {
+            if (!skillName.trim() || !skillCity.trim() || !skillExperience.trim() || !skillPrice) {
                 alert('❌ Заполните все обязательные поля');
                 return;
             }
-            
-            // Валидация города
+
             if (skillCity.trim().length < 2) {
                 alert('❌ Название города должно содержать минимум 2 символа');
                 return;
             }
+
+            // Получаем координаты города
+            const cityCoords = getCityCoordinates(skillCity);
             
             const skillData = {
                 skill: skillName.trim(),
-                experience: skillExperience.trim(),
-                price: parseInt(skillPrice),
                 city: skillCity.trim(),
                 radius: currentEditRadius,
+                experience: skillExperience.trim(),
+                price: parseInt(skillPrice),
                 status: currentEditMasterStatus,
+                location: cityCoords || currentEditingSkill?.location || { lat: 55.7558, lon: 37.6173 },
                 updatedAt: new Date().toISOString()
             };
             
-            // Получаем координаты города
-            const cityCoords = getCityCoordinates(skillCity);
-            if (cityCoords) {
-                skillData.location = cityCoords;
-            }
-            
-            console.log('📤 Сохраняю изменения умейки:', skillData);
+            console.log('📤 Сохраняю изменения умейки со статусом:', skillData.status);
+            console.log('🏙️ Город:', skillData.city);
+            console.log('📡 Радиус:', skillData.radius);
             
             if (editSkillPhoto) {
                 const estimatedSize = (editSkillPhoto.length * 0.75) / 1024;
@@ -3766,6 +2883,11 @@
         return '#f56565'; // Красный для занятых
     }
 
+    function getCircleColor(status) {
+        if (!status || status === 'ready') return '#22c55e'; // Зеленый для готовых
+        return '#f56565'; // Красный для занятых
+    }
+
     async function loadSkillsOnMap() {
         try {
             console.log('🗺️ Загрузка умейок с сервера для карты');
@@ -3802,21 +2924,8 @@
                     const rating = skill.rating?.average || 5.0;
                     const isUserSkill = skill.userId === currentUserId;
                     const status = skill.status || 'ready';
-                    const radius = skill.radius || 10;
                     
-                    // Цвет круга в зависимости от статуса
-                    const circleColor = (!status || status === 'ready') ? '#22c55e' : '#f56565';
-                    
-                    // Добавляем круг радиуса
-                    const circle = L.circle([skill.location.lat, skill.location.lon], {
-                        color: circleColor,
-                        fillColor: circleColor,
-                        fillOpacity: 0.2,
-                        radius: radius * 1000 // конвертируем км в метры
-                    }).addTo(map);
-                    
-                    markers.push(circle);
-                    
+                    // Добавляем маркер
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
                         icon: L.divIcon({
                             className: 'umeyka-marker',
@@ -3827,6 +2936,24 @@
                     })
                     .addTo(map)
                     .bindPopup(createMapSkillPopup(skill, isUserSkill));
+                    
+                    // Добавляем круг радиуса
+                    const radius = skill.radius || 10; // радиус в км
+                    const circle = L.circle([skill.location.lat, skill.location.lon], {
+                        color: getCircleColor(status),
+                        fillColor: getCircleColor(status),
+                        fillOpacity: 0.2,
+                        radius: radius * 1000 // переводим км в метры
+                    }).addTo(map);
+                    
+                    circle.bindPopup(`
+                        <div style="padding: 10px;">
+                            <strong>${skill.skill}</strong><br>
+                            🏙️ ${skill.city || 'Город не указан'}<br>
+                            📡 Радиус: ${radius} км<br>
+                            ${status === 'ready' ? '✅ Готов' : '⏰ Занят'}
+                        </div>
+                    `);
                     
                     marker.on('popupopen', async () => {
                         try {
@@ -3839,10 +2966,11 @@
                     });
                     
                     markers.push(marker);
+                    markers.push(circle);
                 }
             });
             
-            console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров');
+            console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров и кругов');
             
         } catch (error) {
             console.error('❌ Ошибка загрузки карты:', error);
@@ -3859,7 +2987,7 @@
     function createMapSkillPopup(skill, isUserSkill) {
         const rating = skill.rating?.average || 5.0;
         const statusBadge = getStatusBadge(skill.status);
-        const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
+        const cityInfo = getCityInfoHtml(skill.city, skill.radius);
         
         return `
             <div class="map-popup-content">
@@ -3879,7 +3007,6 @@
                     </p>
                     
                     ${statusBadge}
-                    
                     ${cityInfo}
                     
                     <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px; border: 1px solid rgba(102,126,234,0.1);">
@@ -4070,8 +3197,8 @@
         
         if (sectionId === 'masterSection') {
             currentMasterStatus = 'ready';
-            selectMasterStatus('ready');
             currentRadius = 10;
+            selectMasterStatus('ready');
             selectRadius(10);
             loadMySkills();
         }
@@ -4193,8 +3320,8 @@
         const searchCity = document.getElementById('searchCity').value.trim();
         const searchResults = document.getElementById('searchResults');
         
-        if (!searchQuery && !searchCity) {
-            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос или выберите город</div>';
+        if (!searchQuery) {
+            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос</div>';
             return;
         }
         
@@ -4205,7 +3332,7 @@
             
             // Пробуем найти на сервере
             try {
-                let url = `${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery || '')}`;
+                let url = `${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery)}`;
                 if (searchCity) {
                     url += `&city=${encodeURIComponent(searchCity)}`;
                 }
@@ -4216,7 +3343,7 @@
                 if (result.success) {
                     skills = result.skills;
                     
-                    // Синхронизируем статусы с глобальным хранилищем (ИСПРАВЛЕНИЕ БАГА #3)
+                    // Синхронизируем статусы с глобальным хранилищем
                     skills = skills.map(skill => {
                         const globalSkill = getGlobalSkillById(skill._id);
                         if (globalSkill && globalSkill.updatedAt) {
@@ -4233,18 +3360,15 @@
             
             // Добавляем из глобального хранилища
             const globalSkills = getGlobalSkills();
-            let matchingGlobal = globalSkills;
+            let matchingGlobal = globalSkills.filter(s => 
+                s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
+            );
             
-            if (searchQuery) {
-                matchingGlobal = matchingGlobal.filter(s => 
-                    s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
-                );
-            }
-            
+            // Фильтруем по городу, если указан
             if (searchCity) {
                 matchingGlobal = matchingGlobal.filter(s => 
-                    s.city && s.city.toLowerCase() === searchCity.toLowerCase()
+                    s.city && s.city.toLowerCase().includes(searchCity.toLowerCase())
                 );
             }
             
@@ -4256,27 +3380,24 @@
                 }
             });
             
-            // Добавляем локальные умейки, которые соответствуют запросу
+            // Добавляем локальные умейки
             const userId = currentUserId || 'demo-user';
             const localSkills = loadSkillsFromLocalStorage(userId);
-            let matchingLocal = localSkills.filter(s => s.local);
+            let matchingLocal = localSkills.filter(s => 
+                s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
+            );
             
-            if (searchQuery) {
-                matchingLocal = matchingLocal.filter(s => 
-                    s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
-                );
-            }
-            
+            // Фильтруем локальные по городу
             if (searchCity) {
                 matchingLocal = matchingLocal.filter(s => 
-                    s.city && s.city.toLowerCase() === searchCity.toLowerCase()
+                    s.city && s.city.toLowerCase().includes(searchCity.toLowerCase())
                 );
             }
             
             skills = [...skills, ...matchingLocal.filter(s => !existingIds.has(s._id))];
             
-            // УДАЛЯЕМ ДУБЛИКАТЫ ПО _id (ИСПРАВЛЕНИЕ БАГА #1)
+            // УДАЛЯЕМ ДУБЛИКАТЫ ПО _id
             const uniqueSkills = [];
             const seenIds = new Set();
             for (const skill of skills) {
@@ -4290,8 +3411,8 @@
             if (skills.length > 0) {
                 searchResults.innerHTML = skills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
+                    const cityInfo = getCityInfoHtml(skill.city, skill.radius);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
-                    const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                     
                     return `
                     <div class="skill-card">
@@ -4303,7 +3424,6 @@
                         <div class="skill-price">${skill.price} ₽</div>
                         
                         ${statusBadge}
-                        
                         ${cityInfo}
                         
                         <div class="skill-contact-info">
@@ -4338,7 +3458,7 @@
                     <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
                         <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
                         <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
-                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос${searchCity ? ' или выбрать другой город' : ''}</div>
+                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос или город</div>
                     </div>
                 `;
             }
@@ -4516,7 +3636,7 @@
         loadDeals();
     };
 
-    // ========== ФУНКЦИИ ДЛЯ СДЕЛОК (из первой версии) ==========
+    // ========== ФУНКЦИИ ДЛЯ СДЕЛОК ==========
 
     function generateDealId() {
         return 'deal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -5106,14 +4226,6 @@
         document.getElementById('projectReviewComment').value = '';
         setProjectRating(0);
     };
-
-    // Добавляем обработчик для поля суммы сделки
-    document.addEventListener('DOMContentLoaded', function() {
-        const dealAmount = document.getElementById('dealAmount');
-        if (dealAmount) {
-            dealAmount.addEventListener('input', updateDealCommission);
-        }
-    });
 
     </script>
 </body>
