@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* Все стили из первой версии + стили статусов из второй */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -106,6 +105,7 @@
             text-decoration: none;
             transition: all 0.3s ease;
             cursor: pointer;
+            width: 100%;
         }
         
         .main-button:active {
@@ -223,7 +223,6 @@
             transition: all 0.3s ease;
         }
 
-        /* СТИЛИ ДЛЯ СТАТУСОВ МАСТЕРА (из второй версии) */
         .master-status {
             display: inline-flex;
             align-items: center;
@@ -307,7 +306,6 @@
             box-shadow: 0 0 10px #f56565;
         }
         
-        /* СТИЛИ ДЛЯ ВЫБОРА РАДИУСА */
         .radius-selector {
             display: flex;
             gap: 10px;
@@ -386,7 +384,6 @@
             border-bottom: none;
         }
         
-        /* Остальные стили из первой версии */
         .skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -512,7 +509,6 @@
             border: 1px solid rgba(255,0,0,0.2);
         }
 
-        /* Стили для личного кабинета */
         .profile-skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -534,7 +530,6 @@
             gap: 8px;
         }
 
-        /* Стили для кнопок вкладок */
         .tab-buttons {
             display: flex;
             gap: 10px;
@@ -680,7 +675,6 @@
             border-radius: 4px;
         }
 
-        /* Стили для сделок (из первой версии) */
         .deal-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -768,7 +762,6 @@
         .view-button { background: #4299e1; color: white; }
         .complete-button { background: #ed8936; color: white; }
 
-        /* Стили для формы создания сделки */
         .quality-options {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -821,7 +814,6 @@
             border: 2px solid #10b981;
         }
 
-        /* Реферальная программа (из первой версии) */
         .referral-section {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
             padding: 25px 20px;
@@ -1025,7 +1017,6 @@
             margin-left: 5px;
         }
 
-        /* Кнопка реферальной программы в ЛК */
         .referral-tab-button {
             background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%) !important;
             border: 1px solid rgba(255,255,255,0.3) !important;
@@ -1035,7 +1026,6 @@
             background: linear-gradient(135deg, #8c6bcf 0%, #6f48c7 100%) !important;
         }
 
-        /* Стили для раздела "О проекте" */
         .about-section {
             background: rgba(255,255,255,0.9);
             padding: 25px;
@@ -1093,7 +1083,6 @@
             opacity: 0.9;
         }
 
-        /* Стили для кнопок вкладок сделок */
         .deals-tab-buttons {
             display: flex;
             flex-direction: column;
@@ -1136,7 +1125,6 @@
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
         }
 
-        /* Стили для фото в карточке */
         .skill-photo {
             width: 100%;
             height: 200px;
@@ -1189,7 +1177,6 @@
             height: 100%;
         }
 
-        /* Стили для модального окна редактирования */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1276,7 +1263,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* Стили для карточки в карте */
         .map-popup-content {
             min-width: 300px;
             max-width: 300px;
@@ -1335,7 +1321,6 @@
             color: white;
         }
 
-        /* Стили для загрузки фото */
         .photo-upload-area {
             border: 2px dashed #667eea;
             border-radius: 10px;
@@ -1394,7 +1379,6 @@
             margin-top: 5px;
         }
 
-        /* Стили для кнопок связи */
         .contact-buttons {
             display: flex;
             flex-direction: column;
@@ -1436,7 +1420,6 @@
             text-align: center;
         }
 
-        /* Стили для отображения контактов */
         .contact-info {
             background: #f7fafc;
             padding: 12px;
@@ -1478,7 +1461,6 @@
             cursor: pointer;
         }
 
-        /* Стили для кнопки "Составить сделку" */
         .create-deal-button {
             background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
             color: white;
@@ -1500,6 +1482,314 @@
         .create-deal-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
+        }
+
+        /* WALLET STYLES */
+        .wallet-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            padding: 25px 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            color: white;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .wallet-section::before {
+            content: '💳';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 40px;
+            color: white;
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .wallet-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wallet-balance {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .wallet-balance-amount {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .wallet-balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .wallet-stars {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wallet-star-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wallet-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .wallet-button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            padding: 18px;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .wallet-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+
+        .wallet-button.withdraw {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
+        }
+
+        .wallet-button.withdraw:hover {
+            box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
+        }
+
+        .wallet-button.history {
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .wallet-button.history:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .transaction-list {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #2d3748;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-type {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .transaction-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .transaction-amount {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .transaction-amount.positive {
+            color: #48bb78;
+        }
+
+        .transaction-amount.negative {
+            color: #f56565;
+        }
+
+        .transaction-status {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-refunded {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .wallet-tab-button {
+            background: linear-gradient(135deg, #38b2ac 0%, #319795 100%) !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+        }
+
+        .wallet-tab-button:hover {
+            background: linear-gradient(135deg, #2c9a94 0%, #2a7a76 100%) !important;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .payment-method {
+            padding: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .payment-method.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: white;
+        }
+
+        .payment-method-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .payment-method-label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .amount-selector {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .amount-option {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.1);
+            font-weight: 600;
+        }
+
+        .amount-option.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: white;
+        }
+
+        .withdrawal-form {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            color: #2d3748;
+        }
+
+        .withdrawal-info {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .withdrawal-info-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+
+        .withdrawal-info-item.total {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2d3748;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+
+        .profile-edit-button-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .profile-edit-button {
+            width: auto;
+            min-width: 250px;
+            padding: 18px 30px;
         }
     </style>
 </head>
@@ -1552,13 +1842,11 @@
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
                 
-                <!-- ПОЛЕ ГОРОДА -->
                 <div class="city-autocomplete">
                     <input type="text" id="skillCity" class="input-field" placeholder="🏙️ Город (например: Евпатория)*" required autocomplete="off" oninput="handleCityInput(this.value)">
                     <div id="cityAutocompleteList" class="autocomplete-list"></div>
                 </div>
                 
-                <!-- ВЫБОР РАДИУСА -->
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
                     <div class="radius-selector">
@@ -1580,7 +1868,6 @@
                     </div>
                 </div>
                 
-                <!-- ВЫБОР СТАТУСА МАСТЕРА -->
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                     <div class="status-selector">
@@ -1597,7 +1884,6 @@
                     </div>
                 </div>
                 
-                <!-- Загрузка фото -->
                 <div style="margin: 15px 0;">
                     <div style="color: white; margin-bottom: 10px;">📸 Фото вашей работы</div>
                     <div class="photo-upload-area" onclick="triggerHapticFeedback(); document.getElementById('skillPhotoInput').click();">
@@ -1631,7 +1917,6 @@
                 
                 <input type="text" id="searchInput" class="input-field" placeholder="🔎 Что ищем? (например: сантехник, электрик)">
                 
-                <!-- ПОЛЕ ГОРОДА В ПОИСКЕ -->
                 <div class="city-autocomplete">
                     <input type="text" id="searchCity" class="input-field" placeholder="🏙️ Город (опционально)" autocomplete="off" oninput="handleSearchCityInput(this.value)">
                     <div id="searchCityAutocompleteList" class="autocomplete-list"></div>
@@ -1650,7 +1935,6 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
                 
-                <!-- Профиль пользователя -->
                 <div id="userProfile">
                     <div style="text-align: center; margin-bottom: 20px;">
                         <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">
@@ -1661,12 +1945,13 @@
                         <div id="userBadges" style="margin: 10px 0;"></div>
                     </div>
                     
-                    <button class="main-button" onclick="triggerHapticFeedback(); editProfile();" style="margin-bottom: 15px;">
-                        ✏️ Редактировать профиль
-                    </button>
+                    <div class="profile-edit-button-container">
+                        <button class="main-button profile-edit-button" onclick="triggerHapticFeedback(); editProfile();">
+                            ✏️ Редактировать профиль
+                        </button>
+                    </div>
                 </div>
                 
-                <!-- Вкладки личного кабинета -->
                 <div class="tab-buttons">
                     <button class="tab-button active" onclick="triggerHapticFeedback(); showProfileTab('stats');" id="statsTab">
                         📊 Статистика
@@ -1677,18 +1962,19 @@
                     <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('deals');" id="dealsTab">
                         📝 Сделки
                     </button>
+                    <button class="tab-button wallet-tab-button" onclick="triggerHapticFeedback(); showProfileTab('wallet');" id="walletTab">
+                        💳 Кошелёк
+                    </button>
                     <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('referral');" id="referralTab">
                         🎁 Реферальная программа
                     </button>
                 </div>
                 
-                <!-- Статистика -->
                 <div id="profileStats" class="profile-tab">
                     <h3 style="margin-bottom: 15px;">📊 Моя статистика</h3>
                     <div id="userStats" class="stats-grid"></div>
                 </div>
                 
-                <!-- Мои умейки -->
                 <div id="profileSkills" class="profile-tab" style="display: none;">
                     <h3 style="margin-bottom: 15px;">✨ Мои умейки</h3>
                     <div id="profileSkillsList"></div>
@@ -1698,11 +1984,9 @@
                     </button>
                 </div>
                 
-                <!-- Сделки -->
                 <div id="profileDeals" class="profile-tab" style="display: none;">
                     <h3 style="margin-bottom: 15px;">📝 Мои сделки</h3>
                     
-                    <!-- Вкладки сделок -->
                     <div class="deals-tab-buttons">
                         <button class="deals-tab-button active" onclick="triggerHapticFeedback(); showDealsTab('pending');" id="pendingDealsTab">
                             ✍️ Ожидают подписи
@@ -1715,17 +1999,58 @@
                         </button>
                     </div>
                     
-                    <!-- Кнопка создания сделки -->
                     <button class="main-button" onclick="triggerHapticFeedback(); showCreateDealSection();" 
                             style="margin-bottom: 20px; background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);">
                         ➕ Создать сделку
                     </button>
                     
-                    <!-- Список сделок -->
                     <div id="dealsList"></div>
                 </div>
                 
-                <!-- РЕФЕРАЛЬНАЯ ПРОГРАММА -->
+                <!-- WALLET SECTION -->
+                <div id="profileWallet" class="profile-tab" style="display: none;">
+                    <div class="wallet-section">
+                        <div class="wallet-title">
+                            <span>💳</span>
+                            <span>Мой кошелёк</span>
+                        </div>
+                        
+                        <div class="wallet-balance">
+                            <div class="wallet-balance-amount" id="walletBalance">0 ₽</div>
+                            <div class="wallet-balance-label">Доступный баланс</div>
+                        </div>
+                        
+                        <div class="wallet-stars">
+                            <div class="wallet-star-item">
+                                <span>⭐</span>
+                                <span id="walletStars">0 Stars</span>
+                            </div>
+                            <div class="wallet-star-item">
+                                <span>🪙</span>
+                                <span id="walletCoins">0 монет</span>
+                            </div>
+                        </div>
+                        
+                        <div class="wallet-buttons">
+                            <button class="wallet-button" onclick="triggerHapticFeedback(); showDepositForm();">
+                                💰 Пополнить баланс
+                            </button>
+                            
+                            <button class="wallet-button withdraw" onclick="triggerHapticFeedback(); showWithdrawForm();">
+                                💸 Вывести средства
+                            </button>
+                            
+                            <button class="wallet-button history" onclick="triggerHapticFeedback(); showTransactionHistory();">
+                                📋 История операций
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="walletContent" style="margin-top: 25px;">
+                        <!-- Dynamic content will be loaded here -->
+                    </div>
+                </div>
+                
                 <div id="profileReferral" class="profile-tab" style="display: none;">
                     <div class="referral-section">
                         <div class="referral-title">
@@ -1738,7 +2063,6 @@
                             Приглашайте друзей в Umeyka и получайте звёзды за каждого приглашённого!
                         </div>
                         
-                        <!-- Статистика реферальной программы -->
                         <div class="referral-stats" id="referralStats">
                             <div class="referral-stat">
                                 <div class="referral-stat-value">
@@ -1761,7 +2085,6 @@
                             </div>
                         </div>
                         
-                        <!-- Реферальная ссылка -->
                         <div class="referral-link-container">
                             <div style="font-weight: bold; color: #667eea; margin-bottom: 10px;">Ваша реферальная ссылка:</div>
                             <div class="referral-link" id="referralLinkText">
@@ -1785,7 +2108,6 @@
                         </div>
                     </div>
 
-                    <!-- Список приглашенных друзей -->
                     <div style="margin-top: 25px;">
                         <h3 style="margin-bottom: 15px; color: white; text-align: center;">👥 Приглашённые друзья</h3>
                         <div id="referralFriendsList" style="min-height: 100px;">
@@ -1798,7 +2120,6 @@
                     </div>
                 </div>
                 
-                <!-- Ссылки на каналы -->
                 <div class="channel-links">
                     <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
                         <div class="channel-icon">🎯</div>
@@ -1826,7 +2147,6 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
         
-                <!-- Аватар -->
                 <div style="text-align: center; margin-bottom: 20px;">
                     <div id="avatarPreview" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; cursor: pointer;" onclick="triggerHapticFeedback(); changeAvatar();">
                         👤
@@ -1835,7 +2155,6 @@
                     <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
                 </div>
         
-                <!-- Основная информация -->
                 <input type="text" id="editFirstName" class="input-field" placeholder="Имя *" required>
                 <input type="number" id="editAge" class="input-field" placeholder="Возраст">
                 <input type="text" id="editExperience" class="input-field" placeholder="Общий опыт работы (например: 5 лет)">
@@ -1853,7 +2172,6 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📄 Создание сделки</h2>
                 
-                <!-- Скрытые поля для данных мастера -->
                 <input type="hidden" id="dealMasterId" value="">
                 <input type="hidden" id="dealMasterName" value="">
                 <input type="hidden" id="dealMasterSkill" value="">
@@ -1865,7 +2183,6 @@
                 <input type="text" id="dealPeriod" class="input-field" placeholder="Срок выполнения (например: 3 дня) *" required>
                 <input type="number" id="dealAmount" class="input-field" placeholder="Сумма в рублях *" required>
                 
-                <!-- Уровень качества -->
                 <div>
                     <label style="color: white; display: block; margin-bottom: 10px;">⭐ Уровень качества *</label>
                     <div class="quality-options">
@@ -1881,7 +2198,6 @@
                     </div>
                 </div>
                 
-                <!-- Дополнительные условия -->
                 <div>
                     <label style="color: white; display: block; margin-bottom: 10px;">✅ Дополнительные условия (выберите 2)</label>
                     <div class="additional-options">
@@ -1902,6 +2218,16 @@
                     <div>Сумма сделки: <span id="dealAmountDisplay">0</span> ₽</div>
                     <div>Комиссия 5%: <span id="commissionAmount">0</span> ₽</div>
                     <div style="font-weight: bold; margin-top: 5px;">Итого: <span id="totalAmount">0</span> ₽</div>
+                </div>
+
+                <div id="walletBalanceInfo" style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; margin: 15px 0; color: #2d3748;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>💳 Доступно в кошельке:</span>
+                        <span id="availableBalance" style="font-weight: bold; font-size: 18px;">0 ₽</span>
+                    </div>
+                    <div id="insufficientFunds" style="color: #e53e3e; font-size: 14px; margin-top: 10px; display: none;">
+                        ⚠️ Недостаточно средств. <a href="#" onclick="triggerHapticFeedback(); showDepositFormFromDeal();" style="color: #667eea;">Пополнить кошелёк</a>
+                    </div>
                 </div>
                 
                 <button class="submit-button" onclick="triggerHapticFeedback(); createDeal();">📝 Создать сделку</button>
@@ -1956,7 +2282,6 @@
                     </div>
                 </div>
 
-                <!-- Форма отзыва о проекте -->
                 <div class="about-section">
                     <h3 style="margin-bottom: 15px; text-align: center;">💬 Оставьте отзыв о проекте</h3>
                     
@@ -1975,7 +2300,6 @@
                     <button class="submit-button" onclick="triggerHapticFeedback(); submitProjectReview();">📤 Отправить отзыв</button>
                 </div>
 
-                <!-- Ссылки на каналы -->
                 <div class="channel-links">
                     <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
                         <div class="channel-icon">🎯</div>
@@ -2009,13 +2333,11 @@
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
-            <!-- ПОЛЕ ГОРОДА В РЕДАКТИРОВАНИИ -->
             <div class="city-autocomplete">
                 <input type="text" id="editSkillCity" class="input-field" placeholder="🏙️ Город" required autocomplete="off" oninput="handleEditCityInput(this.value)">
                 <div id="editCityAutocompleteList" class="autocomplete-list"></div>
             </div>
             
-            <!-- ВЫБОР РАДИУСА В РЕДАКТИРОВАНИИ -->
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
                 <div class="radius-selector" style="background: #f7fafc;">
@@ -2034,7 +2356,6 @@
                 </div>
             </div>
             
-            <!-- ВЫБОР СТАТУСА ПРИ РЕДАКТИРОВАНИИ -->
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                 <div class="status-selector" style="background: #f7fafc;">
@@ -2047,7 +2368,6 @@
                 </div>
             </div>
             
-            <!-- Загрузка фото для редактирования -->
             <div style="margin: 15px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📸 Фото вашей работы</div>
                 <div class="photo-upload-area" onclick="triggerHapticFeedback(); document.getElementById('editSkillPhotoInput').click();">
@@ -2119,23 +2439,18 @@
     let currentEditingSkill = null;
     let currentDealMaster = null;
     
-    // ПЕРЕМЕННЫЕ ДЛЯ СТАТУСОВ
     let currentMasterStatus = 'ready';
     let currentEditMasterStatus = 'ready';
     
-    // ПЕРЕМЕННЫЕ ДЛЯ РАДИУСА
     let currentRadius = 10;
     let currentEditRadius = 10;
     
-    // ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ УМЕЕК (как запасной вариант)
     let localSkills = {};
     
-    // ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ СТАТУСОВ МАСТЕРОВ (для синхронизации между пользователями)
     let globalSkillsStatus = {};
 
     // ========== БАЗА ДАННЫХ ГОРОДОВ ==========
     const citiesDatabase = {
-        // Крым
         'Евпатория': { lat: 45.1906, lon: 33.3666 },
         'Севастополь': { lat: 44.6167, lon: 33.5254 },
         'Симферополь': { lat: 44.9482, lon: 34.1003 },
@@ -2146,8 +2461,6 @@
         'Бахчисарай': { lat: 44.7514, lon: 33.8751 },
         'Джанкой': { lat: 45.7086, lon: 34.3933 },
         'Судак': { lat: 44.8539, lon: 34.9722 },
-        
-        // Россия
         'Москва': { lat: 55.7558, lon: 37.6173 },
         'Санкт-Петербург': { lat: 59.9343, lon: 30.3351 },
         'Новосибирск': { lat: 54.9833, lon: 82.8964 },
@@ -2170,8 +2483,564 @@
         'Ижевск': { lat: 56.8527, lon: 53.2115 }
     };
 
-    // Список всех городов для автодополнения
     const allCities = Object.keys(citiesDatabase).sort();
+
+    // ========== WALLET FUNCTIONS ==========
+    
+    function getWalletData() {
+        const data = getLocalStorage(`wallet_${currentUserId}`);
+        return data || {
+            balance: 0,
+            stars: 0,
+            transactions: [],
+            pendingWithdrawals: []
+        };
+    }
+
+    function saveWalletData(walletData) {
+        setLocalStorage(`wallet_${currentUserId}`, walletData);
+        updateWalletDisplay();
+    }
+
+    function updateWalletDisplay() {
+        const wallet = getWalletData();
+        const balanceEl = document.getElementById('walletBalance');
+        const starsEl = document.getElementById('walletStars');
+        const coinsEl = document.getElementById('walletCoins');
+        
+        if (balanceEl) balanceEl.textContent = `${wallet.balance.toLocaleString('ru-RU')} ₽`;
+        if (starsEl) starsEl.textContent = `${wallet.stars} Stars`;
+        if (coinsEl) coinsEl.textContent = `${getCoinsData()} монет`;
+        
+        // Update available balance in deal form
+        const availableBalanceEl = document.getElementById('availableBalance');
+        if (availableBalanceEl) {
+            availableBalanceEl.textContent = `${wallet.balance.toLocaleString('ru-RU')} ₽`;
+        }
+    }
+
+    function addTransaction(type, amount, description, status = 'completed', dealId = null) {
+        const wallet = getWalletData();
+        const transaction = {
+            id: 'trx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            type: type, // 'deposit', 'withdrawal', 'deal_payment', 'deal_income', 'refund'
+            amount: amount,
+            description: description,
+            status: status, // 'pending', 'completed', 'refunded'
+            timestamp: new Date().toISOString(),
+            dealId: dealId
+        };
+        
+        wallet.transactions.unshift(transaction);
+        saveWalletData(wallet);
+        return transaction;
+    }
+
+    function reserveFundsForDeal(amount, dealId) {
+        const wallet = getWalletData();
+        if (wallet.balance < amount) {
+            return { success: false, error: 'Недостаточно средств' };
+        }
+        
+        wallet.balance -= amount;
+        const transaction = addTransaction('deal_payment', -amount, `Резервирование средств для сделки #${dealId}`, 'pending', dealId);
+        saveWalletData(wallet);
+        
+        return { success: true, transaction: transaction };
+    }
+
+    function releaseFundsToMaster(dealId, masterId, amount) {
+        const wallet = getWalletData();
+        const commission = Math.round(amount * 0.05);
+        const masterAmount = amount - commission;
+        
+        // Find and update the pending transaction
+        const transactionIndex = wallet.transactions.findIndex(t => t.dealId === dealId && t.status === 'pending');
+        if (transactionIndex !== -1) {
+            wallet.transactions[transactionIndex].status = 'completed';
+        }
+        
+        // Add income to master's wallet
+        const masterWallet = getOrCreateWallet(masterId);
+        masterWallet.balance += masterAmount;
+        addTransaction.call({ getLocalStorage, setLocalStorage, currentUserId: masterId }, 'deal_income', masterAmount, `Оплата за сделку #${dealId}`, 'completed', dealId);
+        
+        // Save master wallet
+        setLocalStorage(`wallet_${masterId}`, masterWallet);
+        
+        // Add commission to system (admin wallet or just track it)
+        addTransaction('commission', commission, `Комиссия системы за сделку #${dealId}`, 'completed', dealId);
+        
+        saveWalletData(wallet);
+        return { success: true, masterAmount: masterAmount, commission: commission };
+    }
+
+    function refundClient(dealId, amount) {
+        const wallet = getWalletData();
+        
+        // Find and update the pending transaction
+        const transactionIndex = wallet.transactions.findIndex(t => t.dealId === dealId && t.status === 'pending');
+        if (transactionIndex !== -1) {
+            wallet.transactions[transactionIndex].status = 'refunded';
+        }
+        
+        wallet.balance += amount;
+        addTransaction('refund', amount, `Возврат средств по сделке #${dealId}`, 'completed', dealId);
+        saveWalletData(wallet);
+        
+        return { success: true };
+    }
+
+    function getOrCreateWallet(userId) {
+        let wallet = getLocalStorage(`wallet_${userId}`);
+        if (!wallet) {
+            wallet = {
+                balance: 0,
+                stars: 0,
+                transactions: [],
+                pendingWithdrawals: []
+            };
+            setLocalStorage(`wallet_${userId}`, wallet);
+        }
+        return wallet;
+    }
+
+    function showDepositForm() {
+        const walletContent = document.getElementById('walletContent');
+        walletContent.innerHTML = `
+            <div class="form-section" style="background: rgba(255,255,255,0.95); color: #2d3748;">
+                <h3 style="margin-bottom: 20px; text-align: center;">💰 Пополнение баланса</h3>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Выберите способ пополнения:</label>
+                    <div class="payment-methods">
+                        <div class="payment-method selected" onclick="selectPaymentMethod('card')" id="paymentCard">
+                            <div class="payment-method-icon">💳</div>
+                            <div class="payment-method-label">Карта</div>
+                        </div>
+                        <div class="payment-method" onclick="selectPaymentMethod('stars')" id="paymentStars">
+                            <div class="payment-method-icon">⭐</div>
+                            <div class="payment-method-label">Telegram Stars</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Выберите сумму:</label>
+                    <div class="amount-selector">
+                        <div class="amount-option" onclick="selectAmount(500)">500 ₽</div>
+                        <div class="amount-option" onclick="selectAmount(1000)">1 000 ₽</div>
+                        <div class="amount-option" onclick="selectAmount(2000)">2 000 ₽</div>
+                        <div class="amount-option" onclick="selectAmount(5000)">5 000 ₽</div>
+                    </div>
+                    <input type="number" id="customAmount" class="input-field" placeholder="Или введите свою сумму (мин. 100 ₽)" style="margin-top: 10px;">
+                </div>
+                
+                <div id="depositInfo" style="background: #f7fafc; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 14px; display: none;">
+                    <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                        <span>Сумма пополнения:</span>
+                        <span id="depositAmount" style="font-weight: bold;">0 ₽</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin: 8px 0;">
+                        <span>Комиссия:</span>
+                        <span id="depositFee" style="font-weight: bold;">0 ₽</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; color: #2d3748; border-top: 1px solid #e2e8f0; padding-top: 8px; margin-top: 8px;">
+                        <span>Итого к оплате:</span>
+                        <span id="depositTotal">0 ₽</span>
+                    </div>
+                </div>
+                
+                <button class="submit-button" onclick="processDeposit();" style="margin-top: 10px;">
+                    💳 Перейти к оплате
+                </button>
+                
+                <button class="main-button" onclick="triggerHapticFeedback(); showProfileTab('wallet');" style="margin-top: 10px; background: #e2e8f0; color: #4a5568;">
+                    ← Назад
+                </button>
+            </div>
+        `;
+        
+        // Add event listener for custom amount
+        setTimeout(() => {
+            const customAmountInput = document.getElementById('customAmount');
+            if (customAmountInput) {
+                customAmountInput.addEventListener('input', updateDepositInfo);
+            }
+        }, 100);
+    }
+
+    let selectedPaymentMethod = 'card';
+    let selectedAmount = 0;
+
+    function selectPaymentMethod(method) {
+        triggerHapticFeedback();
+        selectedPaymentMethod = method;
+        
+        document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+        document.getElementById(method === 'card' ? 'paymentCard' : 'paymentStars').classList.add('selected');
+        
+        updateDepositInfo();
+    }
+
+    function selectAmount(amount) {
+        triggerHapticFeedback();
+        selectedAmount = amount;
+        
+        document.querySelectorAll('.amount-option').forEach(el => el.classList.remove('selected'));
+        event.target.classList.add('selected');
+        
+        document.getElementById('customAmount').value = '';
+        updateDepositInfo();
+    }
+
+    function updateDepositInfo() {
+        const customAmount = parseInt(document.getElementById('customAmount')?.value) || 0;
+        const amount = selectedAmount || customAmount;
+        
+        if (amount >= 100) {
+            const fee = Math.round(amount * 0.02); // 2% commission
+            const total = amount + fee;
+            
+            document.getElementById('depositInfo').style.display = 'block';
+            document.getElementById('depositAmount').textContent = `${amount.toLocaleString('ru-RU')} ₽`;
+            document.getElementById('depositFee').textContent = `${fee.toLocaleString('ru-RU')} ₽`;
+            document.getElementById('depositTotal').textContent = `${total.toLocaleString('ru-RU')} ₽`;
+        } else {
+            document.getElementById('depositInfo').style.display = 'none';
+        }
+    }
+
+    function processDeposit() {
+        triggerHapticFeedback();
+        
+        const customAmount = parseInt(document.getElementById('customAmount')?.value) || 0;
+        const amount = selectedAmount || customAmount;
+        
+        if (amount < 100) {
+            alert('❌ Минимальная сумма пополнения - 100 ₽');
+            return;
+        }
+        
+        // Simulate payment processing
+        const fee = Math.round(amount * 0.02);
+        const total = amount + fee;
+        
+        // In real implementation, this would open Telegram Payment API
+        if (window.Telegram?.WebApp?.openInvoice) {
+            // Use Telegram Payments API
+            window.Telegram.WebApp.openInvoice({
+                title: 'Пополнение кошелька Umeyka',
+                description: `Пополнение на ${amount.toLocaleString('ru-RU')} ₽`,
+                payload: JSON.stringify({
+                    userId: currentUserId,
+                    amount: amount,
+                    type: 'deposit'
+                }),
+                provider_token: 'YOUR_PROVIDER_TOKEN', // Replace with actual token
+                currency: 'RUB',
+                prices: [{ label: 'Пополнение', amount: total * 100 }] // Amount in kopecks
+            }, (status) => {
+                if (status === 'paid') {
+                    const wallet = getWalletData();
+                    wallet.balance += amount;
+                    addTransaction('deposit', amount, `Пополнение через ${selectedPaymentMethod === 'card' ? 'карту' : 'Telegram Stars'}`, 'completed');
+                    saveWalletData(wallet);
+                    
+                    alert('✅ Баланс успешно пополнен!');
+                    showProfileTab('wallet');
+                } else {
+                    alert('❌ Оплата не завершена');
+                }
+            });
+        } else {
+            // Demo mode - simulate successful payment
+            setTimeout(() => {
+                const wallet = getWalletData();
+                wallet.balance += amount;
+                addTransaction('deposit', amount, `Пополнение через ${selectedPaymentMethod === 'card' ? 'карту' : 'Telegram Stars'} (Demo)`, 'completed');
+                saveWalletData(wallet);
+                
+                alert('✅ Баланс успешно пополнен! (Demo режим)');
+                showProfileTab('wallet');
+            }, 1500);
+        }
+    }
+
+    function showWithdrawForm() {
+        const wallet = getWalletData();
+        
+        if (wallet.balance < 1000) {
+            alert('❌ Минимальная сумма для вывода - 1 000 ₽');
+            return;
+        }
+        
+        const walletContent = document.getElementById('walletContent');
+        walletContent.innerHTML = `
+            <div class="withdrawal-form">
+                <h3 style="margin-bottom: 20px; text-align: center;">💸 Вывод средств</h3>
+                
+                <div class="withdrawal-info">
+                    <div class="withdrawal-info-item">
+                        <span>Доступно для вывода:</span>
+                        <span style="font-weight: bold;">${wallet.balance.toLocaleString('ru-RU')} ₽</span>
+                    </div>
+                    <div class="withdrawal-info-item">
+                        <span>Комиссия (3%):</span>
+                        <span style="font-weight: bold;">-${Math.round(wallet.balance * 0.03).toLocaleString('ru-RU')} ₽</span>
+                    </div>
+                    <div class="withdrawal-info-item total">
+                        <span>Итого к получению:</span>
+                        <span>${Math.round(wallet.balance * 0.97).toLocaleString('ru-RU')} ₽</span>
+                    </div>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: 600;">Способ вывода:</label>
+                    <select id="withdrawMethod" class="input-field" onchange="updateWithdrawForm()">
+                        <option value="card">💳 Банковская карта</option>
+                        <option value="sbp">📱 СБП (Система быстрых платежей)</option>
+                        <option value="wallet">👛 Электронный кошелёк</option>
+                    </select>
+                </div>
+                
+                <div id="withdrawDetails">
+                    <input type="text" id="cardNumber" class="input-field" placeholder="Номер карты (16 цифр)*">
+                    <input type="text" id="cardHolder" class="input-field" placeholder="Имя держателя карты*">
+                </div>
+                
+                <input type="number" id="withdrawAmount" class="input-field" placeholder="Сумма вывода (мин. 1000 ₽)*" 
+                       max="${wallet.balance}" value="${wallet.balance}">
+                
+                <div style="background: #fef3c7; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 14px; color: #92400e;">
+                    <strong>⚠️ Важно:</strong><br>
+                    • Вывод осуществляется в течение 1-3 рабочих дней<br>
+                    • Минимальная сумма вывода: 1 000 ₽<br>
+                    • Комиссия: 3% от суммы вывода
+                </div>
+                
+                <button class="submit-button" onclick="processWithdrawal();" style="margin-top: 10px;">
+                    💸 Заявка на вывод
+                </button>
+                
+                <button class="main-button" onclick="triggerHapticFeedback(); showProfileTab('wallet');" 
+                        style="margin-top: 10px; background: #e2e8f0; color: #4a5568;">
+                    ← Назад
+                </button>
+            </div>
+        `;
+    }
+
+    function updateWithdrawForm() {
+        const method = document.getElementById('withdrawMethod').value;
+        const detailsDiv = document.getElementById('withdrawDetails');
+        
+        if (method === 'card') {
+            detailsDiv.innerHTML = `
+                <input type="text" id="cardNumber" class="input-field" placeholder="Номер карты (16 цифр)*">
+                <input type="text" id="cardHolder" class="input-field" placeholder="Имя держателя карты*">
+            `;
+        } else if (method === 'sbp') {
+            detailsDiv.innerHTML = `
+                <input type="text" id="phoneNumber" class="input-field" placeholder="Номер телефона*">
+                <select id="sbpBank" class="input-field">
+                    <option value="">Выберите банк</option>
+                    <option value="sber">Сбербанк</option>
+                    <option value="tinkoff">Тинькофф</option>
+                    <option value="vtb">ВТБ</option>
+                    <option value="alfa">Альфа-Банк</option>
+                    <option value="raiff">Райффайзен</option>
+                </select>
+            `;
+        } else if (method === 'wallet') {
+            detailsDiv.innerHTML = `
+                <select id="walletType" class="input-field">
+                    <option value="">Выберите тип кошелька</option>
+                    <option value="qiwi">Qiwi</option>
+                    <option value="yoomoney">ЮMoney</option>
+                    <option value="webmoney">WebMoney</option>
+                </select>
+                <input type="text" id="walletNumber" class="input-field" placeholder="Номер кошелька*">
+            `;
+        }
+    }
+
+    function processWithdrawal() {
+        triggerHapticFeedback();
+        
+        const amount = parseInt(document.getElementById('withdrawAmount').value);
+        const wallet = getWalletData();
+        
+        if (!amount || amount < 1000) {
+            alert('❌ Минимальная сумма вывода - 1 000 ₽');
+            return;
+        }
+        
+        if (amount > wallet.balance) {
+            alert('❌ Недостаточно средств на балансе');
+            return;
+        }
+        
+        const method = document.getElementById('withdrawMethod').value;
+        let details = {};
+        
+        if (method === 'card') {
+            const cardNumber = document.getElementById('cardNumber').value;
+            const cardHolder = document.getElementById('cardHolder').value;
+            
+            if (!cardNumber || cardNumber.length < 16) {
+                alert('❌ Введите корректный номер карты');
+                return;
+            }
+            if (!cardHolder) {
+                alert('❌ Введите имя держателя карты');
+                return;
+            }
+            
+            details = { cardNumber: cardNumber.slice(-4), cardHolder };
+        } else if (method === 'sbp') {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const bank = document.getElementById('sbpBank').value;
+            
+            if (!phoneNumber) {
+                alert('❌ Введите номер телефона');
+                return;
+            }
+            if (!bank) {
+                alert('❌ Выберите банк');
+                return;
+            }
+            
+            details = { phoneNumber, bank };
+        } else if (method === 'wallet') {
+            const walletType = document.getElementById('walletType').value;
+            const walletNumber = document.getElementById('walletNumber').value;
+            
+            if (!walletType) {
+                alert('❌ Выберите тип кошелька');
+                return;
+            }
+            if (!walletNumber) {
+                alert('❌ Введите номер кошелька');
+                return;
+            }
+            
+            details = { walletType, walletNumber };
+        }
+        
+        // Create withdrawal request
+        const withdrawalRequest = {
+            id: 'wdr_' + Date.now(),
+            userId: currentUserId,
+            amount: amount,
+            method: method,
+            details: details,
+            status: 'pending',
+            createdAt: new Date().toISOString(),
+            fee: Math.round(amount * 0.03),
+            netAmount: Math.round(amount * 0.97)
+        };
+        
+        wallet.pendingWithdrawals.push(withdrawalRequest);
+        wallet.balance -= amount;
+        
+        addTransaction('withdrawal', -amount, `Заявка на вывод ${amount.toLocaleString('ru-RU')} ₽`, 'pending');
+        saveWalletData(wallet);
+        
+        alert('✅ Заявка на вывод создана! Обработка занимает 1-3 рабочих дня.');
+        showProfileTab('wallet');
+    }
+
+    function showTransactionHistory() {
+        const wallet = getWalletData();
+        const walletContent = document.getElementById('walletContent');
+        
+        let transactionsHtml = '';
+        
+        if (wallet.transactions.length === 0) {
+            transactionsHtml = `
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                    <div style="font-size: 50px; margin-bottom: 15px;">📋</div>
+                    <div style="font-size: 16px;">История операций пуста</div>
+                </div>
+            `;
+        } else {
+            transactionsHtml = wallet.transactions.map(trx => {
+                const date = new Date(trx.timestamp).toLocaleDateString('ru-RU');
+                const time = new Date(trx.timestamp).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                const isPositive = trx.amount > 0;
+                const statusClass = trx.status === 'completed' ? 'status-completed' : 
+                                   trx.status === 'refunded' ? 'status-refunded' : 'status-pending';
+                const statusText = trx.status === 'completed' ? '✅' : 
+                                  trx.status === 'refunded' ? '↩️' : '⏳';
+                
+                let typeIcon = '💰';
+                if (trx.type === 'deal_payment') typeIcon = '🤝';
+                if (trx.type === 'deal_income') typeIcon = '💵';
+                if (trx.type === 'withdrawal') typeIcon = '💸';
+                if (trx.type === 'refund') typeIcon = '↩️';
+                if (trx.type === 'commission') typeIcon = '🏦';
+                
+                return `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-type">${typeIcon} ${trx.description}</div>
+                            <div class="transaction-date">${date} ${time}</div>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <div class="transaction-amount ${isPositive ? 'positive' : 'negative'}">
+                                ${isPositive ? '+' : ''}${trx.amount.toLocaleString('ru-RU')} ₽
+                            </div>
+                            <div class="transaction-status ${statusClass}">${statusText}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Pending withdrawals section
+        let pendingWithdrawalsHtml = '';
+        if (wallet.pendingWithdrawals && wallet.pendingWithdrawals.filter(w => w.status === 'pending').length > 0) {
+            const pending = wallet.pendingWithdrawals.filter(w => w.status === 'pending');
+            pendingWithdrawalsHtml = `
+                <div style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px; color: white; text-align: center;">⏳ Заявки на вывод</h3>
+                    ${pending.map(w => `
+                        <div class="transaction-item" style="background: #fef3c7;">
+                            <div class="transaction-info">
+                                <div class="transaction-type">💸 Вывод средств</div>
+                                <div class="transaction-date">${new Date(w.createdAt).toLocaleDateString('ru-RU')}</div>
+                                <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                                    ${w.method === 'card' ? '💳 Карта' : w.method === 'sbp' ? '📱 СБП' : '👛 Кошелёк'} 
+                                    • ${w.netAmount.toLocaleString('ru-RU')} ₽ (с учётом комиссии)
+                                </div>
+                            </div>
+                            <div class="transaction-status status-pending">⏳ В обработке</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        walletContent.innerHTML = `
+            <div style="margin-top: 25px;">
+                <h3 style="margin-bottom: 15px; color: white; text-align: center;">📋 История операций</h3>
+                <div class="transaction-list">
+                    ${transactionsHtml}
+                </div>
+                ${pendingWithdrawalsHtml}
+                <button class="main-button" onclick="triggerHapticFeedback(); showProfileTab('wallet');" 
+                        style="margin-top: 20px; background: rgba(255,255,255,0.2);">
+                    ← Назад
+                </button>
+            </div>
+        `;
+    }
+
+    function showDepositFormFromDeal() {
+        showProfileTab('wallet');
+        setTimeout(() => showDepositForm(), 300);
+    }
 
     // ========== ФУНКЦИИ ДЛЯ ГОРОДОВ ==========
     function getCityCoordinates(cityName) {
@@ -2366,7 +3235,7 @@
 
     window.triggerHapticFeedback = triggerHapticFeedback;
 
-    // ========== ФУНКЦИИ ДЛЯ СТАТУСОВ (из второй версии) ==========
+    // ========== ФУНКЦИИ ДЛЯ СТАТУСОВ ==========
     
     function selectMasterStatus(status) {
         console.log('🔄 Выбор статуса (создание):', status);
@@ -2620,7 +3489,7 @@
         dealsCount: 0
     };
 
-    // ========== СИНХРОНИЗАЦИЯ СДЕЛОК (из первой версии) ==========
+    // ========== СИНХРОНИЗАЦИЯ СДЕЛОК ==========
     
     function getGlobalDeals() {
         return getLocalStorage('umeyka_global_deals') || [];
@@ -2681,7 +3550,7 @@
         return globalDeals.find(deal => deal.id === dealId);
     }
 
-    // ========== ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ УМЕЕК (для синхронизации статусов) ==========
+    // ========== ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ УМЕЕК ==========
     
     function getGlobalSkills() {
         return getLocalStorage('umeyka_global_skills') || [];
@@ -2693,7 +3562,6 @@
     
     function addGlobalSkill(skill) {
         const globalSkills = getGlobalSkills();
-        // Проверяем, существует ли уже такая умейка
         const existingIndex = globalSkills.findIndex(s => s._id === skill._id);
         if (existingIndex !== -1) {
             globalSkills[existingIndex] = skill;
@@ -2918,14 +3786,12 @@
 
     // ========== ИСПРАВЛЕННЫЕ ФУНКЦИИ ДЛЯ УМЕЕК ==========
 
-    // Функция для сохранения умейки в локальное хранилище
     function saveSkillToLocalStorage(skill) {
         const userId = currentUserId || 'demo-user';
         if (!localSkills[userId]) {
             localSkills[userId] = [];
         }
         
-        // Если это обновление, удаляем старую версию
         if (skill._id) {
             const index = localSkills[userId].findIndex(s => s._id === skill._id);
             if (index !== -1) {
@@ -2941,7 +3807,6 @@
         console.log(`💾 Умейка сохранена в localStorage для пользователя ${userId}`);
     }
 
-    // Функция для загрузки умейок из локального хранилища
     function loadSkillsFromLocalStorage(userId) {
         const skills = getLocalStorage(`skills_${userId}`);
         if (skills) {
@@ -2952,7 +3817,6 @@
         return [];
     }
 
-    // Функция для удаления умейки из локального хранилища
     function deleteSkillFromLocalStorage(skillId) {
         const userId = currentUserId || 'demo-user';
         if (localSkills[userId]) {
@@ -2978,7 +3842,6 @@
                 return;
             }
             
-            // Валидация города
             if (skillCity.trim().length < 2) {
                 alert('❌ Название города должно содержать минимум 2 символа');
                 return;
@@ -2997,7 +3860,6 @@
                 return;
             }
 
-            // Получаем координаты города
             const cityCoords = getCityCoordinates(skillCity);
             const location = cityCoords || userLocation || { lat: 55.7558, lon: 37.6173 };
 
@@ -3030,7 +3892,6 @@
 
             console.log('📤 Итоговые данные для отправки:', skillData);
 
-            // Пробуем отправить на сервер
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -3051,12 +3912,10 @@
                     console.log('📱 Ответ сервера при добавлении:', result);
                     
                     if (result.success) {
-                        // Сохраняем в глобальное хранилище для синхронизации
                         addGlobalSkill(result.skill || skillData);
                         
                         alert('✅ Умейка успешно опубликована!');
                         
-                        // Очищаем форму
                         document.getElementById('skillName').value = '';
                         document.getElementById('skillExperience').value = '';
                         document.getElementById('skillPrice').value = '';
@@ -3064,7 +3923,6 @@
                         removeSkillPhoto();
                         currentSkillPhoto = null;
                         
-                        // Сбрасываем радиус на дефолтный
                         currentRadius = 10;
                         selectRadius(10);
                         
@@ -3086,7 +3944,6 @@
                 console.log('⚠️ Сервер недоступен, сохраняем локально:', serverError);
             }
             
-            // Если сервер недоступен, сохраняем локально
             const localSkill = {
                 ...skillData,
                 _id: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
@@ -3094,13 +3951,11 @@
                 local: true
             };
             
-            // Сохраняем и в локальное, и в глобальное хранилище
             saveSkillToLocalStorage(localSkill);
             addGlobalSkill(localSkill);
             
             alert('✅ Умейка сохранена локально (сервер недоступен)');
             
-            // Очищаем форму
             document.getElementById('skillName').value = '';
             document.getElementById('skillExperience').value = '';
             document.getElementById('skillPrice').value = '';
@@ -3108,7 +3963,6 @@
             removeSkillPhoto();
             currentSkillPhoto = null;
             
-            // Сбрасываем радиус на дефолтный
             currentRadius = 10;
             selectRadius(10);
             
@@ -3140,12 +3994,10 @@
             if (result.success) {
                 console.log(`✅ Загружено ${result.skills.length} умейок с сервера`);
                 
-                // Синхронизируем с глобальным хранилищем
                 const globalSkills = getGlobalSkills();
                 result.skills.forEach(skill => {
                     const existingIndex = globalSkills.findIndex(s => s._id === skill._id);
                     if (existingIndex !== -1) {
-                        // Обновляем существующую, сохраняя статус из глобального хранилища если он новее
                         const existing = globalSkills[existingIndex];
                         if (existing.updatedAt && skill.updatedAt) {
                             if (new Date(existing.updatedAt) > new Date(skill.updatedAt)) {
@@ -3162,13 +4014,10 @@
                 return result.skills;
             } else {
                 console.error('❌ Ошибка загрузки умейок:', result.error);
-                // Возвращаем глобальные умейки
                 return getGlobalSkills();
             }
         } catch (error) {
             console.error('❌ Ошибка соединения с сервером:', error);
-            
-            // Возвращаем глобальные умейки
             return getGlobalSkills();
         }
     }
@@ -3190,7 +4039,6 @@
             
             let skills = [];
             
-            // Пробуем загрузить с сервера
             try {
                 const response = await fetch(`${API_URL}/api/skills/user/${userId}`);
                 
@@ -3200,9 +4048,7 @@
                     
                     if (result.success && result.skills) {
                         skills = result.skills;
-                        console.log(`✅ Найдено ${skills.length} моих умейок на сервере`);
                         
-                        // Синхронизируем статусы с глобальным хранилищем
                         skills = skills.map(skill => {
                             const globalSkill = getGlobalSkillById(skill._id);
                             if (globalSkill && globalSkill.updatedAt) {
@@ -3218,15 +4064,12 @@
                 console.log('⚠️ Сервер недоступен, загружаем локальные умейки');
             }
             
-            // Добавляем локальные умейки
             const localUserSkills = loadSkillsFromLocalStorage(userId);
             skills = [...skills, ...localUserSkills.filter(s => s.local)];
             
-            // Также добавляем из глобального хранилища умейки этого пользователя
             const globalSkills = getGlobalSkills();
             const myGlobalSkills = globalSkills.filter(s => s.userId === userId);
             
-            // Объединяем, избегая дубликатов
             const existingIds = new Set(skills.map(s => s._id));
             myGlobalSkills.forEach(skill => {
                 if (!existingIds.has(skill._id)) {
@@ -3234,7 +4077,6 @@
                 }
             });
             
-            // УДАЛЯЕМ ДУБЛИКАТЫ ПО _id (ИСПРАВЛЕНИЕ БАГА #1)
             const uniqueSkills = [];
             const seenIds = new Set();
             for (const skill of skills) {
@@ -3330,7 +4172,6 @@
             const skillsList = document.getElementById('profileSkillsList');
             let skills = [];
             
-            // Пробуем загрузить с сервера
             try {
                 const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
                 if (response.ok) {
@@ -3338,7 +4179,6 @@
                     if (result.success) {
                         skills = result.skills;
                         
-                        // Синхронизируем статусы с глобальным хранилищем
                         skills = skills.map(skill => {
                             const globalSkill = getGlobalSkillById(skill._id);
                             if (globalSkill && globalSkill.updatedAt) {
@@ -3354,11 +4194,9 @@
                 console.log('⚠️ Сервер недоступен для загрузки умейок в профиль');
             }
             
-            // Добавляем локальные умейки
             const localUserSkills = loadSkillsFromLocalStorage(currentUserId);
             skills = [...skills, ...localUserSkills.filter(s => s.local)];
             
-            // Добавляем из глобального хранилища
             const globalSkills = getGlobalSkills();
             const myGlobalSkills = globalSkills.filter(s => s.userId === currentUserId);
             
@@ -3369,7 +4207,6 @@
                 }
             });
             
-            // УДАЛЯЕМ ДУБЛИКАТЫ ПО _id (ИСПРАВЛЕНИЕ БАГА #1)
             const uniqueSkills = [];
             const seenIds = new Set();
             for (const skill of skills) {
@@ -3441,17 +4278,14 @@
             
             let skill = null;
             
-            // Сначала ищем в глобальном хранилище (для актуального статуса)
             skill = getGlobalSkillById(skillId);
             
-            // Если не нашли, ищем в локальных умейках
             if (!skill) {
                 const userId = currentUserId || 'demo-user';
                 const localSkills = loadSkillsFromLocalStorage(userId);
                 skill = localSkills.find(s => s._id === skillId);
             }
             
-            // Если не нашли локально, ищем на сервере
             if (!skill) {
                 try {
                     const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
@@ -3478,7 +4312,6 @@
             document.getElementById('editSkillPrice').value = skill.price || '';
             document.getElementById('editSkillCity').value = skill.city || '';
             
-            // Устанавливаем радиус
             currentEditRadius = skill.radius || 10;
             selectEditRadius(currentEditRadius);
             
@@ -3539,7 +4372,6 @@
                 return;
             }
             
-            // Валидация города
             if (skillCity.trim().length < 2) {
                 alert('❌ Название города должно содержать минимум 2 символа');
                 return;
@@ -3555,7 +4387,6 @@
                 updatedAt: new Date().toISOString()
             };
             
-            // Получаем координаты города
             const cityCoords = getCityCoordinates(skillCity);
             if (cityCoords) {
                 skillData.location = cityCoords;
@@ -3578,7 +4409,6 @@
             
             let updateSuccess = false;
             
-            // Пробуем обновить на сервере
             try {
                 const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                     method: 'PUT',
@@ -3594,14 +4424,12 @@
                     updateSuccess = true;
                     console.log('✅ Умейка обновлена на сервере');
                     
-                    // Обновляем в глобальном хранилище
                     addGlobalSkill({ ...currentEditingSkill, ...skillData });
                 }
             } catch (serverError) {
                 console.log('⚠️ Сервер недоступен для обновления, сохраняем локально');
             }
             
-            // Если сервер недоступен или это локальная умейка, обновляем локально
             if (!updateSuccess) {
                 const updatedSkill = {
                     ...currentEditingSkill,
@@ -3609,11 +4437,9 @@
                     local: true
                 };
                 
-                // Удаляем старую версию и сохраняем новую
                 deleteSkillFromLocalStorage(skillId);
                 saveSkillToLocalStorage(updatedSkill);
                 
-                // Обновляем в глобальном хранилище для синхронизации статуса
                 addGlobalSkill(updatedSkill);
                 
                 console.log('💾 Умейка обновлена локально и в глобальном хранилище');
@@ -3644,7 +4470,6 @@
                 
                 let deleteSuccess = false;
                 
-                // Пробуем удалить с сервера
                 try {
                     const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                         method: 'DELETE'
@@ -3661,10 +4486,8 @@
                     console.log('⚠️ Сервер недоступен, удаляем локально');
                 }
                 
-                // В любом случае удаляем из локального хранилища
                 deleteSkillFromLocalStorage(skillId);
                 
-                // Удаляем из глобального хранилища
                 const globalSkills = getGlobalSkills();
                 const updatedGlobalSkills = globalSkills.filter(s => s._id !== skillId);
                 setGlobalSkills(updatedGlobalSkills);
@@ -3762,8 +4585,8 @@
     }
 
     function getMarkerColor(status) {
-        if (!status || status === 'ready') return '#22c55e'; // Зеленый для готовых
-        return '#f56565'; // Красный для занятых
+        if (!status || status === 'ready') return '#22c55e';
+        return '#f56565';
     }
 
     async function loadSkillsOnMap() {
@@ -3804,15 +4627,13 @@
                     const status = skill.status || 'ready';
                     const radius = skill.radius || 10;
                     
-                    // Цвет круга в зависимости от статуса
                     const circleColor = (!status || status === 'ready') ? '#22c55e' : '#f56565';
                     
-                    // Добавляем круг радиуса
                     const circle = L.circle([skill.location.lat, skill.location.lon], {
                         color: circleColor,
                         fillColor: circleColor,
                         fillOpacity: 0.2,
-                        radius: radius * 1000 // конвертируем км в метры
+                        radius: radius * 1000
                     }).addTo(map);
                     
                     markers.push(circle);
@@ -4141,7 +4962,6 @@
             localStorage.setItem('umeyka_user_id', currentUserId);
             console.log('💾 User ID сохранен в localStorage:', currentUserId);
             
-            // Загружаем локальные умейки для пользователя
             loadSkillsFromLocalStorage(currentUserId);
         }
         
@@ -4152,7 +4972,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Umeyka app loaded successfully!');
         
-        // Устанавливаем начальные значения статусов и радиуса
         currentMasterStatus = 'ready';
         currentEditMasterStatus = 'ready';
         currentRadius = 10;
@@ -4177,7 +4996,6 @@
             }
         }
         
-        // Добавляем обработчик для поля суммы сделки
         const dealAmount = document.getElementById('dealAmount');
         if (dealAmount) {
             dealAmount.addEventListener('input', updateDealCommission);
@@ -4203,7 +5021,6 @@
         try {
             let skills = [];
             
-            // Пробуем найти на сервере
             try {
                 let url = `${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery || '')}`;
                 if (searchCity) {
@@ -4216,7 +5033,6 @@
                 if (result.success) {
                     skills = result.skills;
                     
-                    // Синхронизируем статусы с глобальным хранилищем (ИСПРАВЛЕНИЕ БАГА #3)
                     skills = skills.map(skill => {
                         const globalSkill = getGlobalSkillById(skill._id);
                         if (globalSkill && globalSkill.updatedAt) {
@@ -4231,7 +5047,6 @@
                 console.log('⚠️ Сервер недоступен для поиска');
             }
             
-            // Добавляем из глобального хранилища
             const globalSkills = getGlobalSkills();
             let matchingGlobal = globalSkills;
             
@@ -4248,7 +5063,6 @@
                 );
             }
             
-            // Объединяем, избегая дубликатов
             const existingIds = new Set(skills.map(s => s._id));
             matchingGlobal.forEach(skill => {
                 if (!existingIds.has(skill._id)) {
@@ -4256,7 +5070,6 @@
                 }
             });
             
-            // Добавляем локальные умейки, которые соответствуют запросу
             const userId = currentUserId || 'demo-user';
             const localSkills = loadSkillsFromLocalStorage(userId);
             let matchingLocal = localSkills.filter(s => s.local);
@@ -4276,7 +5089,6 @@
             
             skills = [...skills, ...matchingLocal.filter(s => !existingIds.has(s._id))];
             
-            // УДАЛЯЕМ ДУБЛИКАТЫ ПО _id (ИСПРАВЛЕНИЕ БАГА #1)
             const uniqueSkills = [];
             const seenIds = new Set();
             for (const skill of skills) {
@@ -4359,6 +5171,7 @@
         const userData = getOrCreateUserProfile(currentUserId);
         const referralData = getReferralData();
         const coins = getCoinsData();
+        const wallet = getWalletData();
         
         document.getElementById('userName').textContent = userData.firstName || 'Пользователь';
         document.getElementById('userBio').textContent = userData.bio || 'Расскажите о себе...';
@@ -4367,17 +5180,23 @@
             document.getElementById('userAvatar').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
         }
         
-        updateUserStats(userData, referralData, coins);
+        updateUserStats(userData, referralData, coins, wallet);
+        updateWalletDisplay();
     }
 
-    function updateUserStats(userData, referralData, coins) {
+    function updateUserStats(userData, referralData, coins, wallet) {
         const statsGrid = document.getElementById('userStats');
         if (!statsGrid) return;
         
         const stars = referralData?.starsEarned || 0;
         const goldCoins = coins || 0;
+        const balance = wallet?.balance || 0;
         
         statsGrid.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-value">${balance.toLocaleString('ru-RU')}</div>
+                <div class="stat-label">💳 Баланс</div>
+            </div>
             <div class="stat-card">
                 <div class="stat-value">${stars}</div>
                 <div class="stat-label">⭐ Звёзды</div>
@@ -4485,6 +5304,7 @@
         document.getElementById('profileStats').style.display = 'none';
         document.getElementById('profileSkills').style.display = 'none';
         document.getElementById('profileDeals').style.display = 'none';
+        document.getElementById('profileWallet').style.display = 'none';
         document.getElementById('profileReferral').style.display = 'none';
         
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -4492,6 +5312,7 @@
         document.getElementById('profileStats').style.display = tabName === 'stats' ? 'block' : 'none';
         document.getElementById('profileSkills').style.display = tabName === 'skills' ? 'block' : 'none';
         document.getElementById('profileDeals').style.display = tabName === 'deals' ? 'block' : 'none';
+        document.getElementById('profileWallet').style.display = tabName === 'wallet' ? 'block' : 'none';
         document.getElementById('profileReferral').style.display = tabName === 'referral' ? 'block' : 'none';
         
         document.getElementById(tabName + 'Tab').classList.add('active');
@@ -4500,6 +5321,9 @@
             loadProfileSkills();
         } else if (tabName === 'deals') {
             loadDeals();
+        } else if (tabName === 'wallet') {
+            updateWalletDisplay();
+            document.getElementById('walletContent').innerHTML = '';
         } else if (tabName === 'referral') {
             updateReferralStats();
         }
@@ -4516,7 +5340,7 @@
         loadDeals();
     };
 
-    // ========== ФУНКЦИИ ДЛЯ СДЕЛОК (из первой версии) ==========
+    // ========== ФУНКЦИИ ДЛЯ СДЕЛОК ==========
 
     function generateDealId() {
         return 'deal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -4606,6 +5430,14 @@
                 
                 const showCompleteButton = deal.status === 'active' && isMaster;
                 
+                const paymentStatus = deal.paymentStatus || 'pending';
+                const paymentStatusText = {
+                    'pending': '⏳ Ожидает оплаты',
+                    'reserved': '🔒 Зарезервировано',
+                    'completed': '✅ Оплачено',
+                    'refunded': '↩️ Возвращено'
+                }[paymentStatus] || '';
+                
                 return `
                     <div class="deal-card">
                         <div class="deal-header">
@@ -4671,6 +5503,11 @@
                                 <span>Итого к оплате:</span>
                                 <span>${Math.round(deal.amount * 1.05)} ₽</span>
                             </div>
+                            ${paymentStatusText ? `
+                                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e2e8f0; color: #667eea; font-weight: 600;">
+                                    ${paymentStatusText}
+                                </div>
+                            ` : ''}
                         </div>
                         
                         <div class="deal-actions">
@@ -4733,6 +5570,9 @@
         document.getElementById('dealTitle').value = `${skillName} - ${masterName}`;
         document.getElementById('dealDescription').value = `Сделка между ${clientName} (клиент) и ${masterName} (мастер) на услугу "${skillName}"`;
         
+        // Update wallet balance display
+        updateWalletDisplay();
+        
         showSection('createDealSection');
     };
 
@@ -4779,6 +5619,23 @@
             document.getElementById('commissionAmount').textContent = Math.round(commission);
             document.getElementById('totalAmount').textContent = Math.round(total);
             document.getElementById('dealCommission').style.display = 'block';
+            
+            // Check if user has enough balance
+            const wallet = getWalletData();
+            const insufficientFundsEl = document.getElementById('insufficientFunds');
+            const availableBalanceEl = document.getElementById('availableBalance');
+            
+            if (availableBalanceEl) {
+                availableBalanceEl.textContent = `${wallet.balance.toLocaleString('ru-RU')} ₽`;
+            }
+            
+            if (insufficientFundsEl) {
+                if (wallet.balance < total) {
+                    insufficientFundsEl.style.display = 'block';
+                } else {
+                    insufficientFundsEl.style.display = 'none';
+                }
+            }
         } else {
             document.getElementById('dealCommission').style.display = 'none';
         }
@@ -4791,7 +5648,7 @@
             const title = document.getElementById('dealTitle').value.trim();
             const description = document.getElementById('dealDescription').value.trim();
             const period = document.getElementById('dealPeriod').value.trim();
-            const amount = document.getElementById('dealAmount').value;
+            const amount = parseInt(document.getElementById('dealAmount').value);
             
             const masterId = document.getElementById('dealMasterId').value;
             const masterName = document.getElementById('dealMasterName').value;
@@ -4821,21 +5678,40 @@
                 return;
             }
             
+            // Check wallet balance
+            const totalAmount = Math.round(amount * 1.05);
+            const wallet = getWalletData();
+            
+            if (wallet.balance < totalAmount) {
+                alert('❌ Недостаточно средств в кошельке. Пополните баланс.');
+                return;
+            }
+            
             console.log('📤 Создаю сделку с мастером:', {
                 masterId, masterName, masterSkill, masterContact
             });
             
+            const dealId = generateDealId();
+            
+            // Reserve funds from client wallet
+            const reserveResult = reserveFundsForDeal(totalAmount, dealId);
+            if (!reserveResult.success) {
+                alert('❌ ' + reserveResult.error);
+                return;
+            }
+            
             const newDeal = {
-                id: generateDealId(),
+                id: dealId,
                 title: title,
                 description: description,
                 period: period,
-                amount: parseInt(amount),
+                amount: amount,
                 quality: selectedQuality,
                 options: [...selectedOptions],
                 commission: Math.round(amount * 0.05),
-                total: Math.round(amount * 1.05),
+                total: totalAmount,
                 status: 'pending',
+                paymentStatus: 'reserved',
                 clientSigned: false,
                 masterSigned: false,
                 createdAt: new Date().toISOString(),
@@ -4876,7 +5752,7 @@
             
             document.getElementById('dealCommission').style.display = 'none';
             
-            alert('✅ Сделка успешно создана! Теперь её должен подписать мастер.');
+            alert('✅ Сделка успешно создана! Средства зарезервированы. Теперь её должен подписать мастер.');
             
             showProfileSection();
             showProfileTab('deals');
@@ -4918,7 +5794,8 @@
             
             if (clientSigned && masterSigned) {
                 updates.status = 'active';
-                alert('🎉 Обе стороны подписали сделку! Сделка теперь активна.');
+                updates.paymentStatus = 'reserved';
+                alert('🎉 Обе стороны подписали сделку! Сделка теперь активна. Средства зарезервированы.');
             } else {
                 alert('✅ Вы успешно подписали сделку! Ожидайте подписи второй стороны.');
             }
@@ -4936,7 +5813,7 @@
     window.completeDeal = function(dealId) {
         triggerHapticFeedback();
         
-        if (confirm('✅ Завершить сделку? После завершения сделка будет перемещена в архив и вы сможете оставить отзыв мастеру.')) {
+        if (confirm('✅ Завершить сделку? Средства будут переведены мастеру с удержанием комиссии 5%.')) {
             try {
                 triggerHapticFeedback();
                 
@@ -4957,9 +5834,19 @@
                     return;
                 }
                 
+                // Release funds to master
+                const releaseResult = releaseFundsToMaster(dealId, deal.masterId, deal.amount);
+                if (!releaseResult.success) {
+                    alert('❌ Ошибка перевода средств');
+                    return;
+                }
+                
                 updateGlobalDeal(dealId, {
                     status: 'completed',
-                    completedAt: new Date().toISOString()
+                    paymentStatus: 'completed',
+                    completedAt: new Date().toISOString(),
+                    masterReceived: releaseResult.masterAmount,
+                    commissionPaid: releaseResult.commission
                 });
                 
                 addCoin();
@@ -4974,7 +5861,7 @@
                 clientData.rating = (clientData.rating || 0) + 0.5;
                 setLocalStorage(`user_${deal.clientId}`, clientData);
                 
-                alert('✅ Сделка успешно завершена! Благодарим за сотрудничество. Получена +1 🪙 монета!');
+                alert(`✅ Сделка успешно завершена! \n💵 Мастер получил: ${releaseResult.masterAmount.toLocaleString('ru-RU')} ₽\n🏦 Комиссия системы: ${releaseResult.commission.toLocaleString('ru-RU')} ₽\n🪙 Получена +1 монета!`);
                 
                 loadDeals();
                 loadUserProfile();
@@ -5008,6 +5895,13 @@
                 'completed': 'Завершена'
             }[deal.status] || 'Неизвестно';
             
+            const paymentStatusText = {
+                'pending': '⏳ Ожидает оплаты',
+                'reserved': '🔒 Зарезервировано',
+                'completed': '✅ Оплачено',
+                'refunded': '↩️ Возвращено'
+            }[deal.paymentStatus || 'pending'] || 'Неизвестно';
+            
             const qualityText = {
                 'premium': 'Премиум',
                 'standard': 'Стандарт',
@@ -5018,6 +5912,7 @@
                 <strong>Название:</strong> ${deal.title}<br><br>
                 <strong>Описание:</strong> ${deal.description}<br><br>
                 <strong>Статус:</strong> ${statusText}<br><br>
+                <strong>Статус оплаты:</strong> ${paymentStatusText}<br><br>
                 <strong>Ваша роль:</strong> ${roleText}<br><br>
                 <strong>Срок выполнения:</strong> ${deal.period}<br><br>
                 <strong>Сумма:</strong> ${deal.amount} ₽<br><br>
@@ -5033,6 +5928,7 @@
                 <strong>Статус подписи мастера:</strong> ${deal.masterSigned ? '✅ Подписана' : '❌ Не подписана'}<br><br>
                 <strong>Комиссия системы (5%):</strong> ${deal.commission} ₽<br><br>
                 <strong>Итого к оплате:</strong> ${deal.total} ₽
+                ${deal.masterReceived ? `<br><br><strong>Мастер получил:</strong> ${deal.masterReceived} ₽` : ''}
             `;
             
             alert(details);
@@ -5062,6 +5958,9 @@
         });
         
         document.getElementById('dealCommission').style.display = 'none';
+        
+        // Update wallet balance
+        updateWalletDisplay();
         
         currentDealMaster = null;
         document.getElementById('dealMasterId').value = '';
@@ -5107,7 +6006,6 @@
         setProjectRating(0);
     };
 
-    // Добавляем обработчик для поля суммы сделки
     document.addEventListener('DOMContentLoaded', function() {
         const dealAmount = document.getElementById('dealAmount');
         if (dealAmount) {
