@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Umeyka Admin - Панель управления</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary: #764ba2;
+            --primary-light: #667eea;
+            --secondary: #f093fb;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --danger: #f56565;
+            --dark: #1a202c;
+            --darker: #171923;
+            --card-bg: #2d3748;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a0aec0;
+            --border: #4a5568;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        }
+        
+        .login-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        
+        .login-logo {
+            font-size: 64px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        
+        .login-subtitle {
+            text-align: center;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .login-input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 18px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .login-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .security-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        /* Admin Layout */
+        .admin-container {
+            display: none;
+            min-height: 100vh;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .admin-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .admin-title {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .header-button {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .header-button:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        .logout-button {
+            background: rgba(245, 101, 101, 0.3);
+            border-color: rgba(245, 101, 101, 0.5);
+        }
+        
+        .logout-button:hover {
+            background: rgba(245, 101, 101, 0.5);
+        }
+        
+        /* Navigation */
+        .admin-nav {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .nav-tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: 2px solid transparent;
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .nav-tab.active {
+            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-color: rgba(255,255,255,0.3);
+        }
+        
+        /* Main Content */
+        .admin-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border-color: var(--primary);
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+            background: rgba(118, 75, 162, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .stat-change.positive {
+            background: rgba(72, 187, 120, 0.2);
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            background: rgba(245, 101, 101, 0.2);
+            color: var(--danger);
+        }
+        
+        /* Charts */
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .chart-canvas {
+            width: 100%;
+            height: 300px;
+        }
+        
+        /* Tables */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .search-input {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--dark);
+            color: var(--text-primary);
+            font-size: 14px;
+            min-width: 200px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .filter-select {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--dark);
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: rgba(118, 75, 162, 0.1);
+            padding: 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .data-table th:hover {
+            color: var(--text-primary);
+        }
+        
+        .data-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .data-table tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .user-id {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: rgba(72, 187, 120, 0.2);
+            color: var(--success);
+        }
+        
+        .status-blocked {
+            background: rgba(245, 101, 101, 0.2);
+            color: var(--danger);
+        }
+        
+        .status-pending {
+            background: rgba(237, 137, 54, 0.2);
+            color: var(--warning);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .action-btn.view {
+            background: rgba(66, 153, 225, 0.2);
+            color: #4299e1;
+        }
+        
+        .action-btn.block {
+            background: rgba(245, 101, 101, 0.2);
+            color: var(--danger);
+        }
+        
+        .action-btn.unblock {
+            background: rgba(72, 187, 120, 0.2);
+            color: var(--success);
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .page-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            background: var(--dark);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+        }
+        
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: calc(90vh - 100px);
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .detail-item {
+            background: var(--dark);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        /* Activity Log */
+        .log-entry {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            border-left: 3px solid var(--primary);
+            background: var(--dark);
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 12px;
+        }
+        
+        .log-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            min-width: 140px;
+            font-family: monospace;
+        }
+        
+        .log-content {
+            flex: 1;
+        }
+        
+        .log-action {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .log-details {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .nav-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+            
+            .data-table {
+                font-size: 12px;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 12px 8px;
+            }
+            
+            .user-cell {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+        
+        /* Loading */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, var(--card-bg) 25%, var(--border) 50%, var(--card-bg) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Export Button */
+        .export-btn {
+            background: linear-gradient(135deg, var(--success) 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+        
+        /* Session Timer */
+        .session-timer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 99;
+        }
+        
+        .timer-warning {
+            color: var(--warning);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .quick-action-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .quick-action-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .quick-action-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .quick-action-label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <div class="login-logo">🛡️</div>
+            <h1 class="login-title">Umeyka Admin</h1>
+            <p class="login-subtitle">Панель управления системой</p>
+            
+            <input type="password" id="adminPassword" class="login-input" placeholder="Введите пароль администратора" autocomplete="off">
+            <button class="login-button" onclick="adminLogin()">🔐 Войти в систему</button>
+            
+            <div class="security-info">
+                <div>🔒 Защищенное соединение</div>
+                <div style="margin-top: 5px; opacity: 0.7;">ID сессии: <span id="sessionId">-</span></div>
+                <div style="opacity: 0.7;">IP: <span id="clientIp">-</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminContainer" class="admin-container">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="admin-header-content">
+                <div class="admin-title">
+                    <span>🛡️</span>
+                    <span>Umeyka Admin</span>
+                    <span class="admin-badge">MASTER</span>
+                </div>
+                <div class="admin-actions">
+                    <button class="header-button" onclick="refreshAllData()">
+                        <span>🔄</span>
+                        <span>Обновить</span>
+                    </button>
+                    <button class="header-button logout-button" onclick="adminLogout()">
+                        <span>🚪</span>
+                        <span>Выйти</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="admin-nav">
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showTab('dashboard')" data-tab="dashboard">
+                    <span>📊</span>
+                    <span>Дашборд</span>
+                </button>
+                <button class="nav-tab" onclick="showTab('users')" data-tab="users">
+                    <span>👥</span>
+                    <span>Пользователи</span>
+                </button>
+                <button class="nav-tab" onclick="showTab('skills')" data-tab="skills">
+                    <span>✨</span>
+                    <span>Умейки</span>
+                </button>
+                <button class="nav-tab" onclick="showTab('deals')" data-tab="deals">
+                    <span>📝</span>
+                    <span>Сделки</span>
+                </button>
+                <button class="nav-tab" onclick="showTab('finance')" data-tab="finance">
+                    <span>💰</span>
+                    <span>Финансы</span>
+                </button>
+                <button class="nav-tab" onclick="showTab('disputes')" data-tab="disputes">
+                    <span>⚠️</span>
+                    <span>Споры</span>
+                </button>
+                <button class="nav-tab" onclick="showTab('logs')" data-tab="logs">
+                    <span>📋</span>
+                    <span>Журнал</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <main class="admin-content">
+            <!-- Dashboard Tab -->
+            <div id="tab-dashboard" class="tab-content">
+                <h2 class="section-title">📊 Обзор системы</h2>
+                
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="showTab('users')">
+                        <div class="quick-action-icon">👤</div>
+                        <div class="quick-action-label">Найти пользователя</div>
+                    </button>
+                    <button class="quick-action-btn" onclick="showTab('disputes')">
+                        <div class="quick-action-icon">🔍</div>
+                        <div class="quick-action-label">Проверить споры</div>
+                    </button>
+                    <button class="quick-action-btn" onclick="exportData('full')">
+                        <div class="quick-action-icon">📥</div>
+                        <div class="quick-action-label">Экспорт данных</div>
+                    </button>
+                    <button class="quick-action-btn" onclick="clearCache()">
+                        <div class="quick-action-icon">🗑️</div>
+                        <div class="quick-action-label">Очистить кэш</div>
+                    </button>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid" id="dashboardStats">
+                    <!-- Generated by JS -->
+                </div>
+
+                <!-- Charts -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">📈 Динамика регистраций (7 дней)</h3>
+                        <span class="loading-spinner"></span>
+                    </div>
+                    <canvas id="registrationsChart" class="chart-canvas"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">🌍 Топ городов по активности</h3>
+                    </div>
+                    <canvas id="citiesChart" class="chart-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="tab-users" class="tab-content" style="display: none;">
+                <h2 class="section-title">👥 Управление пользователями</h2>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Все пользователи</h3>
+                        <div class="table-actions">
+                            <input type="text" class="search-input" id="userSearch" placeholder="🔍 Поиск по ID, имени..." oninput="filterUsers()">
+                            <select class="filter-select" id="userStatusFilter" onchange="filterUsers()">
+                                <option value="all">Все статусы</option>
+                                <option value="active">Активные</option>
+                                <option value="blocked">Заблокированные</option>
+                            </select>
+                            <button class="export-btn" onclick="exportData('users')">
+                                <span>📥</span>
+                                <span>CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('users', 'name')">Пользователь ↕</th>
+                                <th onclick="sortTable('users', 'id')">ID ↕</th>
+                                <th onclick="sortTable('users', 'city')">Город ↕</th>
+                                <th onclick="sortTable('users', 'skills')">Умейки ↕</th>
+                                <th onclick="sortTable('users', 'deals')">Сделки ↕</th>
+                                <th onclick="sortTable('users', 'status')">Статус ↕</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Generated by JS -->
+                        </tbody>
+                    </table>
+                    <div class="pagination" id="usersPagination"></div>
+                </div>
+            </div>
+
+            <!-- Skills Tab -->
+            <div id="tab-skills" class="tab-content" style="display: none;">
+                <h2 class="section-title">✨ Модерация умейок</h2>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Все умейки</h3>
+                        <div class="table-actions">
+                            <input type="text" class="search-input" id="skillSearch" placeholder="🔍 Поиск..." oninput="filterSkills()">
+                            <select class="filter-select" id="skillStatusFilter" onchange="filterSkills()">
+                                <option value="all">Все статусы</option>
+                                <option value="ready">✅ Готовы</option>
+                                <option value="busy">⏰ Заняты</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Умейка</th>
+                                <th>Мастер</th>
+                                <th>Город</th>
+                                <th>Цена</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="skillsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Deals Tab -->
+            <div id="tab-deals" class="tab-content" style="display: none;">
+                <h2 class="section-title">📝 Все сделки</h2>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Список сделок</h3>
+                        <div class="table-actions">
+                            <select class="filter-select" id="dealStatusFilter" onchange="filterDeals()">
+                                <option value="all">Все статусы</option>
+                                <option value="pending">Ожидают</option>
+                                <option value="active">Активные</option>
+                                <option value="completed">Завершенные</option>
+                                <option value="dispute">Споры</option>
+                            </select>
+                            <button class="export-btn" onclick="exportData('deals')">
+                                <span>📥</span>
+                                <span>CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Клиент</th>
+                                <th>Мастер</th>
+                                <th>Сумма</th>
+                                <th>Статус</th>
+                                <th>Оплата</th>
+                                <th>Дата</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dealsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Finance Tab -->
+            <div id="tab-finance" class="tab-content" style="display: none;">
+                <h2 class="section-title">💰 Финансовый контроль</h2>
+                
+                <div class="stats-grid" id="financeStats"></div>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">Все транзакции</h3>
+                        <div class="table-actions">
+                            <select class="filter-select" id="transactionTypeFilter" onchange="filterTransactions()">
+                                <option value="all">Все типы</option>
+                                <option value="deposit">Пополнения</option>
+                                <option value="withdrawal">Выводы</option>
+                                <option value="payment">Оплаты</option>
+                                <option value="commission">Комиссии</option>
+                            </select>
+                            <button class="export-btn" onclick="exportData('transactions')">
+                                <span>📥</span>
+                                <span>CSV</span>
+                            </button>
+                        </div>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Тип</th>
+                                <th>Пользователь</th>
+                                <th>Сумма</th>
+                                <th>Описание</th>
+                                <th>Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Disputes Tab -->
+            <div id="tab-disputes" class="tab-content" style="display: none;">
+                <h2 class="section-title">⚠️ Сделки в споре</h2>
+                
+                <div id="disputesList">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+
+            <!-- Logs Tab -->
+            <div id="tab-logs" class="tab-content" style="display: none;">
+                <h2 class="section-title">📋 Журнал действий</h2>
+                
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title">История операций</h3>
+                        <button class="export-btn" onclick="exportData('logs')">
+                            <span>📥</span>
+                            <span>CSV</span>
+                        </button>
+                    </div>
+                    <div id="logsContainer" style="padding: 20px;">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div id="userModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">👤 Профиль пользователя</h3>
+                <button class="modal-close" onclick="closeModal('userModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="userModalBody">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Timer -->
+    <div class="session-timer" id="sessionTimer" style="display: none;">
+        <span>⏱️</span>
+        <span id="timerText">29:59</span>
+    </div>
+
+    <script>
+        // ========== CONFIGURATION ==========
+        const ADMIN_CONFIG = {
+            masterId: 'MASTER_ADMIN_001',
+            masterUsername: 'umeyka_admin',
+            sessionTimeout: 30 * 60 * 1000, // 30 minutes
+            cacheTimeout: 5 * 60 * 1000, // 5 minutes
+            password: 'umeyka2024secure' // В реальном приложении использовать хеш
+        };
+
+        // ========== STATE ==========
+        let currentAdmin = null;
+        let sessionStart = null;
+        let sessionTimer = null;
+        let cache = {
+            users: null,
+            skills: null,
+            deals: null,
+            transactions: null,
+            lastUpdate: null
+        };
+
+        let currentTab = 'dashboard';
+        let pagination = {
+            users: { page: 1, perPage: 10, total: 0 },
+            skills: { page: 1, perPage: 10, total: 0 },
+            deals: { page: 1, perPage: 10, total: 0 }
+        };
+
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            generateSessionId();
+            checkExistingSession();
+            initCharts();
+        });
+
+        function generateSessionId() {
+            const sessionId = 'adm_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5);
+            document.getElementById('sessionId').textContent = sessionId;
+            
+            // Симуляция IP (в реальности получать с сервера)
+            document.getElementById('clientIp').textContent = '***.***.***.' + Math.floor(Math.random() * 255);
+        }
+
+        // ========== AUTHENTICATION ==========
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            const tg = window.Telegram?.WebApp;
+            
+            // Проверка через Telegram WebApp initData или пароль
+            let isValid = false;
+            let authMethod = '';
+            
+            if (tg?.initDataUnsafe?.user?.username === ADMIN_CONFIG.masterUsername) {
+                isValid = true;
+                authMethod = 'telegram';
+            } else if (password === ADMIN_CONFIG.password) {
+                isValid = true;
+                authMethod = 'password';
+            }
+            
+            if (!isValid) {
+                alert('❌ Неверные учетные данные');
+                logAction('login_failed', { method: authMethod || 'unknown' });
+                return;
+            }
+            
+            // Создание сессии
+            currentAdmin = {
+                id: ADMIN_CONFIG.masterId,
+                username: tg?.initDataUnsafe?.user?.username || 'admin',
+                authMethod: authMethod,
+                loginTime: new Date().toISOString(),
+                ip: document.getElementById('clientIp').textContent,
+                sessionId: document.getElementById('sessionId').textContent
+            };
+            
+            sessionStart = Date.now();
+            localStorage.setItem('admin_session', JSON.stringify({
+                admin: currentAdmin,
+                startTime: sessionStart,
+                expires: sessionStart + ADMIN_CONFIG.sessionTimeout
+            }));
+            
+            logAction('login_success', { method: authMethod });
+            
+            showAdminPanel();
+            startSessionTimer();
+            loadAllData();
+        }
+
+        function checkExistingSession() {
+            const saved = localStorage.getItem('admin_session');
+            if (!saved) return;
+            
+            try {
+                const session = JSON.parse(saved);
+                if (Date.now() < session.expires) {
+                    currentAdmin = session.admin;
+                    sessionStart = session.startTime;
+                    showAdminPanel();
+                    startSessionTimer();
+                    loadAllData();
+                    logAction('session_restored', {});
+                } else {
+                    localStorage.removeItem('admin_session');
+                }
+            } catch (e) {
+                localStorage.removeItem('admin_session');
+            }
+        }
+
+        function adminLogout() {
+            logAction('logout', { duration: Date.now() - sessionStart });
+            localStorage.removeItem('admin_session');
+            currentAdmin = null;
+            clearInterval(sessionTimer);
+            
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('adminContainer').style.display = 'none';
+            document.getElementById('sessionTimer').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function showAdminPanel() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminContainer').style.display = 'block';
+            document.getElementById('sessionTimer').style.display = 'flex';
+        }
+
+        function startSessionTimer() {
+            updateTimer();
+            sessionTimer = setInterval(() => {
+                const elapsed = Date.now() - sessionStart;
+                const remaining = ADMIN_CONFIG.sessionTimeout - elapsed;
+                
+                if (remaining <= 0) {
+                    alert('⏰ Сессия истекла. Пожалуйста, войдите снова.');
+                    adminLogout();
+                    return;
+                }
+                
+                updateTimer(remaining);
+                
+                if (remaining < 5 * 60 * 1000) { // Менее 5 минут
+                    document.getElementById('timerText').classList.add('timer-warning');
+                }
+            }, 1000);
+        }
+
+        function updateTimer(remaining = ADMIN_CONFIG.sessionTimeout) {
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            document.getElementById('timerText').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // ========== DATA MANAGEMENT ==========
+        function loadAllData(force = false) {
+            const now = Date.now();
+            
+            // Проверка кэша
+            if (!force && cache.lastUpdate && (now - cache.lastUpdate < ADMIN_CONFIG.cacheTimeout)) {
+                console.log('📦 Using cached data');
+                renderDashboard();
+                return;
+            }
+            
+            console.log('🔄 Loading fresh data...');
+            
+            // Сбор данных из localStorage Umeyka
+            cache.users = collectAllUsers();
+            cache.skills = collectAllSkills();
+            cache.deals = collectAllDeals();
+            cache.transactions = collectAllTransactions();
+            cache.lastUpdate = now;
+            
+            renderDashboard();
+            renderUsers();
+            renderSkills();
+            renderDeals();
+            renderFinance();
+            renderDisputes();
+            renderLogs();
+            
+            logAction('data_refresh', { 
+                users: cache.users.length,
+                skills: cache.skills.length,
+                deals: cache.deals.length
+            });
+        }
+
+        function refreshAllData() {
+            loadAllData(true);
+            showNotification('🔄 Данные обновлены');
+        }
+
+        function clearCache() {
+            cache = { users: null, skills: null, deals: null, transactions: null, lastUpdate: null };
+            showNotification('🗑️ Кэш очищен');
+            loadAllData(true);
+        }
+
+        // ========== DATA COLLECTORS ==========
+        function collectAllUsers() {
+            const users = [];
+            const seen = new Set();
+            
+            // Сбор из всех ключей user_*
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key?.startsWith('user_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data && !seen.has(data.userId || key)) {
+                            seen.add(data.userId || key);
+                            users.push({
+                                ...data,
+                                _key: key,
+                                id: data.userId || key.replace('user_', ''),
+                                isBlocked: localStorage.getItem(`admin_block_${data.userId}`) === 'true'
+                            });
+                        }
+                    } catch (e) {}
+                }
+            }
+            
+            // Добавление пользователей из сделок (которых может не быть в профилях)
+            const deals = collectAllDeals();
+            deals.forEach(deal => {
+                [deal.clientId, deal.masterId].forEach(userId => {
+                    if (userId && !seen.has(userId)) {
+                        seen.add(userId);
+                        users.push({
+                            id: userId,
+                            firstName: deal.clientId === userId ? deal.clientName : deal.masterName,
+                            userId: userId,
+                            _generated: true
+                        });
+                    }
+                });
+            });
+            
+            return users;
+        }
+
+        function collectAllSkills() {
+            const skills = [];
+            
+            // Глобальные умейки
+            const global = JSON.parse(localStorage.getItem('umeyka_global_skills') || '[]');
+            skills.push(...global);
+            
+            // Локальные умейки всех пользователей
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key?.startsWith('skills_')) {
+                    try {
+                        const userSkills = JSON.parse(localStorage.getItem(key));
+                        if (Array.isArray(userSkills)) {
+                            userSkills.forEach(skill => {
+                                if (!skills.find(s => s._id === skill._id)) {
+                                    skills.push(skill);
+                                }
+                            });
+                        }
+                    } catch (e) {}
+                }
+            }
+            
+            return skills;
+        }
+
+        function collectAllDeals() {
+            return JSON.parse(localStorage.getItem('umeyka_global_deals') || '[]');
+        }
+
+        function collectAllTransactions() {
+            const transactions = [];
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key?.startsWith('finance_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        const userId = key.replace('finance_', '');
+                        if (data.transactions) {
+                            transactions.push(...data.transactions.map(t => ({
+                                ...t,
+                                userId: userId,
+                                userName: getUserName(userId)
+                            })));
+                        }
+                    } catch (e) {}
+                }
+            }
+            
+            return transactions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+
+        function getUserName(userId) {
+            const user = cache.users?.find(u => u.id === userId || u.userId === userId);
+            return user?.firstName || user?.username || userId;
+        }
+
+        // ========== RENDERERS ==========
+        function renderDashboard() {
+            const users = cache.users || [];
+            const skills = cache.skills || [];
+            const deals = cache.deals || [];
+            const transactions = cache.transactions || [];
+            
+            const activeUsers = users.filter(u => !u.isBlocked).length;
+            const blockedUsers = users.filter(u => u.isBlocked).length;
+            
+            const readySkills = skills.filter(s => !s.status || s.status === 'ready').length;
+            const busySkills = skills.filter(s => s.status === 'busy').length;
+            
+            const pendingDeals = deals.filter(d => d.status === 'pending').length;
+            const activeDeals = deals.filter(d => d.status === 'active').length;
+            const completedDeals = deals.filter(d => d.status === 'completed').length;
+            const disputeDeals = deals.filter(d => d.status === 'dispute').length;
+            
+            const totalVolume = transactions
+                .filter(t => t.type === 'payment' || t.type === 'deposit')
+                .reduce((sum, t) => sum + (t.amount || 0), 0);
+            
+            const totalCommission = transactions
+                .filter(t => t.type === 'commission')
+                .reduce((sum, t) => sum + (t.amount || 0), 0);
+            
+            const escrowBalance = deals
+                .filter(d => d.paymentStatus === 'escrow')
+                .reduce((sum, d) => sum + (d.escrowBalance || 0), 0);
+            
+            // Города
+            const cityStats = {};
+            skills.forEach(s => {
+                if (s.city) {
+                    cityStats[s.city] = (cityStats[s.city] || 0) + 1;
+                }
+            });
+            const topCities = Object.entries(cityStats)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+            
+            const statsHtml = `
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value">${users.length}</div>
+                    <div class="stat-label">Всего пользователей</div>
+                    <div class="stat-change positive">+${activeUsers} активных</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✨</div>
+                    <div class="stat-value">${skills.length}</div>
+                    <div class="stat-label">Всего умейок</div>
+                    <div class="stat-change ${readySkills > busySkills ? 'positive' : 'negative'}">
+                        ${readySkills} доступны / ${busySkills} заняты
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-value">${deals.length}</div>
+                    <div class="stat-label">Всего сделок</div>
+                    <div class="stat-change positive">
+                        ${completedDeals} завершено / ${activeDeals} активно
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value">${Math.round(totalVolume)}</div>
+                    <div class="stat-label">Оборот (Stars)</div>
+                    <div class="stat-change positive">
+                        ${Math.round(totalCommission)} комиссий
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔒</div>
+                    <div class="stat-value">${Math.round(escrowBalance)}</div>
+                    <div class="stat-label">В эскроу</div>
+                    <div class="stat-change ${escrowBalance > 0 ? 'positive' : ''}">
+                        ${deals.filter(d => d.paymentStatus === 'escrow').length} сделок
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-value">${disputeDeals}</div>
+                    <div class="stat-label">Споров</div>
+                    <div class="stat-change ${disputeDeals > 0 ? 'negative' : 'positive'}">
+                        ${disputeDeals > 0 ? 'Требуют внимания' : 'Все хорошо'}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('dashboardStats').innerHTML = statsHtml;
+            
+            // Обновление графиков
+            updateCharts(topCities);
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            const users = cache.users || [];
+            
+            // Фильтрация
+            const search = document.getElementById('userSearch')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('userStatusFilter')?.value || 'all';
+            
+            let filtered = users.filter(u => {
+                const matchesSearch = !search || 
+                    u.id?.toLowerCase().includes(search) ||
+                    u.firstName?.toLowerCase().includes(search) ||
+                    u.city?.toLowerCase().includes(search);
+                
+                const matchesStatus = statusFilter === 'all' || 
+                    (statusFilter === 'blocked' ? u.isBlocked : !u.isBlocked);
+                
+                return matchesSearch && matchesStatus;
+            });
+            
+            // Сортировка (простая)
+            filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            
+            // Пагинация
+            const { page, perPage } = pagination.users;
+            const total = filtered.length;
+            const start = (page - 1) * perPage;
+            const paginated = filtered.slice(start, start + perPage);
+            
+            tbody.innerHTML = paginated.map(u => {
+                const skills = (cache.skills || []).filter(s => s.userId === u.id).length;
+                const deals = (cache.deals || []).filter(d => d.clientId === u.id || d.masterId === u.id).length;
+                
+                return `
+                    <tr>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar">${(u.firstName?.[0] || '?').toUpperCase()}</div>
+                                <div class="user-info">
+                                    <div class="user-name">${u.firstName || 'Без имени'}</div>
+                                    <div class="user-id">${u.username || '@unknown'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><code>${u.id}</code></td>
+                        <td>${u.city || '-'}</td>
+                        <td>${skills}</td>
+                        <td>${deals}</td>
+                        <td>
+                            <span class="status-badge ${u.isBlocked ? 'status-blocked' : 'status-active'}">
+                                ${u.isBlocked ? '🔒 Заблокирован' : '✅ Активен'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn view" onclick="viewUser('${u.id}')" title="Просмотр">👁</button>
+                                <button class="action-btn ${u.isBlocked ? 'unblock' : 'block'}" 
+                                    onclick="toggleBlockUser('${u.id}')" 
+                                    title="${u.isBlocked ? 'Разблокировать' : 'Заблокировать'}">
+                                    ${u.isBlocked ? '🔓' : '🔒'}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            // Пагинация
+            const totalPages = Math.ceil(total / perPage);
+            document.getElementById('usersPagination').innerHTML = totalPages > 1 ? 
+                Array.from({length: totalPages}, (_, i) => i + 1).map(p => `
+                    <button class="page-btn ${p === page ? 'active' : ''}" onclick="goToPage('users', ${p})">${p}</button>
+                `).join('') : '';
+        }
+
+        function renderSkills() {
+            const tbody = document.getElementById('skillsTableBody');
+            const skills = cache.skills || [];
+            
+            const search = document.getElementById('skillSearch')?.value.toLowerCase() || '';
+            const statusFilter = document.getElementById('skillStatusFilter')?.value || 'all';
+            
+            let filtered = skills.filter(s => {
+                const matchesSearch = !search || 
+                    s.skill?.toLowerCase().includes(search) ||
+                    s.username?.toLowerCase().includes(search);
+                
+                const matchesStatus = statusFilter === 'all' || 
+                    (statusFilter === 'ready' ? (!s.status || s.status === 'ready') : s.status === 'busy');
+                
+                return matchesSearch && matchesStatus;
+            });
+            
+            tbody.innerHTML = filtered.slice(0, 50).map(s => `
+                <tr>
+                    <td>
+                        <strong>${s.skill}</strong>
+                        ${s.photo ? '<span style="color: var(--primary); margin-left: 8px;">📷</span>' : ''}
+                    </td>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar">${(s.username?.[0] || '?').toUpperCase()}</div>
+                            <span>${s.username || 'Unknown'}</span>
+                        </div>
+                    </td>
+                    <td>${s.city || '-'} <small>(${s.radius || 10}км)</small></td>
+                    <td><strong style="color: var(--success);">${s.price} ₽</strong></td>
+                    <td>
+                        <span class="status-badge ${!s.status || s.status === 'ready' ? 'status-active' : 'status-pending'}">
+                            ${!s.status || s.status === 'ready' ? '✅ Готов' : '⏰ Занят'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn block" onclick="deleteSkill('${s._id}')" title="Удалить">🗑</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderDeals() {
+            const tbody = document.getElementById('dealsTableBody');
+            const deals = cache.deals || [];
+            
+            const statusFilter = document.getElementById('dealStatusFilter')?.value || 'all';
+            
+            let filtered = deals;
+            if (statusFilter !== 'all') {
+                filtered = deals.filter(d => d.status === statusFilter);
+            }
+            
+            tbody.innerHTML = filtered.slice(0, 50).map(d => {
+                const paymentStatusColors = {
+                    'pending': 'var(--warning)',
+                    'paid': 'var(--success)',
+                    'escrow': 'var(--primary)',
+                    'released': 'var(--success)',
+                    'refunded': 'var(--danger)'
+                };
+                
+                return `
+                    <tr>
+                        <td><code>${d.id?.slice(-8) || 'N/A'}</code></td>
+                        <td>${d.clientName}</td>
+                        <td>${d.masterName}</td>
+                        <td><strong>${d.amount} ₽</strong></td>
+                        <td>
+                            <span class="status-badge status-${d.status === 'completed' ? 'active' : d.status === 'dispute' ? 'blocked' : 'pending'}">
+                                ${d.status === 'pending' ? '⏳ Ожидает' : 
+                                  d.status === 'active' ? '▶️ Активна' : 
+                                  d.status === 'completed' ? '✅ Завершена' : '⚠️ Спор'}
+                            </span>
+                        </td>
+                        <td style="color: ${paymentStatusColors[d.paymentStatus] || 'inherit'}">
+                            ${d.paymentStatus === 'pending' ? '⏳' : 
+                              d.paymentStatus === 'escrow' ? '🔒' : 
+                              d.paymentStatus === 'released' ? '✅' : '💳'} 
+                            ${d.paymentStatus || 'pending'}
+                        </td>
+                        <td>${new Date(d.createdAt).toLocaleDateString('ru-RU')}</td>
+                        <td>
+                            <button class="action-btn view" onclick="viewDeal('${d.id}')" title="Просмотр">👁</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderFinance() {
+            const transactions = cache.transactions || [];
+            const deals = cache.deals || [];
+            
+            // Статистика
+            const totalVolume = transactions
+                .filter(t => ['payment', 'deposit', 'payout'].includes(t.type))
+                .reduce((sum, t) => sum + Math.abs(t.amount || 0), 0);
+            
+            const totalCommission = transactions
+                .filter(t => t.type === 'commission')
+                .reduce((sum, t) => sum + (t.amount || 0), 0);
+            
+            const escrowTotal = deals
+                .filter(d => d.paymentStatus === 'escrow')
+                .reduce((sum, d) => sum + (d.escrowBalance || 0), 0);
+            
+            const pendingWithdrawals = transactions
+                .filter(t => t.type === 'withdrawal' && t.status === 'pending')
+                .reduce((sum, t) => sum + (t.amount || 0), 0);
+            
+            document.getElementById('financeStats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-icon">💸</div>
+                    <div class="stat-value">${Math.round(totalVolume)}</div>
+                    <div class="stat-label">Общий оборот</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value">${Math.round(totalCommission)}</div>
+                    <div class="stat-label">Комиссии</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔐</div>
+                    <div class="stat-value">${Math.round(escrowTotal)}</div>
+                    <div class="stat-label">Заморожено</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-value">${Math.round(pendingWithdrawals)}</div>
+                    <div class="stat-label">На выводе</div>
+                </div>
+            `;
+            
+            // Таблица транзакций
+            const typeFilter = document.getElementById('transactionTypeFilter')?.value || 'all';
+            let filtered = transactions;
+            if (typeFilter !== 'all') {
+                filtered = transactions.filter(t => t.type === typeFilter);
+            }
+            
+            document.getElementById('transactionsTableBody').innerHTML = filtered.slice(0, 100).map(t => {
+                const typeLabels = {
+                    'deposit': '⬇️ Пополнение',
+                    'withdrawal': '⬆️ Вывод',
+                    'payment': '💳 Оплата',
+                    'payout': '💰 Выплата',
+                    'commission': '💸 Комиссия',
+                    'escrow': '🔒 Эскроу',
+                    'release': '🔓 Разблокировка'
+                };
+                
+                return `
+                    <tr>
+                        <td><code>${t.id?.slice(-8) || 'N/A'}</code></td>
+                        <td>${typeLabels[t.type] || t.type}</td>
+                        <td>${t.userName || t.userId?.slice(-8) || 'Unknown'}</td>
+                        <td style="color: ${t.amount > 0 ? 'var(--success)' : 'var(--danger)'}; font-weight: 600;">
+                            ${t.amount > 0 ? '+' : ''}${t.amount} ⭐
+                        </td>
+                        <td>${t.description}</td>
+                        <td>${new Date(t.timestamp).toLocaleString('ru-RU')}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderDisputes() {
+            const disputes = (cache.deals || []).filter(d => d.status === 'dispute');
+            const container = document.getElementById('disputesList');
+            
+            if (disputes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🕊️</div>
+                        <h3>Нет активных споров</h3>
+                        <p>Все сделки проходят гладко</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = disputes.map(d => `
+                <div class="deal-card" style="margin-bottom: 20px; border-left: 4px solid var(--danger);">
+                    <div class="deal-header">
+                        <div>
+                            <h3>${d.title}</h3>
+                            <p style="color: var(--text-secondary); margin-top: 5px;">ID: ${d.id}</p>
+                        </div>
+                        <span class="status-badge status-blocked">⚠️ СПОР</span>
+                    </div>
+                    
+                    <div class="detail-grid" style="margin: 20px 0;">
+                        <div class="detail-item">
+                            <div class="detail-label">Клиент</div>
+                            <div class="detail-value">${d.clientName}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Мастер</div>
+                            <div class="detail-value">${d.masterName}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Сумма</div>
+                            <div class="detail-value">${d.amount} ₽</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">В эскроу</div>
+                            <div class="detail-value" style="color: var(--primary);">${d.escrowBalance || 0} ⭐</div>
+                        </div>
+                    </div>
+                    
+                    <p style="margin-bottom: 15px;"><strong>Описание:</strong> ${d.description}</p>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button class="export-btn" onclick="resolveDispute('${d.id}', 'refund')" style="background: var(--danger);">
+                            ↩️ Вернуть клиенту
+                        </button>
+                        <button class="export-btn" onclick="resolveDispute('${d.id}', 'payout')" style="background: var(--success);">
+                            💰 Выплатить мастеру
+                        </button>
+                        <button class="header-button" onclick="viewDeal('${d.id}')" style="margin-left: auto;">
+                            👁️ Подробнее
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderLogs() {
+            const logs = JSON.parse(localStorage.getItem('admin_logs') || '[]');
+            const container = document.getElementById('logsContainer');
+            
+            if (logs.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Журнал пуст</p></div>';
+                return;
+            }
+            
+            container.innerHTML = logs.slice().reverse().slice(0, 100).map(log => `
+                <div class="log-entry">
+                    <div class="log-time">${new Date(log.timestamp).toLocaleString('ru-RU')}</div>
+                    <div class="log-content">
+                        <div class="log-action">${log.action}</div>
+                        <div class="log-details">${JSON.stringify(log.details)}</div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                            by ${log.admin} | IP: ${log.ip}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ========== CHARTS ==========
+        function initCharts() {
+            // Placeholder для графиков (в реальности использовать Chart.js)
+            window.updateCharts = function(topCities) {
+                const regCanvas = document.getElementById('registrationsChart');
+                const cityCanvas = document.getElementById('citiesChart');
+                
+                if (regCanvas) drawSimpleChart(regCanvas, 'Регистрации', [12, 19, 15, 25, 22, 30, 28]);
+                if (cityCanvas) drawBarChart(cityCanvas, topCities);
+            };
+        }
+
+        function drawSimpleChart(canvas, label, data) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            // Grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.beginPath();
+            for (let i = 0; i <= 5; i++) {
+                const y = height - (i * height / 5);
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+            }
+            ctx.stroke();
+            
+            // Line
+            const max = Math.max(...data);
+            const stepX = width / (data.length - 1);
+            
+            ctx.strokeStyle = '#764ba2';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            data.forEach((val, i) => {
+                const x = i * stepX;
+                const y = height - (val / max * height * 0.8) - 20;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            
+            // Points
+            ctx.fillStyle = '#667eea';
+            data.forEach((val, i) => {
+                const x = i * stepX;
+                const y = height - (val / max * height * 0.8) - 20;
+                ctx.beginPath();
+                ctx.arc(x, y, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawBarChart(canvas, cities) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const max = Math.max(...cities.map(c => c[1]));
+            const barWidth = width / cities.length * 0.6;
+            const gap = width / cities.length * 0.4;
+            
+            cities.forEach(([city, count], i) => {
+                const barHeight = (count / max) * height * 0.7;
+                const x = i * (barWidth + gap) + gap / 2;
+                const y = height - barHeight - 30;
+                
+                // Bar
+                const gradient = ctx.createLinearGradient(0, y, 0, height - 30);
+                gradient.addColorStop(0, '#764ba2');
+                gradient.addColorStop(1, '#667eea');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, y, barWidth, barHeight);
+                
+                // Label
+                ctx.fillStyle = '#a0aec0';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(city.slice(0, 8), x + barWidth / 2, height - 10);
+                
+                // Value
+                ctx.fillStyle = '#fff';
+                ctx.fillText(count, x + barWidth / 2, y - 5);
+            });
+        }
+
+        // ========== ACTIONS ==========
+        function showTab(tab) {
+            // Update nav
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.getElementById(`tab-${tab}`).style.display = 'block';
+            
+            currentTab = tab;
+            
+            // Refresh specific data
+            if (tab === 'users') renderUsers();
+            if (tab === 'skills') renderSkills();
+            if (tab === 'deals') renderDeals();
+            if (tab === 'finance') renderFinance();
+            if (tab === 'disputes') renderDisputes();
+            if (tab === 'logs') renderLogs();
+        }
+
+        function filterUsers() { renderUsers(); }
+        function filterSkills() { renderSkills(); }
+        function filterDeals() { renderDeals(); }
+        function filterTransactions() { renderFinance(); }
+
+        function goToPage(type, page) {
+            pagination[type].page = page;
+            if (type === 'users') renderUsers();
+        }
+
+        function sortTable(type, field) {
+            // Simple sort implementation
+            console.log('Sorting by', field);
+        }
+
+        function viewUser(userId) {
+            const user = cache.users.find(u => u.id === userId);
+            if (!user) return;
+            
+            const skills = cache.skills.filter(s => s.userId === userId);
+            const deals = cache.deals.filter(d => d.clientId === userId || d.masterId === userId);
+            const finance = JSON.parse(localStorage.getItem(`finance_${userId}`) || '{}');
+            
+            document.getElementById('userModalBody').innerHTML = `
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">ID</div>
+                        <div class="detail-value"><code>${user.id}</code></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Имя</div>
+                        <div class="detail-value">${user.firstName || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Username</div>
+                        <div class="detail-value">${user.username || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Город</div>
+                        <div class="detail-value">${user.city || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Умейки</div>
+                        <div class="detail-value">${skills.length}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Сделки</div>
+                        <div class="detail-value">${deals.length}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Баланс</div>
+                        <div class="detail-value">${finance.availableBalance || 0} ⭐</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Статус</div>
+                        <div class="detail-value" style="color: ${user.isBlocked ? 'var(--danger)' : 'var(--success)'}">
+                            ${user.isBlocked ? '🔒 Заблокирован' : '✅ Активен'}
+                        </div>
+                    </div>
+                </div>
+                
+                <h4 style="margin: 24px 0 16px;">Умейки пользователя:</h4>
+                ${skills.length ? skills.map(s => `
+                    <div style="background: var(--dark); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
+                        <strong>${s.skill}</strong> - ${s.price} ₽ (${s.city || 'Без города'})
+                    </div>
+                `).join('') : '<p style="color: var(--text-secondary);">Нет умейок</p>'}
+                
+                <h4 style="margin: 24px 0 16px;">Последние сделки:</h4>
+                ${deals.slice(0, 5).map(d => `
+                    <div style="background: var(--dark); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>${d.title}</span>
+                            <span style="color: var(--primary);">${d.amount} ₽</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+                            ${new Date(d.createdAt).toLocaleDateString('ru-RU')} | ${d.status}
+                        </div>
+                    </div>
+                `).join('') || '<p style="color: var(--text-secondary);">Нет сделок</p>'}
+            `;
+            
+            document.getElementById('userModal').classList.add('active');
+            logAction('view_user', { userId });
+        }
+
+        function toggleBlockUser(userId) {
+            const isBlocked = localStorage.getItem(`admin_block_${userId}`) === 'true';
+            
+            if (isBlocked) {
+                localStorage.removeItem(`admin_block_${userId}`);
+                showNotification('✅ Пользователь разблокирован');
+                logAction('unblock_user', { userId });
+            } else {
+                if (confirm('🔒 Заблокировать пользователя? Он не сможет создавать сделки и умейки.')) {
+                    localStorage.setItem(`admin_block_${userId}`, 'true');
+                    showNotification('🔒 Пользователь заблокирован');
+                    logAction('block_user', { userId });
+                }
+            }
+            
+            loadAllData(true);
+        }
+
+        function deleteSkill(skillId) {
+            if (!confirm('🗑️ Удалить эту умейку?')) return;
+            
+            // Удаление из глобального хранилища
+            const global = JSON.parse(localStorage.getItem('umeyka_global_skills') || '[]');
+            const filtered = global.filter(s => s._id !== skillId);
+            localStorage.setItem('umeyka_global_skills', JSON.stringify(filtered));
+            
+            // Удаление из локальных хранилищ
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key?.startsWith('skills_')) {
+                    const skills = JSON.parse(localStorage.getItem(key) || '[]');
+                    const filtered = skills.filter(s => s._id !== skillId);
+                    localStorage.setItem(key, JSON.stringify(filtered));
+                }
+            }
+            
+            showNotification('🗑️ Умейка удалена');
+            logAction('delete_skill', { skillId });
+            loadAllData(true);
+        }
+
+        function viewDeal(dealId) {
+            const deal = cache.deals.find(d => d.id === dealId);
+            if (!deal) return;
+            
+            alert(`
+Сделка: ${deal.title}
+ID: ${deal.id}
+
+Клиент: ${deal.clientName} (${deal.clientId})
+Мастер: ${deal.masterName} (${deal.masterId})
+
+Сумма: ${deal.amount} ₽
+Комиссия: ${deal.commission} ₽
+Итого: ${deal.total} ₽
+
+Статус: ${deal.status}
+Оплата: ${deal.paymentStatus || 'pending'}
+
+Создана: ${new Date(deal.createdAt).toLocaleString('ru-RU')}
+            `);
+            
+            logAction('view_deal', { dealId });
+        }
+
+        function resolveDispute(dealId, resolution) {
+            const deal = cache.deals.find(d => d.id === dealId);
+            if (!deal) return;
+            
+            if (resolution === 'refund') {
+                // Возврат клиенту
+                const clientFinance = JSON.parse(localStorage.getItem(`finance_${deal.clientId}`) || '{}');
+                clientFinance.availableBalance = (clientFinance.availableBalance || 0) + (deal.escrowBalance || 0);
+                clientFinance.transactions = clientFinance.transactions || [];
+                clientFinance.transactions.unshift({
+                    id: 'tx_' + Date.now(),
+                    type: 'refund',
+                    amount: deal.escrowBalance,
+                    description: `Возврат по спорной сделке: ${deal.title}`,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem(`finance_${deal.clientId}`, JSON.stringify(clientFinance));
+                
+                updateDeal(dealId, { status: 'completed', paymentStatus: 'refunded', resolvedAt: new Date().toISOString() });
+                showNotification('↩️ Средства возвращены клиенту');
+                logAction('dispute_refund', { dealId, amount: deal.escrowBalance });
+                
+            } else {
+                // Выплата мастеру
+                const masterFinance = JSON.parse(localStorage.getItem(`finance_${deal.masterId}`) || '{}');
+                masterFinance.availableBalance = (masterFinance.availableBalance || 0) + (deal.masterPayout || deal.amount * 0.95);
+                masterFinance.transactions = masterFinance.transactions || [];
+                masterFinance.transactions.unshift({
+                    id: 'tx_' + Date.now(),
+                    type: 'payout',
+                    amount: deal.masterPayout || deal.amount * 0.95,
+                    description: `Выплата по спорной сделке: ${deal.title}`,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem(`finance_${deal.masterId}`, JSON.stringify(masterFinance));
+                
+                updateDeal(dealId, { status: 'completed', paymentStatus: 'released', resolvedAt: new Date().toISOString() });
+                showNotification('💰 Средства выплачены мастеру');
+                logAction('dispute_payout', { dealId, amount: deal.masterPayout || deal.amount * 0.95 });
+            }
+            
+            loadAllData(true);
+        }
+
+        function updateDeal(dealId, updates) {
+            const deals = JSON.parse(localStorage.getItem('umeyka_global_deals') || '[]');
+            const idx = deals.findIndex(d => d.id === dealId);
+            if (idx !== -1) {
+                deals[idx] = { ...deals[idx], ...updates };
+                localStorage.setItem('umeyka_global_deals', JSON.stringify(deals));
+            }
+        }
+
+        function exportData(type) {
+            let data = [];
+            let filename = '';
+            
+            switch(type) {
+                case 'users':
+                    data = cache.users;
+                    filename = 'users_export.csv';
+                    break;
+                case 'deals':
+                    data = cache.deals;
+                    filename = 'deals_export.csv';
+                    break;
+                case 'transactions':
+                    data = cache.transactions;
+                    filename = 'transactions_export.csv';
+                    break;
+                case 'logs':
+                    data = JSON.parse(localStorage.getItem('admin_logs') || '[]');
+                    filename = 'admin_logs.csv';
+                    break;
+                case 'full':
+                    data = {
+                        users: cache.users,
+                        skills: cache.skills,
+                        deals: cache.deals,
+                        transactions: cache.transactions,
+                        exportDate: new Date().toISOString()
+                    };
+                    filename = 'full_backup.json';
+                    break;
+            }
+            
+            const content = type === 'full' ? 
+                JSON.stringify(data, null, 2) : 
+                convertToCSV(data);
+            
+            const blob = new Blob([content], { type: type === 'full' ? 'application/json' : 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+            
+            showNotification('📥 Экспорт завершен');
+            logAction('export', { type, records: data.length || Object.keys(data).length });
+        }
+
+        function convertToCSV(data) {
+            if (!data || !data.length) return '';
+            const headers = Object.keys(data[0]);
+            const rows = data.map(obj => headers.map(h => {
+                const val = obj[h];
+                return typeof val === 'string' && val.includes(',') ? `"${val}"` : val;
+            }).join(','));
+            return [headers.join(','), ...rows].join('\n');
+        }
+
+        // ========== UTILITIES ==========
+        function logAction(action, details) {
+            const logs = JSON.parse(localStorage.getItem('admin_logs') || '[]');
+            logs.push({
+                timestamp: new Date().toISOString(),
+                admin: currentAdmin?.username || 'unknown',
+                action: action,
+                details: details,
+                ip: currentAdmin?.ip || 'unknown',
+                sessionId: currentAdmin?.sessionId
+            });
+            
+            // Хранить только последние 1000 записей
+            if (logs.length > 1000) logs.shift();
+            
+            localStorage.setItem('admin_logs', JSON.stringify(logs));
+        }
+
+        function showNotification(message) {
+            const notif = document.createElement('div');
+            notif.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+                color: white;
+                padding: 16px 24px;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                z-index: 10000;
+                font-weight: 600;
+                animation: slideIn 0.3s ease;
+            `;
+            notif.textContent = message;
+            document.body.appendChild(notif);
+            
+            setTimeout(() => {
+                notif.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notif.remove(), 300);
+            }, 3000);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Закрытие модалок по клику вне
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('active');
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (!currentAdmin) return;
+            
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+            }
+            
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'r':
+                        e.preventDefault();
+                        refreshAllData();
+                        break;
+                    case '1':
+                        e.preventDefault();
+                        showTab('dashboard');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        showTab('users');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        showTab('deals');
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
