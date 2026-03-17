@@ -1928,6 +1928,14 @@
                     <span class="button-icon">🔍</span>
                     Я ищу
                 </button>
+
+                <!-- Админ-панель -->
+                <button class="main-button" onclick="window.open('umeyka-admin.html', '_blank')" 
+                        style="background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);">
+                    <span class="button-icon">🛡️</span>
+                    Админ-панель
+                </button>
+    
                 <button class="main-button" onclick="triggerHapticFeedback(); showProfileSection();" 
                         style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">
                     <span class="button-icon">👤</span>
@@ -6242,6 +6250,86 @@
         setProjectRating(0);
     };
 
+    // ========== СЕКРЕТНЫЙ ВХОД ДЛЯ АДМИНА ==========
+(function initSecretAdminAccess() {
+    let logoTaps = 0;
+    let lastTapTime = 0;
+    const TAP_TIMEOUT = 800; // мс между тапами
+    const REQUIRED_TAPS = 5;
+    
+    // Найти логотип (по классу .logo или эмодзи 🤝✨)
+    const logo = document.querySelector('.logo');
+    
+    if (!logo) {
+        console.log('🔒 Логотип не найден, секретный вход недоступен');
+        return;
+    }
+    
+    // Убрать виброотклик с логотипа
+    logo.style.pointerEvents = 'auto';
+    logo.style.userSelect = 'none';
+    logo.style.webkitUserSelect = 'none';
+    logo.style.touchAction = 'manipulation';
+    
+    logo.addEventListener('click', function(e) {
+        // НЕ вызывать triggerHapticFeedback() — полная тишина
+        
+        const now = Date.now();
+        const timeDiff = now - lastTapTime;
+        
+        // Сброс если пауза слишком длинная
+        if (timeDiff > TAP_TIMEOUT) {
+            logoTaps = 1;
+        } else {
+            logoTaps++;
+        }
+        
+        lastTapTime = now;
+        
+        // Визуальная подсказка только для админа (очень тонкая)
+        if (logoTaps >= 3) {
+            logo.style.opacity = '0.' + (logoTaps * 2); // Лёгкое мигание
+            setTimeout(() => logo.style.opacity = '1', 100);
+        }
+        
+        // Секретный код выполнен
+        if (logoTaps >= REQUIRED_TAPS) {
+            logoTaps = 0;
+            
+            // Проверка: админ ли?
+            const tg = window.Telegram?.WebApp?.initDataUnsafe?.user;
+            const isAdmin = tg?.username === 'umeyka_admin' || 
+                           tg?.id?.toString() === 'MASTER_ADMIN_001';
+            
+            if (isAdmin) {
+                // Плавный переход
+                logo.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    window.open('umeyka-admin.html', '_blank');
+                    logo.style.transform = 'scale(1)';
+                }, 150);
+            } else {
+                // Не админ — сброс с "ошибкой"
+                logo.style.animation = 'shake 0.5s';
+                setTimeout(() => logo.style.animation = '', 500);
+                console.log('🔒 Попытка секретного входа не админом');
+            }
+        }
+    });
+    
+    // Добавить стиль анимации shake
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    console.log('🔒 Секретный вход инициализирован (5 тапов по логотипу)');
+})();    
     </script>
 </body>
 </html>
