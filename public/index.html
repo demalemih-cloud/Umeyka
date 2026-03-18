@@ -1550,6 +1550,323 @@
             display: flex;
             max-width: 300px;
         }
+
+        /* ========== НОВЫЕ СТИЛИ ========== */
+        
+        /* Стили для уведомления о свободных мастерах */
+        .nearby-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            z-index: 3000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+            color: white;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .nearby-notification.show {
+            transform: translateY(0);
+        }
+
+        .nearby-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .nearby-icon {
+            font-size: 24px;
+        }
+
+        .nearby-close {
+            margin-left: auto;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .nearby-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .nearby-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .nearby-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin: 8px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nearby-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .nearby-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .nearby-info {
+            flex: 1;
+        }
+
+        .nearby-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .nearby-skill {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .nearby-distance {
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .nearby-refresh {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nearby-refresh:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Стили для рейтинга районов */
+        .district-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px !important;
+            height: 50px !important;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 3px solid;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.2;
+            transition: all 0.2s ease;
+        }
+
+        .district-marker:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .district-marker.green {
+            border-color: #48bb78;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .district-marker.yellow {
+            border-color: #f6e05e;
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+        }
+
+        .district-marker.red {
+            border-color: #f56565;
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+        }
+
+        .district-count {
+            font-size: 10px;
+            opacity: 0.9;
+        }
+
+        /* Стили для премиум-карточек */
+        .premium-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .premium-section h4 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .premium-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .premium-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .premium-card.active {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.3) 0%, rgba(56, 161, 105, 0.3) 100%);
+            border-color: #48bb78;
+        }
+
+        .premium-card.gold {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 165, 0, 0.3) 100%);
+            border-color: #FFD700;
+        }
+
+        .premium-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .premium-price {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #FFD700;
+        }
+
+        .premium-desc {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .premium-button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .premium-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .premium-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .premium-note {
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .premium-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #744210;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        /* Стили для пульсирующего круга */
+        @keyframes circlePulse {
+            0% { stroke-opacity: 1; stroke-width: 3; }
+            50% { stroke-opacity: 0.5; stroke-width: 5; }
+            100% { stroke-opacity: 1; stroke-width: 3; }
+        }
+
+        .pulse-circle path {
+            animation: circlePulse 2s infinite;
+            stroke: #FFD700 !important;
+        }
+
+        .gold-radius path {
+            stroke: #FFD700 !important;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 5px gold);
+        }
+
+        .premium-marker {
+            filter: drop-shadow(0 0 10px gold);
+            font-size: 28px !important;
+        }
     </style>
 </head>
 <body>
@@ -1736,6 +2053,39 @@
                 <div id="profileStats" class="profile-tab">
                     <h3 style="margin-bottom: 15px;">📊 Моя статистика</h3>
                     <div id="userStats" class="stats-grid"></div>
+                    
+                    <!-- НОВЫЙ РАЗДЕЛ: ПРЕМИУМ-ВОЗМОЖНОСТИ -->
+                    <div class="premium-section">
+                        <h4>🌟 Премиум-возможности</h4>
+                        
+                        <div class="premium-cards">
+                            <div class="premium-card" id="topRankCard">
+                                <div class="premium-title">
+                                    <span>📈</span>
+                                    <span>Вверх в районе</span>
+                                    <span id="topRankBadge" class="premium-badge" style="display: none;">Активно</span>
+                                </div>
+                                <div class="premium-price">100 ⭐ / 30 дней</div>
+                                <div class="premium-desc">Ваш маркер всегда будет сверху в своём районе, привлекая больше клиентов</div>
+                                <button class="premium-button" onclick="buyPremiumFeature('topRank')" id="buyTopRankBtn">Купить</button>
+                            </div>
+                            
+                            <div class="premium-card gold" id="goldRadiusCard">
+                                <div class="premium-title">
+                                    <span>✨</span>
+                                    <span>Золотой радиус</span>
+                                    <span id="goldRadiusBadge" class="premium-badge" style="display: none;">Активно</span>
+                                </div>
+                                <div class="premium-price">200 ⭐ / 30 дней</div>
+                                <div class="premium-desc">Ваш радиус работы станет золотым с пульсирующей анимацией, выделяя вас на карте</div>
+                                <button class="premium-button" onclick="buyPremiumFeature('goldRadius')" id="buyGoldRadiusBtn">Купить</button>
+                            </div>
+                        </div>
+                        
+                        <div class="premium-note">
+                            💡 Звёзды можно получить за приглашённых друзей или купить (скоро будет доступно)
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Мои умейки -->
@@ -1802,6 +2152,14 @@
                                 </div>
                                 <div class="referral-stat-label">Звёзд заработано</div>
                             </div>
+                        </div>
+                        
+                        <!-- НОВОЕ: отображение доступных звёзд -->
+                        <div class="referral-stat" style="margin-top: 10px; background: rgba(255, 255, 255, 0.3);">
+                            <div class="referral-stat-value">
+                                ⭐<span id="availableStars">0</span>
+                            </div>
+                            <div class="referral-stat-label">Доступно для траты</div>
                         </div>
                         
                         <div class="referral-benefits">
@@ -2149,6 +2507,19 @@
         </div>
     </div>
 
+    <!-- КОНТЕЙНЕР ДЛЯ УВЕДОМЛЕНИЯ О СВОБОДНЫХ МАСТЕРАХ -->
+    <div id="nearbyNotification" class="nearby-notification">
+        <div class="nearby-header">
+            <span class="nearby-icon">🔔</span>
+            <span>Свободные мастера рядом!</span>
+            <button class="nearby-close" onclick="closeNearbyNotification()">×</button>
+        </div>
+        <div class="nearby-list" id="nearbyMastersList"></div>
+        <button class="nearby-refresh" onclick="refreshNearbyMasters()">
+            🔄 Обновить список
+        </button>
+    </div>
+
     <script>
     // ========== КОНФИГУРАЦИЯ API ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
@@ -2165,6 +2536,7 @@
     let projectRating = 0;
     let map = null;
     let markers = [];
+    let districtMarkers = []; // НОВОЕ: маркеры рейтингов районов
     let userLocation = null;
     let mapRefreshInterval = null;
     let currentEditingSkill = null;
@@ -2494,6 +2866,157 @@
         return newCoins;
     }
 
+    // ========== НОВЫЕ ФУНКЦИИ ДЛЯ ЗВЁЗД ==========
+    
+    function getUserStars(userId) {
+        const data = getLocalStorage(`stars_${userId}`);
+        return data || 0;
+    }
+
+    function saveUserStars(userId, stars) {
+        setLocalStorage(`stars_${userId}`, stars);
+    }
+
+    function spendStars(userId, amount) {
+        const current = getUserStars(userId);
+        if (current >= amount) {
+            saveUserStars(userId, current - amount);
+            console.log(`✅ Потрачено ${amount} звёзд. Осталось: ${current - amount}`);
+            return true;
+        }
+        console.log(`❌ Недостаточно звёзд. Нужно: ${amount}, есть: ${current}`);
+        return false;
+    }
+
+    function addStars(userId, amount) {
+        const current = getUserStars(userId);
+        const newAmount = current + amount;
+        saveUserStars(userId, newAmount);
+        console.log(`✅ Добавлено ${amount} звёзд. Всего: ${newAmount}`);
+        return newAmount;
+    }
+
+    function buyStars(amount) {
+        triggerHapticFeedback();
+        showNotification('💳 Покупка звёзд будет доступна после подключения Альфа-банка');
+        // Здесь будет интеграция с платёжной системой
+    }
+
+    // ========== НОВЫЕ ФУНКЦИИ ДЛЯ ПРЕМИУМ-УЛУЧШЕНИЙ ==========
+
+    function isPremium(userId) {
+        const user = getOrCreateUserProfile(userId);
+        return user.premiumUntil && new Date(user.premiumUntil) > new Date();
+    }
+
+    function activatePremiumFeature(userId, feature, days = 30) {
+        console.log(`🌟 Активация улучшения ${feature} для пользователя ${userId}`);
+        
+        const prices = {
+            'topRank': 100,
+            'goldRadius': 200
+        };
+        
+        const price = prices[feature];
+        if (!price) {
+            console.error('❌ Неизвестное улучшение:', feature);
+            return false;
+        }
+        
+        if (!spendStars(userId, price)) {
+            showNotification(`❌ Недостаточно звёзд! Нужно ${price} ⭐`);
+            return false;
+        }
+        
+        const user = getOrCreateUserProfile(userId);
+        
+        const premiumUntil = new Date();
+        premiumUntil.setDate(premiumUntil.getDate() + days);
+        
+        if (feature === 'topRank') {
+            user.topRank = true;
+            user.topRankUntil = premiumUntil.toISOString();
+        } else if (feature === 'goldRadius') {
+            user.goldRadius = true;
+            user.goldRadiusUntil = premiumUntil.toISOString();
+        }
+        
+        user.premiumUntil = premiumUntil.toISOString();
+        
+        setLocalStorage(`user_${userId}`, user);
+        
+        showNotification(`✅ Улучшение "${feature === 'topRank' ? 'Вверх в районе' : 'Золотой радиус'}" активировано на 30 дней!`);
+        
+        if (map) {
+            loadSkillsOnMap();
+        }
+        
+        loadUserProfile();
+        
+        return true;
+    }
+
+    function buyPremiumFeature(feature) {
+        triggerHapticFeedback();
+        console.log(`🛒 Покупка улучшения: ${feature}`);
+        
+        if (!currentUserId) {
+            showNotification('❌ Пользователь не определён');
+            return;
+        }
+        
+        activatePremiumFeature(currentUserId, feature, 30);
+    }
+
+    function cleanupExpiredPremiums() {
+        console.log('🧹 Проверка просроченных улучшений...');
+        
+        const allUsers = getAllUsers();
+        
+        allUsers.forEach(userId => {
+            const user = getOrCreateUserProfile(userId);
+            const now = new Date();
+            let updated = false;
+            
+            if (user.topRankUntil && new Date(user.topRankUntil) <= now) {
+                user.topRank = false;
+                delete user.topRankUntil;
+                updated = true;
+                console.log(`📉 У пользователя ${userId} истёк срок topRank`);
+            }
+            
+            if (user.goldRadiusUntil && new Date(user.goldRadiusUntil) <= now) {
+                user.goldRadius = false;
+                delete user.goldRadiusUntil;
+                updated = true;
+                console.log(`📉 У пользователя ${userId} истёк срок goldRadius`);
+            }
+            
+            if (user.premiumUntil && new Date(user.premiumUntil) <= now) {
+                user.premiumUntil = null;
+                updated = true;
+                console.log(`📉 У пользователя ${userId} истёк срок premium`);
+            }
+            
+            if (updated) {
+                setLocalStorage(`user_${userId}`, user);
+            }
+        });
+        
+        console.log('✅ Проверка завершена');
+    }
+
+    function getAllUsers() {
+        const users = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('user_')) {
+                users.push(key.replace('user_', ''));
+            }
+        }
+        return users;
+    }
+
     // ========== РЕФЕРАЛЬНАЯ ПРОГРАММА ==========
     function getReferralData() {
         const data = getLocalStorage(`referral_${currentUserId}`);
@@ -2511,9 +3034,11 @@
 
     function updateReferralStats() {
         const data = getReferralData();
+        const availableStars = getUserStars(currentUserId);
         
         document.getElementById('referralCount').textContent = data.referralCount;
         document.getElementById('starsEarned').textContent = data.starsEarned;
+        document.getElementById('availableStars').textContent = availableStars;
         
         const referralLink = generateReferralLink();
         document.getElementById('referralLinkText').textContent = referralLink;
@@ -2604,6 +3129,10 @@
             data.starsEarned += 1;
             
             saveReferralData(data);
+            
+            // Добавляем звезду в общий счёт
+            addStars(currentUserId, 1);
+            
             updateReferralStats();
             
             showNotification(`🎉 Ваш друг зарегистрировался! Вы получили +1 звезду!`);
@@ -2667,7 +3196,10 @@
         skills: [],
         rating: 0,
         completedDeals: 0,
-        dealsCount: 0
+        dealsCount: 0,
+        premiumUntil: null,
+        topRank: false,
+        goldRadius: false
     };
 
     // ========== СИНХРОНИЗАЦИЯ СДЕЛОК ==========
@@ -3689,6 +4221,416 @@
         }
     };
 
+    // ========== НОВЫЕ ФУНКЦИИ ДЛЯ КАРТЫ ==========
+
+    // 1.1. Функция проверки расстояния (формула гаверсинусов)
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Радиус Земли в км
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c;
+        return distance;
+    }
+
+    // 1.2. Функция поиска ближайших мастеров
+    function findNearbyFreeMasters(userLat, userLon, radiusKm = 1) {
+        console.log(`🔍 Поиск свободных мастеров в радиусе ${radiusKm} км от [${userLat}, ${userLon}]`);
+        
+        const skills = getGlobalSkills();
+        
+        const nearbyMasters = skills.filter(skill => {
+            if (!skill.location || !skill.location.lat || !skill.location.lon) return false;
+            if (skill.status !== 'ready') return false;
+            if (skill.userId === currentUserId) return false; // Не показываем себя
+            
+            const distance = getDistance(userLat, userLon, skill.location.lat, skill.location.lon);
+            return distance <= radiusKm;
+        });
+        
+        console.log(`✅ Найдено ${nearbyMasters.length} свободных мастеров рядом`);
+        return nearbyMasters;
+    }
+
+    // 1.3. Функция показа уведомления
+    function showNearbyMasterNotification(masters) {
+        console.log('🔔 Показ уведомления о свободных мастерах:', masters.length);
+        
+        const notification = document.getElementById('nearbyNotification');
+        const mastersList = document.getElementById('nearbyMastersList');
+        
+        mastersList.innerHTML = masters.slice(0, 3).map(master => {
+            const distance = userLocation ? 
+                getDistance(userLocation.lat, userLocation.lon, master.location.lat, master.location.lon).toFixed(1) : 
+                '?';
+            
+            return `
+                <div class="nearby-item" onclick="focusOnMaster('${master._id}')">
+                    <div class="nearby-avatar">🔧</div>
+                    <div class="nearby-info">
+                        <div class="nearby-name">${master.username || 'Мастер'}</div>
+                        <div class="nearby-skill">${master.skill}</div>
+                    </div>
+                    <div class="nearby-distance">${distance} км</div>
+                </div>
+            `;
+        }).join('');
+        
+        if (masters.length > 3) {
+            const more = document.createElement('div');
+            more.style.cssText = 'text-align: center; color: rgba(255,255,255,0.7); padding: 8px; font-size: 12px;';
+            more.textContent = `и ещё ${masters.length - 3} мастер${masters.length - 3 === 1 ? '' : 'ов'}`;
+            mastersList.appendChild(more);
+        }
+        
+        notification.classList.add('show');
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 10000);
+    }
+
+    // Функция для закрытия уведомления
+    window.closeNearbyNotification = function() {
+        const notification = document.getElementById('nearbyNotification');
+        notification.classList.remove('show');
+    };
+
+    // Функция для обновления списка ближайших мастеров
+    window.refreshNearbyMasters = function() {
+        triggerHapticFeedback();
+        
+        if (userLocation) {
+            const nearby = findNearbyFreeMasters(userLocation.lat, userLocation.lon);
+            if (nearby.length > 0) {
+                showNearbyMasterNotification(nearby);
+            } else {
+                const notification = document.getElementById('nearbyNotification');
+                notification.classList.remove('show');
+                showNotification('🙌 Свободных мастеров рядом пока нет');
+            }
+        } else {
+            showNotification('📍 Не удалось определить ваше местоположение');
+        }
+    };
+
+    // Функция для фокуса на мастере
+    window.focusOnMaster = function(masterId) {
+        triggerHapticFeedback();
+        
+        const skill = getGlobalSkillById(masterId);
+        if (skill && skill.location && map) {
+            map.setView([skill.location.lat, skill.location.lon], 15);
+            
+            setTimeout(() => {
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Marker && layer.getPopup() && layer._popup) {
+                        const popupContent = layer.getPopup().getContent();
+                        if (popupContent && popupContent.includes(skill._id)) {
+                            layer.openPopup();
+                        }
+                    }
+                });
+            }, 500);
+            
+            closeNearbyNotification();
+        }
+    };
+
+    // 2.1. Функция разбиения на районы
+    function getDistrictGrid(bounds, cellSizeKm = 2) {
+        const cells = [];
+        
+        const southWest = bounds.getSouthWest();
+        const northEast = bounds.getNorthEast();
+        
+        const latStep = cellSizeKm / 111.32; // 1 градус широты ≈ 111.32 км
+        const lonStep = cellSizeKm / (111.32 * Math.cos((southWest.lat + northEast.lat) / 2 * Math.PI / 180));
+        
+        for (let lat = southWest.lat; lat <= northEast.lat; lat += latStep) {
+            for (let lon = southWest.lng; lon <= northEast.lng; lon += lonStep) {
+                cells.push({
+                    center: { lat, lon },
+                    bounds: {
+                        minLat: lat,
+                        maxLat: lat + latStep,
+                        minLon: lon,
+                        maxLon: lon + lonStep
+                    }
+                });
+            }
+        }
+        
+        console.log(`🗺️ Создано ${cells.length} ячеек для районов`);
+        return cells;
+    }
+
+    // 2.2. Функция расчета рейтинга района
+    function calculateDistrictRating(centerLat, centerLon, radiusKm = 2) {
+        const skills = getGlobalSkills();
+        
+        const mastersInDistrict = skills.filter(skill => {
+            if (!skill.location || !skill.location.lat || !skill.location.lon) return false;
+            const distance = getDistance(centerLat, centerLon, skill.location.lat, skill.location.lon);
+            return distance <= radiusKm;
+        });
+        
+        if (mastersInDistrict.length === 0) {
+            return { average: 0, count: 0 };
+        }
+        
+        let totalRating = 0;
+        mastersInDistrict.forEach(master => {
+            totalRating += master.rating?.average || 5.0;
+        });
+        
+        const averageRating = totalRating / mastersInDistrict.length;
+        
+        return {
+            average: averageRating,
+            count: mastersInDistrict.length
+        };
+    }
+
+    // 2.3. Функция отображения рейтингов
+    function showDistrictRatings() {
+        if (!map) return;
+        
+        // Удаляем старые маркеры районов
+        districtMarkers.forEach(marker => map.removeLayer(marker));
+        districtMarkers = [];
+        
+        const bounds = map.getBounds();
+        const zoom = map.getZoom();
+        
+        // Адаптивный размер ячейки в зависимости от зума
+        let cellSizeKm = 2;
+        if (zoom >= 15) cellSizeKm = 0.5;
+        else if (zoom >= 13) cellSizeKm = 1;
+        else if (zoom >= 10) cellSizeKm = 2;
+        else if (zoom >= 8) cellSizeKm = 5;
+        else cellSizeKm = 10;
+        
+        const cells = getDistrictGrid(bounds, cellSizeKm);
+        
+        cells.forEach(cell => {
+            const rating = calculateDistrictRating(cell.center.lat, cell.center.lon, cellSizeKm);
+            
+            if (rating.count === 0) return;
+            
+            // Определяем цвет в зависимости от рейтинга
+            let colorClass = '';
+            if (rating.average >= 4.5) colorClass = 'green';
+            else if (rating.average >= 4.0) colorClass = 'yellow';
+            else colorClass = 'red';
+            
+            // Формируем текст маркера
+            const starRating = rating.average.toFixed(1);
+            const markerText = `⭐ ${starRating}<br><span class="district-count">${rating.count} маст.</span>`;
+            
+            // Создаём маркер
+            const marker = L.marker([cell.center.lat, cell.center.lon], {
+                icon: L.divIcon({
+                    className: `district-marker ${colorClass}`,
+                    html: markerText,
+                    iconSize: [50, 50],
+                    iconAnchor: [25, 25]
+                }),
+                zIndexOffset: 500 // Выше обычных маркеров, но ниже премиум
+            }).addTo(map);
+            
+            // Добавляем попап с подробной информацией
+            marker.bindPopup(`
+                <div style="text-align: center; min-width: 150px;">
+                    <h3 style="margin: 0 0 10px 0; color: #2d3748;">Рейтинг района</h3>
+                    <div style="font-size: 24px; font-weight: bold; color: ${colorClass === 'green' ? '#48bb78' : (colorClass === 'yellow' ? '#d69e2e' : '#f56565')}">
+                        ⭐ ${rating.average.toFixed(1)}
+                    </div>
+                    <div style="margin: 10px 0; color: #666;">
+                        Мастеров в районе: <strong>${rating.count}</strong>
+                    </div>
+                    <div style="font-size: 12px; color: #999;">
+                        Основано на отзывах клиентов
+                    </div>
+                </div>
+            `);
+            
+            districtMarkers.push(marker);
+        });
+        
+        console.log(`✅ Отображено ${districtMarkers.length} маркеров рейтинга районов`);
+    }
+
+    // Функция для удаления маркеров районов
+    function removeDistrictMarkers() {
+        districtMarkers.forEach(marker => map.removeLayer(marker));
+        districtMarkers = [];
+    }
+
+    // 3.3. Функция создания премиум-маркера
+    function createPremiumMarker(skill, isUserSkill) {
+        const user = getOrCreateUserProfile(skill.userId);
+        const isPrem = isPremium(skill.userId);
+        
+        let iconHtml = '';
+        let className = 'umeyka-marker';
+        let iconSize = [30, 30];
+        let zIndex = 1;
+        
+        if (isPrem && user.topRank) {
+            className = 'umeyka-marker premium-marker';
+            iconSize = [40, 40];
+            zIndex = 1000;
+            
+            if (isUserSkill) {
+                iconHtml = `<div style="color: gold; font-size: 32px; filter: drop-shadow(0 0 10px gold);">👑</div>`;
+            } else {
+                iconHtml = `<div style="color: gold; font-size: 32px; filter: drop-shadow(0 0 10px gold);">⭐</div>`;
+            }
+        } else {
+            const color = getMarkerColor(skill.status);
+            iconHtml = `<div style="color: ${color}; font-size: 24px; ${isUserSkill ? 'filter: drop-shadow(0 0 5px #667eea);' : ''}">${isUserSkill ? '👤' : '🔧'}</div>`;
+        }
+        
+        const marker = L.marker([skill.location.lat, skill.location.lon], {
+            icon: L.divIcon({
+                className: className,
+                html: iconHtml,
+                iconSize: iconSize,
+                iconAnchor: [iconSize[0]/2, iconSize[1]]
+            }),
+            zIndexOffset: zIndex
+        });
+        
+        marker.bindPopup(createMapSkillPopup(skill, isUserSkill));
+        
+        marker.on('popupopen', async () => {
+            try {
+                await fetch(`${API_URL}/api/skills/${skill._id}/view`, {
+                    method: 'POST'
+                });
+            } catch (error) {
+                console.error('❌ Ошибка обновления просмотров:', error);
+            }
+        });
+        
+        return marker;
+    }
+
+    // 3.3. Функция создания круга радиуса с учётом премиум
+    function createRadiusCircle(skill) {
+        const user = getOrCreateUserProfile(skill.userId);
+        const isPrem = isPremium(skill.userId);
+        
+        let circleColor = getMarkerColor(skill.status);
+        let className = '';
+        
+        if (isPrem && user.goldRadius) {
+            circleColor = '#FFD700';
+            className = 'pulse-circle gold-radius';
+        }
+        
+        const circle = L.circle([skill.location.lat, skill.location.lon], {
+            color: circleColor,
+            fillColor: circleColor,
+            fillOpacity: 0.2,
+            radius: (skill.radius || 10) * 1000,
+            className: className
+        });
+        
+        return circle;
+    }
+
+    // ========== ОБНОВЛЁННАЯ ФУНКЦИЯ ЗАГРУЗКИ КАРТЫ ==========
+    async function loadSkillsOnMap() {
+        try {
+            console.log('🗺️ Загрузка умейок с сервера для карты');
+            
+            const skills = await loadAllSkillsFromServer();
+            
+            console.log('📊 Получено умейок с сервера:', skills.length);
+            
+            const userData = getOrCreateUserProfile(currentUserId);
+            
+            if (markers.length > 0) {
+                markers.forEach(marker => map.removeLayer(marker));
+                markers = [];
+            }
+            
+            // Удаляем маркеры районов (они будут добавлены отдельно)
+            removeDistrictMarkers();
+            
+            if (userLocation) {
+                const userMarker = L.marker([userLocation.lat, userLocation.lon], {
+                    icon: L.divIcon({
+                        className: 'user-marker',
+                        html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
+                        iconSize: [16, 16],
+                        iconAnchor: [8, 16]
+                    })
+                })
+                .addTo(map)
+                .bindPopup(`📍 <b>${userData.firstName || 'Вы'}</b><br>Ваше местоположение`)
+                .openPopup();
+                
+                markers.push(userMarker);
+            }
+            
+            // Сортируем мастеров: сначала премиум с topRank
+            const sortedSkills = [...skills].sort((a, b) => {
+                const aPrem = isPremium(a.userId);
+                const bPrem = isPremium(b.userId);
+                const aTop = aPrem && getOrCreateUserProfile(a.userId).topRank;
+                const bTop = bPrem && getOrCreateUserProfile(b.userId).topRank;
+                
+                if (aTop && !bTop) return -1;
+                if (!aTop && bTop) return 1;
+                return 0;
+            });
+            
+            sortedSkills.forEach(skill => {
+                if (skill.location && skill.location.lat && skill.location.lon) {
+                    const isUserSkill = skill.userId === currentUserId;
+                    
+                    const circle = createRadiusCircle(skill);
+                    circle.addTo(map);
+                    markers.push(circle);
+                    
+                    const marker = createPremiumMarker(skill, isUserSkill);
+                    marker.addTo(map);
+                    markers.push(marker);
+                }
+            });
+            
+            // Добавляем рейтинги районов
+            showDistrictRatings();
+            
+            // Поиск ближайших свободных мастеров
+            if (userLocation) {
+                const nearby = findNearbyFreeMasters(userLocation.lat, userLocation.lon);
+                if (nearby.length > 0) {
+                    showNearbyMasterNotification(nearby);
+                }
+            }
+            
+            console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров');
+            
+        } catch (error) {
+            console.error('❌ Ошибка загрузки карты:', error);
+            
+            if (map) {
+                L.popup()
+                    .setLatLng([55.7558, 37.6173])
+                    .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
+                    .openOn(map);
+            }
+        }
+    }
+
     // ========== ФУНКЦИИ ДЛЯ КАРТЫ ==========
 
     window.openMap = function() {
@@ -3701,6 +4643,15 @@
             initMap();
         } else {
             loadSkillsOnMap();
+        }
+        
+        // Подписаться на движение карты для обновления рейтингов
+        if (map) {
+            map.off('moveend');
+            map.on('moveend', function() {
+                removeDistrictMarkers();
+                showDistrictRatings();
+            });
         }
         
         startMapAutoRefresh();
@@ -3768,94 +4719,6 @@
     function getMarkerColor(status) {
         if (!status || status === 'ready') return '#22c55e';
         return '#f56565';
-    }
-
-    async function loadSkillsOnMap() {
-        try {
-            console.log('🗺️ Загрузка умейок с сервера для карты');
-            
-            const skills = await loadAllSkillsFromServer();
-            
-            console.log('📊 Получено умейок с сервера:', skills.length);
-            
-            const userData = getOrCreateUserProfile(currentUserId);
-            
-            if (markers.length > 0) {
-                markers.forEach(marker => map.removeLayer(marker));
-                markers = [];
-            }
-            
-            if (userLocation) {
-                const userMarker = L.marker([userLocation.lat, userLocation.lon], {
-                    icon: L.divIcon({
-                        className: 'user-marker',
-                        html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
-                        iconSize: [16, 16],
-                        iconAnchor: [8, 16]
-                    })
-                })
-                .addTo(map)
-                .bindPopup(`📍 <b>${userData.firstName || 'Вы'}</b><br>Ваше местоположение`)
-                .openPopup();
-                
-                markers.push(userMarker);
-            }
-            
-            skills.forEach(skill => {
-                if (skill.location && skill.location.lat && skill.location.lon) {
-                    const rating = skill.rating?.average || 5.0;
-                    const isUserSkill = skill.userId === currentUserId;
-                    const status = skill.status || 'ready';
-                    const radius = skill.radius || 10;
-                    
-                    const circleColor = (!status || status === 'ready') ? '#22c55e' : '#f56565';
-                    
-                    const circle = L.circle([skill.location.lat, skill.location.lon], {
-                        color: circleColor,
-                        fillColor: circleColor,
-                        fillOpacity: 0.2,
-                        radius: radius * 1000
-                    }).addTo(map);
-                    
-                    markers.push(circle);
-                    
-                    const marker = L.marker([skill.location.lat, skill.location.lon], {
-                        icon: L.divIcon({
-                            className: 'umeyka-marker',
-                            html: `<div style="color: ${getMarkerColor(status)}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
-                            iconSize: [30, 30],
-                            iconAnchor: [15, 30]
-                        })
-                    })
-                    .addTo(map)
-                    .bindPopup(createMapSkillPopup(skill, isUserSkill));
-                    
-                    marker.on('popupopen', async () => {
-                        try {
-                            await fetch(`${API_URL}/api/skills/${skill._id}/view`, {
-                                method: 'POST'
-                            });
-                        } catch (error) {
-                            console.error('❌ Ошибка обновления просмотров:', error);
-                        }
-                    });
-                    
-                    markers.push(marker);
-                }
-            });
-            
-            console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров');
-            
-        } catch (error) {
-            console.error('❌ Ошибка загрузки карты:', error);
-            
-            if (map) {
-                L.popup()
-                    .setLatLng([55.7558, 37.6173])
-                    .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
-                    .openOn(map);
-            }
-        }
     }
 
     function createMapSkillPopup(skill, isUserSkill) {
@@ -4219,6 +5082,9 @@
         
         currentUserId = checkAndSetUserId();
         
+        // Очистка просроченных улучшений
+        cleanupExpiredPremiums();
+        
         processReferralLink();
         
         const tg = window.Telegram?.WebApp;
@@ -4409,6 +5275,7 @@
         const userData = getOrCreateUserProfile(currentUserId);
         const referralData = getReferralData();
         const coins = getCoinsData();
+        const stars = getUserStars(currentUserId);
         
         document.getElementById('userName').textContent = userData.firstName || 'Пользователь';
         document.getElementById('userBio').textContent = userData.bio || 'Расскажите о себе...';
@@ -4417,14 +5284,53 @@
             document.getElementById('userAvatar').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
         }
         
-        updateUserStats(userData, referralData, coins);
+        // Обновляем премиум-бейджи
+        const isPrem = isPremium(currentUserId);
+        const topRankActive = isPrem && userData.topRank;
+        const goldRadiusActive = isPrem && userData.goldRadius;
+        
+        document.getElementById('topRankBadge').style.display = topRankActive ? 'inline-block' : 'none';
+        document.getElementById('goldRadiusBadge').style.display = goldRadiusActive ? 'inline-block' : 'none';
+        
+        if (topRankActive) {
+            document.getElementById('topRankCard').classList.add('active');
+        } else {
+            document.getElementById('topRankCard').classList.remove('active');
+        }
+        
+        if (goldRadiusActive) {
+            document.getElementById('goldRadiusCard').classList.add('gold');
+        } else {
+            document.getElementById('goldRadiusCard').classList.remove('gold');
+        }
+        
+        // Проверяем достаточно ли звёзд для покупки
+        const topRankBtn = document.getElementById('buyTopRankBtn');
+        const goldRadiusBtn = document.getElementById('buyGoldRadiusBtn');
+        
+        if (topRankActive) {
+            topRankBtn.textContent = 'Активно';
+            topRankBtn.disabled = true;
+        } else {
+            topRankBtn.textContent = 'Купить';
+            topRankBtn.disabled = false;
+        }
+        
+        if (goldRadiusActive) {
+            goldRadiusBtn.textContent = 'Активно';
+            goldRadiusBtn.disabled = true;
+        } else {
+            goldRadiusBtn.textContent = 'Купить';
+            goldRadiusBtn.disabled = false;
+        }
+        
+        updateUserStats(userData, referralData, coins, stars);
     }
 
-    function updateUserStats(userData, referralData, coins) {
+    function updateUserStats(userData, referralData, coins, stars) {
         const statsGrid = document.getElementById('userStats');
         if (!statsGrid) return;
         
-        const stars = referralData?.starsEarned || 0;
         const goldCoins = coins || 0;
         
         statsGrid.innerHTML = `
