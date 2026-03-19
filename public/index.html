@@ -1886,6 +1886,119 @@
         .star-display span {
             font-size: 16px;
         }
+
+        /* ===== НОВЫЕ СТИЛИ ДЛЯ УВЕДОМЛЕНИЙ ===== */
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Стили для настроек уведомлений */
+        .notification-option {
+            background: rgba(255,255,255,0.1);
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .notification-option label {
+            color: white;
+            cursor: pointer;
+        }
+
+        .notification-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Стили для статистики отзывов */
+        .review-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .review-stat-card {
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .review-stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #667eea;
+        }
+
+        .review-stat-label {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .review-distribution-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+        }
+
+        .review-distribution-label {
+            width: 30px;
+            font-size: 14px;
+            color: #FFD700;
+        }
+
+        .review-distribution-progress {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .review-distribution-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            border-radius: 4px;
+        }
+
+        .review-distribution-count {
+            width: 40px;
+            text-align: right;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .review-photo-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .review-photo-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .rating-distribution {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 10px;
+            color: #2d3748;
+        }
     </style>
 </head>
 <body>
@@ -2066,6 +2179,9 @@
                     <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('referral');" id="referralTab">
                         🎁 Рефералы
                     </button>
+                    <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('notifications');" id="notificationsTab">
+                        🔔 Уведомления
+                    </button>
                 </div>
                 
                 <!-- Статистика -->
@@ -2073,7 +2189,20 @@
                     <h3 style="margin-bottom: 15px;">📊 Моя статистика</h3>
                     <div id="userStats" class="stats-grid"></div>
                     
-                    <!-- ===== НОВЫЙ РАЗДЕЛ: ПРЕМИУМ-ВОЗМОЖНОСТИ ===== -->
+                    <!-- ===== НОВЫЙ РАЗДЕЛ: ОТЗЫВЫ В ПРОФИЛЕ ===== -->
+                    <div id="reviewsSection" style="margin-top: 30px;">
+                        <h3 style="margin-bottom: 15px;">📝 Отзывы клиентов</h3>
+                        
+                        <div id="reviewsStats" class="rating-details"></div>
+                        
+                        <div id="reviewsList" style="max-height: 400px; overflow-y: auto;"></div>
+                        
+                        <button id="loadMoreReviews" class="main-button" style="margin-top: 15px; display: none;" onclick="loadMoreReviews()">
+                            Загрузить ещё
+                        </button>
+                    </div>
+                    
+                    <!-- ===== ПРЕМИУМ-ВОЗМОЖНОСТИ ===== -->
                     <div class="premium-section">
                         <div class="premium-title">🌟 Премиум-возможности</div>
                         
@@ -2220,6 +2349,58 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- НАСТРОЙКИ УВЕДОМЛЕНИЙ -->
+                <div id="profileNotifications" class="profile-tab" style="display: none;">
+                    <h3 style="margin-bottom: 15px;">🔔 Настройки уведомлений</h3>
+                    
+                    <div class="form-section" style="background: rgba(255,255,255,0.15);">
+                        <h4 style="margin-bottom: 15px;">📨 Типы уведомлений</h4>
+                        
+                        <div class="notification-option">
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="notifyNewDeal" checked>
+                                <span>📝 Новая сделка</span>
+                            </label>
+                        </div>
+                        
+                        <div class="notification-option">
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="notifyDealSigned" checked>
+                                <span>✍️ Подписание сделки</span>
+                            </label>
+                        </div>
+                        
+                        <div class="notification-option">
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="notifyNewReview" checked>
+                                <span>⭐ Новый отзыв</span>
+                            </label>
+                        </div>
+                        
+                        <div class="notification-option">
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="notifyNearbyMaster" checked>
+                                <span>📍 Мастер рядом</span>
+                            </label>
+                        </div>
+                        
+                        <h4 style="margin: 20px 0 15px;">⏰ Тихий режим</h4>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <input type="time" id="quietTimeStart" value="23:00" class="input-field" style="background: white;">
+                            <span style="align-self: center;">—</span>
+                            <input type="time" id="quietTimeEnd" value="08:00" class="input-field" style="background: white;">
+                        </div>
+                        
+                        <button class="submit-button" onclick="saveNotificationSettings()" style="margin-top: 20px;">
+                            💾 Сохранить настройки
+                        </button>
+                    </div>
+                    
+                    <h3 style="margin: 20px 0 15px;">📋 История уведомлений</h3>
+                    <div id="notificationsHistory" style="max-height: 400px; overflow-y: auto;"></div>
                 </div>
                 
                 <!-- Ссылки на каналы -->
@@ -2523,6 +2704,76 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ОТЗЫВА -->
+    <div id="reviewModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeReviewModal()">×</button>
+            <div class="modal-title">✨ Оцените мастера</div>
+            
+            <div id="reviewDealInfo" style="text-align: center; margin-bottom: 20px;">
+                <img id="reviewMasterAvatar" src="" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 10px; display: none;">
+                <h3 id="reviewMasterName"></h3>
+                <p id="reviewSkillName"></p>
+            </div>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <div class="rating-stars" id="reviewStars" style="font-size: 30px;">
+                    <span onclick="setReviewRating(1)">☆</span>
+                    <span onclick="setReviewRating(2)">☆</span>
+                    <span onclick="setReviewRating(3)">☆</span>
+                    <span onclick="setReviewRating(4)">☆</span>
+                    <span onclick="setReviewRating(5)">☆</span>
+                </div>
+            </div>
+            
+            <textarea id="reviewText" class="input-field" 
+                      placeholder="Напишите подробный отзыв о работе мастера..." 
+                      style="height: 100px; background: white;"></textarea>
+            
+            <div style="margin: 15px 0;">
+                <div class="photo-upload-area" onclick="document.getElementById('reviewPhotos').click();">
+                    <span class="photo-upload-icon">📷</span>
+                    <div>Добавить фото (до 3 шт)</div>
+                </div>
+                <input type="file" id="reviewPhotos" accept="image/*" multiple style="display: none;" 
+                       onchange="handleReviewPhotos(event)">
+                <div id="reviewPhotosPreview" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;"></div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="modal-button modal-save" onclick="submitReviewFromModal()">
+                    📝 Отправить отзыв
+                </button>
+                <button class="modal-button modal-cancel" onclick="closeReviewModal()">
+                    Позже
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ОТВЕТА НА ОТЗЫВ -->
+    <div id="responseModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeResponseModal()">×</button>
+            <div class="modal-title">💬 Ответить на отзыв</div>
+            
+            <textarea id="responseText" class="input-field" 
+                      placeholder="Напишите ответ на отзыв..." 
+                      style="height: 100px; background: white;"></textarea>
+            
+            <input type="hidden" id="responseReviewId">
+            
+            <div class="modal-buttons">
+                <button class="modal-button modal-save" onclick="submitResponse()">
+                    📤 Отправить
+                </button>
+                <button class="modal-button modal-cancel" onclick="closeResponseModal()">
+                    Отмена
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
     // ========== КОНФИГУРАЦИЯ API ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
@@ -2539,7 +2790,7 @@
     let projectRating = 0;
     let map = null;
     let markers = [];
-    let districtMarkers = []; // Маркеры рейтингов районов
+    let districtMarkers = [];
     let userLocation = null;
     let mapRefreshInterval = null;
     let currentEditingSkill = null;
@@ -2553,6 +2804,13 @@
     let currentRadius = 10;
     let currentEditRadius = 10;
     
+    // ПЕРЕМЕННЫЕ ДЛЯ ОТЗЫВОВ
+    let currentReviewRating = 0;
+    let currentReviewPhotos = [];
+    let currentReviewDeal = null;
+    let currentReviewsOffset = 0;
+    const REVIEWS_PER_PAGE = 3;
+
     // ЛОКАЛЬНОЕ ХРАНИЛИЩЕ ДЛЯ УМЕЕК
     let localSkills = {};
     
@@ -3338,10 +3596,15 @@
             return { rating: 0, count: 0 };
         }
         
-        // Считаем средний рейтинг
-        const totalRating = mastersInDistrict.reduce((sum, master) => {
-            return sum + (master.rating?.average || 5.0);
-        }, 0);
+        // Считаем средний рейтинг с учётом отзывов
+        let totalRating = 0;
+        mastersInDistrict.forEach(master => {
+            const reviews = getGlobalReviews().filter(r => r.masterId === master.userId);
+            const avgRating = reviews.length > 0 
+                ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length 
+                : 5.0;
+            totalRating += avgRating;
+        });
         
         const avgRating = totalRating / mastersInDistrict.length;
         
@@ -3445,7 +3708,13 @@
         bio: 'Расскажите о себе...',
         avatar: null,
         skills: [],
-        rating: 0,
+        rating: {
+            average: 0,
+            count: 0,
+            distribution: { 5:0, 4:0, 3:0, 2:0, 1:0 }
+        },
+        reviewsCount: 0,
+        responseRate: 100,
         completedDeals: 0,
         dealsCount: 0,
         premiumUntil: null,
@@ -3554,6 +3823,746 @@
     function getGlobalSkillById(skillId) {
         const globalSkills = getGlobalSkills();
         return globalSkills.find(s => s._id === skillId);
+    }
+
+    // ========== НОВЫЕ ФУНКЦИИ ДЛЯ ОТЗЫВОВ ==========
+    
+    function getGlobalReviews() {
+        return getLocalStorage('umeyka_global_reviews') || [];
+    }
+
+    function setGlobalReviews(reviews) {
+        return setLocalStorage('umeyka_global_reviews', reviews);
+    }
+
+    function askForReview(dealId) {
+        const deal = getDealById(dealId);
+        if (!deal || deal.status !== 'completed') return;
+        
+        // Проверяем, не оставляли ли уже отзыв
+        const reviews = getGlobalReviews();
+        const existingReview = reviews.find(r => r.dealId === dealId);
+        if (existingReview) return;
+        
+        // Сохраняем данные сделки для отзыва
+        currentReviewDeal = deal;
+        
+        // Заполняем информацию в модальном окне
+        document.getElementById('reviewMasterName').textContent = deal.masterName;
+        document.getElementById('reviewSkillName').textContent = deal.masterSkill || '';
+        
+        // Показываем модальное окно
+        document.getElementById('reviewModal').style.display = 'flex';
+        
+        // Сбрасываем предыдущие значения
+        setReviewRating(0);
+        document.getElementById('reviewText').value = '';
+        document.getElementById('reviewPhotosPreview').innerHTML = '';
+        currentReviewPhotos = [];
+    }
+
+    function setReviewRating(rating) {
+        currentReviewRating = rating;
+        const starsContainer = document.getElementById('reviewStars');
+        starsContainer.innerHTML = '';
+        
+        for (let i = 1; i <= 5; i++) {
+            starsContainer.innerHTML += i <= rating ? 
+                '<span style="cursor: pointer; color: #FFD700; font-size: 30px;" onclick="setReviewRating(' + i + ');">★</span>' :
+                '<span style="cursor: pointer; font-size: 30px;" onclick="setReviewRating(' + i + ');">☆</span>';
+        }
+    }
+
+    function handleReviewPhotos(event) {
+        const files = Array.from(event.target.files);
+        
+        files.forEach(file => {
+            if (!file.type.match('image.*')) {
+                alert('❌ Пожалуйста, выберите изображение');
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('❌ Файл слишком большой. Максимальный размер: 5MB');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (currentReviewPhotos.length < 3) {
+                    currentReviewPhotos.push(e.target.result);
+                    updateReviewPhotosPreview();
+                } else {
+                    alert('❌ Можно добавить не более 3 фото');
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        // Очищаем input для возможности повторного выбора
+        event.target.value = '';
+    }
+
+    function updateReviewPhotosPreview() {
+        const preview = document.getElementById('reviewPhotosPreview');
+        preview.innerHTML = currentReviewPhotos.map((photo, index) => `
+            <div style="position: relative;">
+                <img src="${photo}" style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover;">
+                <button onclick="removeReviewPhoto(${index})" 
+                        style="position: absolute; top: -5px; right: -5px; background: #f56565; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer;">×</button>
+            </div>
+        `).join('');
+    }
+
+    function removeReviewPhoto(index) {
+        currentReviewPhotos.splice(index, 1);
+        updateReviewPhotosPreview();
+    }
+
+    function submitReviewFromModal() {
+        if (!currentReviewRating) {
+            alert('❌ Пожалуйста, поставьте оценку');
+            return;
+        }
+        
+        const text = document.getElementById('reviewText').value.trim();
+        if (!text) {
+            alert('❌ Пожалуйста, напишите отзыв');
+            return;
+        }
+        
+        if (currentReviewDeal) {
+            submitReview(currentReviewDeal.id, currentReviewRating, text, currentReviewPhotos);
+            closeReviewModal();
+        }
+    }
+
+    function submitReview(dealId, rating, text, photos = []) {
+        const deal = getDealById(dealId);
+        if (!deal) return false;
+        
+        const review = {
+            id: 'review_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+            dealId,
+            masterId: deal.masterId,
+            clientId: deal.clientId,
+            clientName: deal.clientName,
+            rating,
+            text,
+            photos,
+            createdAt: new Date().toISOString(),
+            responseFromMaster: null,
+            likes: 0,
+            reported: false
+        };
+        
+        // Сохраняем отзыв
+        const reviews = getGlobalReviews();
+        reviews.push(review);
+        setGlobalReviews(reviews);
+        
+        // Обновляем рейтинг мастера
+        updateMasterRating(deal.masterId, rating);
+        
+        // Отправляем уведомление мастеру
+        sendTelegramNotification(deal.masterId, 
+            `📝 Новый отзыв от ${deal.clientName}\n` +
+            `Оценка: ${'⭐'.repeat(rating)}\n` +
+            `"${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"\n\n` +
+            `Посмотреть в профиле: ${TELEGRAM_BOT_URL}?start=reviews`,
+            'review',
+            { reviewId: review.id, type: 'new_review' }
+        );
+        
+        // Добавляем звёзды за отзыв
+        if (rating >= 4) {
+            addUserStars(deal.masterId, 2); // +2 звезды за хороший отзыв
+        }
+        
+        showNotification('✅ Спасибо за отзыв!');
+        return true;
+    }
+
+    function updateMasterRating(masterId, newRating) {
+        const master = getOrCreateUserProfile(masterId);
+        const reviews = getGlobalReviews().filter(r => r.masterId === masterId);
+        
+        // Инициализируем структуру рейтинга, если её нет
+        if (!master.rating) master.rating = { distribution: {5:0,4:0,3:0,2:0,1:0} };
+        master.rating.distribution[newRating] = (master.rating.distribution[newRating] || 0) + 1;
+        
+        // Пересчитываем средний рейтинг
+        let total = 0;
+        let count = 0;
+        for (let i = 1; i <= 5; i++) {
+            total += i * (master.rating.distribution[i] || 0);
+            count += master.rating.distribution[i] || 0;
+        }
+        
+        master.rating.average = count > 0 ? parseFloat((total / count).toFixed(1)) : 0;
+        master.rating.count = count;
+        master.reviewsCount = count;
+        
+        setLocalStorage(`user_${masterId}`, master);
+        
+        // Обновляем карту и поиск
+        if (map) loadSkillsOnMap();
+    }
+
+    function respondToReview(reviewId, responseText) {
+        const reviews = getGlobalReviews();
+        const reviewIndex = reviews.findIndex(r => r.id === reviewId);
+        
+        if (reviewIndex !== -1) {
+            reviews[reviewIndex].responseFromMaster = {
+                text: responseText,
+                createdAt: new Date().toISOString()
+            };
+            setGlobalReviews(reviews);
+            
+            // Уведомляем клиента
+            sendTelegramNotification(reviews[reviewIndex].clientId,
+                `💬 Мастер ${reviews[reviewIndex].clientName} ответил на ваш отзыв`,
+                'review',
+                { reviewId, type: 'review_response' }
+            );
+            
+            showNotification('✅ Ответ отправлен');
+            
+            // Обновляем отображение отзывов
+            if (currentProfileTab === 'stats') {
+                loadUserProfile();
+            }
+            
+            return true;
+        }
+        return false;
+    }
+
+    function getMasterReviews(masterId, limit = 10, offset = 0) {
+        return getGlobalReviews()
+            .filter(r => r.masterId === masterId)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(offset, offset + limit);
+    }
+
+    function getReviewStats(masterId) {
+        const reviews = getGlobalReviews().filter(r => r.masterId === masterId);
+        
+        const distribution = {5:0,4:0,3:0,2:0,1:0};
+        reviews.forEach(r => distribution[r.rating]++);
+        
+        return {
+            total: reviews.length,
+            average: reviews.length > 0 
+                ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+                : 0,
+            distribution,
+            withPhotos: reviews.filter(r => r.photos && r.photos.length > 0).length,
+            withResponses: reviews.filter(r => r.responseFromMaster).length
+        };
+    }
+
+    function createReviewStats(stats) {
+        if (stats.total === 0) {
+            return '<div style="text-align: center; color: #666; padding: 20px;">Пока нет отзывов</div>';
+        }
+        
+        const stars = '⭐'.repeat(Math.round(stats.average)) + '☆'.repeat(5 - Math.round(stats.average));
+        
+        return `
+            <div class="review-stats-grid">
+                <div class="review-stat-card">
+                    <div class="review-stat-value">${stats.average}</div>
+                    <div class="review-stat-label">Средний рейтинг</div>
+                    <div style="color: #FFD700; margin-top: 5px;">${stars}</div>
+                </div>
+                <div class="review-stat-card">
+                    <div class="review-stat-value">${stats.total}</div>
+                    <div class="review-stat-label">Всего отзывов</div>
+                </div>
+                <div class="review-stat-card">
+                    <div class="review-stat-value">${stats.withPhotos}</div>
+                    <div class="review-stat-label">С фото</div>
+                </div>
+            </div>
+            
+            <div class="rating-distribution">
+                <h4 style="margin-bottom: 10px;">Распределение оценок</h4>
+                ${[5,4,3,2,1].map(rating => {
+                    const count = stats.distribution[rating] || 0;
+                    const percentage = stats.total > 0 ? (count / stats.total * 100).toFixed(0) : 0;
+                    
+                    return `
+                        <div class="review-distribution-bar">
+                            <div class="review-distribution-label">${rating}⭐</div>
+                            <div class="review-distribution-progress">
+                                <div class="review-distribution-fill" style="width: ${percentage}%;"></div>
+                            </div>
+                            <div class="review-distribution-count">${count}</div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    function createReviewCard(review, isMaster = false) {
+        const date = new Date(review.createdAt).toLocaleDateString('ru-RU');
+        const stars = '⭐'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+        
+        let photosHtml = '';
+        if (review.photos && review.photos.length > 0) {
+            photosHtml = `
+                <div style="display: flex; gap: 10px; margin: 10px 0; flex-wrap: wrap;">
+                    ${review.photos.map(photo => `
+                        <img src="${photo}" class="review-photo-thumb" onclick="showFullImage('${photo}')">
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        let responseHtml = '';
+        if (review.responseFromMaster) {
+            responseHtml = `
+                <div style="margin-left: 20px; margin-top: 10px; padding: 10px; background: #e6f7ff; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">👨‍🔧</span>
+                        <div>
+                            <div style="font-weight: bold; color: #1890ff;">Ответ мастера</div>
+                            <div>${review.responseFromMaster.text}</div>
+                            <div style="font-size: 11px; color: #999; margin-top: 5px;">
+                                ${new Date(review.responseFromMaster.createdAt).toLocaleDateString('ru-RU')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="deal-card" style="border-left-color: ${review.rating >= 4 ? '#48bb78' : '#f56565'};">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 24px;">👤</span>
+                        <div>
+                            <div style="font-weight: bold;">${review.clientName}</div>
+                            <div style="font-size: 12px; color: #666;">${date}</div>
+                        </div>
+                    </div>
+                    <div style="color: #FFD700;">${stars}</div>
+                </div>
+                
+                <p style="margin: 10px 0; line-height: 1.5;">${review.text}</p>
+                
+                ${photosHtml}
+                ${responseHtml}
+                
+                ${isMaster && !review.responseFromMaster ? `
+                    <button class="chat-button" onclick="showResponseForm('${review.id}')" 
+                            style="margin-top: 10px; background: #1890ff;">
+                        💬 Ответить на отзыв
+                    </button>
+                ` : ''}
+                
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="deal-button" onclick="likeReview('${review.id}')" 
+                            style="background: #f0f0f0; color: #333;">
+                        👍 ${review.likes}
+                    </button>
+                    <button class="deal-button" onclick="reportReview('${review.id}')" 
+                            style="background: #fff1f0; color: #f5222d;">
+                        ⚠️ Пожаловаться
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    function showResponseForm(reviewId) {
+        document.getElementById('responseReviewId').value = reviewId;
+        document.getElementById('responseText').value = '';
+        document.getElementById('responseModal').style.display = 'flex';
+    }
+
+    function submitResponse() {
+        const reviewId = document.getElementById('responseReviewId').value;
+        const responseText = document.getElementById('responseText').value.trim();
+        
+        if (!responseText) {
+            alert('❌ Напишите ответ');
+            return;
+        }
+        
+        respondToReview(reviewId, responseText);
+        closeResponseModal();
+    }
+
+    function likeReview(reviewId) {
+        const reviews = getGlobalReviews();
+        const reviewIndex = reviews.findIndex(r => r.id === reviewId);
+        
+        if (reviewIndex !== -1) {
+            reviews[reviewIndex].likes = (reviews[reviewIndex].likes || 0) + 1;
+            setGlobalReviews(reviews);
+            showNotification('👍 Спасибо за оценку!');
+            
+            // Обновляем отображение отзывов
+            if (currentProfileTab === 'stats') {
+                loadUserProfile();
+            }
+        }
+    }
+
+    function reportReview(reviewId) {
+        if (confirm('⚠️ Пожаловаться на этот отзыв?')) {
+            const reviews = getGlobalReviews();
+            const reviewIndex = reviews.findIndex(r => r.id === reviewId);
+            
+            if (reviewIndex !== -1) {
+                reviews[reviewIndex].reported = true;
+                setGlobalReviews(reviews);
+                showNotification('✅ Жалоба отправлена модератору');
+            }
+        }
+    }
+
+    function closeReviewModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+        currentReviewDeal = null;
+        currentReviewRating = 0;
+        currentReviewPhotos = [];
+    }
+
+    function closeResponseModal() {
+        document.getElementById('responseModal').style.display = 'none';
+        document.getElementById('responseReviewId').value = '';
+        document.getElementById('responseText').value = '';
+    }
+
+    function showFullImage(src) {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        `;
+        
+        const img = document.createElement('img');
+        img.src = src;
+        img.style.cssText = `
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 10px;
+        `;
+        
+        modal.appendChild(img);
+        modal.onclick = () => modal.remove();
+        document.body.appendChild(modal);
+    }
+
+    function loadMoreReviews() {
+        currentReviewsOffset += REVIEWS_PER_PAGE;
+        const masterId = currentUserId;
+        const moreReviews = getMasterReviews(masterId, REVIEWS_PER_PAGE, currentReviewsOffset);
+        
+        if (moreReviews.length > 0) {
+            const container = document.getElementById('reviewsList');
+            moreReviews.forEach(review => {
+                container.innerHTML += createReviewCard(review, true);
+            });
+            
+            const stats = getReviewStats(masterId);
+            if (stats.total <= currentReviewsOffset + REVIEWS_PER_PAGE) {
+                document.getElementById('loadMoreReviews').style.display = 'none';
+            }
+        } else {
+            document.getElementById('loadMoreReviews').style.display = 'none';
+        }
+    }
+
+    // ========== НОВЫЕ ФУНКЦИИ ДЛЯ УВЕДОМЛЕНИЙ ==========
+    
+    function getUserNotificationSettings(userId) {
+        const settings = getLocalStorage(`notify_${userId}`);
+        return settings || {
+            newDeal: true,
+            dealSigned: true,
+            newReview: true,
+            nearbyMaster: true,
+            messageReceived: true,
+            promoNews: false,
+            notifyTimeStart: '09:00',
+            notifyTimeEnd: '23:00'
+        };
+    }
+
+    function getUserNotifications(userId, limit = 50) {
+        const notifications = getLocalStorage(`notifications_${userId}`) || [];
+        return notifications
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, limit);
+    }
+
+    function addNotification(userId, notification) {
+        const notifications = getLocalStorage(`notifications_${userId}`) || [];
+        notifications.unshift({
+            id: 'notify_' + Date.now(),
+            ...notification,
+            createdAt: new Date().toISOString(),
+            read: false
+        });
+        
+        // Храним последние 100 уведомлений
+        if (notifications.length > 100) notifications.pop();
+        
+        setLocalStorage(`notifications_${userId}`, notifications);
+        return notifications[0];
+    }
+
+    async function sendTelegramNotification(userId, message, type = 'info', data = {}) {
+        console.log(`📱 Отправка уведомления пользователю ${userId}:`, message);
+        
+        // Проверяем настройки уведомлений
+        const settings = getUserNotificationSettings(userId);
+        const now = new Date();
+        const currentTime = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        
+        // Проверяем тихий час
+        if (currentTime < settings.notifyTimeStart || currentTime > settings.notifyTimeEnd) {
+            if (type !== 'urgent') {
+                console.log('🔕 Тихий час, уведомление не отправлено');
+                return false;
+            }
+        }
+        
+        // Проверяем включен ли тип уведомления
+        if (!settings[type] && type !== 'urgent') {
+            console.log(`🔕 Уведомления типа ${type} отключены`);
+            return false;
+        }
+        
+        // Сохраняем в историю
+        addNotification(userId, { message, type, data });
+        
+        // Показываем красивое уведомление
+        showTelegramStyleNotification(message, type, data);
+        
+        try {
+            // Отправляем через сервер
+            const response = await fetch(`${API_URL}/api/notify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, message, type, data })
+            });
+            
+            if (response.ok) {
+                console.log('✅ Уведомление отправлено через сервер');
+                return true;
+            }
+        } catch (error) {
+            console.log('⚠️ Сервер недоступен, сохраняем локально');
+            
+            // Если сервер недоступен, сохраняем уведомление для показа при следующем входе
+            const pending = getLocalStorage(`pending_notifications_${userId}`) || [];
+            pending.push({ message, type, data, createdAt: new Date().toISOString() });
+            setLocalStorage(`pending_notifications_${userId}`, pending);
+        }
+        
+        return false;
+    }
+
+    function showTelegramStyleNotification(message, type = 'info', data = {}) {
+        const colors = {
+            info: { bg: '#667eea', icon: 'ℹ️' },
+            success: { bg: '#48bb78', icon: '✅' },
+            warning: { bg: '#ed8936', icon: '⚠️' },
+            error: { bg: '#f56565', icon: '❌' },
+            deal: { bg: '#9f7aea', icon: '📝' },
+            review: { bg: '#fbbf24', icon: '⭐' },
+            nearby: { bg: '#38b2ac', icon: '📍' }
+        };
+        
+        const style = colors[type] || colors.info;
+        
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            max-width: 350px;
+            background: ${style.bg};
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.3s ease-out;
+            cursor: pointer;
+            transition: transform 0.2s;
+        `;
+        
+        notification.innerHTML = `
+            <div style="font-size: 24px;">${style.icon}</div>
+            <div style="flex: 1;">
+                <div style="font-weight: 600; margin-bottom: 4px;">Umeyka</div>
+                <div style="opacity: 0.9;">${message}</div>
+            </div>
+            <div style="font-size: 12px; opacity: 0.7;">только что</div>
+        `;
+        
+        // Добавляем обработчик клика
+        if (data.dealId) {
+            notification.addEventListener('click', () => {
+                triggerHapticFeedback();
+                showProfileSection();
+                showProfileTab('deals');
+                notification.remove();
+            });
+        } else if (data.reviewId) {
+            notification.addEventListener('click', () => {
+                triggerHapticFeedback();
+                showProfileSection();
+                showProfileTab('stats');
+                notification.remove();
+            });
+        } else {
+            notification.addEventListener('click', () => notification.remove());
+        }
+        
+        notification.addEventListener('mouseenter', () => {
+            notification.style.transform = 'translateX(-5px)';
+        });
+        notification.addEventListener('mouseleave', () => {
+            notification.style.transform = 'translateX(0)';
+        });
+        
+        // Добавляем кнопку закрытия
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '×';
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.7;
+            padding: 5px;
+        `;
+        closeBtn.onclick = (e) => {
+            e.stopPropagation();
+            notification.remove();
+        };
+        notification.appendChild(closeBtn);
+        
+        document.body.appendChild(notification);
+        
+        // Автоматически скрываем через 8 секунд
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.animation = 'slideOutRight 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }
+        }, 8000);
+    }
+
+    function showPendingNotifications() {
+        const pending = getLocalStorage(`pending_notifications_${currentUserId}`) || [];
+        if (pending.length === 0) return;
+        
+        // Показываем уведомления по одному
+        pending.forEach((notify, index) => {
+            setTimeout(() => {
+                showTelegramStyleNotification(notify.message, notify.type, notify.data);
+            }, index * 3000);
+        });
+        
+        // Очищаем
+        setLocalStorage(`pending_notifications_${currentUserId}`, []);
+    }
+
+    function loadNotificationsHistory() {
+        const history = getUserNotifications(currentUserId);
+        const container = document.getElementById('notificationsHistory');
+        
+        if (history.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                    <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
+                    <div>У вас пока нет уведомлений</div>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = history.map(notif => {
+            const date = new Date(notif.createdAt).toLocaleString('ru-RU');
+            const icons = {
+                info: 'ℹ️',
+                success: '✅',
+                warning: '⚠️',
+                error: '❌',
+                deal: '📝',
+                review: '⭐',
+                nearby: '📍'
+            };
+            
+            return `
+                <div class="deal-card" style="border-left-color: ${notif.read ? '#999' : '#667eea'};">
+                    <div style="display: flex; gap: 15px;">
+                        <span style="font-size: 24px;">${icons[notif.type] || 'ℹ️'}</span>
+                        <div style="flex: 1;">
+                            <div style="font-weight: ${notif.read ? 'normal' : 'bold'};">${notif.message}</div>
+                            <div style="font-size: 11px; color: #999; margin-top: 5px;">${date}</div>
+                        </div>
+                        ${!notif.read ? '<span style="width: 8px; height: 8px; background: #667eea; border-radius: 50%;"></span>' : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function saveNotificationSettings() {
+        const settings = {
+            newDeal: document.getElementById('notifyNewDeal').checked,
+            dealSigned: document.getElementById('notifyDealSigned').checked,
+            newReview: document.getElementById('notifyNewReview').checked,
+            nearbyMaster: document.getElementById('notifyNearbyMaster').checked,
+            notifyTimeStart: document.getElementById('quietTimeStart').value,
+            notifyTimeEnd: document.getElementById('quietTimeEnd').value
+        };
+        
+        setLocalStorage(`notify_${currentUserId}`, settings);
+        showNotification('✅ Настройки сохранены');
+    }
+
+    function loadNotificationSettings() {
+        const settings = getUserNotificationSettings(currentUserId);
+        
+        document.getElementById('notifyNewDeal').checked = settings.newDeal;
+        document.getElementById('notifyDealSigned').checked = settings.dealSigned;
+        document.getElementById('notifyNewReview').checked = settings.newReview;
+        document.getElementById('notifyNearbyMaster').checked = settings.nearbyMaster;
+        document.getElementById('quietTimeStart').value = settings.notifyTimeStart;
+        document.getElementById('quietTimeEnd').value = settings.notifyTimeEnd;
     }
 
     // ========== ФУНКЦИЯ СЖАТИЯ ИЗОБРАЖЕНИЙ ==========
@@ -4216,10 +5225,16 @@
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
                             </div>
                         ` : ''}
-                        <div style="color: #666; margin: 15px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
+                        
+                        <div style="color: #666; margin: 15px 0;">
+                            ⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5
+                            (${getGlobalReviews().filter(r => r.masterId === skill.userId).length} отзывов)
+                        </div>
+                        
                         <div style="color: #48bb78; font-size: 12px; margin: 15px 0;">
                             👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
                         </div>
+                        
                         <div class="skill-actions">
                             <button class="edit-button" onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
                                 ✏️
@@ -4653,7 +5668,11 @@
             
             sortedSkills.forEach(skill => {
                 if (skill.location && skill.location.lat && skill.location.lon) {
-                    const rating = skill.rating?.average || 5.0;
+                    const reviews = getGlobalReviews().filter(r => r.masterId === skill.userId);
+                    const avgRating = reviews.length > 0 
+                        ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+                        : '5.0';
+                    
                     const isUserSkill = skill.userId === currentUserId;
                     const status = skill.status || 'ready';
                     
@@ -4666,7 +5685,7 @@
                     const marker = createPremiumMarker(skill, isUserSkill);
                     
                     marker.addTo(map)
-                        .bindPopup(createMapSkillPopup(skill, isUserSkill));
+                        .bindPopup(createMapSkillPopup(skill, isUserSkill, avgRating, reviews.length));
                     
                     marker.on('popupopen', async () => {
                         try {
@@ -4692,6 +5711,16 @@
                 const nearby = findNearbyFreeMasters(userLocation.lat, userLocation.lon);
                 if (nearby.length > 0) {
                     showNearbyMasterNotification(nearby);
+                    
+                    // Отправляем уведомление о свободных мастерах
+                    if (nearby.length > 0) {
+                        sendTelegramNotification(currentUserId,
+                            `📍 Рядом с вами ${nearby.length} свободных мастеров!\n` +
+                            `Открыть карту: ${TELEGRAM_BOT_URL}?start=map`,
+                            'nearby',
+                            { count: nearby.length, type: 'nearby_masters' }
+                        );
+                    }
                 }
             }
             
@@ -4707,8 +5736,7 @@
         }
     }
 
-    function createMapSkillPopup(skill, isUserSkill) {
-        const rating = skill.rating?.average || 5.0;
+    function createMapSkillPopup(skill, isUserSkill, avgRating, reviewsCount) {
         const statusBadge = getStatusBadge(skill.status);
         const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
         
@@ -4746,10 +5774,10 @@
                         </div>
                     </div>
                     
-                    <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
+                    <div style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
                         <span style="color:#667eea;">⭐</span> 
-                        Рейтинг: <strong>${rating.toFixed(1)}/5</strong>
-                    </p>
+                        Рейтинг: <strong>${avgRating}</strong> (${reviewsCount} отзывов)
+                    </div>
                 </div>
                 
                 ${skill.photo ? `
@@ -4937,6 +5965,7 @@
         triggerHapticFeedback();
         showSection('profileSection');
         loadUserProfile();
+        currentReviewsOffset = 0;
     };
 
     window.showAboutSection = function() {
@@ -5078,6 +6107,11 @@
         // Очищаем просроченные премиум-статусы при загрузке
         cleanupExpiredPremiums();
         
+        // Показываем накопившиеся уведомления
+        setTimeout(() => {
+            showPendingNotifications();
+        }, 2000);
+        
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -5200,6 +6234,11 @@
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
                     const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                     
+                    const reviews = getGlobalReviews().filter(r => r.masterId === skill.userId);
+                    const avgRating = reviews.length > 0 
+                        ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+                        : '5.0';
+                    
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
@@ -5227,8 +6266,8 @@
                             </div>
                         ` : ''}
                         
-                        <div style="color: #666; margin: 15px 0 20px;">
-                            👤 ${skill.username}
+                        <div style="color: #666; margin: 15px 0;">
+                            👤 ${skill.username} • ⭐ Рейтинг: ${avgRating} (${reviews.length} отзывов)
                         </div>
                         
                         <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');">
@@ -5284,6 +6323,26 @@
         }
         
         updateUserStats(userData, referralData, coins, stars);
+        
+        // Загружаем отзывы
+        const masterId = currentUserId;
+        const reviews = getMasterReviews(masterId, REVIEWS_PER_PAGE, 0);
+        const stats = getReviewStats(masterId);
+        
+        if (reviews.length > 0) {
+            document.getElementById('reviewsStats').innerHTML = createReviewStats(stats);
+            document.getElementById('reviewsList').innerHTML = reviews.map(r => createReviewCard(r, true)).join('');
+            
+            if (stats.total > REVIEWS_PER_PAGE) {
+                document.getElementById('loadMoreReviews').style.display = 'block';
+            } else {
+                document.getElementById('loadMoreReviews').style.display = 'none';
+            }
+        } else {
+            document.getElementById('reviewsStats').innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">У вас пока нет отзывов</div>';
+            document.getElementById('reviewsList').innerHTML = '';
+            document.getElementById('loadMoreReviews').style.display = 'none';
+        }
     }
 
     function updateUserStats(userData, referralData, coins, stars) {
@@ -5294,6 +6353,10 @@
             <div class="stat-card">
                 <div class="stat-value">${stars}</div>
                 <div class="stat-label">⭐ Звёзды</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${userData.reviewsCount || 0}</div>
+                <div class="stat-label">📝 Отзывов</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value">${userData.completedDeals || 0}</div>
@@ -5395,6 +6458,7 @@
         document.getElementById('profileSkills').style.display = 'none';
         document.getElementById('profileDeals').style.display = 'none';
         document.getElementById('profileReferral').style.display = 'none';
+        document.getElementById('profileNotifications').style.display = 'none';
         
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
         
@@ -5402,6 +6466,7 @@
         document.getElementById('profileSkills').style.display = tabName === 'skills' ? 'block' : 'none';
         document.getElementById('profileDeals').style.display = tabName === 'deals' ? 'block' : 'none';
         document.getElementById('profileReferral').style.display = tabName === 'referral' ? 'block' : 'none';
+        document.getElementById('profileNotifications').style.display = tabName === 'notifications' ? 'block' : 'none';
         
         document.getElementById(tabName + 'Tab').classList.add('active');
         
@@ -5413,6 +6478,10 @@
             updateReferralStats();
         } else if (tabName === 'stats') {
             updatePremiumButtonsStatus();
+            loadUserProfile(); // Перезагружаем для обновления отзывов
+        } else if (tabName === 'notifications') {
+            loadNotificationsHistory();
+            loadNotificationSettings();
         }
     };
 
@@ -5762,6 +6831,21 @@
             masterData.dealsCount = (masterData.dealsCount || 0) + 1;
             setLocalStorage(`user_${masterId}`, masterData);
             
+            // Отправляем уведомления
+            sendTelegramNotification(masterId, 
+                `📝 Новая сделка от ${clientName}\n` +
+                `Услуга: ${masterSkill}\n` +
+                `Сумма: ${amount} ₽\n` +
+                `Перейдите в профиль для подтверждения`,
+                'deal',
+                { dealId: newDeal.id, type: 'new_deal' }
+            );
+
+            sendTelegramNotification(currentUserId,
+                `✅ Сделка создана и отправлена мастеру`,
+                'success'
+            );
+            
             document.getElementById('dealTitle').value = '';
             document.getElementById('dealDescription').value = '';
             document.getElementById('dealPeriod').value = '';
@@ -5828,6 +6912,34 @@
             
             updateGlobalDeal(dealId, updates);
             
+            // Отправляем уведомления о подписании
+            const userData = getOrCreateUserProfile(currentUserId);
+            const otherPartyId = isClient ? deal.masterId : deal.clientId;
+            const otherPartyName = isClient ? deal.masterName : deal.clientName;
+            const role = isClient ? 'Клиент' : 'Мастер';
+
+            sendTelegramNotification(otherPartyId,
+                `✍️ ${role} ${userData.firstName} подписал сделку "${deal.title}"\n` +
+                `Осталось подписать ${isClient ? 'мастеру' : 'клиенту'}`,
+                'deal',
+                { dealId, type: 'deal_signed' }
+            );
+
+            if (clientSigned && masterSigned) {
+                sendTelegramNotification(deal.clientId,
+                    `🎉 Сделка "${deal.title}" подписана обеими сторонами!\n` +
+                    `Можно приступать к работе`,
+                    'success',
+                    { dealId, type: 'deal_active' }
+                );
+                sendTelegramNotification(deal.masterId,
+                    `🎉 Сделка "${deal.title}" подписана обеими сторонами!\n` +
+                    `Можно приступать к работе`,
+                    'success',
+                    { dealId, type: 'deal_active' }
+                );
+            }
+            
             loadDeals();
             
         } catch (error) {
@@ -5876,6 +6988,17 @@
                 clientData.completedDeals = (clientData.completedDeals || 0) + 1;
                 clientData.rating = (clientData.rating || 0) + 0.5;
                 setLocalStorage(`user_${deal.clientId}`, clientData);
+                
+                // Отправляем уведомление клиенту
+                sendTelegramNotification(deal.clientId,
+                    `✅ Сделка "${deal.title}" завершена мастером!\n` +
+                    `Пожалуйста, оцените работу мастера`,
+                    'review',
+                    { dealId, type: 'deal_completed' }
+                );
+
+                // Запускаем таймер для запроса отзыва
+                setTimeout(() => askForReview(dealId), 60 * 60 * 1000);
                 
                 loadDeals();
                 loadUserProfile();
