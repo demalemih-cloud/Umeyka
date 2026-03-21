@@ -49,6 +49,13 @@
             backdrop-filter: blur(10px);
             position: relative;
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .header:active {
+            transform: scale(0.99);
         }
         
         .about-button {
@@ -68,18 +75,21 @@
         .logo {
             font-size: 50px;
             margin-bottom: 10px;
+            pointer-events: none;
         }
         
         .app-title {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 8px;
+            pointer-events: none;
         }
         
         .app-description {
             font-size: 16px;
             opacity: 0.9;
             margin-bottom: 15px;
+            pointer-events: none;
         }
         
         .rating {
@@ -89,6 +99,7 @@
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 14px;
+            pointer-events: none;
         }
         
         .stars {
@@ -1805,7 +1816,7 @@
     <div class="container">
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
-            <div class="header">
+            <div class="header" id="logoHeader">
                 <button class="about-button" onclick="triggerHapticFeedback(); showAboutSection();">ℹ️ О проекте</button>
                 <div class="logo">🤝✨</div>
                 <div class="app-title">Umeyka</div>
@@ -2484,6 +2495,10 @@
     let localSkills = {};
     let globalSkillsStatus = {};
     let pendingPaymentDealId = null;
+    
+    // Счетчик кликов по логотипу для открытия админ-панели
+    let logoClickCount = 0;
+    let logoClickTimer = null;
 
     // ========== БАЗА ДАННЫХ ГОРОДОВ ==========
     const citiesDatabase = {
@@ -2545,7 +2560,7 @@
         const wallet = getWalletData();
         const transaction = {
             id: 'tx_' + Date.now(),
-            type: type, // 'deposit', 'payment', 'payout', 'commission', 'refund'
+            type: type,
             amount: amount,
             description: description,
             dealId: dealId,
@@ -2556,7 +2571,6 @@
         wallet.transactions.unshift(transaction);
         saveWalletData(wallet);
         
-        // Добавляем в глобальную историю для синхронизации
         const globalTx = getLocalStorage('umeyka_global_transactions') || [];
         globalTx.push({
             ...transaction,
@@ -2628,9 +2642,7 @@
                 return;
             }
             
-            // Проверяем доступность Wallet
             if (tg.openInvoice) {
-                // Симулируем подключение кошелька
                 const wallet = getWalletData();
                 wallet.connected = true;
                 wallet.walletAddress = 'EQ' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -2638,7 +2650,6 @@
                 
                 showNotification('✅ Wallet успешно подключен!');
                 
-                // Предлагаем пополнить баланс
                 setTimeout(() => {
                     if (confirm('💰 Хотите пополнить баланс?')) {
                         depositFunds();
@@ -2667,8 +2678,6 @@
             const tg = window.Telegram?.WebApp;
             
             if (tg?.openInvoice) {
-                // В реальном приложении здесь будет вызов API Telegram для создания инвойса
-                // Симулируем успешное пополнение
                 setTimeout(() => {
                     const wallet = getWalletData();
                     wallet.availableBalance += parseInt(amount);
@@ -2679,7 +2688,6 @@
                     showNotification(`✅ Баланс пополнен на ${amount} Stars!`);
                 }, 1500);
             } else {
-                // Демо-режим
                 const wallet = getWalletData();
                 wallet.availableBalance += parseInt(amount);
                 saveWalletData(wallet);
@@ -2721,7 +2729,6 @@
         }
         
         try {
-            // В реальном приложении здесь будет API-вызов для вывода
             setTimeout(() => {
                 wallet.availableBalance -= parseInt(amount);
                 saveWalletData(wallet);
@@ -2750,12 +2757,10 @@
             return false;
         }
         
-        // Списываем деньги с баланса клиента
         wallet.availableBalance -= totalAmount;
         wallet.frozenBalance += totalAmount;
         saveWalletData(wallet);
         
-        // Обновляем статус сделки
         updateGlobalDeal(dealId, {
             paymentStatus: 'paid',
             escrowBalance: deal.amount,
@@ -2763,7 +2768,6 @@
             paidAt: new Date().toISOString()
         });
         
-        // Добавляем транзакции
         addTransaction('payment', totalAmount, `Оплата сделки "${deal.title}"`, dealId);
         addTransaction('commission', deal.commission, `Комиссия по сделке "${deal.title}"`, dealId);
         
@@ -2777,32 +2781,27 @@
         const masterWallet = getOrCreateWallet(deal.masterId);
         const systemWallet = getOrCreateWallet('system');
         
-        const masterAmount = deal.amount * 0.95; // 95% мастеру
-        const commission = deal.amount * 0.05;   // 5% системе
+        const masterAmount = deal.amount * 0.95;
+        const commission = deal.amount * 0.05;
         
-        // Размораживаем у клиента
         const clientWallet = getWalletData();
         clientWallet.frozenBalance -= deal.total;
         saveWalletData(clientWallet);
         
-        // Зачисляем мастеру
         masterWallet.availableBalance += masterAmount;
         masterWallet.totalEarned += masterAmount;
         saveWalletData(masterWallet);
         
-        // Комиссия системе
         systemWallet.availableBalance += commission;
         systemWallet.totalCommission += commission;
         saveWalletData(systemWallet);
         
-        // Обновляем сделку
         updateGlobalDeal(dealId, {
             paymentStatus: 'released',
             masterPayout: masterAmount,
             releasedAt: new Date().toISOString()
         });
         
-        // Транзакция для мастера
         const masterTx = {
             id: 'tx_' + Date.now(),
             type: 'payout',
@@ -2825,7 +2824,6 @@
         const deal = getDealById(dealId);
         if (!deal || deal.paymentStatus !== 'paid') return false;
         
-        // Возвращаем деньги клиенту
         const wallet = getWalletData();
         wallet.frozenBalance -= deal.total;
         wallet.availableBalance += deal.total;
@@ -2881,7 +2879,6 @@
             return;
         }
         
-        // Показываем модальное окно подтверждения
         pendingPaymentDealId = dealId;
         document.getElementById('confirmDealTitle').textContent = deal.title;
         document.getElementById('confirmDealAmount').textContent = deal.amount + ' ⭐';
@@ -4769,7 +4766,41 @@
         
         return currentUserId;
     };
-
+    
+    // ========== АДМИН-ПАНЕЛЬ (6 кликов по логотипу) ==========
+    function initAdminAccess() {
+        const logoHeader = document.getElementById('logoHeader');
+        if (!logoHeader) return;
+        
+        logoHeader.addEventListener('click', (e) => {
+            e.stopPropagation();
+            logoClickCount++;
+            console.log(`[Admin] Клик по логотипу: ${logoClickCount}/6`);
+            
+            if (logoClickTimer) clearTimeout(logoClickTimer);
+            
+            logoClickTimer = setTimeout(() => {
+                if (logoClickCount >= 6) {
+                    openAdminPanel();
+                    logoClickCount = 0;
+                } else {
+                    logoClickCount = 0;
+                }
+                if (logoClickTimer) clearTimeout(logoClickTimer);
+            }, 800);
+        });
+    }
+    
+    function openAdminPanel() {
+        console.log('🔓 Открытие админ-панели (6 кликов)');
+        
+        // Открываем админку в новой вкладке/окне
+        const adminUrl = 'umeyka-admin.html';
+        window.open(adminUrl, '_blank');
+    }
+    
+    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (продолжение) ==========
+    
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Umeyka app loaded successfully!');
         
@@ -4801,6 +4832,8 @@
         if (dealAmount) {
             dealAmount.addEventListener('input', updateDealCommission);
         }
+        
+        initAdminAccess();
     });
 
     window.searchSkills = async function() {
@@ -5597,7 +5630,6 @@
                     return;
                 }
                 
-                // Выпускаем платеж мастеру
                 if (releasePayment(dealId)) {
                     updateGlobalDeal(dealId, {
                         status: 'completed',
