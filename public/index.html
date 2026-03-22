@@ -1836,6 +1836,11 @@
                     <span class="button-icon">🔍</span>
                     Я ищу
                 </button>
+                <button class="main-button" onclick="triggerHapticFeedback(); showWalletSection();" 
+                        style="background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%);">
+                    <span class="button-icon">💰</span>
+                    Мой кошелёк
+                </button>
                 <button class="main-button" onclick="triggerHapticFeedback(); showProfileSection();" 
                         style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">
                     <span class="button-icon">👤</span>
@@ -1947,6 +1952,61 @@
             </div>
         </div>
 
+        <!-- СЕКЦИЯ КОШЕЛЬКА (НОВАЯ ОТДЕЛЬНАЯ СЕКЦИЯ) -->
+        <div id="walletSection" class="section">
+            <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
+            
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">💰 Мой кошелёк</h2>
+                
+                <!-- Кошелек -->
+                <div class="wallet-section" style="margin-top: 0;">
+                    <div class="wallet-title">
+                        💰 Баланс
+                    </div>
+                    
+                    <div id="walletStatusMain" class="wallet-disconnected">
+                        <span>🔴</span>
+                        <span>Telegram Wallet не подключен</span>
+                    </div>
+                    
+                    <div class="balance-grid">
+                        <div class="balance-card">
+                            <div class="balance-label">Доступно</div>
+                            <div class="balance-value available" id="availableBalanceMain">0 ⭐</div>
+                        </div>
+                        <div class="balance-card">
+                            <div class="balance-label">Заморожено</div>
+                            <div class="balance-value frozen" id="frozenBalanceMain">0 ⭐</div>
+                        </div>
+                        <div class="balance-card">
+                            <div class="balance-label">Всего заработано</div>
+                            <div class="balance-value total" id="totalEarnedMain">0 ⭐</div>
+                        </div>
+                        <div class="balance-card">
+                            <div class="balance-label">Комиссии</div>
+                            <div class="balance-value" id="totalCommissionMain" style="color: #ed8936;">0 ⭐</div>
+                        </div>
+                    </div>
+                    
+                    <div class="wallet-actions">
+                        <button class="wallet-button deposit" onclick="triggerHapticFeedback(); connectWalletMain();">
+                            🔗 Подключить / Пополнить Wallet
+                        </button>
+                        <button class="wallet-button withdraw" onclick="triggerHapticFeedback(); withdrawFundsMain();" id="withdrawButtonMain" style="display: none;">
+                            💸 Вывести средства
+                        </button>
+                    </div>
+                    
+                    <div class="transaction-history" id="transactionHistoryMain">
+                        <div style="text-align: center; color: #666; padding: 20px;">
+                            История операций пуста
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА -->
         <div id="profileSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
@@ -1968,52 +2028,6 @@
                     <button class="main-button" onclick="triggerHapticFeedback(); editProfile();" style="margin-bottom: 15px;">
                         ✏️ Редактировать профиль
                     </button>
-                </div>
-                
-                <!-- Кошелек -->
-                <div class="wallet-section">
-                    <div class="wallet-title">
-                        💰 Мой кошелек
-                    </div>
-                    
-                    <div id="walletStatus" class="wallet-disconnected">
-                        <span>🔴</span>
-                        <span>Telegram Wallet не подключен</span>
-                    </div>
-                    
-                    <div class="balance-grid">
-                        <div class="balance-card">
-                            <div class="balance-label">Доступно</div>
-                            <div class="balance-value available" id="availableBalance">0 ⭐</div>
-                        </div>
-                        <div class="balance-card">
-                            <div class="balance-label">Заморожено</div>
-                            <div class="balance-value frozen" id="frozenBalance">0 ⭐</div>
-                        </div>
-                        <div class="balance-card">
-                            <div class="balance-label">Всего заработано</div>
-                            <div class="balance-value total" id="totalEarned">0 ⭐</div>
-                        </div>
-                        <div class="balance-card">
-                            <div class="balance-label">Комиссии</div>
-                            <div class="balance-value" id="totalCommission" style="color: #ed8936;">0 ⭐</div>
-                        </div>
-                    </div>
-                    
-                    <div class="wallet-actions">
-                        <button class="wallet-button deposit" onclick="triggerHapticFeedback(); connectWallet();">
-                            🔗 Подключить / Пополнить Wallet
-                        </button>
-                        <button class="wallet-button withdraw" onclick="triggerHapticFeedback(); withdrawFunds();" id="withdrawButton" style="display: none;">
-                            💸 Вывести средства
-                        </button>
-                    </div>
-                    
-                    <div class="transaction-history" id="transactionHistory">
-                        <div style="text-align: center; color: #666; padding: 20px;">
-                            История операций пуста
-                        </div>
-                    </div>
                 </div>
                 
                 <!-- Вкладки личного кабинета -->
@@ -2554,6 +2568,7 @@
     function saveWalletData(data) {
         setLocalStorage(`wallet_${currentUserId}`, data);
         updateWalletUI();
+        updateWalletMainUI();
     }
 
     function addTransaction(type, amount, description, dealId = null) {
@@ -2590,21 +2605,53 @@
         document.getElementById('totalCommission').textContent = wallet.totalCommission + ' ⭐';
         
         const walletStatus = document.getElementById('walletStatus');
-        if (wallet.connected) {
-            walletStatus.className = 'wallet-connected';
-            walletStatus.innerHTML = `<span>🟢</span><span>Wallet подключен: ${wallet.walletAddress?.slice(0, 6)}...${wallet.walletAddress?.slice(-4)}</span>`;
-            document.getElementById('withdrawButton').style.display = 'flex';
-        } else {
-            walletStatus.className = 'wallet-disconnected';
-            walletStatus.innerHTML = `<span>🔴</span><span>Telegram Wallet не подключен</span>`;
-            document.getElementById('withdrawButton').style.display = 'none';
+        if (walletStatus) {
+            if (wallet.connected) {
+                walletStatus.className = 'wallet-connected';
+                walletStatus.innerHTML = `<span>🟢</span><span>Wallet подключен: ${wallet.walletAddress?.slice(0, 6)}...${wallet.walletAddress?.slice(-4)}</span>`;
+                document.getElementById('withdrawButton').style.display = 'flex';
+            } else {
+                walletStatus.className = 'wallet-disconnected';
+                walletStatus.innerHTML = `<span>🔴</span><span>Telegram Wallet не подключен</span>`;
+                document.getElementById('withdrawButton').style.display = 'none';
+            }
         }
-        
-        renderTransactionHistory(wallet.transactions);
     }
 
-    function renderTransactionHistory(transactions) {
-        const container = document.getElementById('transactionHistory');
+    // Обновление UI для отдельной секции кошелька
+    function updateWalletMainUI() {
+        const wallet = getWalletData();
+        
+        const availableBalanceMain = document.getElementById('availableBalanceMain');
+        const frozenBalanceMain = document.getElementById('frozenBalanceMain');
+        const totalEarnedMain = document.getElementById('totalEarnedMain');
+        const totalCommissionMain = document.getElementById('totalCommissionMain');
+        const walletStatusMain = document.getElementById('walletStatusMain');
+        const withdrawButtonMain = document.getElementById('withdrawButtonMain');
+        
+        if (availableBalanceMain) availableBalanceMain.textContent = wallet.availableBalance + ' ⭐';
+        if (frozenBalanceMain) frozenBalanceMain.textContent = wallet.frozenBalance + ' ⭐';
+        if (totalEarnedMain) totalEarnedMain.textContent = wallet.totalEarned + ' ⭐';
+        if (totalCommissionMain) totalCommissionMain.textContent = wallet.totalCommission + ' ⭐';
+        
+        if (walletStatusMain) {
+            if (wallet.connected) {
+                walletStatusMain.className = 'wallet-connected';
+                walletStatusMain.innerHTML = `<span>🟢</span><span>Wallet подключен: ${wallet.walletAddress?.slice(0, 6)}...${wallet.walletAddress?.slice(-4)}</span>`;
+                if (withdrawButtonMain) withdrawButtonMain.style.display = 'flex';
+            } else {
+                walletStatusMain.className = 'wallet-disconnected';
+                walletStatusMain.innerHTML = `<span>🔴</span><span>Telegram Wallet не подключен</span>`;
+                if (withdrawButtonMain) withdrawButtonMain.style.display = 'none';
+            }
+        }
+        
+        renderTransactionHistoryMain(wallet.transactions);
+    }
+
+    function renderTransactionHistoryMain(transactions) {
+        const container = document.getElementById('transactionHistoryMain');
+        if (!container) return;
         
         if (!transactions || transactions.length === 0) {
             container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">История операций пуста</div>';
@@ -2631,7 +2678,7 @@
         }).join('');
     }
 
-    async function connectWallet() {
+    async function connectWalletMain() {
         triggerHapticFeedback();
         
         try {
@@ -2652,7 +2699,7 @@
                 
                 setTimeout(() => {
                     if (confirm('💰 Хотите пополнить баланс?')) {
-                        depositFunds();
+                        depositFundsMain();
                     }
                 }, 500);
             } else {
@@ -2664,7 +2711,7 @@
         }
     }
 
-    async function depositFunds() {
+    async function depositFundsMain() {
         triggerHapticFeedback();
         
         const amount = prompt('💰 Введите сумму для пополнения (в Stars):', '100');
@@ -2702,7 +2749,7 @@
         }
     }
 
-    async function withdrawFunds() {
+    async function withdrawFundsMain() {
         triggerHapticFeedback();
         
         const wallet = getWalletData();
@@ -2875,7 +2922,7 @@
         const wallet = getWalletData();
         
         if (!wallet.connected) {
-            alert('❌ Сначала подключите Telegram Wallet в личном кабинете');
+            alert('❌ Сначала подключите Telegram Wallet в разделе "Мой кошелёк"');
             return;
         }
         
@@ -2895,6 +2942,7 @@
             closePaymentConfirm();
             loadDeals();
             updateWalletUI();
+            updateWalletMainUI();
         }
         
         pendingPaymentDealId = null;
@@ -4668,6 +4716,7 @@
         document.getElementById('mainScreen').style.display = 'block';
         document.getElementById('masterSection').style.display = 'none';
         document.getElementById('clientSection').style.display = 'none';
+        document.getElementById('walletSection').style.display = 'none';
         document.getElementById('profileSection').style.display = 'none';
         document.getElementById('editProfileSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
@@ -4685,6 +4734,7 @@
         document.getElementById('mainScreen').style.display = 'none';
         document.getElementById('masterSection').style.display = 'none';
         document.getElementById('clientSection').style.display = 'none';
+        document.getElementById('walletSection').style.display = 'none';
         document.getElementById('profileSection').style.display = 'none';
         document.getElementById('editProfileSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
@@ -4700,11 +4750,17 @@
         }
     };
 
+    // Новая функция для показа отдельной секции кошелька
+    window.showWalletSection = function() {
+        triggerHapticFeedback();
+        showSection('walletSection');
+        updateWalletMainUI();
+    };
+
     window.showProfileSection = function() {
         triggerHapticFeedback();
         showSection('profileSection');
         loadUserProfile();
-        updateWalletUI();
     };
 
     window.showAboutSection = function() {
@@ -5653,6 +5709,7 @@
                     loadDeals();
                     loadUserProfile();
                     updateWalletUI();
+                    updateWalletMainUI();
                 }
                 
             } catch (error) {
