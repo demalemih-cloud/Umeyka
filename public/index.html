@@ -2154,8 +2154,8 @@
                     Создать сделку
                 </button>
                 
-                <!-- Исправлено: id="dealsList" -->
-                <div id="dealsList"></div>
+                <!-- ИСПРАВЛЕНО: id="dealsContent" вместо id="dealsList" -->
+                <div id="dealsContent"></div>
             </div>
         </div>
 
@@ -4971,6 +4971,8 @@
     
     function openAdminPanel() {
         console.log('🔓 Открытие админ-панели (6 кликов)');
+        
+        // Открываем админку в новой вкладке/окне
         const adminUrl = 'umeyka-admin.html';
         window.open(adminUrl, '_blank');
     }
@@ -5323,17 +5325,15 @@
         return 'deal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ: используем 'dealsList' вместо 'dealsContent'
     function loadDealsContent() {
         try {
-            // Ищем элемент с id="dealsList" (исправлено)
-            const dealsList = document.getElementById('dealsList');
-            if (!dealsList) {
-                console.error('❌ Элемент dealsList не найден в DOM');
+            const dealsContent = document.getElementById('dealsContent');
+            if (!dealsContent) {
+                console.error('❌ Элемент dealsContent не найден');
                 return;
             }
             
-            dealsList.innerHTML = '<div class="loading">📄 Загрузка сделок...</div>';
+            dealsContent.innerHTML = '<div class="loading">📄 Загрузка сделок...</div>';
             
             const userDeals = getUserDeals(currentUserId);
             console.log(`📊 Найдено сделок для пользователя ${currentUserId}:`, userDeals.length);
@@ -5372,7 +5372,7 @@
                         message = 'У вас пока нет сделок';
                 }
                 
-                dealsList.innerHTML = `
+                dealsContent.innerHTML = `
                     <div style="text-align: center; color: #666; padding: 40px;">
                         <div style="font-size: 50px; margin-bottom: 20px;">📄</div>
                         <div style="font-size: 18px; margin-bottom: 10px;">${message}</div>
@@ -5382,7 +5382,7 @@
                 return;
             }
             
-            dealsList.innerHTML = filteredDeals.map(deal => {
+            dealsContent.innerHTML = filteredDeals.map(deal => {
                 const isClient = deal.clientId === currentUserId;
                 const isMaster = deal.masterId === currentUserId;
                 const roleText = isClient ? 'Вы: Клиент' : (isMaster ? 'Вы: Мастер' : 'Неизвестно');
@@ -5526,9 +5526,9 @@
             
         } catch (error) {
             console.error('❌ Ошибка загрузки сделок:', error);
-            const dealsList = document.getElementById('dealsList');
-            if (dealsList) {
-                dealsList.innerHTML = `
+            const dealsContent = document.getElementById('dealsContent');
+            if (dealsContent) {
+                dealsContent.innerHTML = `
                     <div class="error-message">
                         ❌ Ошибка загрузки сделок<br>
                         <small>${error.message}</small>
