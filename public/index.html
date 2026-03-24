@@ -30,105 +30,6 @@
             padding: 0;
         }
         
-        /* ========== SKELETON SCREENS ========== */
-        .skeleton {
-            background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
-            background-size: 200% 100%;
-            animation: skeleton-loading 1.5s infinite;
-            border-radius: 8px;
-        }
-        
-        @keyframes skeleton-loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        
-        .skeleton-card {
-            height: 200px;
-            margin: 15px 0;
-        }
-        
-        .skeleton-text {
-            height: 20px;
-            margin: 10px 0;
-        }
-        
-        /* ========== ИНДИКАТОР ЗАГРУЗКИ ========== */
-        .loading-indicator {
-            text-align: center;
-            padding: 20px;
-            color: rgba(255,255,255,0.8);
-        }
-        
-        .loading-spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* ========== КНОПКА "ЗАГРУЗИТЬ ЕЩЁ" ========== */
-        .load-more-button {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 15px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin: 20px 0;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .load-more-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .load-more-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        /* ========== ОФФЛАЙН ИНДИКАТОР ========== */
-        .offline-indicator {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: #ed8936;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            font-size: 14px;
-            z-index: 10000;
-            display: none;
-            animation: slideDown 0.3s ease;
-        }
-        
-        @keyframes slideDown {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(0); }
-        }
-        
-        .offline-indicator.show {
-            display: block;
-        }
-        
         /* ========== ИСПРАВЛЕНИЕ #1: ЦЕНТРИРОВАНИЕ КНОПКИ РЕДАКТИРОВАНИЯ ПРОФИЛЯ ========== */
         #userProfile {
             text-align: center;
@@ -517,27 +418,6 @@
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             border-left: 4px solid #667eea;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.5s ease forwards;
-        }
-        
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .skill-card.lazy-load {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        
-        .skill-card.visible {
-            opacity: 1;
-            transform: translateY(0);
-            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
         .gold-card {
@@ -2108,11 +1988,6 @@
     </style>
 </head>
 <body>
-    <!-- Оффлайн индикатор -->
-    <div id="offlineIndicator" class="offline-indicator">
-        ⚠️ Нет подключения к интернету. Работа в офлайн-режиме.
-    </div>
-
     <div class="container">
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
@@ -2136,7 +2011,7 @@
                     <span class="button-icon">🔍</span>
                     Я ищу
                 </button>
-                button class="main-button" onclick="triggerHapticFeedback(); showProfileSection();" 
+                <button class="main-button" onclick="triggerHapticFeedback(); showProfileSection();" 
                         style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">
                     <span class="button-icon">👤</span>
                     Личный кабинет
@@ -2244,12 +2119,6 @@
                 <button class="submit-button" onclick="triggerHapticFeedback(); searchSkills();">Найти мастеров</button>
                 
                 <div id="searchResults" style="margin-top: 20px;"></div>
-                
-                <!-- Кнопка "Загрузить ещё" для пагинации -->
-                <button id="loadMoreButton" class="load-more-button" style="display: none;" onclick="triggerHapticFeedback(); loadMoreSkills();">
-                    <span>📥</span>
-                    <span>Загрузить ещё</span>
-                </button>
             </div>
         </div>
 
@@ -2826,31 +2695,6 @@
     // ========== КОНФИГУРАЦИЯ ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
     const TELEGRAM_BOT_URL = 'https://t.me/ymeyka_bot';
-    
-    // ========== КОНФИГУРАЦИЯ МАСШТАБИРУЕМОСТИ ==========
-    const CONFIG = {
-        PAGINATION: {
-            ITEMS_PER_PAGE: 20,
-            MAX_ITEMS: 100
-        },
-        CACHE: {
-            TTL: 5 * 60 * 1000, // 5 минут
-            KEY_PREFIX: 'umeyka_cache_'
-        },
-        RATE_LIMIT: {
-            MIN_INTERVAL: 2000, // 2 секунды между запросами
-            MAX_RETRIES: 3
-        },
-        MAP: {
-            REFRESH_INTERVAL: 60000, // 60 секунд вместо 30
-            DEBOUNCE_DELAY: 300
-        },
-        COMPRESSION: {
-            MAX_IMAGE_SIZE: 500 * 1024, // 500KB
-            JPEG_QUALITY: 0.7
-        }
-    };
-    
     let currentUserId = null;
     let currentAvatar = null;
     let currentSkillPhoto = null;
@@ -2873,19 +2717,6 @@
     let localSkills = {};
     let globalSkillsStatus = {};
     let pendingPaymentDealId = null;
-    
-    // ========== ПЕРЕМЕННЫЕ ДЛЯ ПАГИНАЦИИ ==========
-    let currentPage = 0;
-    let allSkillsCache = [];
-    let isLoadingMore = false;
-    let hasMoreSkills = true;
-    
-    // ========== RATE LIMITING ==========
-    let lastRequestTime = 0;
-    let requestQueue = [];
-    
-    // ========== INTERSECTION OBSERVER ДЛЯ LAZY LOADING ==========
-    let lazyLoadObserver = null;
     
     // Счетчик кликов по логотипу для открытия админ-панели
     let logoClickCount = 0;
@@ -2926,125 +2757,6 @@
     };
 
     const allCities = Object.keys(citiesDatabase).sort();
-
-    // ========== СИСТЕМА КЭШИРОВАНИЯ ==========
-    const CacheManager = {
-        get(key) {
-            try {
-                const cached = localStorage.getItem(CONFIG.CACHE.KEY_PREFIX + key);
-                if (!cached) return null;
-                
-                const { data, timestamp } = JSON.parse(cached);
-                const age = Date.now() - timestamp;
-                
-                if (age > CONFIG.CACHE.TTL) {
-                    localStorage.removeItem(CONFIG.CACHE.KEY_PREFIX + key);
-                    return null;
-                }
-                
-                return data;
-            } catch (e) {
-                return null;
-            }
-        },
-        
-        set(key, data) {
-            try {
-                const cacheData = {
-                    data: data,
-                    timestamp: Date.now()
-                };
-                localStorage.setItem(CONFIG.CACHE.KEY_PREFIX + key, JSON.stringify(cacheData));
-            } catch (e) {
-                console.warn('Cache save failed:', e);
-            }
-        },
-        
-        clear(key) {
-            if (key) {
-                localStorage.removeItem(CONFIG.CACHE.KEY_PREFIX + key);
-            } else {
-                Object.keys(localStorage)
-                    .filter(k => k.startsWith(CONFIG.CACHE.KEY_PREFIX))
-                    .forEach(k => localStorage.removeItem(k));
-            }
-        }
-    };
-
-    // ========== RATE LIMITING ==========
-    async function rateLimitedRequest(requestFn) {
-        const now = Date.now();
-        const timeSinceLastRequest = now - lastRequestTime;
-        
-        if (timeSinceLastRequest < CONFIG.RATE_LIMIT.MIN_INTERVAL) {
-            const delay = CONFIG.RATE_LIMIT.MIN_INTERVAL - timeSinceLastRequest;
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-        
-        lastRequestTime = Date.now();
-        
-        for (let attempt = 0; attempt < CONFIG.RATE_LIMIT.MAX_RETRIES; attempt++) {
-            try {
-                return await requestFn();
-            } catch (error) {
-                if (attempt === CONFIG.RATE_LIMIT.MAX_RETRIES - 1) throw error;
-                await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
-            }
-        }
-    }
-
-    // ========== OFFLINE MODE ==========
-    function initOfflineMode() {
-        const offlineIndicator = document.getElementById('offlineIndicator');
-        
-        function updateOnlineStatus() {
-            if (navigator.onLine) {
-                offlineIndicator.classList.remove('show');
-            } else {
-                offlineIndicator.classList.add('show');
-            }
-        }
-        
-        window.addEventListener('online', updateOnlineStatus);
-        window.addEventListener('offline', updateOnlineStatus);
-        updateOnlineStatus();
-    }
-
-    // ========== LAZY LOADING ==========
-    function initLazyLoading() {
-        if (lazyLoadObserver) return;
-        
-        lazyLoadObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    const src = img.dataset.src;
-                    if (src) {
-                        img.src = src;
-                        img.removeAttribute('data-src');
-                        lazyLoadObserver.unobserve(img);
-                    }
-                    
-                    const card = entry.target.closest('.skill-card');
-                    if (card && card.classList.contains('lazy-load')) {
-                        card.classList.add('visible');
-                        card.classList.remove('lazy-load');
-                    }
-                }
-            });
-        }, {
-            rootMargin: '50px',
-            threshold: 0.1
-        });
-    }
-
-    function observeLazyElements() {
-        if (!lazyLoadObserver) return;
-        
-        document.querySelectorAll('img[data-src], .skill-card.lazy-load').forEach(el => {
-            lazyLoadObserver.observe(el);
-        });
-    }
 
     // ========== ФИНАНСОВАЯ СИСТЕМА ==========
     
@@ -4304,30 +4016,15 @@
         }
     };
 
-    // ========== ОПТИМИЗИРОВАННАЯ ЗАГРУЗКА УМЕЕК С ПАГИНАЦИЕЙ ==========
-    async function loadAllSkillsFromServer(page = 0, append = false) {
-        const cacheKey = `skills_page_${page}`;
-        const cached = CacheManager.get(cacheKey);
-        
-        if (cached && !append) {
-            console.log('📦 Используем кэш для страницы', page);
-            return cached;
-        }
-        
+    async function loadAllSkillsFromServer() {
         try {
-            console.log('📡 Загрузка умейок с сервера, страница:', page);
+            console.log('📡 Загрузка умейок с сервера...');
             
-            const response = await rateLimitedRequest(() => 
-                fetch(`${API_URL}/api/skills?page=${page}&limit=${CONFIG.PAGINATION.ITEMS_PER_PAGE}`)
-            );
-            
+            const response = await fetch(`${API_URL}/api/skills`);
             const result = await response.json();
             
             if (result.success) {
                 console.log(`✅ Загружено ${result.skills.length} умейок с сервера`);
-                
-                // Обновляем кэш
-                CacheManager.set(cacheKey, result.skills);
                 
                 const globalSkills = getGlobalSkills();
                 result.skills.forEach(skill => {
@@ -4357,101 +4054,6 @@
         }
     }
 
-    // ========== ПАГИНАЦИЯ: ЗАГРУЗИТЬ ЕЩЁ ==========
-    window.loadMoreSkills = async function() {
-        if (isLoadingMore || !hasMoreSkills) return;
-        
-        isLoadingMore = true;
-        const button = document.getElementById('loadMoreButton');
-        button.disabled = true;
-        button.innerHTML = '<div class="loading-spinner" style="width: 20px; height: 20px; border-width: 2px;"></div> Загрузка...';
-        
-        try {
-            currentPage++;
-            const newSkills = await loadAllSkillsFromServer(currentPage, true);
-            
-            if (newSkills.length < CONFIG.PAGINATION.ITEMS_PER_PAGE) {
-                hasMoreSkills = false;
-                button.style.display = 'none';
-            }
-            
-            allSkillsCache = [...allSkillsCache, ...newSkills];
-            appendSkillsToResults(newSkills);
-            
-        } catch (error) {
-            console.error('❌ Ошибка загрузки дополнительных умейок:', error);
-        } finally {
-            isLoadingMore = false;
-            button.disabled = false;
-            button.innerHTML = '<span>📥</span><span>Загрузить ещё</span>';
-        }
-    };
-
-    function appendSkillsToResults(skills) {
-        const searchResults = document.getElementById('searchResults');
-        const currentHtml = searchResults.innerHTML;
-        
-        const newHtml = skills.map(skill => createSkillCard(skill)).join('');
-        
-        // Удаляем "Ничего не найдено" если есть
-        if (currentHtml.includes('Ничего не найдено')) {
-            searchResults.innerHTML = newHtml;
-        } else {
-            searchResults.innerHTML = currentHtml + newHtml;
-        }
-        
-        observeLazyElements();
-    }
-
-    function createSkillCard(skill) {
-        const statusBadge = getStatusBadge(skill.status);
-        const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
-        const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
-        
-        const photoHtml = skill.photo ? `
-            <div class="skill-photo">
-                <img data-src="${skill.photo}" alt="Фото работы" class="lazy-image" onerror="this.parentElement.style.display='none'">
-            </div>
-        ` : '';
-        
-        return `
-            <div class="skill-card lazy-load">
-                <div class="skill-header">
-                    <div class="skill-title">${skill.skill} ${isLocal}</div>
-                    <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                </div>
-                
-                <div class="skill-price">${skill.price} ₽</div>
-                
-                ${statusBadge}
-                
-                ${cityInfo}
-                
-                <div class="skill-contact-info">
-                    <div class="contact-label">📞 Контакты:</div>
-                    <div class="contact-item">
-                        <span class="contact-icon">📱</span>
-                        <span class="contact-text">${skill.experience || 'Не указано'}</span>
-                    </div>
-                </div>
-                
-                ${photoHtml}
-                
-                <div style="color: #666; margin: 15px 0 20px;">
-                    👤 ${skill.username}
-                </div>
-                
-                <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');">
-                    📞 Подробные контакты
-                </button>
-                
-                <button class="create-deal-button" onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.userId}', '${skill.experience || ''}');">
-                    📝 Составить сделку
-                </button>
-            </div>
-        `;
-    }
-
     async function loadMySkills() {
         try {
             console.log('📡 Загрузка моих умейок...');
@@ -4462,8 +4064,7 @@
                 return;
             }
             
-            // Показываем skeleton
-            skillsList.innerHTML = Array(3).fill('<div class="skeleton skeleton-card"></div>').join('');
+            skillsList.innerHTML = '<div class="loading">⏳ Загрузка ваших умейок...</div>';
             
             const userId = currentUserId || 'demo-user';
             console.log('🆔 Используем User ID:', userId);
@@ -4601,10 +4202,6 @@
             console.log('📡 Загрузка моих умейок для профиля...');
             
             const skillsList = document.getElementById('profileSkillsList');
-            
-            // Skeleton loading
-            skillsList.innerHTML = Array(2).fill('<div class="skeleton skeleton-card" style="height: 150px;"></div>').join('');
-            
             let skills = [];
             
             try {
@@ -5022,35 +4619,11 @@
         return '#f56565';
     }
 
-    // ========== ОПТИМИЗИРОВАННАЯ ЗАГРУЗКА КАРТЫ С DEBOUNCE ==========
-    let mapLoadTimeout = null;
-    
     async function loadSkillsOnMap() {
-        if (mapLoadTimeout) {
-            clearTimeout(mapLoadTimeout);
-        }
-        
-        mapLoadTimeout = setTimeout(async () => {
-            await performMapLoad();
-        }, CONFIG.MAP.DEBOUNCE_DELAY);
-    }
-    
-    async function performMapLoad() {
         try {
             console.log('🗺️ Загрузка умейок с сервера для карты');
             
-            // Проверяем кэш
-            const cachedSkills = CacheManager.get('map_skills');
-            let skills;
-            
-            if (cachedSkills && navigator.onLine) {
-                skills = cachedSkills;
-                // Фоновое обновление
-                setTimeout(() => updateMapSkillsCache(), 5000);
-            } else {
-                skills = await loadAllSkillsFromServer();
-                CacheManager.set('map_skills', skills);
-            }
+            const skills = await loadAllSkillsFromServer();
             
             console.log('📊 Получено умейок с сервера:', skills.length);
             
@@ -5077,15 +4650,8 @@
                 markers.push(userMarker);
             }
             
-            // Оптимизация: показываем только видимые маркеры
-            const bounds = map.getBounds();
-            
             skills.forEach(skill => {
                 if (skill.location && skill.location.lat && skill.location.lon) {
-                    // Проверяем, находится ли маркер в видимой области
-                    const latLng = L.latLng(skill.location.lat, skill.location.lon);
-                    if (!bounds.contains(latLng)) return;
-                    
                     const rating = skill.rating?.average || 5.0;
                     const isUserSkill = skill.userId === currentUserId;
                     const status = skill.status || 'ready';
@@ -5138,15 +4704,6 @@
                     .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
                     .openOn(map);
             }
-        }
-    }
-    
-    async function updateMapSkillsCache() {
-        try {
-            const skills = await loadAllSkillsFromServer();
-            CacheManager.set('map_skills', skills);
-        } catch (e) {
-            console.log('Фоновое обновление кэша не удалось');
         }
     }
 
@@ -5224,10 +4781,9 @@
         mapRefreshInterval = setInterval(() => {
             if (document.querySelector('.map-active') && map) {
                 console.log('🔄 Автоматическое обновление карты...');
-                // Обновляем только видимые маркеры
                 loadSkillsOnMap();
             }
-        }, CONFIG.MAP.REFRESH_INTERVAL);
+        }, 30000);
     }
 
     function stopMapAutoRefresh() {
@@ -5482,10 +5038,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Umeyka app loaded successfully!');
         
-        // Инициализация оптимизаций
-        initOfflineMode();
-        initLazyLoading();
-        
         currentMasterStatus = 'ready';
         currentEditMasterStatus = 'ready';
         currentRadius = 10;
@@ -5518,66 +5070,47 @@
         initAdminAccess();
     });
 
-    // ========== ОПТИМИЗИРОВАННЫЙ ПОИСК С ПАГИНАЦИЕЙ ==========
     window.searchSkills = async function() {
         triggerHapticFeedback();
         
         const searchQuery = document.getElementById('searchInput').value.trim();
         const searchCity = document.getElementById('searchCity').value.trim();
         const searchResults = document.getElementById('searchResults');
-        const loadMoreBtn = document.getElementById('loadMoreButton');
         
         if (!searchQuery && !searchCity) {
             searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос или выберите город</div>';
-            loadMoreBtn.style.display = 'none';
             return;
         }
         
-        // Сброс пагинации
-        currentPage = 0;
-        hasMoreSkills = true;
-        allSkillsCache = [];
-        
-        // Показываем skeleton
-        searchResults.innerHTML = Array(3).fill('<div class="skeleton skeleton-card"></div>').join('');
-        loadMoreBtn.style.display = 'none';
+        searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
         
         try {
             let skills = [];
             
-            // Проверяем кэш
-            const cacheKey = `search_${searchQuery}_${searchCity}_page_0`;
-            const cached = CacheManager.get(cacheKey);
-            
-            if (cached) {
-                skills = cached;
-            } else {
-                try {
-                    let url = `${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery || '')}&page=0&limit=${CONFIG.PAGINATION.ITEMS_PER_PAGE}`;
-                    if (searchCity) {
-                        url += `&city=${encodeURIComponent(searchCity)}`;
-                    }
-                    
-                    const response = await rateLimitedRequest(() => fetch(url));
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        skills = result.skills;
-                        CacheManager.set(cacheKey, skills);
-                        
-                        skills = skills.map(skill => {
-                            const globalSkill = getGlobalSkillById(skill._id);
-                            if (globalSkill && globalSkill.updatedAt) {
-                                if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
-                                    skill.status = globalSkill.status;
-                                }
-                            }
-                            return skill;
-                        });
-                    }
-                } catch (serverError) {
-                    console.log('⚠️ Сервер недоступен для поиска');
+            try {
+                let url = `${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery || '')}`;
+                if (searchCity) {
+                    url += `&city=${encodeURIComponent(searchCity)}`;
                 }
+                
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.success) {
+                    skills = result.skills;
+                    
+                    skills = skills.map(skill => {
+                        const globalSkill = getGlobalSkillById(skill._id);
+                        if (globalSkill && globalSkill.updatedAt) {
+                            if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
+                                skill.status = globalSkill.status;
+                            }
+                        }
+                        return skill;
+                    });
+                }
+            } catch (serverError) {
+                console.log('⚠️ Сервер недоступен для поиска');
             }
             
             const globalSkills = getGlobalSkills();
@@ -5632,24 +5165,52 @@
             }
             skills = uniqueSkills;
             
-            allSkillsCache = skills;
-            
-            // Ограничиваем первую загрузку
-            const initialSkills = skills.slice(0, CONFIG.PAGINATION.ITEMS_PER_PAGE);
-            const remainingCount = skills.length - initialSkills.length;
-            
-            if (initialSkills.length > 0) {
-                searchResults.innerHTML = initialSkills.map(skill => createSkillCard(skill)).join('');
-                
-                // Показываем кнопку "Загрузить ещё" если есть ещё результаты
-                if (remainingCount > 0) {
-                    loadMoreBtn.style.display = 'flex';
-                    loadMoreBtn.innerHTML = `<span>📥</span><span>Загрузить ещё (${remainingCount})</span>`;
-                } else {
-                    loadMoreBtn.style.display = 'none';
-                }
-                
-                observeLazyElements();
+            if (skills.length > 0) {
+                searchResults.innerHTML = skills.map(skill => {
+                    const statusBadge = getStatusBadge(skill.status);
+                    const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                    const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
+                    
+                    return `
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-title">${skill.skill} ${isLocal}</div>
+                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                        </div>
+                        
+                        <div class="skill-price">${skill.price} ₽</div>
+                        
+                        ${statusBadge}
+                        
+                        ${cityInfo}
+                        
+                        <div class="skill-contact-info">
+                            <div class="contact-label">📞 Контакты:</div>
+                            <div class="contact-item">
+                                <span class="contact-icon">📱</span>
+                                <span class="contact-text">${skill.experience || 'Не указано'}</span>
+                            </div>
+                        </div>
+                        
+                        ${skill.photo ? `
+                            <div class="skill-photo">
+                                <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
+                            </div>
+                        ` : ''}
+                        
+                        <div style="color: #666; margin: 15px 0 20px;">
+                            👤 ${skill.username}
+                        </div>
+                        
+                        <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');">
+                            📞 Подробные контакты
+                        </button>
+                        
+                        <button class="create-deal-button" onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.userId}', '${skill.experience || ''}');">
+                            📝 Составить сделку
+                        </button>
+                    </div>
+                `}).join('');
             } else {
                 searchResults.innerHTML = `
                     <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
@@ -5658,7 +5219,6 @@
                         <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос${searchCity ? ' или выбрать другой город' : ''}</div>
                     </div>
                 `;
-                loadMoreBtn.style.display = 'none';
             }
         } catch (error) {
             console.error('Ошибка поиска:', error);
@@ -5668,7 +5228,6 @@
                     <small>Проверьте подключение к интернету</small>
                 </div>
             `;
-            loadMoreBtn.style.display = 'none';
         }
     };
 
@@ -5850,7 +5409,7 @@
             const dealsList = document.getElementById('dealsList');
             if (!dealsList) return;
             
-            dealsList.innerHTML = '<div class="loading-indicator"><div class="loading-spinner"></div><p>Загрузка сделок...</p></div>';
+            dealsList.innerHTML = '<div class="loading">📄 Загрузка сделок...</div>';
             
             const userDeals = getUserDeals(currentUserId);
             console.log(`📊 Найдено сделок для пользователя ${currentUserId}:`, userDeals.length);
