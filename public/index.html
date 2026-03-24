@@ -901,6 +901,16 @@
             box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
         }
 
+        /* ========== СТИЛЬ ДЛЯ КНОПКИ УДАЛЕНИЯ СДЕЛКИ ========== */
+        .delete-deal {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            box-shadow: 0 4px 10px rgba(245, 101, 101, 0.3);
+        }
+        .delete-deal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(245, 101, 101, 0.4);
+        }
+
         /* ========== ФИНАНСОВЫЕ СТИЛИ ========== */
         .wallet-section {
             background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
@@ -5489,6 +5499,7 @@
                 const showCompleteButton = deal.status === 'active' && isMaster;
                 const showPayButton = isClient && deal.status === 'pending' && (!deal.paymentStatus || deal.paymentStatus === 'pending');
                 const showEscrowInfo = deal.paymentStatus === 'paid' || deal.paymentStatus === 'released';
+                const showDeleteButton = deal.status === 'completed';
                 
                 return `
                     <div class="deal-card">
@@ -5595,6 +5606,12 @@
                             <button class="deal-button view-button" onclick="triggerHapticFeedback(); viewDealDetails('${deal.id}');">
                                 👁️ Подробнее
                             </button>
+                            
+                            ${showDeleteButton ? `
+                                <button class="deal-button delete-deal" onclick="triggerHapticFeedback(); deleteDeal('${deal.id}');">
+                                    🗑️ Удалить сделку
+                                </button>
+                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -6037,6 +6054,56 @@
         
         document.getElementById('projectReviewComment').value = '';
         setProjectRating(0);
+    };
+
+    // ========== ФУНКЦИЯ УДАЛЕНИЯ СДЕЛКИ ==========
+    window.deleteDeal = function(dealId) {
+        triggerHapticFeedback();
+        
+        if (confirm('❌ Удалить эту завершённую сделку?')) {
+            try {
+                const globalDeals = getGlobalDeals();
+                const dealIndex = globalDeals.findIndex(deal => deal.id === dealId);
+                
+                if (dealIndex === -1) {
+                    alert('❌ Сделка не найдена');
+                    return;
+                }
+                
+                const deal = globalDeals[dealIndex];
+                
+                // Проверяем, что сделка завершена
+                if (deal.status !== 'completed') {
+                    alert('❌ Можно удалять только завершённые сделки');
+                    return;
+                }
+                
+                // Проверяем, что пользователь является участником сделки
+                const isClient = deal.clientId === currentUserId;
+                const isMaster = deal.masterId === currentUserId;
+                
+                if (!isClient && !isMaster) {
+                    alert('❌ Вы не являетесь участником этой сделки');
+                    return;
+                }
+                
+                // Удаляем сделку из глобального хранилища
+                globalDeals.splice(dealIndex, 1);
+                setGlobalDeals(globalDeals);
+                
+                console.log(`✅ Сделка ${dealId} удалена из глобального хранилища`);
+                
+                // Обновляем список сделок
+                loadDeals();
+                
+                // Показываем уведомление
+                showNotification('✅ Сделка успешно удалена!');
+                
+            } catch (error) {
+                console.error('❌ Ошибка удаления сделки:', error);
+                alert('❌ Ошибка удаления сделки: ' + error.message);
+            }
+        }
     };
 
     document.addEventListener('DOMContentLoaded', function() {
