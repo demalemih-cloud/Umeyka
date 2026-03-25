@@ -2173,6 +2173,89 @@
             font-size: 14px;
             text-align: center;
         }
+
+        /* ========== НОВЫЕ СТИЛИ ДЛЯ МАРКЕРОВ КАРТЫ ========== */
+        .umeyka-marker-container {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            animation: markerAppear 0.4s ease-out;
+            cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .umeyka-marker-container:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        .umeyka-marker-container.status-ready {
+            border-color: #48bb78;
+        }
+
+        .umeyka-marker-container.status-busy {
+            border-color: #f56565;
+        }
+
+        .umeyka-marker-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .umeyka-marker-fallback {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        @keyframes markerAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .user-marker-container {
+            width: 16px;
+            height: 16px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* Стили для миниатюры фото в popup */
+        .popup-skill-photo {
+            width: 100px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+            float: right;
+            margin-left: 10px;
+        }
+
+        .popup-skill-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -4807,17 +4890,20 @@
                     console.log('📍 Местоположение пользователя:', userLocation);
                     map.setView([latitude, longitude], 13);
                     
-                    L.marker([latitude, longitude], {
+                    // Маркер пользователя с новым стилем
+                    const userMarker = L.marker([latitude, longitude], {
                         icon: L.divIcon({
                             className: 'user-marker',
-                            html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
+                            html: '<div class="user-marker-container"></div>',
                             iconSize: [16, 16],
-                            iconAnchor: [8, 16]
+                            iconAnchor: [8, 8]
                         })
                     })
                     .addTo(map)
-                    .bindPopup('📍 Ваше местоположение')
+                    .bindPopup('📍 <b>Ваше местоположение</b>')
                     .openPopup();
+                        
+                    markers.push(userMarker);
                         
                     loadSkillsOnMap();
                 },
@@ -4835,9 +4921,26 @@
         }
     }
 
-    function getMarkerColor(status) {
-        if (!status || status === 'ready') return '#22c55e';
-        return '#f56565';
+    // ========== НОВАЯ ФУНКЦИЯ СОЗДАНИЯ МАРКЕРА ==========
+    function createSkillMarkerHtml(skill, isUserSkill) {
+        const status = skill.status || 'ready';
+        const statusClass = status === 'ready' ? 'status-ready' : 'status-busy';
+        const fallbackIcon = isUserSkill ? '👤' : '🔧';
+        
+        // Если есть фото - показываем фото, иначе fallback с иконкой
+        if (skill.photo) {
+            return `
+                <div class="umeyka-marker-container ${statusClass}">
+                    <img src="${skill.photo}" class="umeyka-marker-photo" alt="${skill.skill}">
+                </div>
+            `;
+        } else {
+            return `
+                <div class="umeyka-marker-container ${statusClass}">
+                    <div class="umeyka-marker-fallback">${fallbackIcon}</div>
+                </div>
+            `;
+        }
     }
 
     async function loadSkillsOnMap() {
@@ -4850,18 +4953,20 @@
             
             const userData = getOrCreateUserProfile(currentUserId);
             
+            // Очищаем старые маркеры
             if (markers.length > 0) {
                 markers.forEach(marker => map.removeLayer(marker));
                 markers = [];
             }
             
+            // Добавляем маркер пользователя
             if (userLocation) {
                 const userMarker = L.marker([userLocation.lat, userLocation.lon], {
                     icon: L.divIcon({
                         className: 'user-marker',
-                        html: '<div style="background: #667eea; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 16px solid #667eea;"></div>',
+                        html: '<div class="user-marker-container"></div>',
                         iconSize: [16, 16],
-                        iconAnchor: [8, 16]
+                        iconAnchor: [8, 8]
                     })
                 })
                 .addTo(map)
@@ -4871,15 +4976,18 @@
                 markers.push(userMarker);
             }
             
-            skills.forEach(skill => {
+            // Добавляем маркеры умейек с новым дизайном
+            skills.forEach((skill, index) => {
                 if (skill.location && skill.location.lat && skill.location.lon) {
                     const rating = skill.rating?.average || 5.0;
                     const isUserSkill = skill.userId === currentUserId;
                     const status = skill.status || 'ready';
                     const radius = skill.radius || 10;
                     
-                    const circleColor = (!status || status === 'ready') ? '#22c55e' : '#f56565';
+                    // Цвет круга радиуса в зависимости от статуса
+                    const circleColor = (!status || status === 'ready') ? '#48bb78' : '#f56565';
                     
+                    // Круг радиуса действия
                     const circle = L.circle([skill.location.lat, skill.location.lon], {
                         color: circleColor,
                         fillColor: circleColor,
@@ -4889,16 +4997,25 @@
                     
                     markers.push(circle);
                     
+                    // Создаем HTML для маркера с задержкой анимации
+                    const markerHtml = createSkillMarkerHtml(skill, isUserSkill);
+                    
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
                         icon: L.divIcon({
                             className: 'umeyka-marker',
-                            html: `<div style="color: ${getMarkerColor(status)}; font-size: 24px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">${isUserSkill ? '👤' : '🔧'}</div>`,
-                            iconSize: [30, 30],
-                            iconAnchor: [15, 30]
+                            html: markerHtml,
+                            iconSize: [50, 50],
+                            iconAnchor: [25, 25]
                         })
                     })
                     .addTo(map)
                     .bindPopup(createMapSkillPopup(skill, isUserSkill));
+                    
+                    // Добавляем задержку анимации для каждого маркера
+                    const markerElement = marker.getElement();
+                    if (markerElement) {
+                        markerElement.style.animationDelay = `${index * 0.05}s`;
+                    }
                     
                     marker.on('popupopen', async () => {
                         try {
@@ -4933,16 +5050,24 @@
         const statusBadge = getStatusBadge(skill.status);
         const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
         
+        // Миниатюра фото для popup (100x60px)
+        const photoThumbnail = skill.photo ? `
+            <div class="popup-skill-photo">
+                <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+            </div>
+        ` : '';
+        
         return `
             <div class="map-popup-content">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                    <div style="width: 50px; height: 50px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">
-                        ${isUserSkill ? '👤' : '🔧'}
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; overflow: hidden; border: 3px solid ${skill.status === 'busy' ? '#f56565' : '#48bb78'};">
+                        ${skill.photo ? `<img src="${skill.photo}" style="width: 100%; height: 100%; object-fit: cover;">` : (isUserSkill ? '👤' : '🔧')}
                     </div>
-                    <div>
-                        <h3 style="margin: 0; color: #2d3748; font-size: 18px;">${skill.skill}</h3>
-                        <p style="margin: 4px 0 0; color: #666; font-size: 14px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0; color: #2d3748; font-size: 16px;">${skill.skill}</h3>
+                        <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
                     </div>
+                    ${photoThumbnail}
                 </div>
                 
                 <div style="margin: 10px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
@@ -4967,12 +5092,6 @@
                         Рейтинг: <strong>${rating.toFixed(1)}/5</strong>
                     </p>
                 </div>
-                
-                ${skill.photo ? `
-                    <div class="map-skill-photo">
-                        <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
-                    </div>
-                ` : ''}
                 
                 <div class="map-skill-actions">
                     <button onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');"
