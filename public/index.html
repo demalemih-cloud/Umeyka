@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Umeyka - Мастера рядом</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -417,6 +418,7 @@
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             border-left: 4px solid #667eea;
+            position: relative;
         }
 
         .gold-card {
@@ -430,6 +432,7 @@
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 10px;
+            padding-right: 70px;
         }
         
         .skill-title {
@@ -542,6 +545,7 @@
             margin: 10px 0;
             border-radius: 12px;
             border-left: 4px solid #667eea;
+            position: relative;
         }
 
         .profile-skill-header {
@@ -549,6 +553,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
+            padding-right: 70px;
         }
 
         .skill-actions {
@@ -2256,6 +2261,121 @@
             height: 100%;
             object-fit: cover;
         }
+
+        /* ========== СТИЛИ ДЛЯ QR-КОДА ========== */
+        .skill-qr-code {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
+            background: white;
+            padding: 4px;
+        }
+
+        .skill-qr-code:hover {
+            transform: scale(1.05);
+        }
+
+        .skill-qr-code img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .qr-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 4000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .qr-modal-overlay.active {
+            display: flex;
+        }
+
+        .qr-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .qr-code-large {
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .qr-code-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .qr-share-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .qr-share-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+
+        .qr-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .qr-modal-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
     </style>
 </head>
 <body>
@@ -2995,6 +3115,19 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО QR-КОДА -->
+    <div id="qrModal" class="qr-modal-overlay">
+        <button class="qr-modal-close" onclick="closeQRModal();">×</button>
+        <div class="qr-modal-content">
+            <h2 id="qrSkillTitle" style="color: #2d3748; margin-bottom: 20px; font-size: 20px;"></h2>
+            <div class="qr-code-large" id="qrCodeLarge"></div>
+            <button class="qr-share-button" onclick="shareQRCode();">
+                <span>📤</span>
+                Поделиться
+            </button>
+        </div>
+    </div>
+
     <script>
     // ========== КОНФИГУРАЦИЯ ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
@@ -3021,6 +3154,7 @@
     let localSkills = {};
     let globalSkillsStatus = {};
     let pendingPaymentDealId = null;
+    let currentQRSkill = null;
     
     // Счетчик кликов по логотипу для открытия админ-панели
     let logoClickCount = 0;
@@ -3061,6 +3195,193 @@
     };
 
     const allCities = Object.keys(citiesDatabase).sort();
+
+    // ========== ФУНКЦИИ QR-КОДА ==========
+    
+    function generateQRCode(skillId, skillName) {
+        const qrData = `https://t.me/ymeyka_bot?start=skill_${skillId}`;
+        
+        // Создаем временный контейнер для генерации QR
+        const tempContainer = document.createElement('div');
+        tempContainer.style.display = 'none';
+        document.body.appendChild(tempContainer);
+        
+        const qrcode = new QRCode(tempContainer, {
+            text: qrData,
+            width: 256,
+            height: 256,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        
+        // Ждем генерации и получаем data URL
+        setTimeout(() => {
+            const img = tempContainer.querySelector('img');
+            if (img) {
+                const qrDataUrl = img.src;
+                
+                // Сохраняем в skill
+                const skill = getGlobalSkillById(skillId) || loadSkillsFromLocalStorage(currentUserId).find(s => s._id === skillId);
+                if (skill) {
+                    skill.qrCode = qrDataUrl;
+                    skill.qrCodeData = qrData;
+                    addGlobalSkill(skill);
+                    
+                    // Обновляем отображение если нужно
+                    loadMySkills();
+                    loadProfileSkills();
+                }
+            }
+            document.body.removeChild(tempContainer);
+        }, 100);
+        
+        return qrData;
+    }
+    
+    function getOrCreateQRCode(skill) {
+        if (skill.qrCode && skill.qrCodeData) {
+            return skill;
+        }
+        
+        // Генерируем новый QR
+        const qrData = `https://t.me/ymeyka_bot?start=skill_${skill._id}`;
+        
+        // Создаем QR синхронно для отображения
+        const tempContainer = document.createElement('div');
+        tempContainer.style.display = 'none';
+        document.body.appendChild(tempContainer);
+        
+        const qrcode = new QRCode(tempContainer, {
+            text: qrData,
+            width: 256,
+            height: 256,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        
+        // Получаем data URL
+        const img = tempContainer.querySelector('img');
+        if (img) {
+            skill.qrCode = img.src;
+            skill.qrCodeData = qrData;
+            addGlobalSkill(skill);
+        }
+        
+        document.body.removeChild(tempContainer);
+        
+        return skill;
+    }
+    
+    function showQRModal(skillId, skillName) {
+        triggerHapticFeedback();
+        
+        const skill = getGlobalSkillById(skillId) || loadSkillsFromLocalStorage(currentUserId).find(s => s._id === skillId);
+        if (!skill) return;
+        
+        currentQRSkill = skill;
+        
+        // Гарантируем наличие QR
+        const skillWithQR = getOrCreateQRCode(skill);
+        
+        document.getElementById('qrSkillTitle').textContent = skillName;
+        
+        const qrContainer = document.getElementById('qrCodeLarge');
+        qrContainer.innerHTML = '';
+        
+        const img = document.createElement('img');
+        img.src = skillWithQR.qrCode;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        qrContainer.appendChild(img);
+        
+        document.getElementById('qrModal').classList.add('active');
+    }
+    
+    function closeQRModal() {
+        document.getElementById('qrModal').classList.remove('active');
+        currentQRSkill = null;
+    }
+    
+    function shareQRCode() {
+        triggerHapticFeedback();
+        
+        if (!currentQRSkill) return;
+        
+        const shareText = `Посмотрите мою умейку "${currentQRSkill.skill}" в Umeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${currentQRSkill.qrCodeData}`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'Моя умейка в Umeyka',
+                text: shareText,
+                url: currentQRSkill.qrCodeData
+            }).catch(err => console.log('Share canceled'));
+        } else {
+            // Копируем в буфер обмена
+            navigator.clipboard.writeText(shareText).then(() => {
+                showNotification('✅ Ссылка скопирована в буфер обмена!');
+            }).catch(() => {
+                alert(shareText);
+            });
+        }
+    }
+    
+    function handleDeepLink() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const startParam = urlParams.get('start');
+        
+        if (startParam && startParam.startsWith('skill_')) {
+            const skillId = startParam.replace('skill_', '');
+            openSkillFromQR(skillId);
+        }
+    }
+    
+    function openSkillFromQR(skillId) {
+        const skill = getGlobalSkillById(skillId);
+        
+        if (!skill) {
+            alert('❌ Умейка не найдена. Возможно, она была удалена.');
+            return;
+        }
+        
+        // Показываем карточку умейки с возможностью создать сделку
+        const userData = getOrCreateUserProfile(currentUserId);
+        const isOwnSkill = skill.userId === currentUserId;
+        
+        if (isOwnSkill) {
+            // Своя умейка - открываем редактирование
+            showProfileSection();
+            showProfileTab('skills');
+        } else {
+            // Чужая умейка - показываем детали и кнопку создания сделки
+            const message = `
+📋 ${skill.skill}
+👤 ${skill.username}
+💰 ${skill.price} ₽
+📞 ${skill.experience || 'Контакт не указан'}
+
+Хотите создать сделку с этим мастером?
+            `;
+            
+            if (confirm(message)) {
+                createDealFromSkill(skill._id, skill.skill, skill.username, skill.userId, skill.experience);
+            }
+        }
+    }
+    
+    function renderQRCode(skill) {
+        if (!skill.qrCode) {
+            skill = getOrCreateQRCode(skill);
+        }
+        
+        return `
+            <div class="skill-qr-code" onclick="event.stopPropagation(); showQRModal('${skill._id}', '${skill.skill.replace(/'/g, "\\'")}');">
+                <img src="${skill.qrCode}" alt="QR-код">
+            </div>
+        `;
+    }
 
     // ========== ФИНАНСОВАЯ СИСТЕМА ==========
     
@@ -3786,7 +4107,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const referrerId = urlParams.get('ref') || urlParams.get('start');
             
-            if (referrerId && referrerId !== currentUserId) {
+            if (referrerId && referrerId !== currentUserId && !referrerId.startsWith('skill_')) {
                 const referrerData = getOrCreateUserProfile(referrerId);
                 
                 addReferralFriend(currentUserId, referrerData.firstName || 'Друг');
@@ -4248,7 +4569,12 @@
                     console.log('📱 Ответ сервера при добавлении:', result);
                     
                     if (result.success) {
-                        addGlobalSkill(result.skill || skillData);
+                        const newSkill = result.skill || skillData;
+                        
+                        // Генерируем QR-код для новой умейки
+                        generateQRCode(newSkill._id, newSkill.skill);
+                        
+                        addGlobalSkill(newSkill);
                         
                         alert('✅ Умейка успешно опубликована!');
                         
@@ -4286,6 +4612,9 @@
                 createdAt: new Date().toISOString(),
                 local: true
             };
+            
+            // Генерируем QR-код для локальной умейки
+            generateQRCode(localSkill._id, localSkill.skill);
             
             saveSkillToLocalStorage(localSkill);
             addGlobalSkill(localSkill);
@@ -4340,6 +4669,11 @@
                                 skill.status = existing.status;
                             }
                         }
+                        // Сохраняем QR если есть
+                        if (existing.qrCode) {
+                            skill.qrCode = existing.qrCode;
+                            skill.qrCodeData = existing.qrCodeData;
+                        }
                         globalSkills[existingIndex] = skill;
                     } else {
                         globalSkills.push(skill);
@@ -4387,9 +4721,16 @@
                         
                         skills = skills.map(skill => {
                             const globalSkill = getGlobalSkillById(skill._id);
-                            if (globalSkill && globalSkill.updatedAt) {
-                                if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
-                                    skill.status = globalSkill.status;
+                            if (globalSkill) {
+                                if (globalSkill.updatedAt) {
+                                    if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
+                                        skill.status = globalSkill.status;
+                                    }
+                                }
+                                // Восстанавливаем QR из глобального хранилища
+                                if (globalSkill.qrCode) {
+                                    skill.qrCode = globalSkill.qrCode;
+                                    skill.qrCodeData = globalSkill.qrCodeData;
                                 }
                             }
                             return skill;
@@ -4423,6 +4764,13 @@
             }
             skills = uniqueSkills;
             
+            // Генерируем QR для умейек без него
+            skills.forEach(skill => {
+                if (!skill.qrCode) {
+                    getOrCreateQRCode(skill);
+                }
+            });
+            
             if (skills.length > 0) {
                 skillsList.innerHTML = skills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
@@ -4431,6 +4779,8 @@
                     
                     return `
                     <div class="skill-card">
+                        ${renderQRCode(skill)}
+                        
                         <div class="skill-header">
                             <div class="skill-title">${skill.skill} ${isLocal}</div>
                             <div class="skill-rating">${'⭐'.repeat(5)}</div>
@@ -4517,9 +4867,16 @@
                         
                         skills = skills.map(skill => {
                             const globalSkill = getGlobalSkillById(skill._id);
-                            if (globalSkill && globalSkill.updatedAt) {
-                                if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
-                                    skill.status = globalSkill.status;
+                            if (globalSkill) {
+                                if (globalSkill.updatedAt) {
+                                    if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
+                                        skill.status = globalSkill.status;
+                                    }
+                                }
+                                // Восстанавливаем QR
+                                if (globalSkill.qrCode) {
+                                    skill.qrCode = globalSkill.qrCode;
+                                    skill.qrCodeData = globalSkill.qrCodeData;
                                 }
                             }
                             return skill;
@@ -4553,6 +4910,13 @@
             }
             skills = uniqueSkills;
             
+            // Генерируем QR для умейек без него
+            skills.forEach(skill => {
+                if (!skill.qrCode) {
+                    getOrCreateQRCode(skill);
+                }
+            });
+            
             if (skills.length > 0) {
                 skillsList.innerHTML = skills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
@@ -4561,6 +4925,8 @@
                     
                     return `
                     <div class="profile-skill-card">
+                        ${renderQRCode(skill)}
+                        
                         <div class="profile-skill-header">
                             <div class="skill-title">${skill.skill} ${isLocal}</div>
                             <div class="skill-price">${skill.price} ₽</div>
@@ -4620,19 +4986,6 @@
                 const userId = currentUserId || 'demo-user';
                 const localSkills = loadSkillsFromLocalStorage(userId);
                 skill = localSkills.find(s => s._id === skillId);
-            }
-            
-            if (!skill) {
-                try {
-                    const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
-                    const result = await response.json();
-                    
-                    if (result.success && result.skills) {
-                        skill = result.skills.find(s => s._id === skillId);
-                    }
-                } catch (serverError) {
-                    console.log('⚠️ Сервер недоступен для загрузки умейки');
-                }
             }
             
             if (!skill) {
@@ -4741,6 +5094,12 @@
                 skillData.photoTimestamp = new Date().toISOString();
             } else if (currentEditingSkill && currentEditingSkill.photo) {
                 skillData.photo = currentEditingSkill.photo;
+            }
+            
+            // Сохраняем существующий QR
+            if (currentEditingSkill && currentEditingSkill.qrCode) {
+                skillData.qrCode = currentEditingSkill.qrCode;
+                skillData.qrCodeData = currentEditingSkill.qrCodeData;
             }
             
             let updateSuccess = false;
@@ -5391,6 +5750,9 @@
         
         processReferralLink();
         
+        // Обрабатываем deeplink при загрузке
+        handleDeepLink();
+        
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -5630,7 +5992,9 @@
         document.getElementById('editBio').value = userData.bio || '';
         
         if (userData.avatar) {
-            document.getElementById('avatarPreview').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+            document.getElementById('avatarPreview').innerHTML = `
+                <img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+            `;
         }
         
         showSection('editProfileSection');
