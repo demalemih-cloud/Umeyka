@@ -3193,12 +3193,12 @@
         wallet.transactions.unshift(transaction);
         saveWalletData(wallet);
         
-        const globalTx = getLocalStorage('umeyka_global_transactions') || [];
+        const globalTx = getLocalStorage('ymeyka_global_transactions') || [];
         globalTx.push({
             ...transaction,
             userId: currentUserId
         });
-        setLocalStorage('umeyka_global_transactions', globalTx);
+        setLocalStorage('ymeyka_global_transactions', globalTx);
         
         return transaction;
     }
@@ -4110,11 +4110,11 @@
     };
 
     function getGlobalDeals() {
-        return getLocalStorage('umeyka_global_deals') || [];
+        return getLocalStorage('ymeyka_global_deals') || [];
     }
     
     function setGlobalDeals(deals) {
-        return setLocalStorage('umeyka_global_deals', deals);
+        return setLocalStorage('ymeyka_global_deals', deals);
     }
     
     function getUserDeals(userId) {
@@ -4169,11 +4169,11 @@
     }
 
     function getGlobalSkills() {
-        return getLocalStorage('umeyka_global_skills') || [];
+        return getLocalStorage('ymeyka_global_skills') || [];
     }
     
     function setGlobalSkills(skills) {
-        return setLocalStorage('umeyka_global_skills', skills);
+        return setLocalStorage('ymeyka_global_skills', skills);
     }
     
     function addGlobalSkill(skill) {
@@ -5645,7 +5645,7 @@
         }
         
         if (currentUserId) {
-            localStorage.setItem('umeyka_user_id', currentUserId);
+            localStorage.setItem('ymeyka_user_id', currentUserId);
             console.log('💾 User ID сохранен в localStorage:', currentUserId);
             
             loadSkillsFromLocalStorage(currentUserId);
@@ -5682,14 +5682,14 @@
         console.log('🔓 Открытие админ-панели (6 кликов)');
         
         // Открываем админку в новой вкладке/окне
-        const adminUrl = 'umeyka-admin.html';
+        const adminUrl = 'ymeyka-admin.html';
         window.open(adminUrl, '_blank');
     }
     
     // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (продолжение) ==========
     
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Umeyka app loaded successfully!');
+        console.log('🚀 Ymeyka app loaded successfully!');
         
         currentMasterStatus = 'ready';
         currentEditMasterStatus = 'ready';
@@ -6689,13 +6689,13 @@
     // ========== ФУНКЦИИ ОТЗЫВОВ О ПРОЕКТЕ ==========
     
     function getProjectReviews() {
-        return getLocalStorage('umeyka_project_reviews') || [];
+        return getLocalStorage('ymeyka_project_reviews') || [];
     }
     
     function saveProjectReview(review) {
         const reviews = getProjectReviews();
         reviews.push(review);
-        setLocalStorage('umeyka_project_reviews', reviews);
+        setLocalStorage('ymeyka_project_reviews', reviews);
         return review;
     }
     
