@@ -59,15 +59,10 @@
             transform: scale(0.99);
         }
         
-        .top-buttons {
+        .about-button {
             position: absolute;
             top: 20px;
             right: 20px;
-            display: flex;
-            gap: 10px;
-        }
-        
-        .about-button {
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
@@ -77,8 +72,11 @@
             cursor: pointer;
             backdrop-filter: blur(10px);
         }
-        
+
         .scanner-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
@@ -87,11 +85,14 @@
             font-size: 14px;
             cursor: pointer;
             backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            transition: all 0.3s ease;
         }
-        
+
+        .scanner-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
         .scanner-button:active {
             transform: scale(0.95);
         }
@@ -2203,7 +2204,7 @@
         }
 
         /* ========== НОВЫЕ СТИЛИ ДЛЯ МАРКЕРОВ КАРТЫ ========== */
-        .umeyka-marker-container {
+        .ymeyka-marker-container {
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -2219,26 +2220,26 @@
             justify-content: center;
         }
 
-        .umeyka-marker-container:hover {
+        .ymeyka-marker-container:hover {
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
 
-        .umeyka-marker-container.status-ready {
+        .ymeyka-marker-container.status-ready {
             border-color: #48bb78;
         }
 
-        .umeyka-marker-container.status-busy {
+        .ymeyka-marker-container.status-busy {
             border-color: #f56565;
         }
 
-        .umeyka-marker-photo {
+        .ymeyka-marker-photo {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .umeyka-marker-fallback {
+        .ymeyka-marker-fallback {
             width: 100%;
             height: 100%;
             display: flex;
@@ -2358,30 +2359,74 @@
             margin-top: 20px;
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
-        
-        /* Стили для сканера QR-кода */
-        #qrScanner {
+
+        /* ========== СТИЛИ ДЛЯ СКАНЕРА ========== */
+        .scanner-modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: #000;
+            background: rgba(0,0,0,0.95);
             z-index: 5000;
             display: none;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        
-        #qrScanner.active {
+
+        .scanner-modal.active {
             display: flex;
         }
-        
-        #qrScanner video {
+
+        .scanner-header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5001;
+        }
+
+        .scanner-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .scanner-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scanner-video-container {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid #667eea;
+        }
+
+        #scannerVideo {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
+
         .scanner-overlay {
             position: absolute;
             top: 0;
@@ -2389,72 +2434,77 @@
             right: 0;
             bottom: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            pointer-events: none;
         }
-        
+
         .scanner-frame {
-            width: 280px;
-            height: 280px;
-            border: 2px solid rgba(255,255,255,0.8);
+            width: 250px;
+            height: 250px;
+            border: 2px solid rgba(102, 126, 234, 0.8);
             border-radius: 20px;
-            box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
             position: relative;
         }
-        
-        .scanner-frame::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            width: 40px;
-            height: 40px;
-            border-top: 4px solid #48bb78;
-            border-left: 4px solid #48bb78;
-            border-radius: 10px 0 0 0;
-        }
-        
+
+        .scanner-frame::before,
         .scanner-frame::after {
             content: '';
             position: absolute;
-            bottom: -2px;
-            right: -2px;
             width: 40px;
             height: 40px;
-            border-bottom: 4px solid #48bb78;
-            border-right: 4px solid #48bb78;
-            border-radius: 0 0 10px 0;
+            border-color: #667eea;
+            border-style: solid;
         }
-        
-        .scanner-text {
+
+        .scanner-frame::before {
+            top: -2px;
+            left: -2px;
+            border-width: 4px 0 0 4px;
+            border-top-left-radius: 20px;
+        }
+
+        .scanner-frame::after {
+            bottom: -2px;
+            right: -2px;
+            border-width: 0 4px 4px 0;
+            border-bottom-right-radius: 20px;
+        }
+
+        .scanner-hint {
+            color: rgba(255,255,255,0.8);
             margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .scanner-input-section {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+
+        .scanner-input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .scanner-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
             color: white;
             font-size: 16px;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-radius: 30px;
-            pointer-events: none;
-        }
-        
-        .scanner-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            font-size: 24px;
-            padding: 12px 18px;
-            border-radius: 50%;
+            font-weight: 600;
             cursor: pointer;
-            pointer-events: auto;
-            backdrop-filter: blur(10px);
-        }
-        
-        .scanner-close:active {
-            transform: scale(0.95);
         }
     </style>
 </head>
@@ -2463,12 +2513,8 @@
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
             <div class="header" id="logoHeader">
-                <div class="top-buttons">
-                    <button class="scanner-button" onclick="triggerHapticFeedback(); openQRScanner();">
-                        📷 Сканер
-                    </button>
-                    <button class="about-button" onclick="triggerHapticFeedback(); showAboutSection();">ℹ️ О проекте</button>
-                </div>
+                <button class="scanner-button" onclick="triggerHapticFeedback(); openScanner();">📷 Сканер</button>
+                <button class="about-button" onclick="triggerHapticFeedback(); showAboutSection();">ℹ️ О проекте</button>
                 <div class="logo">🤝✨</div>
                 <div class="app-title">Ymeyka</div>
                 <div class="app-description">Мастера на все руки рядом с вами</div>
@@ -3214,20 +3260,31 @@
             </button>
         </div>
     </div>
-    
-    <!-- ЭКРАН СКАНЕРА QR-КОДОВ -->
-    <div id="qrScanner" class="qr-scanner">
-        <video id="scannerVideo" autoplay playsinline></video>
-        <div class="scanner-overlay">
-            <div class="scanner-frame"></div>
-            <div class="scanner-text">Наведите на QR-код</div>
+
+    <!-- МОДАЛЬНОЕ ОКНО СКАНЕРА -->
+    <div id="scannerModal" class="scanner-modal">
+        <div class="scanner-header">
+            <div class="scanner-title">📷 Сканер QR-кода</div>
+            <button class="scanner-close" onclick="closeScanner();">×</button>
         </div>
-        <button class="scanner-close" onclick="closeQRScanner();">✕</button>
+        <div class="scanner-video-container">
+            <video id="scannerVideo" autoplay playsinline></video>
+            <div class="scanner-overlay">
+                <div class="scanner-frame"></div>
+            </div>
+        </div>
+        <div class="scanner-hint">
+            Наведите камеру на QR-код Ymeyka
+        </div>
+        <div class="scanner-input-section">
+            <input type="text" id="scannerManualInput" class="scanner-input" placeholder="Или введите ID умейки вручную...">
+            <button class="scanner-submit" onclick="triggerHapticFeedback(); processManualScan();">🔍 Найти</button>
+        </div>
     </div>
 
     <script>
     // ========== КОНФИГУРАЦИЯ ==========
-    const API_URL = 'https://umeyka-oocn.onrender.com';
+    const API_URL = 'https://ymeyka-oocn.onrender.com';
     const TELEGRAM_BOT_URL = 'https://t.me/ymeyka_bot';
     let currentUserId = null;
     let currentAvatar = null;
@@ -3295,202 +3352,6 @@
 
     const allCities = Object.keys(citiesDatabase).sort();
 
-    // ========== СКАНЕР QR-КОДОВ ==========
-    
-    function openQRScanner() {
-        triggerHapticFeedback();
-        
-        const scannerElement = document.getElementById('qrScanner');
-        const video = document.getElementById('scannerVideo');
-        
-        scannerElement.classList.add('active');
-        
-        // Запрашиваем доступ к камере
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-                .then(stream => {
-                    scannerStream = stream;
-                    video.srcObject = stream;
-                    video.setAttribute('playsinline', true);
-                    video.play();
-                    startScanning();
-                })
-                .catch(err => {
-                    console.error('Ошибка доступа к камере:', err);
-                    alert('❌ Не удалось получить доступ к камере. Проверьте разрешения.');
-                    closeQRScanner();
-                });
-        } else {
-            alert('❌ Ваш браузер не поддерживает сканирование QR-кодов');
-            closeQRScanner();
-        }
-    }
-    
-    function closeQRScanner() {
-        triggerHapticFeedback();
-        
-        const scannerElement = document.getElementById('qrScanner');
-        scannerElement.classList.remove('active');
-        
-        if (scannerStream) {
-            scannerStream.getTracks().forEach(track => track.stop());
-            scannerStream = null;
-        }
-        
-        const video = document.getElementById('scannerVideo');
-        video.srcObject = null;
-    }
-    
-    function startScanning() {
-        const video = document.getElementById('scannerVideo');
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        
-        function scanFrame() {
-            if (!document.getElementById('qrScanner').classList.contains('active')) {
-                return;
-            }
-            
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                const code = jsQR(imageData.data, canvas.width, canvas.height);
-                
-                if (code) {
-                    handleScannedQR(code.data);
-                    return;
-                }
-            }
-            
-            requestAnimationFrame(scanFrame);
-        }
-        
-        // Ждем, пока видео загрузится
-        video.addEventListener('loadeddata', () => {
-            scanFrame();
-        });
-    }
-    
-    function handleScannedQR(qrData) {
-        console.log('📱 Отсканирован QR:', qrData);
-        
-        // Останавливаем сканирование
-        if (scannerStream) {
-            scannerStream.getTracks().forEach(track => track.stop());
-            scannerStream = null;
-        }
-        
-        // Закрываем сканер
-        closeQRScanner();
-        
-        // Парсим ссылку
-        // Формат: https://t.me/ymeyka_bot?start=skill_{skillId}
-        const tgMatch = qrData.match(/t\.me\/ymeyka_bot\?start=skill_(\w+)/);
-        
-        if (tgMatch) {
-            const skillId = tgMatch[1];
-            console.log('🔍 Найдена умейка с ID:', skillId);
-            
-            // Находим умейку в глобальном хранилище
-            const skill = getGlobalSkillById(skillId);
-            
-            if (skill) {
-                openSkillFromQR(skill);
-            } else {
-                // Пытаемся загрузить с сервера
-                fetchSkillFromServer(skillId).then(skill => {
-                    if (skill) {
-                        openSkillFromQR(skill);
-                    } else {
-                        alert('❌ Умейка не найдена');
-                    }
-                }).catch(() => {
-                    alert('❌ Не удалось найти умейку');
-                });
-            }
-        } else {
-            alert('❌ Неверный QR-код. Отсканируйте QR-код умейки Ymeyka.');
-        }
-    }
-    
-    async function fetchSkillFromServer(skillId) {
-        try {
-            const response = await fetch(`${API_URL}/api/skills/${skillId}`);
-            const result = await response.json();
-            if (result.success && result.skill) {
-                return result.skill;
-            }
-            return null;
-        } catch (error) {
-            console.error('Ошибка загрузки умейки:', error);
-            return null;
-        }
-    }
-    
-    function openSkillFromQR(skill) {
-        // Показываем модальное окно с информацией об умейке
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.style.display = 'flex';
-        modal.style.zIndex = '5000';
-        modal.innerHTML = `
-            <div class="modal-content" style="max-width: 400px;">
-                <button class="modal-close" onclick="this.parentElement.parentElement.remove();">×</button>
-                <div class="modal-title">✨ Найдена умейка</div>
-                
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <div style="font-size: 48px; margin-bottom: 10px;">🔧</div>
-                    <h3 style="color: #2d3748; margin-bottom: 10px;">${escapeHtml(skill.skill)}</h3>
-                    <p style="color: #48bb78; font-size: 24px; font-weight: bold;">${skill.price} ₽</p>
-                </div>
-                
-                <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                    <p style="color: #2d3748; margin: 5px 0;"><strong>👤 Мастер:</strong> ${escapeHtml(skill.username)}</p>
-                    <p style="color: #2d3748; margin: 5px 0;"><strong>📍 Город:</strong> ${escapeHtml(skill.city || 'Не указан')}</p>
-                    <p style="color: #2d3748; margin: 5px 0;"><strong>📞 Контакт:</strong> ${escapeHtml(skill.experience || 'Не указан')}</p>
-                </div>
-                
-                <button class="submit-button" onclick="triggerHapticFeedback(); this.parentElement.parentElement.remove(); createDealFromSkill('${skill._id}', '${escapeJs(skill.skill)}', '${escapeJs(skill.username)}', '${skill.userId}', '${escapeJs(skill.experience || '')}');" style="margin-bottom: 10px;">
-                    📝 Создать сделку
-                </button>
-                <button class="modal-button modal-cancel" onclick="this.parentElement.parentElement.remove();">
-                    Закрыть
-                </button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
-        });
-    }
-    
-    function escapeJs(str) {
-        if (!str) return '';
-        return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
-    }
-    
-    // Подключаем библиотеку jsQR для сканирования
-    function loadJsQR() {
-        if (typeof jsQR !== 'undefined') return;
-        
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
-        script.onload = () => console.log('✅ jsQR загружен');
-        document.head.appendChild(script);
-    }
-    
     // ========== ФИНАНСОВАЯ СИСТЕМА ==========
     
     function getWalletData() {
@@ -3985,6 +3846,104 @@
         }
     };
     
+    // ========== СКАНЕР QR-КОДОВ ==========
+    
+    window.openScanner = async function() {
+        triggerHapticFeedback();
+        
+        const modal = document.getElementById('scannerModal');
+        modal.classList.add('active');
+        
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'environment' } 
+            });
+            scannerStream = stream;
+            const video = document.getElementById('scannerVideo');
+            video.srcObject = stream;
+            
+            // Запускаем сканирование
+            startQRScanning();
+        } catch (error) {
+            console.error('❌ Ошибка доступа к камере:', error);
+            alert('❌ Не удалось получить доступ к камере. Вы можете ввести ID умейки вручную.');
+        }
+    };
+    
+    window.closeScanner = function() {
+        triggerHapticFeedback();
+        
+        const modal = document.getElementById('scannerModal');
+        modal.classList.remove('active');
+        
+        // Останавливаем камеру
+        if (scannerStream) {
+            scannerStream.getTracks().forEach(track => track.stop());
+            scannerStream = null;
+        }
+    };
+    
+    function startQRScanning() {
+        const video = document.getElementById('scannerVideo');
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        
+        function scan() {
+            if (!scannerStream) return;
+            
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                
+                // Здесь можно добавить библиотеку для распознавания QR (jsQR)
+                // Для простоты используем ручной ввод
+            }
+            
+            requestAnimationFrame(scan);
+        }
+        
+        scan();
+    }
+    
+    window.processManualScan = function() {
+        triggerHapticFeedback();
+        
+        const input = document.getElementById('scannerManualInput').value.trim();
+        if (!input) {
+            alert('❌ Введите ID умейки');
+            return;
+        }
+        
+        // Ищем умейку по ID или URL
+        let skillId = input;
+        
+        // Если введена полная ссылка, извлекаем ID
+        if (input.includes('skill_')) {
+            const match = input.match(/skill_([a-zA-Z0-9_]+)/);
+            if (match) {
+                skillId = match[1];
+            }
+        }
+        
+        // Ищем умейку
+        const skill = getGlobalSkillById(skillId) || findSkillByPartialId(skillId);
+        
+        if (skill) {
+            closeScanner();
+            openSkillFromQR(skill);
+        } else {
+            alert('❌ Умейка не найдена. Проверьте ID или ссылку.');
+        }
+    };
+    
+    function findSkillByPartialId(partialId) {
+        const allSkills = getGlobalSkills();
+        return allSkills.find(s => s._id.includes(partialId));
+    }
+    
     function handleDeepLink() {
         const urlParams = new URLSearchParams(window.location.search);
         const startParam = urlParams.get('start');
@@ -4002,6 +3961,40 @@
                 }, 1000);
             }
         }
+    }
+    
+    function openSkillFromQR(skill) {
+        // Показываем модальное окно с информацией об умейке
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.style.display = 'flex';
+        modal.style.zIndex = '5000';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 400px;">
+                <button class="modal-close" onclick="this.parentElement.parentElement.remove();">×</button>
+                <div class="modal-title">✨ Найдена умейка</div>
+                
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🔧</div>
+                    <h3 style="color: #2d3748; margin-bottom: 10px;">${skill.skill}</h3>
+                    <p style="color: #48bb78; font-size: 24px; font-weight: bold;">${skill.price} ₽</p>
+                </div>
+                
+                <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <p style="color: #2d3748; margin: 5px 0;"><strong>👤 Мастер:</strong> ${skill.username}</p>
+                    <p style="color: #2d3748; margin: 5px 0;"><strong>📍 Город:</strong> ${skill.city || 'Не указан'}</p>
+                    <p style="color: #2d3748; margin: 5px 0;"><strong>📞 Контакт:</strong> ${skill.experience || 'Не указан'}</p>
+                </div>
+                
+                <button class="submit-button" onclick="triggerHapticFeedback(); this.parentElement.parentElement.remove(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g, "\\'")}', '${skill.username.replace(/'/g, "\\'")}', '${skill.userId}', '${skill.experience || ''}');" style="margin-bottom: 10px;">
+                    📝 Создать сделку
+                </button>
+                <button class="modal-button modal-cancel" onclick="this.parentElement.parentElement.remove();">
+                    Закрыть
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
     }
 
     // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
@@ -5540,14 +5533,14 @@
         // Если есть фото - показываем фото, иначе fallback с иконкой
         if (skill.photo) {
             return `
-                <div class="umeyka-marker-container ${statusClass}">
-                    <img src="${skill.photo}" class="umeyka-marker-photo" alt="${skill.skill}">
+                <div class="ymeyka-marker-container ${statusClass}">
+                    <img src="${skill.photo}" class="ymeyka-marker-photo" alt="${skill.skill}">
                 </div>
             `;
         } else {
             return `
-                <div class="umeyka-marker-container ${statusClass}">
-                    <div class="umeyka-marker-fallback">${fallbackIcon}</div>
+                <div class="ymeyka-marker-container ${statusClass}">
+                    <div class="ymeyka-marker-fallback">${fallbackIcon}</div>
                 </div>
             `;
         }
@@ -5612,7 +5605,7 @@
                     
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
                         icon: L.divIcon({
-                            className: 'umeyka-marker',
+                            className: 'ymeyka-marker',
                             html: markerHtml,
                             iconSize: [50, 50],
                             iconAnchor: [25, 25]
@@ -6003,9 +5996,6 @@
         
         // Обрабатываем deeplink при загрузке
         handleDeepLink();
-        
-        // Загружаем библиотеку jsQR для сканера
-        loadJsQR();
         
         const tg = window.Telegram?.WebApp;
         if (tg) {
