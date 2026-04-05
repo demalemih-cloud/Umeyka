@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+            <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -2506,6 +2506,132 @@
             font-weight: 600;
             cursor: pointer;
         }
+
+        /* ========== СТИЛИ ДЛЯ ПРИГЛАСИВШЕГО ========== */
+        .inviter-section {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.95) 0%, rgba(56, 161, 105, 0.95) 100%);
+            padding: 25px 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            color: white;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(72, 187, 120, 0.3);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .inviter-section::before {
+            content: '🎉';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 40px;
+            color: white;
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        .inviter-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .inviter-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .inviter-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .inviter-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .inviter-skill {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .inviter-date {
+            font-size: 14px;
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        .inviter-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 15px 25px;
+            border-radius: 15px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        .inviter-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .no-inviter-section {
+            background: linear-gradient(135deg, rgba(160, 174, 192, 0.95) 0%, rgba(113, 128, 150, 0.95) 100%);
+            padding: 25px 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            color: white;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(113, 128, 150, 0.3);
+        }
+
+        .no-inviter-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .no-inviter-text {
+            font-size: 16px;
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -2761,6 +2887,9 @@
                 
                 <!-- РЕФЕРАЛЬНАЯ ПРОГРАММА -->
                 <div id="profileReferral" class="profile-tab" style="display: none;">
+                    <!-- БЛОК ПРИГЛАСИВШЕГО (в самом начале) -->
+                    <div id="inviterBlock"></div>
+                    
                     <div class="referral-section">
                         <div class="referral-title">
                             <span>🎁</span>
@@ -3997,6 +4126,133 @@
         document.body.appendChild(modal);
     }
 
+    // ========== СИСТЕМА ПРИГЛАСИВШЕГО ==========
+    
+    function getInviterData() {
+        return getLocalStorage(`inviter_${currentUserId}`);
+    }
+    
+    function saveInviterData(inviterId, inviterSkillId, inviterSkillName, inviterName, source) {
+        const data = {
+            inviterId: inviterId,
+            inviterSkillId: inviterSkillId,
+            inviterSkillName: inviterSkillName,
+            inviterName: inviterName,
+            source: source, // 'qr' или 'link'
+            invitedAt: new Date().toISOString()
+        };
+        setLocalStorage(`inviter_${currentUserId}`, data);
+        return data;
+    }
+    
+    function processInviterFromQR(skill) {
+        // Сохраняем информацию о пригласившем
+        saveInviterData(
+            skill.userId,
+            skill._id,
+            skill.skill,
+            skill.username,
+            'qr'
+        );
+        
+        console.log('✅ Сохранена информация о пригласившем через QR:', skill.username);
+    }
+    
+    function processInviterFromLink(referrerId) {
+        // Получаем данные реферера
+        const referrerData = getOrCreateUserProfile(referrerId);
+        
+        saveInviterData(
+            referrerId,
+            null,
+            null,
+            referrerData.firstName || 'Пользователь',
+            'link'
+        );
+        
+        console.log('✅ Сохранена информация о пригласившем через ссылку:', referrerData.firstName);
+    }
+    
+    function displayInviterBlock() {
+        const inviterData = getInviterData();
+        const container = document.getElementById('inviterBlock');
+        
+        if (!container) return;
+        
+        if (!inviterData) {
+            // Нет пригласившего
+            container.innerHTML = `
+                <div class="no-inviter-section">
+                    <div class="no-inviter-icon">🤝</div>
+                    <div class="no-inviter-text">Вы присоединились самостоятельно</div>
+                </div>
+            `;
+            return;
+        }
+        
+        // Есть пригласивший
+        const sourceText = inviterData.source === 'qr' ? 'через QR-код' : 'по реферальной ссылке';
+        const skillText = inviterData.inviterSkillName ? `<div class="inviter-skill">Умейка: ${inviterData.inviterSkillName}</div>` : '';
+        
+        container.innerHTML = `
+            <div class="inviter-section">
+                <div class="inviter-title">
+                    <span>🎉</span>
+                    <span>Вас пригласил</span>
+                </div>
+                
+                <div class="inviter-avatar">
+                    👤
+                </div>
+                
+                <div class="inviter-name">${inviterData.inviterName}</div>
+                ${skillText}
+                <div class="inviter-date">${sourceText} • ${new Date(inviterData.invitedAt).toLocaleDateString('ru-RU')}</div>
+                
+                <button class="inviter-button" onclick="triggerHapticFeedback(); viewInviterProfile('${inviterData.inviterId}');">
+                    👁️ Посмотреть профиль
+                </button>
+            </div>
+        `;
+    }
+    
+    window.viewInviterProfile = function(inviterId) {
+        triggerHapticFeedback();
+        
+        const inviterData = getOrCreateUserProfile(inviterId);
+        const inviterInfo = getInviterData();
+        
+        // Показываем информацию о пригласившем
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.style.display = 'flex';
+        modal.style.zIndex = '5000';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 400px;">
+                <button class="modal-close" onclick="this.parentElement.parentElement.remove();">×</button>
+                <div class="modal-title">👤 Пригласивший вас</div>
+                
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 50px; color: white;">
+                        👤
+                    </div>
+                    <h3 style="color: #2d3748; margin-bottom: 10px;">${inviterData.firstName || 'Пользователь'}</h3>
+                    <p style="color: #666;">${inviterInfo.source === 'qr' ? 'Пригласил через QR-код' : 'Пригласил по ссылке'}</p>
+                </div>
+                
+                <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <p style="color: #2d3748; margin: 5px 0;"><strong>📅 Дата приглашения:</strong> ${new Date(inviterInfo.invitedAt).toLocaleDateString('ru-RU')}</p>
+                    ${inviterInfo.inviterSkillName ? `<p style="color: #2d3748; margin: 5px 0;"><strong>✨ Умейка:</strong> ${inviterInfo.inviterSkillName}</p>` : ''}
+                </div>
+                
+                <button class="modal-button modal-cancel" onclick="this.parentElement.parentElement.remove();" style="width: 100%;">
+                    Закрыть
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    };
+
     // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
     
     function getCityCoordinates(cityName) {
@@ -4255,6 +4511,9 @@
         
         const userData = getOrCreateUserProfile(currentUserId);
         setLocalStorage(`user_${currentUserId}`, userData);
+        
+        // Обновляем блок пригласившего
+        displayInviterBlock();
     }
 
     function generateReferralLink() {
@@ -4353,6 +4612,9 @@
             const referrerId = urlParams.get('ref') || urlParams.get('start');
             
             if (referrerId && referrerId !== currentUserId && !referrerId.startsWith('skill_')) {
+                // Это реферальная ссылка (не QR-код умейки)
+                processInviterFromLink(referrerId);
+                
                 const referrerData = getOrCreateUserProfile(referrerId);
                 
                 addReferralFriend(currentUserId, referrerData.firstName || 'Друг');
@@ -5493,7 +5755,6 @@
                     console.log('📍 Местоположение пользователя:', userLocation);
                     map.setView([latitude, longitude], 13);
                     
-                    // Маркер пользователя с новым стилем
                     const userMarker = L.marker([latitude, longitude], {
                         icon: L.divIcon({
                             className: 'user-marker',
@@ -5524,13 +5785,11 @@
         }
     }
 
-    // ========== НОВАЯ ФУНКЦИЯ СОЗДАНИЯ МАРКЕРА ==========
     function createSkillMarkerHtml(skill, isUserSkill) {
         const status = skill.status || 'ready';
         const statusClass = status === 'ready' ? 'status-ready' : 'status-busy';
         const fallbackIcon = isUserSkill ? '👤' : '🔧';
         
-        // Если есть фото - показываем фото, иначе fallback с иконкой
         if (skill.photo) {
             return `
                 <div class="ymeyka-marker-container ${statusClass}">
@@ -5556,13 +5815,11 @@
             
             const userData = getOrCreateUserProfile(currentUserId);
             
-            // Очищаем старые маркеры
             if (markers.length > 0) {
                 markers.forEach(marker => map.removeLayer(marker));
                 markers = [];
             }
             
-            // Добавляем маркер пользователя
             if (userLocation) {
                 const userMarker = L.marker([userLocation.lat, userLocation.lon], {
                     icon: L.divIcon({
@@ -5579,7 +5836,6 @@
                 markers.push(userMarker);
             }
             
-            // Добавляем маркеры умейек с новым дизайном
             skills.forEach((skill, index) => {
                 if (skill.location && skill.location.lat && skill.location.lon) {
                     const rating = skill.rating?.average || 5.0;
@@ -5587,10 +5843,8 @@
                     const status = skill.status || 'ready';
                     const radius = skill.radius || 10;
                     
-                    // Цвет круга радиуса в зависимости от статуса
                     const circleColor = (!status || status === 'ready') ? '#48bb78' : '#f56565';
                     
-                    // Круг радиуса действия
                     const circle = L.circle([skill.location.lat, skill.location.lon], {
                         color: circleColor,
                         fillColor: circleColor,
@@ -5600,7 +5854,6 @@
                     
                     markers.push(circle);
                     
-                    // Создаем HTML для маркера с задержкой анимации
                     const markerHtml = createSkillMarkerHtml(skill, isUserSkill);
                     
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
@@ -5614,7 +5867,6 @@
                     .addTo(map)
                     .bindPopup(createMapSkillPopup(skill, isUserSkill));
                     
-                    // Добавляем задержку анимации для каждого маркера
                     const markerElement = marker.getElement();
                     if (markerElement) {
                         markerElement.style.animationDelay = `${index * 0.05}s`;
@@ -5653,7 +5905,6 @@
         const statusBadge = getStatusBadge(skill.status);
         const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
         
-        // Миниатюра фото для popup (100x60px)
         const photoThumbnail = skill.photo ? `
             <div class="popup-skill-photo">
                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
@@ -5871,7 +6122,6 @@
         triggerHapticFeedback();
         showSection('profileSection');
         loadUserProfile();
-        // Скрываем все вкладки при входе в ЛК
         document.getElementById('profileStats').style.display = 'none';
         document.getElementById('profileSkills').style.display = 'none';
         document.getElementById('profileDeals').style.display = 'none';
@@ -5946,7 +6196,6 @@
         return currentUserId;
     };
     
-    // ========== АДМИН-ПАНЕЛЬ (6 кликов по логотипу) ==========
     function initAdminAccess() {
         const logoHeader = document.getElementById('logoHeader');
         if (!logoHeader) return;
@@ -5973,12 +6222,9 @@
     function openAdminPanel() {
         console.log('🔓 Открытие админ-панели (6 кликов)');
         
-        // Открываем админку в новой вкладке/окне
         const adminUrl = 'ymeyka-admin.html';
         window.open(adminUrl, '_blank');
     }
-    
-    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (продолжение) ==========
     
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Ymeyka app loaded successfully!');
@@ -5994,7 +6240,6 @@
         
         processReferralLink();
         
-        // Обрабатываем deeplink при загрузке
         handleDeepLink();
         
         const tg = window.Telegram?.WebApp;
@@ -6016,6 +6261,8 @@
         }
         
         initAdminAccess();
+        
+        displayInviterBlock();
     });
 
     window.searchSkills = async function() {
@@ -6312,19 +6559,16 @@
         triggerHapticFeedback();
         currentProfileTab = tabName;
         
-        // Скрываем все вкладки
         document.getElementById('profileStats').style.display = 'none';
         document.getElementById('profileSkills').style.display = 'none';
         document.getElementById('profileDeals').style.display = 'none';
         document.getElementById('profileReferral').style.display = 'none';
         
-        // Показываем выбранную вкладку
         document.getElementById('profileStats').style.display = tabName === 'stats' ? 'block' : 'none';
         document.getElementById('profileSkills').style.display = tabName === 'skills' ? 'block' : 'none';
         document.getElementById('profileDeals').style.display = tabName === 'deals' ? 'block' : 'none';
         document.getElementById('profileReferral').style.display = tabName === 'referral' ? 'block' : 'none';
         
-        // Загружаем данные для вкладки
         if (tabName === 'skills') {
             loadProfileSkills();
         } else if (tabName === 'deals') {
@@ -6340,7 +6584,6 @@
         triggerHapticFeedback();
         currentDealTab = tabName;
         
-        // Обновляем активность кнопок
         document.querySelectorAll('.deals-tab-button').forEach(btn => btn.classList.remove('active'));
         
         if (tabName === 'pending') {
@@ -6996,20 +7239,16 @@
         const globalDeals = getGlobalDeals();
         const globalSkills = getGlobalSkills();
         
-        // Количество мастеров (уникальные userId из skills)
         const uniqueMasters = new Set(globalSkills.map(s => s.userId)).size;
         
-        // Количество сделок
         const dealsCount = globalDeals.length;
         
-        // Средний рейтинг проекта
         let averageRating = 0;
         if (reviews.length > 0) {
             const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
             averageRating = sum / reviews.length;
         }
         
-        // Процент довольных клиентов (завершённые сделки без споров)
         const completedDeals = globalDeals.filter(d => d.status === 'completed');
         const satisfiedClients = completedDeals.filter(d => d.paymentStatus !== 'refunded').length;
         const satisfactionRate = completedDeals.length > 0 
@@ -7017,8 +7256,8 @@
             : 0;
         
         return {
-            mastersCount: uniqueMasters || Math.floor(Math.random() * 500) + 500, // Fallback для демо
-            dealsCount: dealsCount || Math.floor(Math.random() * 1000) + 1000, // Fallback для демо
+            mastersCount: uniqueMasters || Math.floor(Math.random() * 500) + 500,
+            dealsCount: dealsCount || Math.floor(Math.random() * 1000) + 1000,
             averageRating: averageRating || 4.9,
             satisfactionRate: satisfactionRate || 98,
             reviewsCount: reviews.length
@@ -7058,7 +7297,6 @@
         const comment = document.getElementById('projectReviewComment').value.trim();
         const userData = getOrCreateUserProfile(currentUserId);
         
-        // Проверка на завершённые сделки
         if ((userData.completedDeals || 0) === 0) {
             alert('❌ Оставить отзыв могут только участники с завершёнными сделками');
             return;
@@ -7089,11 +7327,9 @@
         
         alert('✅ Спасибо за ваш отзыв!');
         
-        // Сброс формы
         document.getElementById('projectReviewComment').value = '';
         setProjectRating(0);
         
-        // Обновление статистики
         updateAboutStats();
     };
     
@@ -7103,11 +7339,9 @@
         const reviews = getProjectReviews();
         const stats = calculateProjectStats();
         
-        // Обновление заголовка модального окна
         document.getElementById('reviewsAverageRating').textContent = stats.averageRating.toFixed(1);
         document.getElementById('reviewsTotalCount').textContent = `${stats.reviewsCount} отзывов`;
         
-        // Звёзды среднего рейтинга
         const starsContainer = document.getElementById('reviewsAverageStars');
         let starsHtml = '';
         for (let i = 1; i <= 5; i++) {
@@ -7115,7 +7349,6 @@
         }
         starsContainer.textContent = starsHtml;
         
-        // Список отзывов
         const listContainer = document.getElementById('reviewsList');
         
         if (reviews.length === 0) {
@@ -7127,7 +7360,6 @@
                 </div>
             `;
         } else {
-            // Сортируем по дате (новые сверху)
             const sortedReviews = [...reviews].sort((a, b) => 
                 new Date(b.createdAt) - new Date(a.createdAt)
             );
@@ -7180,13 +7412,11 @@
                 
                 const deal = globalDeals[dealIndex];
                 
-                // Проверяем, что сделка завершена
                 if (deal.status !== 'completed') {
                     alert('❌ Можно удалять только завершённые сделки');
                     return;
                 }
                 
-                // Проверяем, что пользователь является участником сделки
                 const isClient = deal.clientId === currentUserId;
                 const isMaster = deal.masterId === currentUserId;
                 
@@ -7195,16 +7425,13 @@
                     return;
                 }
                 
-                // Удаляем сделку из глобального хранилища
                 globalDeals.splice(dealIndex, 1);
                 setGlobalDeals(globalDeals);
                 
                 console.log(`✅ Сделка ${dealId} удалена из глобального хранилища`);
                 
-                // Обновляем список сделок
                 loadDeals();
                 
-                // Показываем уведомление
                 showNotification('✅ Сделка успешно удалена!');
                 
             } catch (error) {
