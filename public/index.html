@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Umeyka - Мастера рядом</title>
+    <title>Ymeyka - Мастера рядом</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -71,6 +71,30 @@
             font-size: 14px;
             cursor: pointer;
             backdrop-filter: blur(10px);
+        }
+
+        .scanner-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .scanner-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .scanner-button:active {
+            transform: scale(0.95);
         }
         
         .logo {
@@ -2180,7 +2204,7 @@
         }
 
         /* ========== НОВЫЕ СТИЛИ ДЛЯ МАРКЕРОВ КАРТЫ ========== */
-        .umeyka-marker-container {
+        .ymeyka-marker-container {
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -2196,26 +2220,26 @@
             justify-content: center;
         }
 
-        .umeyka-marker-container:hover {
+        .ymeyka-marker-container:hover {
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
 
-        .umeyka-marker-container.status-ready {
+        .ymeyka-marker-container.status-ready {
             border-color: #48bb78;
         }
 
-        .umeyka-marker-container.status-busy {
+        .ymeyka-marker-container.status-busy {
             border-color: #f56565;
         }
 
-        .umeyka-marker-photo {
+        .ymeyka-marker-photo {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .umeyka-marker-fallback {
+        .ymeyka-marker-fallback {
             width: 100%;
             height: 100%;
             display: flex;
@@ -2335,6 +2359,153 @@
             margin-top: 20px;
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
+
+        /* ========== СТИЛИ ДЛЯ СКАНЕРА ========== */
+        .scanner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 5000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .scanner-modal.active {
+            display: flex;
+        }
+
+        .scanner-header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 5001;
+        }
+
+        .scanner-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .scanner-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scanner-video-container {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid #667eea;
+        }
+
+        #scannerVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scanner-frame {
+            width: 250px;
+            height: 250px;
+            border: 2px solid rgba(102, 126, 234, 0.8);
+            border-radius: 20px;
+            position: relative;
+        }
+
+        .scanner-frame::before,
+        .scanner-frame::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-color: #667eea;
+            border-style: solid;
+        }
+
+        .scanner-frame::before {
+            top: -2px;
+            left: -2px;
+            border-width: 4px 0 0 4px;
+            border-top-left-radius: 20px;
+        }
+
+        .scanner-frame::after {
+            bottom: -2px;
+            right: -2px;
+            border-width: 0 4px 4px 0;
+            border-bottom-right-radius: 20px;
+        }
+
+        .scanner-hint {
+            color: rgba(255,255,255,0.8);
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .scanner-input-section {
+            width: 100%;
+            max-width: 400px;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+
+        .scanner-input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .scanner-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -2342,9 +2513,10 @@
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
             <div class="header" id="logoHeader">
+                <button class="scanner-button" onclick="triggerHapticFeedback(); openScanner();">📷 Сканер</button>
                 <button class="about-button" onclick="triggerHapticFeedback(); showAboutSection();">ℹ️ О проекте</button>
                 <div class="logo">🤝✨</div>
-                <div class="app-title">Umeyka</div>
+                <div class="app-title">Ymeyka</div>
                 <div class="app-description">Мастера на все руки рядом с вами</div>
                 <div class="rating">
                     <span class="stars">★★★★★</span>
@@ -2597,7 +2769,7 @@
                         </div>
                         
                         <div class="referral-description">
-                            Приглашайте друзей в Umeyka и получайте звёзды за каждого приглашённого!
+                            Приглашайте друзей в Ymeyka и получайте звёзды за каждого приглашённого!
                         </div>
                         
                         <div class="referral-stats" id="referralStats">
@@ -2668,10 +2840,10 @@
                         </div>
                     </a>
                     
-                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
+                    <a href="https://t.me/ymeyka_bot" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
                         <div class="channel-icon">✨</div>
                         <div class="channel-info">
-                            <div class="channel-name">Umeyka</div>
+                            <div class="channel-name">Ymeyka</div>
                             <div class="channel-description">Официальный канал проекта</div>
                         </div>
                     </a>
@@ -2824,10 +2996,10 @@
             
             <div class="form-section">
                 <div class="about-section">
-                    <div class="about-title">🤝 О проекте Umeyka</div>
+                    <div class="about-title">🤝 О проекте Ymeyka</div>
                     
                     <p style="margin-bottom: 15px; line-height: 1.6;">
-                        <strong>Umeyka</strong> - это инновационная платформа, которая соединяет мастеров и клиентов, 
+                        <strong>Ymeyka</strong> - это инновационная платформа, которая соединяет мастеров и клиентов, 
                         создавая экосистему доверия и качества.
                     </p>
                     
@@ -2904,10 +3076,10 @@
                         </div>
                     </a>
                     
-                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
+                    <a href="https://t.me/ymeyka_bot" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
                         <div class="channel-icon">✨</div>
                         <div class="channel-info">
-                            <div class="channel-name">Umeyka</div>
+                            <div class="channel-name">Ymeyka</div>
                             <div class="channel-description">Официальный канал проекта</div>
                         </div>
                     </a>
@@ -3089,9 +3261,30 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО СКАНЕРА -->
+    <div id="scannerModal" class="scanner-modal">
+        <div class="scanner-header">
+            <div class="scanner-title">📷 Сканер QR-кода</div>
+            <button class="scanner-close" onclick="closeScanner();">×</button>
+        </div>
+        <div class="scanner-video-container">
+            <video id="scannerVideo" autoplay playsinline></video>
+            <div class="scanner-overlay">
+                <div class="scanner-frame"></div>
+            </div>
+        </div>
+        <div class="scanner-hint">
+            Наведите камеру на QR-код Ymeyka
+        </div>
+        <div class="scanner-input-section">
+            <input type="text" id="scannerManualInput" class="scanner-input" placeholder="Или введите ID умейки вручную...">
+            <button class="scanner-submit" onclick="triggerHapticFeedback(); processManualScan();">🔍 Найти</button>
+        </div>
+    </div>
+
     <script>
     // ========== КОНФИГУРАЦИЯ ==========
-    const API_URL = 'https://umeyka-oocn.onrender.com';
+    const API_URL = 'https://ymeyka-oocn.onrender.com';
     const TELEGRAM_BOT_URL = 'https://t.me/ymeyka_bot';
     let currentUserId = null;
     let currentAvatar = null;
@@ -3117,6 +3310,7 @@
     let pendingPaymentDealId = null;
     let currentQRSkillId = null;
     let currentQRSkillName = null;
+    let scannerStream = null;
     
     // Счетчик кликов по логотипу для открытия админ-панели
     let logoClickCount = 0;
@@ -3193,12 +3387,12 @@
         wallet.transactions.unshift(transaction);
         saveWalletData(wallet);
         
-        const globalTx = getLocalStorage('umeyka_global_transactions') || [];
+        const globalTx = getLocalStorage('ymeyka_global_transactions') || [];
         globalTx.push({
             ...transaction,
             userId: currentUserId
         });
-        setLocalStorage('umeyka_global_transactions', globalTx);
+        setLocalStorage('ymeyka_global_transactions', globalTx);
         
         return transaction;
     }
@@ -3634,7 +3828,7 @@
         const skill = getGlobalSkillById(currentQRSkillId);
         if (!skill) return;
         
-        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Umeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`}`;
+        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`}`;
         
         if (navigator.share) {
             navigator.share({
@@ -3651,6 +3845,104 @@
             });
         }
     };
+    
+    // ========== СКАНЕР QR-КОДОВ ==========
+    
+    window.openScanner = async function() {
+        triggerHapticFeedback();
+        
+        const modal = document.getElementById('scannerModal');
+        modal.classList.add('active');
+        
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'environment' } 
+            });
+            scannerStream = stream;
+            const video = document.getElementById('scannerVideo');
+            video.srcObject = stream;
+            
+            // Запускаем сканирование
+            startQRScanning();
+        } catch (error) {
+            console.error('❌ Ошибка доступа к камере:', error);
+            alert('❌ Не удалось получить доступ к камере. Вы можете ввести ID умейки вручную.');
+        }
+    };
+    
+    window.closeScanner = function() {
+        triggerHapticFeedback();
+        
+        const modal = document.getElementById('scannerModal');
+        modal.classList.remove('active');
+        
+        // Останавливаем камеру
+        if (scannerStream) {
+            scannerStream.getTracks().forEach(track => track.stop());
+            scannerStream = null;
+        }
+    };
+    
+    function startQRScanning() {
+        const video = document.getElementById('scannerVideo');
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        
+        function scan() {
+            if (!scannerStream) return;
+            
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                
+                // Здесь можно добавить библиотеку для распознавания QR (jsQR)
+                // Для простоты используем ручной ввод
+            }
+            
+            requestAnimationFrame(scan);
+        }
+        
+        scan();
+    }
+    
+    window.processManualScan = function() {
+        triggerHapticFeedback();
+        
+        const input = document.getElementById('scannerManualInput').value.trim();
+        if (!input) {
+            alert('❌ Введите ID умейки');
+            return;
+        }
+        
+        // Ищем умейку по ID или URL
+        let skillId = input;
+        
+        // Если введена полная ссылка, извлекаем ID
+        if (input.includes('skill_')) {
+            const match = input.match(/skill_([a-zA-Z0-9_]+)/);
+            if (match) {
+                skillId = match[1];
+            }
+        }
+        
+        // Ищем умейку
+        const skill = getGlobalSkillById(skillId) || findSkillByPartialId(skillId);
+        
+        if (skill) {
+            closeScanner();
+            openSkillFromQR(skill);
+        } else {
+            alert('❌ Умейка не найдена. Проверьте ID или ссылку.');
+        }
+    };
+    
+    function findSkillByPartialId(partialId) {
+        const allSkills = getGlobalSkills();
+        return allSkills.find(s => s._id.includes(partialId));
+    }
     
     function handleDeepLink() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -4110,11 +4402,11 @@
     };
 
     function getGlobalDeals() {
-        return getLocalStorage('umeyka_global_deals') || [];
+        return getLocalStorage('ymeyka_global_deals') || [];
     }
     
     function setGlobalDeals(deals) {
-        return setLocalStorage('umeyka_global_deals', deals);
+        return setLocalStorage('ymeyka_global_deals', deals);
     }
     
     function getUserDeals(userId) {
@@ -4169,11 +4461,11 @@
     }
 
     function getGlobalSkills() {
-        return getLocalStorage('umeyka_global_skills') || [];
+        return getLocalStorage('ymeyka_global_skills') || [];
     }
     
     function setGlobalSkills(skills) {
-        return setLocalStorage('umeyka_global_skills', skills);
+        return setLocalStorage('ymeyka_global_skills', skills);
     }
     
     function addGlobalSkill(skill) {
@@ -5241,14 +5533,14 @@
         // Если есть фото - показываем фото, иначе fallback с иконкой
         if (skill.photo) {
             return `
-                <div class="umeyka-marker-container ${statusClass}">
-                    <img src="${skill.photo}" class="umeyka-marker-photo" alt="${skill.skill}">
+                <div class="ymeyka-marker-container ${statusClass}">
+                    <img src="${skill.photo}" class="ymeyka-marker-photo" alt="${skill.skill}">
                 </div>
             `;
         } else {
             return `
-                <div class="umeyka-marker-container ${statusClass}">
-                    <div class="umeyka-marker-fallback">${fallbackIcon}</div>
+                <div class="ymeyka-marker-container ${statusClass}">
+                    <div class="ymeyka-marker-fallback">${fallbackIcon}</div>
                 </div>
             `;
         }
