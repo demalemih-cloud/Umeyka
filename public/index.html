@@ -6,7 +6,6 @@
     <title>Ymeyka - Мастера рядом</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -32,6 +31,7 @@
             padding: 0;
         }
         
+        /* ========== ИСПРАВЛЕНИЕ #1: ЦЕНТРИРОВАНИЕ КНОПКИ РЕДАКТИРОВАНИЯ ПРОФИЛЯ ========== */
         #userProfile {
             text-align: center;
         }
@@ -2506,149 +2506,6 @@
             font-weight: 600;
             cursor: pointer;
         }
-
-        /* ========== СТИЛИ ДЛЯ ПРИГЛАСИВШЕГО ========== */
-        .inviter-section {
-            background: linear-gradient(135deg, rgba(72, 187, 120, 0.95) 0%, rgba(56, 161, 105, 0.95) 100%);
-            padding: 25px 20px;
-            border-radius: 20px;
-            margin: 20px 0;
-            color: white;
-            text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(72, 187, 120, 0.3);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        .inviter-section::before {
-            content: '🎉';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 40px;
-            color: white;
-            opacity: 0.2;
-            z-index: 0;
-        }
-
-        .inviter-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .inviter-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: white;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-        }
-
-        .inviter-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .inviter-name {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .inviter-skill {
-            font-size: 16px;
-            opacity: 0.9;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .inviter-date {
-            font-size: 14px;
-            opacity: 0.8;
-            position: relative;
-            z-index: 1;
-        }
-
-        .inviter-button {
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            padding: 15px 25px;
-            border-radius: 15px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-            backdrop-filter: blur(10px);
-        }
-
-        .inviter-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .no-inviter-section {
-            background: linear-gradient(135deg, rgba(160, 174, 192, 0.95) 0%, rgba(113, 128, 150, 0.95) 100%);
-            padding: 25px 20px;
-            border-radius: 20px;
-            margin: 20px 0;
-            color: white;
-            text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(113, 128, 150, 0.3);
-        }
-
-        .no-inviter-icon {
-            font-size: 50px;
-            margin-bottom: 15px;
-            opacity: 0.7;
-        }
-
-        .no-inviter-text {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-
-        /* ========== ЛИНИЯ СКАНИРОВАНИЯ ========== */
-        .scan-line {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: #667eea;
-            box-shadow: 0 0 10px #667eea;
-            animation: scan 2s linear infinite;
-        }
-
-        @keyframes scan {
-            0% { top: 0; opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
-        }
     </style>
 </head>
 <body>
@@ -2839,6 +2696,24 @@
                     </button>
                 </div>
                 
+                <!-- Вкладки личного кабинета (скрытые, открываются по кнопкам) -->
+                <div style="display: none;">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="triggerHapticFeedback(); showProfileTab('stats');" id="statsTab">
+                            📊 Статистика
+                        </button>
+                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('skills');" id="skillsTab">
+                            ✨ Мои умейки
+                        </button>
+                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('deals');" id="dealsTab">
+                            📝 Сделки
+                        </button>
+                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('referral');" id="referralTab">
+                            🎁 Реферальная программа
+                        </button>
+                    </div>
+                </div>
+                
                 <!-- Статистика -->
                 <div id="profileStats" class="profile-tab">
                     <h3 style="margin-bottom: 15px; text-align: center;">📊 Моя статистика</h3>
@@ -2886,9 +2761,6 @@
                 
                 <!-- РЕФЕРАЛЬНАЯ ПРОГРАММА -->
                 <div id="profileReferral" class="profile-tab" style="display: none;">
-                    <!-- БЛОК ПРИГЛАСИВШЕГО (в самом начале) -->
-                    <div id="inviterBlock"></div>
-                    
                     <div class="referral-section">
                         <div class="referral-title">
                             <span>🎁</span>
@@ -2968,7 +2840,7 @@
                         </div>
                     </a>
                     
-                    <a href="https://t.me/ymeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
+                    <a href="https://t.me/ymeyka_bot" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
                         <div class="channel-icon">✨</div>
                         <div class="channel-info">
                             <div class="channel-name">Ymeyka</div>
@@ -3398,9 +3270,7 @@
         <div class="scanner-video-container">
             <video id="scannerVideo" autoplay playsinline></video>
             <div class="scanner-overlay">
-                <div class="scanner-frame">
-                    <div class="scan-line"></div>
-                </div>
+                <div class="scanner-frame"></div>
             </div>
         </div>
         <div class="scanner-hint">
@@ -3441,7 +3311,6 @@
     let currentQRSkillId = null;
     let currentQRSkillName = null;
     let scannerStream = null;
-    let isScanning = false;
     
     // Счетчик кликов по логотипу для открытия админ-панели
     let logoClickCount = 0;
@@ -3852,72 +3721,96 @@
         pendingPaymentDealId = null;
     }
 
-    // ========== QR-КОД ФУНКЦИИ (ИСПРАВЛЕНЫ) ==========
+    // ========== QR-КОД ФУНКЦИИ ==========
     
-    // Генерация QR-кода для умейки
-    function generateSkillQR(skillId, skillName) {
-        return new Promise((resolve) => {
-            const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
-            const tempDiv = document.createElement('div');
-            tempDiv.style.display = 'none';
-            document.body.appendChild(tempDiv);
-            
-            try {
-                const qrcode = new QRCode(tempDiv, {
-                    text: qrData,
-                    width: 250,
-                    height: 250,
-                    colorDark: '#000000',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-                
-                setTimeout(() => {
-                    const img = tempDiv.querySelector('img');
-                    if (img && img.src) {
-                        document.body.removeChild(tempDiv);
-                        resolve({ dataUrl: img.src, qrData });
-                    } else {
-                        document.body.removeChild(tempDiv);
-                        resolve({ dataUrl: null, qrData });
-                    }
-                }, 100);
-            } catch (error) {
-                console.error('QR generation error:', error);
-                document.body.removeChild(tempDiv);
-                resolve({ dataUrl: null, qrData });
-            }
+    function generateQRCode(skillId, skillName) {
+        const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
+        
+        // Создаем временный контейнер для генерации QR
+        const tempContainer = document.createElement('div');
+        tempContainer.id = 'tempQR';
+        tempContainer.style.display = 'none';
+        document.body.appendChild(tempContainer);
+        
+        // Генерируем QR-код
+        const qrcode = new QRCode(tempContainer, {
+            text: qrData,
+            width: 250,
+            height: 250,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
         });
+        
+        // Получаем data URL изображения
+        setTimeout(() => {
+            const qrImg = tempContainer.querySelector('img');
+            if (qrImg) {
+                const qrDataUrl = qrImg.src;
+                
+                // Сохраняем в skill
+                const skill = getGlobalSkillById(skillId);
+                if (skill) {
+                    skill.qrCode = qrDataUrl;
+                    skill.qrCodeData = qrData;
+                    addGlobalSkill(skill);
+                }
+            }
+            document.body.removeChild(tempContainer);
+        }, 100);
+        
+        return qrDataUrl;
     }
     
-    window.showQRModal = async function(skillId, skillName) {
+    function getSkillQRCode(skillId) {
+        const skill = getGlobalSkillById(skillId);
+        if (skill && skill.qrCode) {
+            return skill.qrCode;
+        }
+        return null;
+    }
+    
+    function ensureQRCode(skillId, skillName) {
+        let skill = getGlobalSkillById(skillId);
+        if (!skill) return null;
+        
+        if (!skill.qrCode) {
+            const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
+            skill.qrCodeData = qrData;
+            // QR будет сгенерирован при открытии модалки
+            addGlobalSkill(skill);
+        }
+        return skill;
+    }
+    
+    window.showQRModal = function(skillId, skillName) {
         triggerHapticFeedback();
         
         currentQRSkillId = skillId;
         currentQRSkillName = skillName;
         
+        const skill = ensureQRCode(skillId, skillName);
+        if (!skill) {
+            alert('❌ Умейка не найдена');
+            return;
+        }
+        
         document.getElementById('qrModalTitle').textContent = skillName;
         
         const container = document.getElementById('qrCodeContainer');
-        container.innerHTML = '<div style="padding: 20px;">⏳ Генерация QR-кода...</div>';
+        container.innerHTML = '';
+        
+        // Генерируем QR-код
+        const qrcode = new QRCode(container, {
+            text: skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${skillId}`,
+            width: 250,
+            height: 250,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
         
         document.getElementById('qrModal').classList.add('active');
-        
-        const { dataUrl, qrData } = await generateSkillQR(skillId, skillName);
-        
-        if (dataUrl) {
-            container.innerHTML = `<img src="${dataUrl}" style="width: 100%; height: 100%;" alt="QR Code">`;
-            
-            // Сохраняем в skill
-            const skill = getGlobalSkillById(skillId);
-            if (skill) {
-                skill.qrCode = dataUrl;
-                skill.qrCodeData = qrData;
-                addGlobalSkill(skill);
-            }
-        } else {
-            container.innerHTML = '<div style="color: red;">❌ Ошибка генерации QR</div>';
-        }
     };
     
     window.closeQRModal = function() {
@@ -3933,33 +3826,33 @@
         if (!currentQRSkillId || !currentQRSkillName) return;
         
         const skill = getGlobalSkillById(currentQRSkillId);
-        const qrData = skill?.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`;
+        if (!skill) return;
         
-        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${qrData}`;
+        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`}`;
         
         if (navigator.share) {
             navigator.share({
                 title: currentQRSkillName,
                 text: shareText,
-                url: qrData
+                url: skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`
             }).catch(err => console.log('Share canceled'));
         } else {
+            // Копируем в буфер обмена
             navigator.clipboard.writeText(shareText).then(() => {
                 showNotification('✅ Ссылка скопирована в буфер обмена!');
             }).catch(() => {
-                alert('Ссылка: ' + qrData);
+                alert('Ссылка: ' + (skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`));
             });
         }
     };
     
-    // ========== СКАНЕР QR-КОДОВ (ИСПРАВЛЕН) ==========
+    // ========== СКАНЕР QR-КОДОВ ==========
     
     window.openScanner = async function() {
         triggerHapticFeedback();
         
         const modal = document.getElementById('scannerModal');
         modal.classList.add('active');
-        isScanning = true;
         
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -3969,10 +3862,8 @@
             const video = document.getElementById('scannerVideo');
             video.srcObject = stream;
             
-            video.onloadedmetadata = () => {
-                video.play();
-                startQRScanning();
-            };
+            // Запускаем сканирование
+            startQRScanning();
         } catch (error) {
             console.error('❌ Ошибка доступа к камере:', error);
             alert('❌ Не удалось получить доступ к камере. Вы можете ввести ID умейки вручную.');
@@ -3981,11 +3872,11 @@
     
     window.closeScanner = function() {
         triggerHapticFeedback();
-        isScanning = false;
         
         const modal = document.getElementById('scannerModal');
         modal.classList.remove('active');
         
+        // Останавливаем камеру
         if (scannerStream) {
             scannerStream.getTracks().forEach(track => track.stop());
             scannerStream = null;
@@ -3998,26 +3889,17 @@
         const context = canvas.getContext('2d');
         
         function scan() {
-            if (!isScanning || !scannerStream || !video.videoWidth || !video.videoHeight) {
-                if (isScanning) requestAnimationFrame(scan);
-                return;
-            }
+            if (!scannerStream) return;
             
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            
-            // Используем jsQR для распознавания
-            const code = jsQR(imageData.data, canvas.width, canvas.height, {
-                inversionAttempts: 'dontInvert',
-            });
-            
-            if (code) {
-                console.log('✅ QR-код распознан:', code.data);
-                processScannedCode(code.data);
-                return;
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                
+                // Здесь можно добавить библиотеку для распознавания QR (jsQR)
+                // Для простоты используем ручной ввод
             }
             
             requestAnimationFrame(scan);
@@ -4026,45 +3908,35 @@
         scan();
     }
     
-    function processScannedCode(data) {
-        console.log('🔗 Обработка отсканированного кода:', data);
-        
-        isScanning = false;
-        closeScanner();
-        
-        // Извлекаем skillId
-        let skillId = null;
-        
-        if (data.includes('skill_')) {
-            const match = data.match(/skill_([a-zA-Z0-9_]+)/);
-            if (match) skillId = match[1];
-        } else if (data.startsWith('http')) {
-            try {
-                const url = new URL(data);
-                const startParam = url.searchParams.get('start');
-                if (startParam && startParam.includes('skill_')) {
-                    skillId = startParam.replace('skill_', '');
-                }
-            } catch (e) {}
-        }
-        
-        if (skillId) {
-            const skill = getGlobalSkillById(skillId);
-            if (skill) {
-                openSkillFromQR(skill);
-            } else {
-                alert('❌ Умейка не найдена в базе.');
-            }
-        } else {
-            alert('❌ Неверный формат QR-кода');
-        }
-    }
-    
     window.processManualScan = function() {
         triggerHapticFeedback();
+        
         const input = document.getElementById('scannerManualInput').value.trim();
-        if (input) processScannedCode(input);
-        else alert('❌ Введите ID умейки');
+        if (!input) {
+            alert('❌ Введите ID умейки');
+            return;
+        }
+        
+        // Ищем умейку по ID или URL
+        let skillId = input;
+        
+        // Если введена полная ссылка, извлекаем ID
+        if (input.includes('skill_')) {
+            const match = input.match(/skill_([a-zA-Z0-9_]+)/);
+            if (match) {
+                skillId = match[1];
+            }
+        }
+        
+        // Ищем умейку
+        const skill = getGlobalSkillById(skillId) || findSkillByPartialId(skillId);
+        
+        if (skill) {
+            closeScanner();
+            openSkillFromQR(skill);
+        } else {
+            alert('❌ Умейка не найдена. Проверьте ID или ссылку.');
+        }
     };
     
     function findSkillByPartialId(partialId) {
@@ -4075,16 +3947,24 @@
     function handleDeepLink() {
         const urlParams = new URLSearchParams(window.location.search);
         const startParam = urlParams.get('start');
+        
         if (startParam && startParam.startsWith('skill_')) {
             const skillId = startParam.replace('skill_', '');
-            console.log('🔗 Deeplink для skill:', skillId);
+            console.log('🔗 Обнаружен deeplink для skill:', skillId);
+            
+            // Находим умейку
             const skill = getGlobalSkillById(skillId);
-            if (skill) setTimeout(() => openSkillFromQR(skill), 1000);
+            if (skill) {
+                // Открываем карточку умейки с возможностью создания сделки
+                setTimeout(() => {
+                    openSkillFromQR(skill);
+                }, 1000);
+            }
         }
     }
     
     function openSkillFromQR(skill) {
-        processInviterFromQR(skill);
+        // Показываем модальное окно с информацией об умейке
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
         modal.style.display = 'flex';
@@ -4093,105 +3973,31 @@
             <div class="modal-content" style="max-width: 400px;">
                 <button class="modal-close" onclick="this.parentElement.parentElement.remove();">×</button>
                 <div class="modal-title">✨ Найдена умейка</div>
+                
                 <div style="text-align: center; margin-bottom: 20px;">
                     <div style="font-size: 48px; margin-bottom: 10px;">🔧</div>
                     <h3 style="color: #2d3748; margin-bottom: 10px;">${skill.skill}</h3>
                     <p style="color: #48bb78; font-size: 24px; font-weight: bold;">${skill.price} ₽</p>
                 </div>
+                
                 <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
                     <p style="color: #2d3748; margin: 5px 0;"><strong>👤 Мастер:</strong> ${skill.username}</p>
                     <p style="color: #2d3748; margin: 5px 0;"><strong>📍 Город:</strong> ${skill.city || 'Не указан'}</p>
                     <p style="color: #2d3748; margin: 5px 0;"><strong>📞 Контакт:</strong> ${skill.experience || 'Не указан'}</p>
                 </div>
+                
                 <button class="submit-button" onclick="triggerHapticFeedback(); this.parentElement.parentElement.remove(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g, "\\'")}', '${skill.username.replace(/'/g, "\\'")}', '${skill.userId}', '${skill.experience || ''}');" style="margin-bottom: 10px;">
                     📝 Создать сделку
                 </button>
-                <button class="modal-button modal-cancel" onclick="this.parentElement.parentElement.remove();">Закрыть</button>
+                <button class="modal-button modal-cancel" onclick="this.parentElement.parentElement.remove();">
+                    Закрыть
+                </button>
             </div>
         `;
         document.body.appendChild(modal);
     }
 
-    // ========== СИСТЕМА ПРИГЛАСИВШЕГО ==========
-    
-    function getInviterData() {
-        return getLocalStorage(`inviter_${currentUserId}`);
-    }
-    
-    function saveInviterData(inviterId, inviterSkillId, inviterSkillName, inviterName, source) {
-        const data = {
-            inviterId: inviterId,
-            inviterSkillId: inviterSkillId,
-            inviterSkillName: inviterSkillName,
-            inviterName: inviterName,
-            source: source,
-            invitedAt: new Date().toISOString()
-        };
-        setLocalStorage(`inviter_${currentUserId}`, data);
-        return data;
-    }
-    
-    function processInviterFromQR(skill) {
-        saveInviterData(skill.userId, skill._id, skill.skill, skill.username, 'qr');
-        console.log('✅ Пригласивший через QR сохранен:', skill.username);
-    }
-    
-    function processInviterFromLink(referrerId) {
-        const referrerData = getOrCreateUserProfile(referrerId);
-        saveInviterData(referrerId, null, null, referrerData.firstName || 'Пользователь', 'link');
-        console.log('✅ Пригласивший по ссылке сохранен:', referrerData.firstName);
-    }
-    
-    function displayInviterBlock() {
-        const inviterData = getInviterData();
-        const container = document.getElementById('inviterBlock');
-        if (!container) return;
-        
-        if (!inviterData) {
-            container.innerHTML = `<div class="no-inviter-section"><div class="no-inviter-icon">🤝</div><div class="no-inviter-text">Вы присоединились самостоятельно</div></div>`;
-            return;
-        }
-        
-        const sourceText = inviterData.source === 'qr' ? 'через QR-код' : 'по реферальной ссылке';
-        const skillText = inviterData.inviterSkillName ? `<div class="inviter-skill">Умейка: ${inviterData.inviterSkillName}</div>` : '';
-        container.innerHTML = `
-            <div class="inviter-section">
-                <div class="inviter-title"><span>🎉</span><span>Вас пригласил</span></div>
-                <div class="inviter-avatar">👤</div>
-                <div class="inviter-name">${inviterData.inviterName}</div>
-                ${skillText}
-                <div class="inviter-date">${sourceText} • ${new Date(inviterData.invitedAt).toLocaleDateString('ru-RU')}</div>
-                <button class="inviter-button" onclick="triggerHapticFeedback(); viewInviterProfile('${inviterData.inviterId}');">👁️ Посмотреть профиль</button>
-            </div>`;
-    }
-    
-    window.viewInviterProfile = function(inviterId) {
-        triggerHapticFeedback();
-        const inviterData = getOrCreateUserProfile(inviterId);
-        const inviterInfo = getInviterData();
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.style.display = 'flex';
-        modal.style.zIndex = '5000';
-        modal.innerHTML = `
-            <div class="modal-content" style="max-width: 400px;">
-                <button class="modal-close" onclick="this.parentElement.parentElement.remove();">×</button>
-                <div class="modal-title">👤 Пригласивший вас</div>
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 50px; color: white;">👤</div>
-                    <h3 style="color: #2d3748; margin-bottom: 10px;">${inviterData.firstName || 'Пользователь'}</h3>
-                    <p style="color: #666;">${inviterInfo.source === 'qr' ? 'Пригласил через QR-код' : 'Пригласил по ссылке'}</p>
-                </div>
-                <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                    <p style="color: #2d3748; margin: 5px 0;"><strong>📅 Дата приглашения:</strong> ${new Date(inviterInfo.invitedAt).toLocaleDateString('ru-RU')}</p>
-                    ${inviterInfo.inviterSkillName ? `<p style="color: #2d3748; margin: 5px 0;"><strong>✨ Умейка:</strong> ${inviterInfo.inviterSkillName}</p>` : ''}
-                </div>
-                <button class="modal-button modal-cancel" onclick="this.parentElement.parentElement.remove();" style="width: 100%;">Закрыть</button>
-            </div>`;
-        document.body.appendChild(modal);
-    };
-
-    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (СОХРАНЕНЫ БЕЗ ИЗМЕНЕНИЙ, КРОМЕ addSkill) ==========
+    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
     
     function getCityCoordinates(cityName) {
         if (!cityName) return null;
@@ -4201,163 +4007,548 @@
 
     function handleCityInput(value) {
         const list = document.getElementById('cityAutocompleteList');
-        if (!value || value.length < 2) { list.style.display = 'none'; return; }
-        const matches = allCities.filter(city => city.toLowerCase().includes(value.toLowerCase())).slice(0, 5);
+        if (!value || value.length < 2) {
+            list.style.display = 'none';
+            return;
+        }
+        
+        const matches = allCities.filter(city => 
+            city.toLowerCase().includes(value.toLowerCase())
+        ).slice(0, 5);
+        
         if (matches.length > 0) {
-            list.innerHTML = matches.map(city => `<div class="autocomplete-item" onclick="selectCity('${city}')">${city}</div>`).join('');
+            list.innerHTML = matches.map(city => `
+                <div class="autocomplete-item" onclick="selectCity('${city}')">${city}</div>
+            `).join('');
             list.style.display = 'block';
-        } else list.style.display = 'none';
+        } else {
+            list.style.display = 'none';
+        }
     }
 
     function handleSearchCityInput(value) {
         const list = document.getElementById('searchCityAutocompleteList');
-        if (!value || value.length < 2) { list.style.display = 'none'; return; }
-        const matches = allCities.filter(city => city.toLowerCase().includes(value.toLowerCase())).slice(0, 5);
+        if (!value || value.length < 2) {
+            list.style.display = 'none';
+            return;
+        }
+        
+        const matches = allCities.filter(city => 
+            city.toLowerCase().includes(value.toLowerCase())
+        ).slice(0, 5);
+        
         if (matches.length > 0) {
-            list.innerHTML = matches.map(city => `<div class="autocomplete-item" onclick="selectSearchCity('${city}')">${city}</div>`).join('');
+            list.innerHTML = matches.map(city => `
+                <div class="autocomplete-item" onclick="selectSearchCity('${city}')">${city}</div>
+            `).join('');
             list.style.display = 'block';
-        } else list.style.display = 'none';
+        } else {
+            list.style.display = 'none';
+        }
     }
 
     function handleEditCityInput(value) {
         const list = document.getElementById('editCityAutocompleteList');
-        if (!value || value.length < 2) { list.style.display = 'none'; return; }
-        const matches = allCities.filter(city => city.toLowerCase().includes(value.toLowerCase())).slice(0, 5);
+        if (!value || value.length < 2) {
+            list.style.display = 'none';
+            return;
+        }
+        
+        const matches = allCities.filter(city => 
+            city.toLowerCase().includes(value.toLowerCase())
+        ).slice(0, 5);
+        
         if (matches.length > 0) {
-            list.innerHTML = matches.map(city => `<div class="autocomplete-item" onclick="selectEditCity('${city}')">${city}</div>`).join('');
+            list.innerHTML = matches.map(city => `
+                <div class="autocomplete-item" onclick="selectEditCity('${city}')">${city}</div>
+            `).join('');
             list.style.display = 'block';
-        } else list.style.display = 'none';
+        } else {
+            list.style.display = 'none';
+        }
     }
 
-    function selectCity(city) { triggerHapticFeedback(); document.getElementById('skillCity').value = city; document.getElementById('cityAutocompleteList').style.display = 'none'; }
-    function selectSearchCity(city) { triggerHapticFeedback(); document.getElementById('searchCity').value = city; document.getElementById('searchCityAutocompleteList').style.display = 'none'; }
-    function selectEditCity(city) { triggerHapticFeedback(); document.getElementById('editSkillCity').value = city; document.getElementById('editCityAutocompleteList').style.display = 'none'; }
+    function selectCity(city) {
+        triggerHapticFeedback();
+        document.getElementById('skillCity').value = city;
+        document.getElementById('cityAutocompleteList').style.display = 'none';
+    }
+
+    function selectSearchCity(city) {
+        triggerHapticFeedback();
+        document.getElementById('searchCity').value = city;
+        document.getElementById('searchCityAutocompleteList').style.display = 'none';
+    }
+
+    function selectEditCity(city) {
+        triggerHapticFeedback();
+        document.getElementById('editSkillCity').value = city;
+        document.getElementById('editCityAutocompleteList').style.display = 'none';
+    }
 
     function selectRadius(radius) {
+        console.log('🔄 Выбор радиуса:', radius);
         currentRadius = radius;
+        
         document.querySelectorAll('#masterSection .radius-option').forEach(option => {
             option.classList.remove('selected');
-            if (parseInt(option.dataset.radius) === radius) option.classList.add('selected');
+            if (parseInt(option.dataset.radius) === radius) {
+                option.classList.add('selected');
+            }
         });
     }
 
     function selectEditRadius(radius) {
+        console.log('🔄 Выбор радиуса (редактирование):', radius);
         currentEditRadius = radius;
+        
         document.querySelectorAll('#editSkillModal .radius-option').forEach(option => {
             option.classList.remove('selected');
-            if (parseInt(option.dataset.radius) === radius) option.classList.add('selected');
+            if (parseInt(option.dataset.radius) === radius) {
+                option.classList.add('selected');
+            }
         });
     }
 
     function triggerHapticFeedback() {
-        try { if (window.Telegram?.WebApp?.HapticFeedback) { window.Telegram.WebApp.HapticFeedback.impactOccurred('medium'); return; } } catch(e) {}
-        try { if (navigator.vibrate) navigator.vibrate(20); } catch(e) {}
+        console.log('📳 Попытка вибрации...');
+        
+        try {
+            if (window.Telegram?.WebApp?.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+                console.log('✅ Вибрация Telegram (impact) сработала');
+                
+                setTimeout(() => {
+                    try {
+                        window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                    } catch (e) {}
+                }, 10);
+                
+                return;
+            }
+        } catch (error) {
+            console.log('❌ Ошибка Telegram HapticFeedback:', error);
+        }
+        
+        try {
+            if (navigator.vibrate) {
+                navigator.vibrate(20);
+                console.log('✅ Вибрация браузера (Vibration API) сработала');
+                return;
+            }
+        } catch (error) {
+            console.log('❌ Ошибка Vibration API:', error);
+        }
     }
+
     window.triggerHapticFeedback = triggerHapticFeedback;
 
     function selectMasterStatus(status) {
+        console.log('🔄 Выбор статуса (создание):', status);
         currentMasterStatus = status;
+        
         const readyOption = document.getElementById('statusReadyOption');
         const busyOption = document.getElementById('statusBusyOption');
+        
         if (readyOption) readyOption.classList.remove('selected');
         if (busyOption) busyOption.classList.remove('selected');
-        if (status === 'ready') { if (readyOption) readyOption.classList.add('selected'); }
-        else { if (busyOption) busyOption.classList.add('selected'); }
+        
+        if (status === 'ready') {
+            if (readyOption) readyOption.classList.add('selected');
+        } else {
+            if (busyOption) busyOption.classList.add('selected');
+        }
+        
+        console.log('✅ Текущий статус:', currentMasterStatus);
     }
     
     function selectEditMasterStatus(status) {
+        console.log('🔄 Выбор статуса (редактирование):', status);
         currentEditMasterStatus = status;
+        
         const readyOption = document.getElementById('editStatusReadyOption');
         const busyOption = document.getElementById('editStatusBusyOption');
+        
         if (readyOption) readyOption.classList.remove('selected');
         if (busyOption) busyOption.classList.remove('selected');
-        if (status === 'ready') { if (readyOption) readyOption.classList.add('selected'); }
-        else { if (busyOption) busyOption.classList.add('selected'); }
+        
+        if (status === 'ready') {
+            if (readyOption) readyOption.classList.add('selected');
+        } else {
+            if (busyOption) busyOption.classList.add('selected');
+        }
+        
+        console.log('✅ Текущий статус редактирования:', currentEditMasterStatus);
     }
     
     function getStatusBadge(status) {
-        if (!status || status === 'ready') return `<div class="master-status status-ready"><span class="status-indicator indicator-ready"></span>✅ Готов к работе</div>`;
-        else return `<div class="master-status status-busy"><span class="status-indicator indicator-busy"></span>⏰ Временно занят</div>`;
+        if (!status || status === 'ready') {
+            return `<div class="master-status status-ready">
+                        <span class="status-indicator indicator-ready"></span>
+                        ✅ Готов к работе
+                    </div>`;
+        } else {
+            return `<div class="master-status status-busy">
+                        <span class="status-indicator indicator-busy"></span>
+                        ⏰ Временно занят
+                    </div>`;
+        }
     }
 
     function getPaymentStatusBadge(status) {
-        const badges = { 'pending': '<div class="payment-status-badge payment-pending">⏳ Ожидает оплаты</div>', 'paid': '<div class="payment-status-badge payment-paid">✅ Оплачено (в эскроу)</div>', 'released': '<div class="payment-status-badge payment-released">💸 Выплачено мастеру</div>', 'refunded': '<div class="payment-status-badge payment-refunded">↩️ Возвращено клиенту</div>' };
+        const badges = {
+            'pending': '<div class="payment-status-badge payment-pending">⏳ Ожидает оплаты</div>',
+            'paid': '<div class="payment-status-badge payment-paid">✅ Оплачено (в эскроу)</div>',
+            'released': '<div class="payment-status-badge payment-released">💸 Выплачено мастеру</div>',
+            'refunded': '<div class="payment-status-badge payment-refunded">↩️ Возвращено клиенту</div>'
+        };
         return badges[status] || badges['pending'];
     }
 
-    function getCoinsData() { return getLocalStorage(`coins_${currentUserId}`) || 0; }
-    function saveCoinsData(coins) { setLocalStorage(`coins_${currentUserId}`, coins); }
-    function addCoin() { const newCoins = getCoinsData() + 1; saveCoinsData(newCoins); const userData = getOrCreateUserProfile(currentUserId); userData.completedDeals = (userData.completedDeals || 0) + 1; setLocalStorage(`user_${currentUserId}`, userData); loadUserProfile(); return newCoins; }
-
-    function getReferralData() { return getLocalStorage(`referral_${currentUserId}`) || { referralCount: 0, starsEarned: 0, referralLink: '', invitedFriends: [] }; }
-    function saveReferralData(data) { setLocalStorage(`referral_${currentUserId}`, data); }
-    function updateReferralStats() { const data = getReferralData(); document.getElementById('referralCount').textContent = data.referralCount; document.getElementById('starsEarned').textContent = data.starsEarned; document.getElementById('referralLinkText').textContent = generateReferralLink(); updateReferralFriendsList(data.invitedFriends); const userData = getOrCreateUserProfile(currentUserId); setLocalStorage(`user_${currentUserId}`, userData); displayInviterBlock(); }
-    function generateReferralLink() { return `${TELEGRAM_BOT_URL}?start=${currentUserId}`; }
-    function updateReferralFriendsList(friends) {
-        const listElement = document.getElementById('referralFriendsList');
-        if (!friends || friends.length === 0) { listElement.innerHTML = `<div style="text-align: center; color: rgba(255,255,255,0.7); padding: 30px;"><div style="font-size: 50px; margin-bottom: 15px;">👥</div><div style="font-size: 16px;">Вы пока никого не пригласили</div><div style="opacity: 0.7; margin-top: 5px; font-size: 14px;">Поделитесь реферальной ссылкой с друзьями</div></div>`; return; }
-        listElement.innerHTML = friends.map((friend, index) => `<div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #667eea;"><div style="display: flex; justify-content: space-between; align-items: center;"><div><div style="font-weight: bold; color: white;">${friend.name || `Друг ${index + 1}`}</div><div style="font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 5px;">Приглашён: ${new Date(friend.invitedAt).toLocaleDateString('ru-RU')}</div></div><div style="display: flex; align-items: center; gap: 10px;">${friend.registered ? `<div style="background: #48bb78; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">✅ Зарегистрирован</div>` : `<div style="background: #ed8936; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">⏳ Ожидает регистрации</div>`}${friend.registered ? `<div style="background: #f6e05e; color: #744210; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">⭐ +1 звезда</div>` : ''}</div></div></div>`).join('');
+    function getCoinsData() {
+        const data = getLocalStorage(`coins_${currentUserId}`);
+        return data || 0;
     }
 
-    function addReferralFriend(friendId, friendName = '') { const data = getReferralData(); if (data.invitedFriends.find(f => f.id === friendId)) return false; data.invitedFriends.push({ id: friendId, name: friendName, invitedAt: new Date().toISOString(), registered: false }); saveReferralData(data); updateReferralStats(); return true; }
-    function markFriendAsRegistered(friendId) { const data = getReferralData(); const friendIndex = data.invitedFriends.findIndex(f => f.id === friendId); if (friendIndex !== -1 && !data.invitedFriends[friendIndex].registered) { data.invitedFriends[friendIndex].registered = true; data.invitedFriends[friendIndex].registeredAt = new Date().toISOString(); data.referralCount += 1; data.starsEarned += 1; saveReferralData(data); updateReferralStats(); showNotification(`🎉 Ваш друг зарегистрировался! Вы получили +1 звезду!`); return true; } return false; }
+    function saveCoinsData(coins) {
+        setLocalStorage(`coins_${currentUserId}`, coins);
+    }
+
+    function addCoin() {
+        const currentCoins = getCoinsData();
+        const newCoins = currentCoins + 1;
+        saveCoinsData(newCoins);
+        console.log(`🪙 +1 монета. Всего: ${newCoins}`);
+        
+        const userData = getOrCreateUserProfile(currentUserId);
+        userData.completedDeals = (userData.completedDeals || 0) + 1;
+        setLocalStorage(`user_${currentUserId}`, userData);
+        
+        loadUserProfile();
+        return newCoins;
+    }
+
+    function getReferralData() {
+        const data = getLocalStorage(`referral_${currentUserId}`);
+        return data || {
+            referralCount: 0,
+            starsEarned: 0,
+            referralLink: '',
+            invitedFriends: []
+        };
+    }
+
+    function saveReferralData(data) {
+        setLocalStorage(`referral_${currentUserId}`, data);
+    }
+
+    function updateReferralStats() {
+        const data = getReferralData();
+        
+        document.getElementById('referralCount').textContent = data.referralCount;
+        document.getElementById('starsEarned').textContent = data.starsEarned;
+        
+        const referralLink = generateReferralLink();
+        document.getElementById('referralLinkText').textContent = referralLink;
+        
+        updateReferralFriendsList(data.invitedFriends);
+        
+        const userData = getOrCreateUserProfile(currentUserId);
+        setLocalStorage(`user_${currentUserId}`, userData);
+    }
+
+    function generateReferralLink() {
+        return `${TELEGRAM_BOT_URL}?start=${currentUserId}`;
+    }
+
+    function updateReferralFriendsList(friends) {
+        const listElement = document.getElementById('referralFriendsList');
+        
+        if (!friends || friends.length === 0) {
+            listElement.innerHTML = `
+                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 30px;">
+                    <div style="font-size: 50px; margin-bottom: 15px;">👥</div>
+                    <div style="font-size: 16px;">Вы пока никого не пригласили</div>
+                    <div style="opacity: 0.7; margin-top: 5px; font-size: 14px;">Поделитесь реферальной ссылкой с друзьями</div>
+                </div>
+            `;
+            return;
+        }
+        
+        listElement.innerHTML = friends.map((friend, index) => `
+            <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #667eea;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-weight: bold; color: white;">${friend.name || `Друг ${index + 1}`}</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 5px;">
+                            Приглашён: ${new Date(friend.invitedAt).toLocaleDateString('ru-RU')}
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        ${friend.registered ? 
+                            `<div style="background: #48bb78; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+                                ✅ Зарегистрирован
+                            </div>` : 
+                            `<div style="background: #ed8936; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+                                ⏳ Ожидает регистрации
+                            </div>`
+                        }
+                        ${friend.registered ? 
+                            `<div style="background: #f6e05e; color: #744210; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+                                ⭐ +1 звезда
+                            </div>` : ''
+                        }
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addReferralFriend(friendId, friendName = '') {
+        const data = getReferralData();
+        
+        const existingFriend = data.invitedFriends.find(f => f.id === friendId);
+        if (existingFriend) {
+            return false;
+        }
+        
+        data.invitedFriends.push({
+            id: friendId,
+            name: friendName,
+            invitedAt: new Date().toISOString(),
+            registered: false
+        });
+        
+        saveReferralData(data);
+        updateReferralStats();
+        
+        return true;
+    }
+
+    function markFriendAsRegistered(friendId) {
+        const data = getReferralData();
+        
+        const friendIndex = data.invitedFriends.findIndex(f => f.id === friendId);
+        if (friendIndex !== -1 && !data.invitedFriends[friendIndex].registered) {
+            data.invitedFriends[friendIndex].registered = true;
+            data.invitedFriends[friendIndex].registeredAt = new Date().toISOString();
+            
+            data.referralCount += 1;
+            data.starsEarned += 1;
+            
+            saveReferralData(data);
+            updateReferralStats();
+            
+            showNotification(`🎉 Ваш друг зарегистрировался! Вы получили +1 звезду!`);
+            
+            return true;
+        }
+        
+        return false;
+    }
 
     function processReferralLink() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const referrerId = urlParams.get('ref') || urlParams.get('start');
+            
             if (referrerId && referrerId !== currentUserId && !referrerId.startsWith('skill_')) {
-                processInviterFromLink(referrerId);
                 const referrerData = getOrCreateUserProfile(referrerId);
+                
                 addReferralFriend(currentUserId, referrerData.firstName || 'Друг');
-                setTimeout(() => markFriendAsRegistered(currentUserId), 1000);
+                
+                setTimeout(() => {
+                    markFriendAsRegistered(currentUserId);
+                }, 1000);
+                
                 console.log(`✅ Пользователь ${currentUserId} зарегистрирован по реферальной ссылке от ${referrerId}`);
             }
-        } catch (error) { console.error('❌ Ошибка обработки реферальной ссылки:', error); }
+        } catch (error) {
+            console.error('❌ Ошибка обработки реферальной ссылки:', error);
+        }
     }
 
-    function getLocalStorage(key) { try { const data = localStorage.getItem(key); return data ? JSON.parse(data) : null; } catch (error) { console.error('❌ Ошибка чтения из localStorage:', error); return null; } }
-    function setLocalStorage(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (error) { console.error('❌ Ошибка записи в localStorage:', error); return false; } }
+    function getLocalStorage(key) {
+        try {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : null;
+        } catch (error) {
+            console.error('❌ Ошибка чтения из localStorage:', error);
+            return null;
+        }
+    }
 
-    const demoUserData = { firstName: 'Пользователь', age: null, experience: '', contact: '', bio: 'Расскажите о себе...', avatar: null, skills: [], rating: 0, completedDeals: 0, dealsCount: 0 };
+    function setLocalStorage(key, value) {
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+            return true;
+        } catch (error) {
+            console.error('❌ Ошибка записи в localStorage:', error);
+            return false;
+        }
+    }
 
-    function getGlobalDeals() { return getLocalStorage('ymeyka_global_deals') || []; }
-    function setGlobalDeals(deals) { return setLocalStorage('ymeyka_global_deals', deals); }
-    function getUserDeals(userId) { const globalDeals = getGlobalDeals(); return globalDeals.filter(deal => deal.clientId === userId || deal.masterId === userId); }
-    function getOrCreateUserProfile(userId, userName = 'Пользователь') { let userData = getLocalStorage(`user_${userId}`); if (!userData) { userData = { ...demoUserData, firstName: userName, userId: userId }; setLocalStorage(`user_${userId}`, userData); } return userData; }
-    function addGlobalDeal(deal) { const globalDeals = getGlobalDeals(); globalDeals.push(deal); setGlobalDeals(globalDeals); return deal; }
-    function updateGlobalDeal(dealId, updates) { const globalDeals = getGlobalDeals(); const dealIndex = globalDeals.findIndex(deal => deal.id === dealId); if (dealIndex !== -1) { globalDeals[dealIndex] = { ...globalDeals[dealIndex], ...updates }; setGlobalDeals(globalDeals); return globalDeals[dealIndex]; } return null; }
-    function getDealById(dealId) { const globalDeals = getGlobalDeals(); return globalDeals.find(deal => deal.id === dealId); }
+    const demoUserData = {
+        firstName: 'Пользователь',
+        age: null,
+        experience: '',
+        contact: '',
+        bio: 'Расскажите о себе...',
+        avatar: null,
+        skills: [],
+        rating: 0,
+        completedDeals: 0,
+        dealsCount: 0
+    };
 
-    function getGlobalSkills() { return getLocalStorage('ymeyka_global_skills') || []; }
-    function setGlobalSkills(skills) { return setLocalStorage('ymeyka_global_skills', skills); }
-    function addGlobalSkill(skill) { const globalSkills = getGlobalSkills(); const existingIndex = globalSkills.findIndex(s => s._id === skill._id); if (existingIndex !== -1) globalSkills[existingIndex] = skill; else globalSkills.push(skill); setGlobalSkills(globalSkills); console.log(`✅ Умейка добавлена/обновлена в глобальном хранилище:`, skill); return skill; }
-    function updateGlobalSkillStatus(skillId, status) { const globalSkills = getGlobalSkills(); const skillIndex = globalSkills.findIndex(s => s._id === skillId); if (skillIndex !== -1) { globalSkills[skillIndex].status = status; globalSkills[skillIndex].updatedAt = new Date().toISOString(); setGlobalSkills(globalSkills); return globalSkills[skillIndex]; } return null; }
-    function getGlobalSkillById(skillId) { const globalSkills = getGlobalSkills(); return globalSkills.find(s => s._id === skillId); }
+    function getGlobalDeals() {
+        return getLocalStorage('ymeyka_global_deals') || [];
+    }
+    
+    function setGlobalDeals(deals) {
+        return setLocalStorage('ymeyka_global_deals', deals);
+    }
+    
+    function getUserDeals(userId) {
+        const globalDeals = getGlobalDeals();
+        console.log(`🔍 Поиск сделок для пользователя ${userId}:`, globalDeals);
+        return globalDeals.filter(deal => {
+            const isClient = deal.clientId === userId;
+            const isMaster = deal.masterId === userId;
+            console.log(`   Сделка ${deal.id}: clientId=${deal.clientId}, masterId=${deal.masterId}, isClient=${isClient}, isMaster=${isMaster}`);
+            return isClient || isMaster;
+        });
+    }
+    
+    function getOrCreateUserProfile(userId, userName = 'Пользователь') {
+        let userData = getLocalStorage(`user_${userId}`);
+        if (!userData) {
+            userData = {
+                ...demoUserData,
+                firstName: userName,
+                userId: userId
+            };
+            setLocalStorage(`user_${userId}`, userData);
+            console.log(`✅ Создан профиль для пользователя ${userId}:`, userData);
+        }
+        return userData;
+    }
+    
+    function addGlobalDeal(deal) {
+        const globalDeals = getGlobalDeals();
+        globalDeals.push(deal);
+        setGlobalDeals(globalDeals);
+        console.log(`✅ Сделка добавлена в глобальное хранилище:`, deal);
+        return deal;
+    }
+    
+    function updateGlobalDeal(dealId, updates) {
+        const globalDeals = getGlobalDeals();
+        const dealIndex = globalDeals.findIndex(deal => deal.id === dealId);
+        
+        if (dealIndex !== -1) {
+            globalDeals[dealIndex] = { ...globalDeals[dealIndex], ...updates };
+            setGlobalDeals(globalDeals);
+            console.log(`✅ Сделка обновлена:`, globalDeals[dealIndex]);
+            return globalDeals[dealIndex];
+        }
+        return null;
+    }
+    
+    function getDealById(dealId) {
+        const globalDeals = getGlobalDeals();
+        return globalDeals.find(deal => deal.id === dealId);
+    }
 
-    function syncGlobalSkills() { const skills = getGlobalSkills(); setGlobalSkills(skills); window.dispatchEvent(new CustomEvent('skillsUpdated', { detail: skills })); console.log('🔄 Глобальные умейки синхронизированы:', skills.length); }
+    function getGlobalSkills() {
+        return getLocalStorage('ymeyka_global_skills') || [];
+    }
+    
+    function setGlobalSkills(skills) {
+        return setLocalStorage('ymeyka_global_skills', skills);
+    }
+    
+    function addGlobalSkill(skill) {
+        const globalSkills = getGlobalSkills();
+        const existingIndex = globalSkills.findIndex(s => s._id === skill._id);
+        if (existingIndex !== -1) {
+            globalSkills[existingIndex] = skill;
+        } else {
+            globalSkills.push(skill);
+        }
+        setGlobalSkills(globalSkills);
+        console.log(`✅ Умейка добавлена/обновлена в глобальном хранилище:`, skill);
+        return skill;
+    }
+    
+    function updateGlobalSkillStatus(skillId, status) {
+        const globalSkills = getGlobalSkills();
+        const skillIndex = globalSkills.findIndex(s => s._id === skillId);
+        
+        if (skillIndex !== -1) {
+            globalSkills[skillIndex].status = status;
+            globalSkills[skillIndex].updatedAt = new Date().toISOString();
+            setGlobalSkills(globalSkills);
+            console.log(`✅ Статус умейки обновлен в глобальном хранилище:`, skillId, status);
+            return globalSkills[skillIndex];
+        }
+        return null;
+    }
+    
+    function getGlobalSkillById(skillId) {
+        const globalSkills = getGlobalSkills();
+        return globalSkills.find(s => s._id === skillId);
+    }
 
     async function compressImage(file, maxWidth = 800, maxHeight = 600, quality = 0.7) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
+            
             reader.onload = function(event) {
                 const img = new Image();
                 img.src = event.target.result;
+                
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    let width = img.width, height = img.height;
-                    if (width > height) { if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; } }
-                    else { if (height > maxHeight) { width = Math.round((width * maxHeight) / height); height = maxHeight; } }
-                    canvas.width = width; canvas.height = height;
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
+                    
                     const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-                    resolve({ dataUrl: compressedDataUrl, originalSize: file.size, compressedSize: (compressedDataUrl.length * 0.75) / 1024 });
+                    
+                    resolve({
+                        dataUrl: compressedDataUrl,
+                        originalSize: file.size,
+                        compressedSize: (compressedDataUrl.length * 0.75) / 1024
+                    });
                 };
-                img.onerror = reject;
+                
+                img.onerror = function(error) {
+                    reject(new Error('Ошибка загрузки изображения'));
+                };
             };
-            reader.onerror = reject;
+            
+            reader.onerror = function(error) {
+                reject(new Error('Ошибка чтения файла'));
+            };
         });
     }
 
@@ -4365,53 +4556,211 @@
         triggerHapticFeedback();
         const file = event.target.files[0];
         if (!file) return;
+        
         const statusElement = document.getElementById('photoCompressionStatus');
         statusElement.style.display = 'block';
         statusElement.textContent = '⚡ Сжимаю фото...';
+        
         try {
-            if (file.size > 5 * 1024 * 1024) { alert('❌ Файл слишком большой. Максимальный размер: 5MB'); statusElement.style.display = 'none'; return; }
-            if (!file.type.match('image.*')) { alert('❌ Пожалуйста, выберите изображение'); statusElement.style.display = 'none'; return; }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('❌ Файл слишком большой. Максимальный размер: 5MB');
+                statusElement.style.display = 'none';
+                return;
+            }
+            
+            if (!file.type.match('image.*')) {
+                alert('❌ Пожалуйста, выберите изображение');
+                statusElement.style.display = 'none';
+                return;
+            }
+            
             const compressed = await compressImage(file, 800, 600, 0.7);
             currentSkillPhoto = compressed.dataUrl;
+            
             const preview = document.getElementById('skillPhotoPreview');
             const img = document.getElementById('skillPhotoImg');
             img.src = currentSkillPhoto;
             preview.style.display = 'block';
+            
             statusElement.textContent = `✅ Фото сжато до ${compressed.compressedSize.toFixed(2)}KB`;
             statusElement.style.color = '#48bb78';
-            setTimeout(() => statusElement.style.display = 'none', 3000);
+            
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 3000);
+            
         } catch (error) {
             console.error('❌ Ошибка сжатия фото:', error);
             statusElement.textContent = '❌ Ошибка сжатия фото';
             statusElement.style.color = '#e53e3e';
+            
             const reader = new FileReader();
-            reader.onload = function(e) { currentSkillPhoto = e.target.result; const preview = document.getElementById('skillPhotoPreview'); const img = document.getElementById('skillPhotoImg'); img.src = currentSkillPhoto; preview.style.display = 'block'; statusElement.textContent = '⚠️ Используется оригинальное фото'; statusElement.style.color = '#ed8936'; };
+            reader.onload = function(e) {
+                currentSkillPhoto = e.target.result;
+                const preview = document.getElementById('skillPhotoPreview');
+                const img = document.getElementById('skillPhotoImg');
+                img.src = currentSkillPhoto;
+                preview.style.display = 'block';
+                
+                statusElement.textContent = '⚠️ Используется оригинальное фото';
+                statusElement.style.color = '#ed8936';
+            };
             reader.readAsDataURL(file);
         }
     };
-    window.removeSkillPhoto = function() { triggerHapticFeedback(); currentSkillPhoto = null; document.getElementById('skillPhotoPreview').style.display = 'none'; document.getElementById('skillPhotoInput').value = ''; document.getElementById('photoCompressionStatus').style.display = 'none'; };
-    window.handleEditSkillPhotoUpload = async function(event) { /* аналогично */ };
-    window.removeEditSkillPhoto = function() { /* аналогично */ };
 
-    function saveSkillToLocalStorage(skill) { const userId = currentUserId || 'demo-user'; if (!localSkills[userId]) localSkills[userId] = []; if (skill._id) { const index = localSkills[userId].findIndex(s => s._id === skill._id); if (index !== -1) localSkills[userId][index] = skill; else localSkills[userId].push(skill); } else localSkills[userId].push(skill); setLocalStorage(`skills_${userId}`, localSkills[userId]); }
-    function loadSkillsFromLocalStorage(userId) { const skills = getLocalStorage(`skills_${userId}`); if (skills) { localSkills[userId] = skills; return skills; } return []; }
-    function deleteSkillFromLocalStorage(skillId) { const userId = currentUserId || 'demo-user'; if (localSkills[userId]) { localSkills[userId] = localSkills[userId].filter(s => s._id !== skillId); setLocalStorage(`skills_${userId}`, localSkills[userId]); return true; } return false; }
+    window.removeSkillPhoto = function() {
+        triggerHapticFeedback();
+        currentSkillPhoto = null;
+        const preview = document.getElementById('skillPhotoPreview');
+        preview.style.display = 'none';
+        document.getElementById('skillPhotoInput').value = '';
+        
+        const statusElement = document.getElementById('photoCompressionStatus');
+        statusElement.style.display = 'none';
+    };
 
-    // ОСНОВНАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ УМЕЙКИ (ИСПРАВЛЕНА)
+    window.handleEditSkillPhotoUpload = async function(event) {
+        triggerHapticFeedback();
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const statusElement = document.getElementById('editPhotoCompressionStatus');
+        statusElement.style.display = 'block';
+        statusElement.textContent = '⚡ Сжимаю фото...';
+        
+        try {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('❌ Файл слишком большой. Максимальный размер: 5MB');
+                statusElement.style.display = 'none';
+                return;
+            }
+            
+            if (!file.type.match('image.*')) {
+                alert('❌ Пожалуйста, выберите изображение');
+                statusElement.style.display = 'none';
+                return;
+            }
+            
+            const compressed = await compressImage(file, 800, 600, 0.7);
+            editSkillPhoto = compressed.dataUrl;
+            
+            const preview = document.getElementById('editSkillPhotoPreview');
+            const img = document.getElementById('editSkillPhotoImg');
+            img.src = editSkillPhoto;
+            preview.style.display = 'block';
+            
+            statusElement.textContent = `✅ Фото сжато до ${compressed.compressedSize.toFixed(2)}KB`;
+            statusElement.style.color = '#48bb78';
+            
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 3000);
+            
+        } catch (error) {
+            console.error('❌ Ошибка сжатия фото:', error);
+            statusElement.textContent = '❌ Ошибка сжатия фото';
+            statusElement.style.color = '#e53e3e';
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                editSkillPhoto = e.target.result;
+                const preview = document.getElementById('editSkillPhotoPreview');
+                const img = document.getElementById('editSkillPhotoImg');
+                img.src = editSkillPhoto;
+                preview.style.display = 'block';
+                
+                statusElement.textContent = '⚠️ Используется оригинальное фото';
+                statusElement.style.color = '#ed8936';
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    window.removeEditSkillPhoto = function() {
+        triggerHapticFeedback();
+        editSkillPhoto = null;
+        const preview = document.getElementById('editSkillPhotoPreview');
+        preview.style.display = 'none';
+        document.getElementById('editSkillPhotoInput').value = '';
+        
+        const statusElement = document.getElementById('editPhotoCompressionStatus');
+        statusElement.style.display = 'none';
+    };
+
+    function saveSkillToLocalStorage(skill) {
+        const userId = currentUserId || 'demo-user';
+        if (!localSkills[userId]) {
+            localSkills[userId] = [];
+        }
+        
+        if (skill._id) {
+            const index = localSkills[userId].findIndex(s => s._id === skill._id);
+            if (index !== -1) {
+                localSkills[userId][index] = skill;
+            } else {
+                localSkills[userId].push(skill);
+            }
+        } else {
+            localSkills[userId].push(skill);
+        }
+        
+        setLocalStorage(`skills_${userId}`, localSkills[userId]);
+        console.log(`💾 Умейка сохранена в localStorage для пользователя ${userId}`);
+    }
+
+    function loadSkillsFromLocalStorage(userId) {
+        const skills = getLocalStorage(`skills_${userId}`);
+        if (skills) {
+            localSkills[userId] = skills;
+            console.log(`📦 Загружено ${skills.length} умейок из localStorage для пользователя ${userId}`);
+            return skills;
+        }
+        return [];
+    }
+
+    function deleteSkillFromLocalStorage(skillId) {
+        const userId = currentUserId || 'demo-user';
+        if (localSkills[userId]) {
+            localSkills[userId] = localSkills[userId].filter(s => s._id !== skillId);
+            setLocalStorage(`skills_${userId}`, localSkills[userId]);
+            console.log(`🗑️ Умейка ${skillId} удалена из localStorage`);
+            return true;
+        }
+        return false;
+    }
+
     window.addSkill = async function() {
         triggerHapticFeedback();
+        
         try {
             const skillName = document.getElementById('skillName').value;
             const skillExperience = document.getElementById('skillExperience').value;
             const skillPrice = document.getElementById('skillPrice').value;
             const skillCity = document.getElementById('skillCity').value;
             
-            if (!skillName.trim() || !skillExperience.trim() || !skillPrice || !skillCity.trim()) { alert('❌ Заполните все обязательные поля (отмечены *)'); return; }
-            if (skillCity.trim().length < 2) { alert('❌ Название города должно содержать минимум 2 символа'); return; }
+            if (!skillName.trim() || !skillExperience.trim() || !skillPrice || !skillCity.trim()) {
+                alert('❌ Заполните все обязательные поля (отмечены *)');
+                return;
+            }
+            
+            if (skillCity.trim().length < 2) {
+                alert('❌ Название города должно содержать минимум 2 символа');
+                return;
+            }
 
             const userData = getOrCreateUserProfile(currentUserId);
+        
             const userId = currentUserId;
-            if (!userId || userId === 'null' || userId === 'undefined') { alert('❌ Ошибка: не определен ID пользователя. Перезагрузите страницу.'); return; }
+            console.log('👤 Добавляю умейку для User ID:', userId);
+            console.log('📊 Статус при создании:', currentMasterStatus);
+            console.log('📍 Город:', skillCity);
+            console.log('📏 Радиус:', currentRadius);
+        
+            if (!userId || userId === 'null' || userId === 'undefined') {
+                alert('❌ Ошибка: не определен ID пользователя. Перезагрузите страницу.');
+                return;
+            }
 
             const cityCoords = getCityCoordinates(skillCity);
             const location = cityCoords || userLocation || { lat: 55.7558, lon: 37.6173 };
@@ -4425,44 +4774,2453 @@
                 location: location,
                 userId: userId,
                 username: userData.firstName || 'Аноним',
-                status: currentMasterStatus,
-                _id: 'skill_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                createdAt: new Date().toISOString(),
-                local: true
+                status: currentMasterStatus
             };
-            if (currentSkillPhoto) skillData.photo = currentSkillPhoto;
 
-            // Генерация QR-кода
-            const { dataUrl, qrData } = await generateSkillQR(skillData._id, skillData.skill);
-            skillData.qrCode = dataUrl;
-            skillData.qrCodeData = qrData;
+            console.log('📤 Отправляю данные на сервер:', skillData);
 
-            // Сохраняем локально и в глобальное хранилище (видно всем)
-            addGlobalSkill(skillData);
-            saveSkillToLocalStorage(skillData);
+            if (currentSkillPhoto) {
+                const estimatedSize = (currentSkillPhoto.length * 0.75) / 1024;
+                console.log(`📊 Размер фото для отправки: ${estimatedSize.toFixed(2)}KB`);
+                
+                if (estimatedSize > 500) {
+                    alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}KB).\nПопробуйте загрузить фото меньшего размера.`);
+                    return;
+                }
+                
+                skillData.photo = currentSkillPhoto;
+                skillData.photoTimestamp = new Date().toISOString();
+            }
+
+            console.log('📤 Итоговые данные для отправки:', skillData);
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                const response = await fetch(`${API_URL}/api/skills`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(skillData),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('📱 Ответ сервера при добавлении:', result);
+                    
+                    if (result.success) {
+                        // Генерируем QR-код для новой умейки
+                        const newSkill = result.skill || skillData;
+                        newSkill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${newSkill._id}`;
+                        addGlobalSkill(newSkill);
+                        
+                        alert('✅ Умейка успешно опубликована!');
+                        
+                        document.getElementById('skillName').value = '';
+                        document.getElementById('skillExperience').value = '';
+                        document.getElementById('skillPrice').value = '';
+                        document.getElementById('skillCity').value = '';
+                        removeSkillPhoto();
+                        currentSkillPhoto = null;
+                        
+                        currentRadius = 10;
+                        selectRadius(10);
+                        
+                        currentMasterStatus = 'ready';
+                        selectMasterStatus('ready');
+                    
+                        setTimeout(() => {
+                            loadMySkills();
+                            loadProfileSkills();
+                        }, 500);
+                    
+                        if (map) {
+                            setTimeout(() => loadSkillsOnMap(), 1000);
+                        }
+                        return;
+                    }
+                }
+            } catch (serverError) {
+                console.log('⚠️ Сервер недоступен, сохраняем локально:', serverError);
+            }
             
-            alert('✅ Умейка успешно опубликована и видна всем!');
+            const localSkill = {
+                ...skillData,
+                _id: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                createdAt: new Date().toISOString(),
+                local: true,
+                qrCodeData: `${TELEGRAM_BOT_URL}?start=skill_local_${Date.now()}`
+            };
             
-            // Очистка формы
+            saveSkillToLocalStorage(localSkill);
+            addGlobalSkill(localSkill);
+            
+            alert('✅ Умейка сохранена локально (сервер недоступен)');
+            
             document.getElementById('skillName').value = '';
             document.getElementById('skillExperience').value = '';
             document.getElementById('skillPrice').value = '';
             document.getElementById('skillCity').value = '';
-            window.removeSkillPhoto();
-            currentRadius = 10; selectRadius(10);
-            currentMasterStatus = 'ready'; selectMasterStatus('ready');
+            removeSkillPhoto();
+            currentSkillPhoto = null;
             
-            syncGlobalSkills();
-            setTimeout(() => { loadMySkills(); loadProfileSkills(); }, 500);
-            if (map) setTimeout(() => loadSkillsOnMap(), 1000);
-        } catch (error) { console.error('Ошибка добавления умейки:', error); alert('❌ Ошибка добавления умейки.'); }
+            currentRadius = 10;
+            selectRadius(10);
+            
+            currentMasterStatus = 'ready';
+            selectMasterStatus('ready');
+        
+            setTimeout(() => {
+                loadMySkills();
+                loadProfileSkills();
+            }, 500);
+        
+            if (map) {
+                setTimeout(() => loadSkillsOnMap(), 1000);
+            }
+            
+        } catch (error) {
+            console.error('Ошибка добавления умейки:', error);
+            alert('❌ Ошибка добавления умейки. Проверьте подключение к интернету.');
+        }
     };
 
-    // Остальные функции (loadMySkills, loadProfileSkills, openEditSkillModal и т.д.) остаются без изменений, 
-    // так как они уже были рабочими. Для краткости я оставлю их в том же виде, что и в вашем финальном коде.
-    // В финальном ответе я приведу полный рабочий код.
-    // ... (продолжение следует)
+    async function loadAllSkillsFromServer() {
+        try {
+            console.log('📡 Загрузка умейок с сервера...');
+            
+            const response = await fetch(`${API_URL}/api/skills`);
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log(`✅ Загружено ${result.skills.length} умейок с сервера`);
+                
+                const globalSkills = getGlobalSkills();
+                result.skills.forEach(skill => {
+                    const existingIndex = globalSkills.findIndex(s => s._id === skill._id);
+                    if (existingIndex !== -1) {
+                        const existing = globalSkills[existingIndex];
+                        if (existing.updatedAt && skill.updatedAt) {
+                            if (new Date(existing.updatedAt) > new Date(skill.updatedAt)) {
+                                skill.status = existing.status;
+                            }
+                        }
+                        // Сохраняем QR данные если они есть
+                        if (existing.qrCode) skill.qrCode = existing.qrCode;
+                        if (existing.qrCodeData) skill.qrCodeData = existing.qrCodeData;
+                        globalSkills[existingIndex] = skill;
+                    } else {
+                        // Добавляем QR данные для новых умейек
+                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                        globalSkills.push(skill);
+                    }
+                });
+                setGlobalSkills(globalSkills);
+                
+                return result.skills;
+            } else {
+                console.error('❌ Ошибка загрузки умейок:', result.error);
+                return getGlobalSkills();
+            }
+        } catch (error) {
+            console.error('❌ Ошибка соединения с сервером:', error);
+            return getGlobalSkills();
+        }
+    }
+
+    async function loadMySkills() {
+        try {
+            console.log('📡 Загрузка моих умейок...');
+            
+            const skillsList = document.getElementById('mySkillsList');
+            if (!skillsList) {
+                console.error('❌ Элемент mySkillsList не найден');
+                return;
+            }
+            
+            skillsList.innerHTML = '<div class="loading">⏳ Загрузка ваших умейок...</div>';
+            
+            const userId = currentUserId || 'demo-user';
+            console.log('🆔 Используем User ID:', userId);
+            
+            let skills = [];
+            
+            try {
+                const response = await fetch(`${API_URL}/api/skills/user/${userId}`);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('📱 Ответ сервера:', result);
+                    
+                    if (result.success && result.skills) {
+                        skills = result.skills;
+                        
+                        skills = skills.map(skill => {
+                            const globalSkill = getGlobalSkillById(skill._id);
+                            if (globalSkill) {
+                                if (globalSkill.updatedAt) {
+                                    if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
+                                        skill.status = globalSkill.status;
+                                    }
+                                }
+                                // Восстанавливаем QR данные
+                                if (globalSkill.qrCode) skill.qrCode = globalSkill.qrCode;
+                                if (globalSkill.qrCodeData) skill.qrCodeData = globalSkill.qrCodeData;
+                            }
+                            // Убедимся что QR данные есть
+                            if (!skill.qrCodeData) {
+                                skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                            }
+                            return skill;
+                        });
+                    }
+                }
+            } catch (serverError) {
+                console.log('⚠️ Сервер недоступен, загружаем локальные умейки');
+            }
+            
+            const localUserSkills = loadSkillsFromLocalStorage(userId);
+            skills = [...skills, ...localUserSkills.filter(s => s.local)];
+            
+            const globalSkills = getGlobalSkills();
+            const myGlobalSkills = globalSkills.filter(s => s.userId === userId);
+            
+            const existingIds = new Set(skills.map(s => s._id));
+            myGlobalSkills.forEach(skill => {
+                if (!existingIds.has(skill._id)) {
+                    if (!skill.qrCodeData) {
+                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                    }
+                    skills.push(skill);
+                }
+            });
+            
+            const uniqueSkills = [];
+            const seenIds = new Set();
+            for (const skill of skills) {
+                if (!seenIds.has(skill._id)) {
+                    seenIds.add(skill._id);
+                    uniqueSkills.push(skill);
+                }
+            }
+            skills = uniqueSkills;
+            
+            if (skills.length > 0) {
+                skillsList.innerHTML = skills.map(skill => {
+                    const statusBadge = getStatusBadge(skill.status);
+                    const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                    const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
+                    
+                    return `
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-title">${skill.skill} ${isLocal}</div>
+                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                        </div>
+                        
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`)}" 
+                             class="skill-qr-code" 
+                             alt="QR"
+                             onclick="event.stopPropagation(); triggerHapticFeedback(); showQRModal('${skill._id}', '${skill.skill.replace(/'/g, "\\'")}');">
+                        
+                        <div class="skill-price">${skill.price} ₽</div>
+                        
+                        ${statusBadge}
+                        
+                        ${cityInfo}
+                        
+                        <div class="skill-contact-info">
+                            <div class="contact-label">📞 Контакты:</div>
+                            <div class="contact-item">
+                                <span class="contact-icon">📱</span>
+                                <span class="contact-text">${skill.experience || 'Не указано'}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="color: #666; margin: 15px 0 20px;">
+                            👤 ${skill.username}
+                        </div>
+                        
+                        ${skill.photo ? `
+                            <div class="skill-photo">
+                                <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
+                            </div>
+                        ` : ''}
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 15px;">
+                            <button class="edit-button" onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');">
+                                ✏️ Редактировать
+                            </button>
+                            <button class="delete-button" onclick="triggerHapticFeedback(); deleteSkill('${skill._id}');">
+                                🗑️ Удалить
+                            </button>
+                        </div>
+                    </div>
+                `}).join('');
+            } else {
+                skillsList.innerHTML = `
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
+                        <button class="main-button" onclick="triggerHapticFeedback(); showSection('masterSection');" style="padding: 15px; margin-top: 10px;">
+                            ✨ Добавить первую умейку
+                        </button>
+                    </div>
+                `;
+            }
+            
+        } catch (error) {
+            console.error('❌ Неожиданная ошибка загрузки умейок:', error);
+            const skillsList = document.getElementById('mySkillsList');
+            if (skillsList) {
+                skillsList.innerHTML = `
+                    <div class="error-message">
+                        ❌ Неожиданная ошибка<br>
+                        <small>${error.message}</small>
+                    </div>
+                `;
+            }
+        }
+    }
+
+    async function loadProfileSkills() {
+        try {
+            if (!currentUserId) {
+                console.log('👤 Пользователь не определен');
+                return;
+            }
+
+            console.log('📡 Загрузка моих умейок для профиля...');
+            
+            const skillsList = document.getElementById('profileSkillsList');
+            let skills = [];
+            
+            try {
+                const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        skills = result.skills;
+                        
+                        skills = skills.map(skill => {
+                            const globalSkill = getGlobalSkillById(skill._id);
+                            if (globalSkill) {
+                                if (globalSkill.updatedAt) {
+                                    if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
+                                        skill.status = globalSkill.status;
+                                    }
+                                }
+                                if (globalSkill.qrCode) skill.qrCode = globalSkill.qrCode;
+                                if (globalSkill.qrCodeData) skill.qrCodeData = globalSkill.qrCodeData;
+                            }
+                            if (!skill.qrCodeData) {
+                                skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                            }
+                            return skill;
+                        });
+                    }
+                }
+            } catch (serverError) {
+                console.log('⚠️ Сервер недоступен для загрузки умейок в профиль');
+            }
+            
+            const localUserSkills = loadSkillsFromLocalStorage(currentUserId);
+            skills = [...skills, ...localUserSkills.filter(s => s.local)];
+            
+            const globalSkills = getGlobalSkills();
+            const myGlobalSkills = globalSkills.filter(s => s.userId === currentUserId);
+            
+            const existingIds = new Set(skills.map(s => s._id));
+            myGlobalSkills.forEach(skill => {
+                if (!existingIds.has(skill._id)) {
+                    if (!skill.qrCodeData) {
+                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                    }
+                    skills.push(skill);
+                }
+            });
+            
+            const uniqueSkills = [];
+            const seenIds = new Set();
+            for (const skill of skills) {
+                if (!seenIds.has(skill._id)) {
+                    seenIds.add(skill._id);
+                    uniqueSkills.push(skill);
+                }
+            }
+            skills = uniqueSkills;
+            
+            if (skills.length > 0) {
+                skillsList.innerHTML = skills.map(skill => {
+                    const statusBadge = getStatusBadge(skill.status);
+                    const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                    const cityInfo = skill.city ? `<div class="city-info" style="background: rgba(102,126,234,0.08); margin: 10px 0; padding: 8px 12px; border-radius: 8px; font-size: 14px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
+                    
+                    return `
+                    <div class="profile-skill-card">
+                        <div class="profile-skill-header">
+                            <div class="skill-title">${skill.skill} ${isLocal}</div>
+                            <div class="skill-price">${skill.price} ₽</div>
+                        </div>
+                        
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`)}" 
+                             class="skill-qr-code" 
+                             alt="QR"
+                             onclick="event.stopPropagation(); triggerHapticFeedback(); showQRModal('${skill._id}', '${skill.skill.replace(/'/g, "\\'")}');">
+                        
+                        ${statusBadge}
+                        
+                        ${cityInfo}
+                        
+                        <div class="skill-contact-info">
+                            <div class="contact-item">
+                                <span class="contact-icon">📱</span>
+                                <span class="contact-text">${skill.experience || 'Не указано'}</span>
+                            </div>
+                        </div>
+                        
+                        ${skill.photo ? `
+                            <div class="skill-photo" style="height: 150px; margin: 15px 0;">
+                                <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+                            </div>
+                        ` : ''}
+                        <div style="color: #666; margin: 15px 0;">⭐ Рейтинг: ${skill.rating?.average?.toFixed(1) || '5.0'}/5</div>
+                        <div style="color: #48bb78; font-size: 12px; margin: 15px 0;">
+                            👁️ ${skill.views || 0} просмотров • 💬 ${skill.contacts || 0} контактов
+                        </div>
+                        <div class="skill-actions">
+                            <button class="edit-button" onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
+                                ✏️
+                            </button>
+                            <button class="delete-button" onclick="triggerHapticFeedback(); deleteSkill('${skill._id}');" style="padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer;">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `}).join('');
+            } else {
+                skillsList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">У вас пока нет добавленных умейок</div>';
+            }
+            
+        } catch (error) {
+            console.error('Ошибка загрузки умейок:', error);
+            document.getElementById('profileSkillsList').innerHTML = '<div class="error-message">Ошибка загрузки умейок</div>';
+        }
+    }
+
+    window.openEditSkillModal = async function(skillId) {
+        triggerHapticFeedback();
+        
+        try {
+            console.log('📱 Загрузка умейки для редактирования:', skillId);
+            
+            let skill = null;
+            
+            skill = getGlobalSkillById(skillId);
+            
+            if (!skill) {
+                const userId = currentUserId || 'demo-user';
+                const localSkills = loadSkillsFromLocalStorage(userId);
+                skill = localSkills.find(s => s._id === skillId);
+            }
+            
+            if (!skill) {
+                alert('❌ Умейка не найдена');
+                return;
+            }
+            
+            currentEditingSkill = skill;
+            
+            document.getElementById('editSkillId').value = skillId;
+            document.getElementById('editSkillName').value = skill.skill || '';
+            document.getElementById('editSkillExperience').value = skill.experience || '';
+            document.getElementById('editSkillPrice').value = skill.price || '';
+            document.getElementById('editSkillCity').value = skill.city || '';
+            
+            currentEditRadius = skill.radius || 10;
+            selectEditRadius(currentEditRadius);
+            
+            const skillStatus = skill.status || 'ready';
+            console.log('📊 Загружен статус для редактирования:', skillStatus);
+            selectEditMasterStatus(skillStatus);
+            
+            editSkillPhoto = null;
+            const preview = document.getElementById('editSkillPhotoPreview');
+            preview.style.display = 'none';
+            
+            if (skill.photo) {
+                const img = document.getElementById('editSkillPhotoImg');
+                img.src = skill.photo;
+                preview.style.display = 'block';
+            }
+            
+            document.getElementById('editSkillModal').style.display = 'flex';
+        } catch (error) {
+            console.error('❌ Ошибка загрузки умейки:', error);
+            alert('❌ Ошибка загрузки умейки: ' + error.message);
+        }
+    };
+
+    window.closeEditSkillModal = function() {
+        triggerHapticFeedback();
+        document.getElementById('editSkillModal').style.display = 'none';
+        currentEditingSkill = null;
+        editSkillPhoto = null;
+        
+        document.getElementById('editSkillId').value = '';
+        document.getElementById('editSkillName').value = '';
+        document.getElementById('editSkillExperience').value = '';
+        document.getElementById('editSkillPrice').value = '';
+        document.getElementById('editSkillCity').value = '';
+        
+        const preview = document.getElementById('editSkillPhotoPreview');
+        preview.style.display = 'none';
+    };
+
+    window.saveEditedSkill = async function() {
+        triggerHapticFeedback();
+        
+        try {
+            const skillId = document.getElementById('editSkillId').value;
+            const skillName = document.getElementById('editSkillName').value;
+            const skillExperience = document.getElementById('editSkillExperience').value;
+            const skillPrice = document.getElementById('editSkillPrice').value;
+            const skillCity = document.getElementById('editSkillCity').value;
+            
+            if (!skillId) {
+                alert('❌ Ошибка: не указан ID умейки');
+                return;
+            }
+            
+            if (!skillName.trim() || !skillExperience.trim() || !skillPrice || !skillCity.trim()) {
+                alert('❌ Заполните все обязательные поля');
+                return;
+            }
+            
+            if (skillCity.trim().length < 2) {
+                alert('❌ Название города должно содержать минимум 2 символа');
+                return;
+            }
+            
+            const skillData = {
+                skill: skillName.trim(),
+                experience: skillExperience.trim(),
+                price: parseInt(skillPrice),
+                city: skillCity.trim(),
+                radius: currentEditRadius,
+                status: currentEditMasterStatus,
+                updatedAt: new Date().toISOString()
+            };
+            
+            const cityCoords = getCityCoordinates(skillCity);
+            if (cityCoords) {
+                skillData.location = cityCoords;
+            }
+            
+            console.log('📤 Сохраняю изменения умейки:', skillData);
+            
+            if (editSkillPhoto) {
+                const estimatedSize = (editSkillPhoto.length * 0.75) / 1024;
+                if (estimatedSize > 500) {
+                    alert(`❌ Фото слишком большое после сжатия (${estimatedSize.toFixed(2)}KB).\nПопробуйте загрузить фото меньшего размера.`);
+                    return;
+                }
+                
+                skillData.photo = editSkillPhoto;
+                skillData.photoTimestamp = new Date().toISOString();
+            } else if (currentEditingSkill && currentEditingSkill.photo) {
+                skillData.photo = currentEditingSkill.photo;
+            }
+            
+            // Сохраняем QR данные
+            if (currentEditingSkill) {
+                if (currentEditingSkill.qrCode) skillData.qrCode = currentEditingSkill.qrCode;
+                if (currentEditingSkill.qrCodeData) skillData.qrCodeData = currentEditingSkill.qrCodeData;
+            }
+            if (!skillData.qrCodeData) {
+                skillData.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
+            }
+            
+            let updateSuccess = false;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(skillData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateSuccess = true;
+                    console.log('✅ Умейка обновлена на сервере');
+                    
+                    addGlobalSkill({ ...currentEditingSkill, ...skillData });
+                }
+            } catch (serverError) {
+                console.log('⚠️ Сервер недоступен для обновления, сохраняем локально');
+            }
+            
+            if (!updateSuccess) {
+                const updatedSkill = {
+                    ...currentEditingSkill,
+                    ...skillData,
+                    local: true
+                };
+                
+                deleteSkillFromLocalStorage(skillId);
+                saveSkillToLocalStorage(updatedSkill);
+                
+                addGlobalSkill(updatedSkill);
+                
+                console.log('💾 Умейка обновлена локально и в глобальном хранилище');
+            }
+            
+            alert('✅ Умейка успешно обновлена!');
+            closeEditSkillModal();
+            
+            await loadMySkills();
+            await loadProfileSkills();
+            
+            if (map) {
+                await loadSkillsOnMap();
+            }
+            
+        } catch (error) {
+            console.error('❌ Ошибка сохранения умейки:', error);
+            alert('❌ Ошибка сохранения умейки');
+        }
+    };
+
+    window.deleteSkill = async function(skillId) {
+        triggerHapticFeedback();
+        
+        if (confirm('❌ Удалить эту умейку?')) {
+            try {
+                triggerHapticFeedback();
+                
+                let deleteSuccess = false;
+                
+                try {
+                    const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            deleteSuccess = true;
+                            console.log('✅ Умейка удалена с сервера');
+                        }
+                    }
+                } catch (serverError) {
+                    console.log('⚠️ Сервер недоступен, удаляем локально');
+                }
+                
+                deleteSkillFromLocalStorage(skillId);
+                
+                const globalSkills = getGlobalSkills();
+                const updatedGlobalSkills = globalSkills.filter(s => s._id !== skillId);
+                setGlobalSkills(updatedGlobalSkills);
+                
+                await loadMySkills();
+                await loadProfileSkills();
+                
+                if (map) {
+                    await loadSkillsOnMap();
+                }
+                
+                alert('✅ Умейка удалена!');
+                
+            } catch (error) {
+                console.error('❌ Ошибка удаления умейки:', error);
+                alert('❌ Ошибка удаления умейки');
+            }
+        }
+    };
+
+    window.openMap = function() {
+        triggerHapticFeedback();
+        console.log('🗺️ Открытие карты');
+        const mapSection = document.querySelector('.map-section');
+        mapSection.classList.add('map-active');
+        
+        if (!map) {
+            initMap();
+        } else {
+            loadSkillsOnMap();
+        }
+        
+        startMapAutoRefresh();
+    };
+
+    function initMap() {
+        if (map) return;
+        
+        console.log('🗺️ Инициализация карты');
+        
+        map = L.map('map', {
+            attributionControl: false
+        }).setView([55.7558, 37.6173], 10);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        map.setMaxBounds([
+            [30, 19],
+            [70, 180]
+        ]);
+
+        initializeUserLocation();
+    }
+
+    function initializeUserLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const { latitude, longitude } = position.coords;
+                    userLocation = { lat: latitude, lon: longitude };
+                    console.log('📍 Местоположение пользователя:', userLocation);
+                    map.setView([latitude, longitude], 13);
+                    
+                    // Маркер пользователя с новым стилем
+                    const userMarker = L.marker([latitude, longitude], {
+                        icon: L.divIcon({
+                            className: 'user-marker',
+                            html: '<div class="user-marker-container"></div>',
+                            iconSize: [16, 16],
+                            iconAnchor: [8, 8]
+                        })
+                    })
+                    .addTo(map)
+                    .bindPopup('📍 <b>Ваше местоположение</b>')
+                    .openPopup();
+                        
+                    markers.push(userMarker);
+                        
+                    loadSkillsOnMap();
+                },
+                error => {
+                    console.log('📍 Геолокация недоступна:', error);
+                    userLocation = { lat: 55.7558, lon: 37.6173 };
+                    console.log('📍 Используем Москву по умолчанию');
+                    loadSkillsOnMap();
+                }
+            );
+        } else {
+            console.log('📍 Геолокация не поддерживается браузером');
+            userLocation = { lat: 55.7558, lon: 37.6173 };
+            loadSkillsOnMap();
+        }
+    }
+
+    // ========== НОВАЯ ФУНКЦИЯ СОЗДАНИЯ МАРКЕРА ==========
+    function createSkillMarkerHtml(skill, isUserSkill) {
+        const status = skill.status || 'ready';
+        const statusClass = status === 'ready' ? 'status-ready' : 'status-busy';
+        const fallbackIcon = isUserSkill ? '👤' : '🔧';
+        
+        // Если есть фото - показываем фото, иначе fallback с иконкой
+        if (skill.photo) {
+            return `
+                <div class="ymeyka-marker-container ${statusClass}">
+                    <img src="${skill.photo}" class="ymeyka-marker-photo" alt="${skill.skill}">
+                </div>
+            `;
+        } else {
+            return `
+                <div class="ymeyka-marker-container ${statusClass}">
+                    <div class="ymeyka-marker-fallback">${fallbackIcon}</div>
+                </div>
+            `;
+        }
+    }
+
+    async function loadSkillsOnMap() {
+        try {
+            console.log('🗺️ Загрузка умейок с сервера для карты');
+            
+            const skills = await loadAllSkillsFromServer();
+            
+            console.log('📊 Получено умейок с сервера:', skills.length);
+            
+            const userData = getOrCreateUserProfile(currentUserId);
+            
+            // Очищаем старые маркеры
+            if (markers.length > 0) {
+                markers.forEach(marker => map.removeLayer(marker));
+                markers = [];
+            }
+            
+            // Добавляем маркер пользователя
+            if (userLocation) {
+                const userMarker = L.marker([userLocation.lat, userLocation.lon], {
+                    icon: L.divIcon({
+                        className: 'user-marker',
+                        html: '<div class="user-marker-container"></div>',
+                        iconSize: [16, 16],
+                        iconAnchor: [8, 8]
+                    })
+                })
+                .addTo(map)
+                .bindPopup(`📍 <b>${userData.firstName || 'Вы'}</b><br>Ваше местоположение`)
+                .openPopup();
+                
+                markers.push(userMarker);
+            }
+            
+            // Добавляем маркеры умейек с новым дизайном
+            skills.forEach((skill, index) => {
+                if (skill.location && skill.location.lat && skill.location.lon) {
+                    const rating = skill.rating?.average || 5.0;
+                    const isUserSkill = skill.userId === currentUserId;
+                    const status = skill.status || 'ready';
+                    const radius = skill.radius || 10;
+                    
+                    // Цвет круга радиуса в зависимости от статуса
+                    const circleColor = (!status || status === 'ready') ? '#48bb78' : '#f56565';
+                    
+                    // Круг радиуса действия
+                    const circle = L.circle([skill.location.lat, skill.location.lon], {
+                        color: circleColor,
+                        fillColor: circleColor,
+                        fillOpacity: 0.2,
+                        radius: radius * 1000
+                    }).addTo(map);
+                    
+                    markers.push(circle);
+                    
+                    // Создаем HTML для маркера с задержкой анимации
+                    const markerHtml = createSkillMarkerHtml(skill, isUserSkill);
+                    
+                    const marker = L.marker([skill.location.lat, skill.location.lon], {
+                        icon: L.divIcon({
+                            className: 'ymeyka-marker',
+                            html: markerHtml,
+                            iconSize: [50, 50],
+                            iconAnchor: [25, 25]
+                        })
+                    })
+                    .addTo(map)
+                    .bindPopup(createMapSkillPopup(skill, isUserSkill));
+                    
+                    // Добавляем задержку анимации для каждого маркера
+                    const markerElement = marker.getElement();
+                    if (markerElement) {
+                        markerElement.style.animationDelay = `${index * 0.05}s`;
+                    }
+                    
+                    marker.on('popupopen', async () => {
+                        try {
+                            await fetch(`${API_URL}/api/skills/${skill._id}/view`, {
+                                method: 'POST'
+                            });
+                        } catch (error) {
+                            console.error('❌ Ошибка обновления просмотров:', error);
+                        }
+                    });
+                    
+                    markers.push(marker);
+                }
+            });
+            
+            console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров');
+            
+        } catch (error) {
+            console.error('❌ Ошибка загрузки карты:', error);
+            
+            if (map) {
+                L.popup()
+                    .setLatLng([55.7558, 37.6173])
+                    .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
+                    .openOn(map);
+            }
+        }
+    }
+
+    function createMapSkillPopup(skill, isUserSkill) {
+        const rating = skill.rating?.average || 5.0;
+        const statusBadge = getStatusBadge(skill.status);
+        const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
+        
+        // Миниатюра фото для popup (100x60px)
+        const photoThumbnail = skill.photo ? `
+            <div class="popup-skill-photo">
+                <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+            </div>
+        ` : '';
+        
+        return `
+            <div class="map-popup-content">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; overflow: hidden; border: 3px solid ${skill.status === 'busy' ? '#f56565' : '#48bb78'};">
+                        ${skill.photo ? `<img src="${skill.photo}" style="width: 100%; height: 100%; object-fit: cover;">` : (isUserSkill ? '👤' : '🔧')}
+                    </div>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0; color: #2d3748; font-size: 16px;">${skill.skill}</h3>
+                        <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
+                    </div>
+                    ${photoThumbnail}
+                </div>
+                
+                <div style="margin: 10px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
+                    <p style="margin: 8px 0; font-weight: bold; color: #48bb78;">
+                        ${skill.price} руб.
+                    </p>
+                    
+                    ${statusBadge}
+                    
+                    ${cityInfo}
+                    
+                    <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px; border: 1px solid rgba(102,126,234,0.1);">
+                        <div style="font-weight: 600; color: #667eea; margin-bottom: 5px; font-size: 14px;">📞 Контакты:</div>
+                        <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding: 8px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
+                            <span style="font-size:18px; color:#667eea;">📱</span>
+                            <span style="font-size: 14px; font-weight: 500; flex: 1;">${skill.experience || 'Не указано'}</span>
+                        </div>
+                    </div>
+                    
+                    <p style="margin: 15px 0; color: #2d3748; font-size: 14px; font-weight: 500;">
+                        <span style="color:#667eea;">⭐</span> 
+                        Рейтинг: <strong>${rating.toFixed(1)}/5</strong>
+                    </p>
+                </div>
+                
+                <div class="map-skill-actions">
+                    <button onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');"
+                            class="map-skill-button map-contact-button">
+                        📞 Подробные контакты
+                    </button>
+                    ${isUserSkill ? `
+                        <button onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');"
+                                class="map-skill-button map-edit-button">
+                            ✏️ Редактировать
+                        </button>
+                    ` : ''}
+                    ${!isUserSkill ? `
+                        <button onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.userId}', '${skill.experience || ''}');"
+                                class="map-skill-button" style="background: #ed8936; color: white;">
+                            📝 Составить сделку
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    function startMapAutoRefresh() {
+        stopMapAutoRefresh();
+        
+        mapRefreshInterval = setInterval(() => {
+            if (document.querySelector('.map-active') && map) {
+                console.log('🔄 Автоматическое обновление карты...');
+                loadSkillsOnMap();
+            }
+        }, 30000);
+    }
+
+    function stopMapAutoRefresh() {
+        if (mapRefreshInterval) {
+            clearInterval(mapRefreshInterval);
+            mapRefreshInterval = null;
+            console.log('⏹️ Автообновление карты остановлено');
+        }
+    }
+
+    window.openContactModal = function(skillId, skillName, username, phone, telegram) {
+        triggerHapticFeedback();
+        
+        const contactInfo = document.getElementById('contactInfo');
+        const callButton = document.getElementById('callButton');
+        const telegramButton = document.getElementById('telegramButton');
+        
+        let contactHtml = `
+            <h3 style="margin-bottom: 15px;">${skillName}</h3>
+            <p style="margin-bottom: 10px; color: #666;">👤 ${username}</p>
+        `;
+        
+        if (phone && phone.trim() !== '') {
+            contactHtml += `
+                <div class="contact-item">
+                    <div class="contact-icon">📞</div>
+                    <div class="contact-text">${phone}</div>
+                    <button class="copy-contact" onclick="triggerHapticFeedback(); copyToClipboard('${phone}');">Копировать</button>
+                </div>
+            `;
+            callButton.href = `tel:${phone.replace(/\s/g, '')}`;
+            callButton.style.display = 'block';
+        } else {
+            callButton.style.display = 'none';
+        }
+        
+        if (telegram && telegram.trim() !== '') {
+            contactHtml += `
+                <div class="contact-item">
+                    <div class="contact-icon">✍️</div>
+                    <div class="contact-text">${telegram}</div>
+                    <button class="copy-contact" onclick="triggerHapticFeedback(); copyToClipboard('${telegram}');">Копировать</button>
+                </div>
+            `;
+            telegramButton.href = `https://t.me/${telegram.replace('@', '')}`;
+            telegramButton.style.display = 'block';
+        } else {
+            telegramButton.style.display = 'none';
+        }
+        
+        if ((!phone || phone.trim() === '') && (!telegram || telegram.trim() === '')) {
+            contactHtml += '<p style="color: #999; text-align: center;">Контактная информация не указана</p>';
+        }
+        
+        contactInfo.innerHTML = contactHtml;
+        document.getElementById('contactModal').style.display = 'flex';
+    };
+
+    window.closeContactModal = function() {
+        triggerHapticFeedback();
+        document.getElementById('contactModal').style.display = 'none';
+    };
+
+    window.copyToClipboard = function(text) {
+        triggerHapticFeedback();
+        navigator.clipboard.writeText(text).then(() => {
+            alert('✅ Скопировано в буфер обмена: ' + text);
+        }).catch(err => {
+            alert('❌ Не удалось скопировать');
+        });
+    };
+
+    window.shareReferralLink = function() {
+        triggerHapticFeedback();
+        
+        const referralLink = generateReferralLink();
+        
+        const shareText = `Привет! Хочу порекомендовать полезное приложение — Ymeyka. Ymeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
+        
+        const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
+        
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.openTelegramLink(tgShareUrl);
+        } else {
+            window.open(tgShareUrl, '_blank');
+        }
+    };
+
+    window.copyReferralLink = function() {
+        triggerHapticFeedback();
+        
+        const referralLink = generateReferralLink();
+        navigator.clipboard.writeText(referralLink).then(() => {
+            showNotification('✅ Реферальная ссылка скопирована!');
+        }).catch(err => {
+            alert('❌ Не удалось скопировать ссылку');
+        });
+    };
+
+    window.showMainScreen = function() {
+        triggerHapticFeedback();
+        stopMapAutoRefresh();
+        
+        document.getElementById('mainScreen').style.display = 'block';
+        document.getElementById('masterSection').style.display = 'none';
+        document.getElementById('clientSection').style.display = 'none';
+        document.getElementById('profileSection').style.display = 'none';
+        document.getElementById('financeSection').style.display = 'none';
+        document.getElementById('editProfileSection').style.display = 'none';
+        document.getElementById('createDealSection').style.display = 'none';
+        document.getElementById('aboutSection').style.display = 'none';
+        document.querySelector('.map-section').classList.remove('map-active');
+    };
+    
+    window.showSection = function(sectionId) {
+        triggerHapticFeedback();
+        
+        if (!document.querySelector('.map-active') && mapRefreshInterval) {
+            stopMapAutoRefresh();
+        }
+        
+        document.getElementById('mainScreen').style.display = 'none';
+        document.getElementById('masterSection').style.display = 'none';
+        document.getElementById('clientSection').style.display = 'none';
+        document.getElementById('profileSection').style.display = 'none';
+        document.getElementById('financeSection').style.display = 'none';
+        document.getElementById('editProfileSection').style.display = 'none';
+        document.getElementById('createDealSection').style.display = 'none';
+        document.getElementById('aboutSection').style.display = 'none';
+        document.getElementById(sectionId).style.display = 'block';
+        
+        if (sectionId === 'masterSection') {
+            currentMasterStatus = 'ready';
+            selectMasterStatus('ready');
+            currentRadius = 10;
+            selectRadius(10);
+            loadMySkills();
+        }
+    };
+
+    window.showProfileSection = function() {
+        triggerHapticFeedback();
+        showSection('profileSection');
+        loadUserProfile();
+        // Скрываем все вкладки при входе в ЛК
+        document.getElementById('profileStats').style.display = 'none';
+        document.getElementById('profileSkills').style.display = 'none';
+        document.getElementById('profileDeals').style.display = 'none';
+        document.getElementById('profileReferral').style.display = 'none';
+    };
+
+    window.showFinanceSection = function() {
+        triggerHapticFeedback();
+        showSection('financeSection');
+        updateWalletUI();
+    };
+
+    window.showAboutSection = function() {
+        triggerHapticFeedback();
+        showSection('aboutSection');
+        updateAboutStats();
+        checkReviewEligibility();
+    };
+
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+        `;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 2000);
+    }
+
+    window.checkAndSetUserId = function() {
+        console.log('🔍 Проверка User ID...');
+        
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.initDataUnsafe?.user) {
+            const user = tg.initDataUnsafe.user;
+            currentUserId = user.id.toString();
+            console.log('✅ User ID из Telegram:', currentUserId);
+            console.log('👤 Данные пользователя Telegram:', user);
+        } else {
+            if (!currentUserId || currentUserId === 'null' || currentUserId === 'undefined') {
+                currentUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+                console.log('🆔 Создан новый User ID:', currentUserId);
+            } else {
+                console.log('📌 Используем существующий User ID:', currentUserId);
+            }
+        }
+        
+        if (currentUserId) {
+            localStorage.setItem('ymeyka_user_id', currentUserId);
+            console.log('💾 User ID сохранен в localStorage:', currentUserId);
+            
+            loadSkillsFromLocalStorage(currentUserId);
+        }
+        
+        return currentUserId;
+    };
+    
+    // ========== АДМИН-ПАНЕЛЬ (6 кликов по логотипу) ==========
+    function initAdminAccess() {
+        const logoHeader = document.getElementById('logoHeader');
+        if (!logoHeader) return;
+        
+        logoHeader.addEventListener('click', (e) => {
+            e.stopPropagation();
+            logoClickCount++;
+            console.log(`[Admin] Клик по логотипу: ${logoClickCount}/6`);
+            
+            if (logoClickTimer) clearTimeout(logoClickTimer);
+            
+            logoClickTimer = setTimeout(() => {
+                if (logoClickCount >= 6) {
+                    openAdminPanel();
+                    logoClickCount = 0;
+                } else {
+                    logoClickCount = 0;
+                }
+                if (logoClickTimer) clearTimeout(logoClickTimer);
+            }, 800);
+        });
+    }
+    
+    function openAdminPanel() {
+        console.log('🔓 Открытие админ-панели (6 кликов)');
+        
+        // Открываем админку в новой вкладке/окне
+        const adminUrl = 'ymeyka-admin.html';
+        window.open(adminUrl, '_blank');
+    }
+    
+    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (продолжение) ==========
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Ymeyka app loaded successfully!');
+        
+        currentMasterStatus = 'ready';
+        currentEditMasterStatus = 'ready';
+        currentRadius = 10;
+        currentEditRadius = 10;
+        
+        showMainScreen();
+        
+        currentUserId = checkAndSetUserId();
+        
+        processReferralLink();
+        
+        // Обрабатываем deeplink при загрузке
+        handleDeepLink();
+        
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            console.log('✅ Telegram Web App initialized');
+            
+            if (tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                console.log('👤 User ID from Telegram:', user.id);
+                console.log('👤 User data:', user);
+            }
+        }
+        
+        const dealAmount = document.getElementById('dealAmount');
+        if (dealAmount) {
+            dealAmount.addEventListener('input', updateDealCommission);
+        }
+        
+        initAdminAccess();
+    });
+
+    window.searchSkills = async function() {
+        triggerHapticFeedback();
+        
+        const searchQuery = document.getElementById('searchInput').value.trim();
+        const searchCity = document.getElementById('searchCity').value.trim();
+        const searchResults = document.getElementById('searchResults');
+        
+        if (!searchQuery && !searchCity) {
+            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос или выберите город</div>';
+            return;
+        }
+        
+        searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
+        
+        try {
+            let skills = [];
+            
+            try {
+                let url = `${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery || '')}`;
+                if (searchCity) {
+                    url += `&city=${encodeURIComponent(searchCity)}`;
+                }
+                
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.success) {
+                    skills = result.skills;
+                    
+                    skills = skills.map(skill => {
+                        const globalSkill = getGlobalSkillById(skill._id);
+                        if (globalSkill && globalSkill.updatedAt) {
+                            if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
+                                skill.status = globalSkill.status;
+                            }
+                        }
+                        if (!skill.qrCodeData) {
+                            skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                        }
+                        return skill;
+                    });
+                }
+            } catch (serverError) {
+                console.log('⚠️ Сервер недоступен для поиска');
+            }
+            
+            const globalSkills = getGlobalSkills();
+            let matchingGlobal = globalSkills;
+            
+            if (searchQuery) {
+                matchingGlobal = matchingGlobal.filter(s => 
+                    s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
+                );
+            }
+            
+            if (searchCity) {
+                matchingGlobal = matchingGlobal.filter(s => 
+                    s.city && s.city.toLowerCase() === searchCity.toLowerCase()
+                );
+            }
+            
+            const existingIds = new Set(skills.map(s => s._id));
+            matchingGlobal.forEach(skill => {
+                if (!existingIds.has(skill._id)) {
+                    if (!skill.qrCodeData) {
+                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                    }
+                    skills.push(skill);
+                }
+            });
+            
+            const userId = currentUserId || 'demo-user';
+            const localSkills = loadSkillsFromLocalStorage(userId);
+            let matchingLocal = localSkills.filter(s => s.local);
+            
+            if (searchQuery) {
+                matchingLocal = matchingLocal.filter(s => 
+                    s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
+                );
+            }
+            
+            if (searchCity) {
+                matchingLocal = matchingLocal.filter(s => 
+                    s.city && s.city.toLowerCase() === searchCity.toLowerCase()
+                );
+            }
+            
+            skills = [...skills, ...matchingLocal.filter(s => !existingIds.has(s._id))];
+            
+            const uniqueSkills = [];
+            const seenIds = new Set();
+            for (const skill of skills) {
+                if (!seenIds.has(skill._id)) {
+                    seenIds.add(skill._id);
+                    uniqueSkills.push(skill);
+                }
+            }
+            skills = uniqueSkills;
+            
+            if (skills.length > 0) {
+                searchResults.innerHTML = skills.map(skill => {
+                    const statusBadge = getStatusBadge(skill.status);
+                    const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                    const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
+                    
+                    return `
+                    <div class="skill-card">
+                        <div class="skill-header">
+                            <div class="skill-title">${skill.skill} ${isLocal}</div>
+                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                        </div>
+                        
+                        <div class="skill-price">${skill.price} ₽</div>
+                        
+                        ${statusBadge}
+                        
+                        ${cityInfo}
+                        
+                        <div class="skill-contact-info">
+                            <div class="contact-label">📞 Контакты:</div>
+                            <div class="contact-item">
+                                <span class="contact-icon">📱</span>
+                                <span class="contact-text">${skill.experience || 'Не указано'}</span>
+                            </div>
+                        </div>
+                        
+                        ${skill.photo ? `
+                            <div class="skill-photo">
+                                <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
+                            </div>
+                        ` : ''}
+                        
+                        <div style="color: #666; margin: 15px 0 20px;">
+                            👤 ${skill.username}
+                        </div>
+                        
+                        <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');">
+                            📞 Подробные контакты
+                        </button>
+                        
+                        <button class="create-deal-button" onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.userId}', '${skill.experience || ''}');">
+                            📝 Составить сделку
+                        </button>
+                    </div>
+                `}).join('');
+            } else {
+                searchResults.innerHTML = `
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
+                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос${searchCity ? ' или выбрать другой город' : ''}</div>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Ошибка поиска:', error);
+            searchResults.innerHTML = `
+                <div class="error-message">
+                    ❌ Ошибка поиска<br>
+                    <small>Проверьте подключение к интернету</small>
+                </div>
+            `;
+        }
+    };
+
+    function loadUserProfile() {
+        const userData = getOrCreateUserProfile(currentUserId);
+        const referralData = getReferralData();
+        const coins = getCoinsData();
+        
+        document.getElementById('userName').textContent = userData.firstName || 'Пользователь';
+        document.getElementById('userBio').textContent = userData.bio || 'Расскажите о себе...';
+        
+        if (userData.avatar) {
+            document.getElementById('userAvatar').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        }
+        
+        updateUserStats(userData, referralData, coins);
+    }
+
+    function updateUserStats(userData, referralData, coins) {
+        const statsGrid = document.getElementById('userStats');
+        if (!statsGrid) return;
+        
+        const stars = referralData?.starsEarned || 0;
+        const goldCoins = coins || 0;
+        
+        statsGrid.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-value">${stars}</div>
+                <div class="stat-label">⭐ Звёзды</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${goldCoins}</div>
+                <div class="stat-label">🪙 Монеты</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${userData.completedDeals || 0}</div>
+                <div class="stat-label">✅ Завершено сделок</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${userData.skills?.length || 0}</div>
+                <div class="stat-label">✨ Умейки</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">${referralData?.referralCount || 0}</div>
+                <div class="stat-label">👥 Приглашено друзей</div>
+            </div>
+        `;
+    }
+
+    window.editProfile = function() {
+        triggerHapticFeedback();
+        const userData = getOrCreateUserProfile(currentUserId);
+        
+        document.getElementById('editFirstName').value = userData.firstName || '';
+        document.getElementById('editAge').value = userData.age || '';
+        document.getElementById('editExperience').value = userData.experience || '';
+        document.getElementById('editContact').value = userData.contact || '';
+        document.getElementById('editBio').value = userData.bio || '';
+        
+        if (userData.avatar) {
+            document.getElementById('avatarPreview').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        }
+        
+        showSection('editProfileSection');
+    };
+
+    window.saveProfile = function() {
+        triggerHapticFeedback();
+        
+        const firstName = document.getElementById('editFirstName').value.trim();
+        const bio = document.getElementById('editBio').value.trim();
+        
+        if (!firstName || !bio) {
+            alert('❌ Пожалуйста, заполните обязательные поля (Имя и О себе)');
+            return;
+        }
+        
+        const userData = getOrCreateUserProfile(currentUserId);
+        
+        userData.firstName = firstName;
+        userData.age = document.getElementById('editAge').value;
+        userData.experience = document.getElementById('editExperience').value;
+        userData.contact = document.getElementById('editContact').value;
+        userData.bio = bio;
+        
+        if (currentAvatar) {
+            userData.avatar = currentAvatar;
+        }
+        
+        setLocalStorage(`user_${currentUserId}`, userData);
+        
+        alert('✅ Профиль сохранен!');
+        showProfileSection();
+        loadUserProfile();
+    };
+
+    window.changeAvatar = function() {
+        triggerHapticFeedback();
+        document.getElementById('avatarInput').click();
+    };
+
+    window.handleAvatarUpload = function(event) {
+        triggerHapticFeedback();
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        if (!file.type.match('image.*')) {
+            alert('❌ Пожалуйста, выберите изображение');
+            return;
+        }
+        
+        if (file.size > 5 * 1024 * 1024) {
+            alert('❌ Файл слишком большой. Максимальный размер: 5MB');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            currentAvatar = e.target.result;
+            document.getElementById('avatarPreview').innerHTML = `
+                <img src="${currentAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+            `;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    window.showProfileTab = function(tabName) {
+        triggerHapticFeedback();
+        currentProfileTab = tabName;
+        
+        // Скрываем все вкладки
+        document.getElementById('profileStats').style.display = 'none';
+        document.getElementById('profileSkills').style.display = 'none';
+        document.getElementById('profileDeals').style.display = 'none';
+        document.getElementById('profileReferral').style.display = 'none';
+        
+        // Показываем выбранную вкладку
+        document.getElementById('profileStats').style.display = tabName === 'stats' ? 'block' : 'none';
+        document.getElementById('profileSkills').style.display = tabName === 'skills' ? 'block' : 'none';
+        document.getElementById('profileDeals').style.display = tabName === 'deals' ? 'block' : 'none';
+        document.getElementById('profileReferral').style.display = tabName === 'referral' ? 'block' : 'none';
+        
+        // Загружаем данные для вкладки
+        if (tabName === 'skills') {
+            loadProfileSkills();
+        } else if (tabName === 'deals') {
+            loadDeals();
+        } else if (tabName === 'referral') {
+            updateReferralStats();
+        } else if (tabName === 'stats') {
+            loadUserProfile();
+        }
+    };
+
+    window.showDealsTab = function(tabName) {
+        triggerHapticFeedback();
+        currentDealTab = tabName;
+        
+        // Обновляем активность кнопок
+        document.querySelectorAll('.deals-tab-button').forEach(btn => btn.classList.remove('active'));
+        
+        if (tabName === 'pending') {
+            document.getElementById('pendingDealsTab').classList.add('active');
+        } else if (tabName === 'active') {
+            document.getElementById('activeDealsTab').classList.add('active');
+        } else if (tabName === 'completed') {
+            document.getElementById('completedDealsTab').classList.add('active');
+        }
+        
+        loadDeals();
+    };
+
+    function generateDealId() {
+        return 'deal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function loadDeals() {
+        try {
+            const dealsList = document.getElementById('dealsList');
+            if (!dealsList) return;
+            
+            dealsList.innerHTML = '<div class="loading">📄 Загрузка сделок...</div>';
+            
+            const userDeals = getUserDeals(currentUserId);
+            console.log(`📊 Найдено сделок для пользователя ${currentUserId}:`, userDeals.length);
+            
+            let filteredDeals = [];
+            
+            switch(currentDealTab) {
+                case 'pending':
+                    filteredDeals = userDeals.filter(deal => deal.status === 'pending');
+                    break;
+                case 'active':
+                    filteredDeals = userDeals.filter(deal => deal.status === 'active');
+                    break;
+                case 'completed':
+                    filteredDeals = userDeals.filter(deal => deal.status === 'completed');
+                    break;
+                default:
+                    filteredDeals = userDeals;
+            }
+            
+            console.log(`📊 Отфильтровано сделок для вкладки ${currentDealTab}:`, filteredDeals.length);
+            
+            if (filteredDeals.length === 0) {
+                let message = '';
+                switch(currentDealTab) {
+                    case 'pending':
+                        message = 'Нет сделок, ожидающих подписи';
+                        break;
+                    case 'active':
+                        message = 'Нет активных сделок';
+                        break;
+                    case 'completed':
+                        message = 'Нет завершенных сделок';
+                        break;
+                    default:
+                        message = 'У вас пока нет сделок';
+                }
+                
+                dealsList.innerHTML = `
+                    <div style="text-align: center; color: #666; padding: 40px;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">📄</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">${message}</div>
+                        ${currentDealTab === 'pending' ? '<div style="opacity: 0.7;">Создайте новую сделку или дождитесь предложения</div>' : ''}
+                    </div>
+                `;
+                return;
+            }
+            
+            dealsList.innerHTML = filteredDeals.map(deal => {
+                const isClient = deal.clientId === currentUserId;
+                const isMaster = deal.masterId === currentUserId;
+                const roleText = isClient ? 'Вы: Клиент' : (isMaster ? 'Вы: Мастер' : 'Неизвестно');
+                
+                const statusText = {
+                    'draft': 'Черновик',
+                    'pending': 'Ожидает подписи',
+                    'active': 'Активна',
+                    'completed': 'Завершена'
+                }[deal.status] || 'Неизвестно';
+                
+                const statusClass = {
+                    'draft': 'status-draft',
+                    'pending': 'status-pending',
+                    'active': 'status-active',
+                    'completed': 'status-completed'
+                }[deal.status] || 'status-draft';
+                
+                const qualityText = {
+                    'premium': 'Премиум',
+                    'standard': 'Стандарт',
+                    'economy': 'Эконом'
+                }[deal.quality] || 'Не указано';
+                
+                const showSignButton = deal.status === 'pending' && 
+                    ((isClient && !deal.clientSigned) || (isMaster && !deal.masterSigned));
+                
+                const showCompleteButton = deal.status === 'active' && isMaster;
+                const showPayButton = isClient && deal.status === 'pending' && (!deal.paymentStatus || deal.paymentStatus === 'pending');
+                const showEscrowInfo = deal.paymentStatus === 'paid' || deal.paymentStatus === 'released';
+                const showDeleteButton = deal.status === 'completed';
+                
+                return `
+                    <div class="deal-card">
+                        <div class="deal-header">
+                            <div class="deal-title">${deal.title}</div>
+                            <div class="deal-status ${statusClass}">${statusText}</div>
+                        </div>
+                        
+                        <p style="margin: 10px 0; color: #666; font-size: 14px;">${roleText}</p>
+                        <p style="margin: 10px 0; color: #666;">${deal.description}</p>
+                        
+                        ${getPaymentStatusBadge(deal.paymentStatus || 'pending')}
+                        
+                        <div class="deal-details">
+                            <div class="deal-detail">
+                                <span style="color: #667eea;">💰</span>
+                                <span>${deal.amount} ₽</span>
+                            </div>
+                            <div class="deal-detail">
+                                <span style="color: #667eea;">⏱️</span>
+                                <span>${deal.period}</span>
+                            </div>
+                            <div class="deal-detail">
+                                <span style="color: #667eea;">⭐</span>
+                                <span>${qualityText}</span>
+                            </div>
+                            <div class="deal-detail">
+                                <span style="color: #667eea;">📅</span>
+                                <span>${new Date(deal.createdAt).toLocaleDateString('ru-RU')}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 10px 0; padding: 10px; background: #f7fafc; border-radius: 8px;">
+                            <div style="margin: 5px 0; font-weight: bold;">${isClient ? 'Мастер' : 'Клиент'}:</div>
+                            <div style="margin: 5px 0; color: #666;">
+                                ${isClient ? deal.masterName : deal.clientName}
+                            </div>
+                            ${isClient && deal.masterSkill ? `
+                                <div style="margin: 5px 0; color: #48bb78; font-weight: bold;">
+                                    Услуга: ${deal.masterSkill}
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        ${showEscrowInfo ? `
+                            <div class="escrow-info">
+                                <div class="escrow-title">
+                                    🔒 Гарант сделки
+                                </div>
+                                <div class="escrow-details">
+                                    ${deal.paymentStatus === 'paid' ? 
+                                        `💰 ${deal.escrowBalance || deal.amount} Stars заморожено до завершения работ` :
+                                        `✅ Выплачено мастеру: ${deal.masterPayout || Math.round(deal.amount * 0.95)} Stars`
+                                    }
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="signatures">
+                            <div class="signature ${deal.clientSigned ? 'signed' : 'unsigned'}">
+                                <span>👤</span>
+                                <span>Клиент ${deal.clientSigned ? 'подписал' : 'не подписал'}</span>
+                            </div>
+                            <div class="signature ${deal.masterSigned ? 'signed' : 'unsigned'}">
+                                <span>🔧</span>
+                                <span>Мастер ${deal.masterSigned ? 'подписал' : 'не подписал'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="deal-commission" style="background: #f7fafc; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Сумма:</span>
+                                <span>${deal.amount} ⭐</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; color: #48bb78;">
+                                <span>Комиссия (5%):</span>
+                                <span>${Math.round(deal.amount * 0.05)} ⭐</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 5px;">
+                                <span>Итого к оплате:</span>
+                                <span>${Math.round(deal.amount * 1.05)} ⭐</span>
+                            </div>
+                        </div>
+                        
+                        <div class="deal-actions">
+                            ${showSignButton ? `
+                                <button class="deal-button sign-button" onclick="triggerHapticFeedback(); signDeal('${deal.id}');">
+                                    ✍️ Подписать сделку
+                                </button>
+                            ` : ''}
+                            
+                            ${showPayButton ? `
+                                <button class="deal-button pay-button" onclick="triggerHapticFeedback(); payForDeal('${deal.id}');">
+                                    💳 Оплатить сделку
+                                </button>
+                            ` : ''}
+                            
+                            ${showCompleteButton ? `
+                                <button class="deal-button complete-button" onclick="triggerHapticFeedback(); completeDeal('${deal.id}');">
+                                    ✅ Завершить сделку
+                                </button>
+                            ` : ''}
+                            
+                            <button class="deal-button view-button" onclick="triggerHapticFeedback(); viewDealDetails('${deal.id}');">
+                                👁️ Подробнее
+                            </button>
+                            
+                            ${showDeleteButton ? `
+                                <button class="deal-button delete-deal" onclick="triggerHapticFeedback(); deleteDeal('${deal.id}');">
+                                    🗑️ Удалить сделку
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+        } catch (error) {
+            console.error('❌ Ошибка загрузки сделок:', error);
+            document.getElementById('dealsList').innerHTML = `
+                <div class="error-message">
+                    ❌ Ошибка загрузки сделок<br>
+                    <small>${error.message}</small>
+                </div>
+            `;
+        }
+    }
+
+    window.createDealFromSkill = function(skillId, skillName, masterName, masterId, masterContact) {
+        triggerHapticFeedback();
+        
+        console.log('📝 Создание сделки с мастером:', {
+            skillId, skillName, masterName, masterId, masterContact
+        });
+        
+        currentDealMaster = {
+            skillId: skillId,
+            skillName: skillName,
+            masterName: masterName,
+            masterId: masterId,
+            masterContact: masterContact
+        };
+        
+        const userData = getOrCreateUserProfile(currentUserId);
+        const clientName = userData.firstName || 'Клиент';
+        
+        getOrCreateUserProfile(masterId, masterName);
+        
+        document.getElementById('dealMasterId').value = masterId;
+        document.getElementById('dealMasterName').value = masterName;
+        document.getElementById('dealMasterSkill').value = skillName;
+        document.getElementById('dealMasterContact').value = masterContact;
+        
+        document.getElementById('dealTitle').value = `${skillName} - ${masterName}`;
+        document.getElementById('dealDescription').value = `Сделка между ${clientName} (клиент) и ${masterName} (мастер) на услугу "${skillName}"`;
+        
+        showSection('createDealSection');
+    };
+
+    window.selectQuality = function(quality) {
+        triggerHapticFeedback();
+        selectedQuality = quality;
+        
+        document.querySelectorAll('.quality-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        document.getElementById('quality' + quality.charAt(0).toUpperCase() + quality.slice(1)).classList.add('selected');
+        
+        updateDealCommission();
+    };
+
+    window.toggleOption = function(option) {
+        triggerHapticFeedback();
+        const element = document.getElementById('option' + option.charAt(0).toUpperCase() + option.slice(1));
+        
+        if (element.classList.contains('selected')) {
+            element.classList.remove('selected');
+            selectedOptions = selectedOptions.filter(item => item !== option);
+        } else {
+            if (selectedOptions.length >= 2) {
+                alert('❌ Вы можете выбрать только 2 дополнительных условия');
+                return;
+            }
+            element.classList.add('selected');
+            selectedOptions.push(option);
+        }
+        
+        updateDealCommission();
+    };
+
+    function updateDealCommission() {
+        const dealAmount = document.getElementById('dealAmount').value || 0;
+        
+        if (dealAmount > 0) {
+            const commission = dealAmount * 0.05;
+            const total = parseInt(dealAmount) + commission;
+            
+            document.getElementById('dealAmountDisplay').textContent = dealAmount;
+            document.getElementById('commissionAmount').textContent = Math.round(commission);
+            document.getElementById('totalAmount').textContent = Math.round(total);
+            document.getElementById('dealCommission').style.display = 'block';
+        } else {
+            document.getElementById('dealCommission').style.display = 'none';
+        }
+    }
+
+    window.createDeal = function() {
+        triggerHapticFeedback();
+        
+        try {
+            const title = document.getElementById('dealTitle').value.trim();
+            const description = document.getElementById('dealDescription').value.trim();
+            const period = document.getElementById('dealPeriod').value.trim();
+            const amount = document.getElementById('dealAmount').value;
+            
+            const masterId = document.getElementById('dealMasterId').value;
+            const masterName = document.getElementById('dealMasterName').value;
+            const masterSkill = document.getElementById('dealMasterSkill').value;
+            const masterContact = document.getElementById('dealMasterContact').value;
+            
+            const userData = getOrCreateUserProfile(currentUserId);
+            const clientName = userData.firstName || 'Клиент';
+            
+            if (!title || !description || !period || !amount) {
+                alert('❌ Заполните все обязательные поля (отмечены *)');
+                return;
+            }
+            
+            if (!selectedQuality) {
+                alert('❌ Выберите уровень качества');
+                return;
+            }
+            
+            if (selectedOptions.length !== 2) {
+                alert('❌ Выберите 2 дополнительных условия');
+                return;
+            }
+            
+            if (!masterId || !masterName) {
+                alert('❌ Ошибка: данные мастера не найдены');
+                return;
+            }
+            
+            console.log('📤 Создаю сделку с мастером:', {
+                masterId, masterName, masterSkill, masterContact
+            });
+            
+            const newDeal = {
+                id: generateDealId(),
+                title: title,
+                description: description,
+                period: period,
+                amount: parseInt(amount),
+                quality: selectedQuality,
+                options: [...selectedOptions],
+                commission: Math.round(amount * 0.05),
+                total: Math.round(amount * 1.05),
+                status: 'pending',
+                paymentStatus: 'pending',
+                escrowBalance: 0,
+                commissionAmount: 0,
+                masterPayout: 0,
+                clientSigned: false,
+                masterSigned: false,
+                createdAt: new Date().toISOString(),
+                clientId: currentUserId,
+                clientName: clientName,
+                masterId: masterId,
+                masterName: masterName,
+                masterSkill: masterSkill,
+                masterContact: masterContact,
+                skillId: currentDealMaster?.skillId || null
+            };
+            
+            console.log('✅ Создана сделка:', newDeal);
+            
+            addGlobalDeal(newDeal);
+            
+            userData.dealsCount = (userData.dealsCount || 0) + 1;
+            setLocalStorage(`user_${currentUserId}`, userData);
+            
+            const masterData = getOrCreateUserProfile(masterId, masterName);
+            masterData.dealsCount = (masterData.dealsCount || 0) + 1;
+            setLocalStorage(`user_${masterId}`, masterData);
+            
+            document.getElementById('dealTitle').value = '';
+            document.getElementById('dealDescription').value = '';
+            document.getElementById('dealPeriod').value = '';
+            document.getElementById('dealAmount').value = '';
+            selectedQuality = '';
+            selectedOptions = [];
+            
+            document.querySelectorAll('.quality-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('.option-checkbox').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            document.getElementById('dealCommission').style.display = 'none';
+            
+            alert('✅ Сделка успешно создана! Теперь её должен подписать мастер и вы должны оплатить.');
+            
+            showProfileSection();
+            showProfileTab('deals');
+            showDealsTab('pending');
+            
+        } catch (error) {
+            console.error('❌ Ошибка создания сделки:', error);
+            alert('❌ Ошибка создания сделки: ' + error.message);
+        }
+    };
+
+    window.signDeal = function(dealId) {
+        triggerHapticFeedback();
+        
+        try {
+            const deal = getDealById(dealId);
+            if (!deal) {
+                alert('❌ Сделка не найдена');
+                return;
+            }
+            
+            const isClient = deal.clientId === currentUserId;
+            const isMaster = deal.masterId === currentUserId;
+            
+            if (!isClient && !isMaster) {
+                alert('❌ Вы не являетесь участником этой сделки');
+                return;
+            }
+            
+            const updates = {};
+            if (isClient) {
+                updates.clientSigned = true;
+            } else if (isMaster) {
+                updates.masterSigned = true;
+            }
+            
+            const clientSigned = isClient ? true : deal.clientSigned;
+            const masterSigned = isMaster ? true : deal.masterSigned;
+            
+            if (clientSigned && masterSigned) {
+                updates.status = 'active';
+                alert('🎉 Обе стороны подписали сделку! Теперь клиент должен оплатить сделку для активации.');
+            } else {
+                alert('✅ Вы успешно подписали сделку! Ожидайте подписи второй стороны и оплаты.');
+            }
+            
+            updateGlobalDeal(dealId, updates);
+            
+            loadDeals();
+            
+        } catch (error) {
+            console.error('❌ Ошибка подписи сделки:', error);
+            alert('❌ Ошибка подписи сделки: ' + error.message);
+        }
+    };
+
+    window.completeDeal = function(dealId) {
+        triggerHapticFeedback();
+        
+        if (confirm('✅ Завершить сделку? После завершения деньги будут переведены мастеру (за вычетом комиссии 5%).')) {
+            try {
+                triggerHapticFeedback();
+                
+                const deal = getDealById(dealId);
+                if (!deal) {
+                    alert('❌ Сделка не найдена');
+                    return;
+                }
+                
+                const isMaster = deal.masterId === currentUserId;
+                if (!isMaster) {
+                    alert('❌ Только мастер может завершить сделку');
+                    return;
+                }
+                
+                if (deal.status !== 'active') {
+                    alert('❌ Можно завершить только активные сделки');
+                    return;
+                }
+                
+                if (deal.paymentStatus !== 'paid') {
+                    alert('❌ Сделка не оплачена клиентом');
+                    return;
+                }
+                
+                if (releasePayment(dealId)) {
+                    updateGlobalDeal(dealId, {
+                        status: 'completed',
+                        completedAt: new Date().toISOString()
+                    });
+                    
+                    addCoin();
+                    
+                    const userData = getOrCreateUserProfile(currentUserId);
+                    userData.completedDeals = (userData.completedDeals || 0) + 1;
+                    userData.rating = (userData.rating || 0) + 0.5;
+                    setLocalStorage(`user_${currentUserId}`, userData);
+                    
+                    const clientData = getOrCreateUserProfile(deal.clientId, deal.clientName);
+                    clientData.completedDeals = (clientData.completedDeals || 0) + 1;
+                    clientData.rating = (clientData.rating || 0) + 0.5;
+                    setLocalStorage(`user_${deal.clientId}`, clientData);
+                    
+                    alert('✅ Сделка успешно завершена! Средства переведены на ваш баланс (за вычетом комиссии 5%). Получена +1 🪙 монета!');
+                    
+                    loadDeals();
+                    loadUserProfile();
+                    updateWalletUI();
+                }
+                
+            } catch (error) {
+                console.error('❌ Ошибка завершения сделки:', error);
+                alert('❌ Ошибка завершения сделки: ' + error.message);
+            }
+        }
+    };
+
+    window.viewDealDetails = function(dealId) {
+        triggerHapticFeedback();
+        
+        try {
+            const deal = getDealById(dealId);
+            
+            if (!deal) {
+                alert('❌ Сделка не найдена');
+                return;
+            }
+            
+            const isClient = deal.clientId === currentUserId;
+            const isMaster = deal.masterId === currentUserId;
+            const roleText = isClient ? 'Вы: Клиент' : (isMaster ? 'Вы: Мастер' : 'Неизвестно');
+            
+            const statusText = {
+                'draft': 'Черновик',
+                'pending': 'Ожидает подписи',
+                'active': 'Активна',
+                'completed': 'Завершена'
+            }[deal.status] || 'Неизвестно';
+            
+            const qualityText = {
+                'premium': 'Премиум',
+                'standard': 'Стандарт',
+                'economy': 'Эконом'
+            }[deal.quality] || 'Не указано';
+            
+            const paymentStatusText = {
+                'pending': '⏳ Ожидает оплаты',
+                'paid': '✅ Оплачено (в эскроу)',
+                'released': '💸 Выплачено мастеру',
+                'refunded': '↩️ Возвращено клиенту'
+            }[deal.paymentStatus || 'pending'];
+            
+            const details = `
+                <strong>Название:</strong> ${deal.title}<br><br>
+                <strong>Описание:</strong> ${deal.description}<br><br>
+                <strong>Статус:</strong> ${statusText}<br><br>
+                <strong>Статус оплаты:</strong> ${paymentStatusText}<br><br>
+                <strong>Ваша роль:</strong> ${roleText}<br><br>
+                <strong>Срок выполнения:</strong> ${deal.period}<br><br>
+                <strong>Сумма:</strong> ${deal.amount} ⭐<br><br>
+                <strong>Уровень качества:</strong> ${qualityText}<br><br>
+                <strong>Дополнительные условия:</strong> ${deal.options?.join(', ') || 'Не указаны'}<br><br>
+                <strong>Клиент:</strong> ${deal.clientName}<br><br>
+                <strong>Мастер:</strong> ${deal.masterName}<br><br>
+                ${deal.masterSkill ? `<strong>Услуга:</strong> ${deal.masterSkill}<br><br>` : ''}
+                ${deal.masterContact ? `<strong>Контакт мастера:</strong> ${deal.masterContact}<br><br>` : ''}
+                <strong>Дата создания:</strong> ${new Date(deal.createdAt).toLocaleString('ru-RU')}<br><br>
+                ${deal.completedAt ? `<strong>Дата завершения:</strong> ${new Date(deal.completedAt).toLocaleString('ru-RU')}<br><br>` : ''}
+                <strong>Статус подписи клиента:</strong> ${deal.clientSigned ? '✅ Подписана' : '❌ Не подписана'}<br><br>
+                <strong>Статус подписи мастера:</strong> ${deal.masterSigned ? '✅ Подписана' : '❌ Не подписана'}<br><br>
+                ${deal.paymentStatus === 'paid' || deal.paymentStatus === 'released' ? `
+                    <strong>Заморожено в эскроу:</strong> ${deal.escrowBalance} ⭐<br><br>
+                    <strong>Комиссия системы (5%):</strong> ${deal.commissionAmount} ⭐<br><br>
+                    <strong>Выплачено мастеру:</strong> ${deal.masterPayout} ⭐<br><br>
+                ` : `
+                    <strong>Комиссия системы (5%):</strong> ${deal.commission} ⭐<br><br>
+                    <strong>Итого к оплате:</strong> ${deal.total} ⭐<br><br>
+                `}
+            `;
+            
+            alert(details);
+            
+        } catch (error) {
+            console.error('❌ Ошибка просмотра сделки:', error);
+            alert('❌ Ошибка просмотра сделки: ' + error.message);
+        }
+    };
+
+    window.showCreateDealSection = function() {
+        triggerHapticFeedback();
+        
+        document.getElementById('dealTitle').value = '';
+        document.getElementById('dealDescription').value = '';
+        document.getElementById('dealPeriod').value = '';
+        document.getElementById('dealAmount').value = '';
+        selectedQuality = '';
+        selectedOptions = [];
+        
+        document.querySelectorAll('.quality-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        document.querySelectorAll('.option-checkbox').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        document.getElementById('dealCommission').style.display = 'none';
+        
+        currentDealMaster = null;
+        document.getElementById('dealMasterId').value = '';
+        document.getElementById('dealMasterName').value = '';
+        document.getElementById('dealMasterSkill').value = '';
+        document.getElementById('dealMasterContact').value = '';
+        
+        showSection('createDealSection');
+    };
+
+    window.setProjectRating = function(rating) {
+        triggerHapticFeedback();
+        projectRating = rating;
+        const stars = document.getElementById('projectRatingStars');
+        stars.innerHTML = '';
+        
+        for (let i = 1; i <= 5; i++) {
+            stars.innerHTML += i <= rating ? 
+                '<span style="cursor: pointer; color: #FFD700;" onclick="triggerHapticFeedback(); setProjectRating(' + i + ');">★</span>' :
+                '<span style="cursor: pointer;" onclick="triggerHapticFeedback(); setProjectRating(' + i + ');">☆</span>';
+        }
+    };
+
+    // ========== ФУНКЦИИ ОТЗЫВОВ О ПРОЕКТЕ ==========
+    
+    function getProjectReviews() {
+        return getLocalStorage('ymeyka_project_reviews') || [];
+    }
+    
+    function saveProjectReview(review) {
+        const reviews = getProjectReviews();
+        reviews.push(review);
+        setLocalStorage('ymeyka_project_reviews', reviews);
+        return review;
+    }
+    
+    function calculateProjectStats() {
+        const reviews = getProjectReviews();
+        const globalDeals = getGlobalDeals();
+        const globalSkills = getGlobalSkills();
+        
+        // Количество мастеров (уникальные userId из skills)
+        const uniqueMasters = new Set(globalSkills.map(s => s.userId)).size;
+        
+        // Количество сделок
+        const dealsCount = globalDeals.length;
+        
+        // Средний рейтинг проекта
+        let averageRating = 0;
+        if (reviews.length > 0) {
+            const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+            averageRating = sum / reviews.length;
+        }
+        
+        // Процент довольных клиентов (завершённые сделки без споров)
+        const completedDeals = globalDeals.filter(d => d.status === 'completed');
+        const satisfiedClients = completedDeals.filter(d => d.paymentStatus !== 'refunded').length;
+        const satisfactionRate = completedDeals.length > 0 
+            ? Math.round((satisfiedClients / completedDeals.length) * 100) 
+            : 0;
+        
+        return {
+            mastersCount: uniqueMasters || Math.floor(Math.random() * 500) + 500, // Fallback для демо
+            dealsCount: dealsCount || Math.floor(Math.random() * 1000) + 1000, // Fallback для демо
+            averageRating: averageRating || 4.9,
+            satisfactionRate: satisfactionRate || 98,
+            reviewsCount: reviews.length
+        };
+    }
+    
+    function updateAboutStats() {
+        const stats = calculateProjectStats();
+        
+        document.getElementById('statMastersCount').textContent = stats.mastersCount.toLocaleString('ru-RU');
+        document.getElementById('statDealsCount').textContent = stats.dealsCount.toLocaleString('ru-RU');
+        document.getElementById('statRating').textContent = stats.averageRating.toFixed(1);
+        document.getElementById('statSatisfaction').textContent = stats.satisfactionRate + '%';
+    }
+    
+    function checkReviewEligibility() {
+        const userData = getOrCreateUserProfile(currentUserId);
+        const hasCompletedDeals = (userData.completedDeals || 0) > 0;
+        
+        const submitBtn = document.getElementById('submitReviewBtn');
+        const warningMsg = document.getElementById('reviewRestrictionMessage');
+        
+        if (!hasCompletedDeals) {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('disabled');
+            warningMsg.style.display = 'block';
+        } else {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('disabled');
+            warningMsg.style.display = 'none';
+        }
+    }
+    
+    window.submitProjectReview = function() {
+        triggerHapticFeedback();
+        
+        const comment = document.getElementById('projectReviewComment').value.trim();
+        const userData = getOrCreateUserProfile(currentUserId);
+        
+        // Проверка на завершённые сделки
+        if ((userData.completedDeals || 0) === 0) {
+            alert('❌ Оставить отзыв могут только участники с завершёнными сделками');
+            return;
+        }
+        
+        if (projectRating === 0) {
+            alert('❌ Пожалуйста, поставьте оценку');
+            return;
+        }
+        
+        if (!comment) {
+            alert('❌ Пожалуйста, напишите отзыв');
+            return;
+        }
+        
+        const review = {
+            id: 'review_' + Date.now(),
+            rating: projectRating,
+            comment: comment,
+            userId: currentUserId,
+            userName: userData.firstName || 'Пользователь',
+            userAvatar: userData.avatar || null,
+            createdAt: new Date().toISOString(),
+            hasCompletedDeals: true
+        };
+        
+        saveProjectReview(review);
+        
+        alert('✅ Спасибо за ваш отзыв!');
+        
+        // Сброс формы
+        document.getElementById('projectReviewComment').value = '';
+        setProjectRating(0);
+        
+        // Обновление статистики
+        updateAboutStats();
+    };
+    
+    window.openReviewsModal = function() {
+        triggerHapticFeedback();
+        
+        const reviews = getProjectReviews();
+        const stats = calculateProjectStats();
+        
+        // Обновление заголовка модального окна
+        document.getElementById('reviewsAverageRating').textContent = stats.averageRating.toFixed(1);
+        document.getElementById('reviewsTotalCount').textContent = `${stats.reviewsCount} отзывов`;
+        
+        // Звёзды среднего рейтинга
+        const starsContainer = document.getElementById('reviewsAverageStars');
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+            starsHtml += i <= Math.round(stats.averageRating) ? '★' : '☆';
+        }
+        starsContainer.textContent = starsHtml;
+        
+        // Список отзывов
+        const listContainer = document.getElementById('reviewsList');
+        
+        if (reviews.length === 0) {
+            listContainer.innerHTML = `
+                <div class="no-reviews">
+                    <div class="no-reviews-icon">💭</div>
+                    <div>Пока нет отзывов</div>
+                    <div style="font-size: 14px; opacity: 0.7; margin-top: 10px;">Будьте первым!</div>
+                </div>
+            `;
+        } else {
+            // Сортируем по дате (новые сверху)
+            const sortedReviews = [...reviews].sort((a, b) => 
+                new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            
+            listContainer.innerHTML = sortedReviews.map(review => {
+                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                const avatar = review.userAvatar 
+                    ? `<img src="${review.userAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
+                    : review.userName.charAt(0).toUpperCase();
+                
+                return `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="review-author">
+                                <div class="review-avatar">${avatar}</div>
+                                <div>
+                                    <div class="review-name">${review.userName}</div>
+                                    <div class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU')}</div>
+                                </div>
+                            </div>
+                            <div class="review-rating">${stars}</div>
+                        </div>
+                        <div class="review-text">${review.comment}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        document.getElementById('reviewsModal').classList.add('active');
+    };
+    
+    window.closeReviewsModal = function() {
+        triggerHapticFeedback();
+        document.getElementById('reviewsModal').classList.remove('active');
+    };
+
+    // ========== ФУНКЦИЯ УДАЛЕНИЯ СДЕЛКИ ==========
+    window.deleteDeal = function(dealId) {
+        triggerHapticFeedback();
+        
+        if (confirm('❌ Удалить эту завершённую сделку?')) {
+            try {
+                const globalDeals = getGlobalDeals();
+                const dealIndex = globalDeals.findIndex(deal => deal.id === dealId);
+                
+                if (dealIndex === -1) {
+                    alert('❌ Сделка не найдена');
+                    return;
+                }
+                
+                const deal = globalDeals[dealIndex];
+                
+                // Проверяем, что сделка завершена
+                if (deal.status !== 'completed') {
+                    alert('❌ Можно удалять только завершённые сделки');
+                    return;
+                }
+                
+                // Проверяем, что пользователь является участником сделки
+                const isClient = deal.clientId === currentUserId;
+                const isMaster = deal.masterId === currentUserId;
+                
+                if (!isClient && !isMaster) {
+                    alert('❌ Вы не являетесь участником этой сделки');
+                    return;
+                }
+                
+                // Удаляем сделку из глобального хранилища
+                globalDeals.splice(dealIndex, 1);
+                setGlobalDeals(globalDeals);
+                
+                console.log(`✅ Сделка ${dealId} удалена из глобального хранилища`);
+                
+                // Обновляем список сделок
+                loadDeals();
+                
+                // Показываем уведомление
+                showNotification('✅ Сделка успешно удалена!');
+                
+            } catch (error) {
+                console.error('❌ Ошибка удаления сделки:', error);
+                alert('❌ Ошибка удаления сделки: ' + error.message);
+            }
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dealAmount = document.getElementById('dealAmount');
+        if (dealAmount) {
+            dealAmount.addEventListener('input', updateDealCommission);
+        }
+    });
+
     </script>
 </body>
 </html>
-```
