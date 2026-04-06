@@ -6,6 +6,7 @@
     <title>Ymeyka - Мастера рядом</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -2632,6 +2633,33 @@
             font-size: 16px;
             opacity: 0.9;
         }
+
+        /* ========== ЛИНИЯ СКАНИРОВАНИЯ ========== */
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #667eea;
+            box-shadow: 0 0 10px #667eea;
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* ========== QR ГЕНЕРАТОР В КАРТОЧКЕ ========== */
+        .qr-thumbnail {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 8px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
     </style>
 </head>
 <body>
@@ -3399,7 +3427,9 @@
         <div class="scanner-video-container">
             <video id="scannerVideo" autoplay playsinline></video>
             <div class="scanner-overlay">
-                <div class="scanner-frame"></div>
+                <div class="scanner-frame">
+                    <div class="scan-line"></div>
+                </div>
             </div>
         </div>
         <div class="scanner-hint">
@@ -3440,6 +3470,7 @@
     let currentQRSkillId = null;
     let currentQRSkillName = null;
     let scannerStream = null;
+    let isScanning = false;
     
     // Счетчик кликов по логотипу для открытия админ-панели
     let logoClickCount = 0;
@@ -3852,94 +3883,96 @@
 
     // ========== QR-КОД ФУНКЦИИ ==========
     
-    function generateQRCode(skillId, skillName) {
-        const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
-        
-        // Создаем временный контейнер для генерации QR
-        const tempContainer = document.createElement('div');
-        tempContainer.id = 'tempQR';
-        tempContainer.style.display = 'none';
-        document.body.appendChild(tempContainer);
-        
-        // Генерируем QR-код
-        const qrcode = new QRCode(tempContainer, {
-            text: qrData,
-            width: 250,
-            height: 250,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
-        });
-        
-        // Получаем data URL изображения
-        setTimeout(() => {
-            const qrImg = tempContainer.querySelector('img');
-            if (qrImg) {
-                const qrDataUrl = qrImg.src;
-                
-                // Сохраняем в skill
-                const skill = getGlobalSkillById(skillId);
-                if (skill) {
-                    skill.qrCode = qrDataUrl;
-                    skill.qrCodeData = qrData;
-                    addGlobalSkill(skill);
-                }
-            }
-            document.body.removeChild(tempContainer);
-        }, 100);
-        
-        return qrDataUrl;
-    }
-    
-    function getSkillQRCode(skillId) {
-        const skill = getGlobalSkillById(skillId);
-        if (skill && skill.qrCode) {
-            return skill.qrCode;
-        }
-        return null;
-    }
-    
-    function ensureQRCode(skillId, skillName) {
-        let skill = getGlobalSkillById(skillId);
-        if (!skill) return null;
-        
-        if (!skill.qrCode) {
+    // Генерация QR-кода для умейки (локальная)
+    function generateSkillQR(skillId, skillName) {
+        return new Promise((resolve) => {
             const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
-            skill.qrCodeData = qrData;
-            // QR будет сгенерирован при открытии модалки
-            addGlobalSkill(skill);
-        }
-        return skill;
+            const tempDiv = document.createElement('div');
+            tempDiv.style.display = 'none';
+            document.body.appendChild(tempDiv);
+            
+            const qrcode = new QRCode(tempDiv, {
+                text: qrData,
+                width: 250,
+                height: 250,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            setTimeout(() => {
+                const img = tempDiv.querySelector('img');
+                if (img) {
+                    const dataUrl = img.src;
+                    document.body.removeChild(tempDiv);
+                    resolve({ dataUrl, qrData });
+                } else {
+                    document.body.removeChild(tempDiv);
+                    resolve({ dataUrl: null, qrData });
+                }
+            }, 100);
+        });
     }
     
-    window.showQRModal = function(skillId, skillName) {
+    // Генерация маленького QR для карточки
+    function generateQRThumbnail(skillId) {
+        return new Promise((resolve) => {
+            const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
+            const tempDiv = document.createElement('div');
+            tempDiv.style.display = 'none';
+            document.body.appendChild(tempDiv);
+            
+            const qrcode = new QRCode(tempDiv, {
+                text: qrData,
+                width: 60,
+                height: 60,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+            
+            setTimeout(() => {
+                const img = tempDiv.querySelector('img');
+                if (img) {
+                    const dataUrl = img.src;
+                    document.body.removeChild(tempDiv);
+                    resolve(dataUrl);
+                } else {
+                    document.body.removeChild(tempDiv);
+                    resolve(null);
+                }
+            }, 50);
+        });
+    }
+    
+    window.showQRModal = async function(skillId, skillName) {
         triggerHapticFeedback();
         
         currentQRSkillId = skillId;
         currentQRSkillName = skillName;
         
-        const skill = ensureQRCode(skillId, skillName);
-        if (!skill) {
-            alert('❌ Умейка не найдена');
-            return;
-        }
-        
         document.getElementById('qrModalTitle').textContent = skillName;
         
         const container = document.getElementById('qrCodeContainer');
-        container.innerHTML = '';
-        
-        // Генерируем QR-код
-        const qrcode = new QRCode(container, {
-            text: skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${skillId}`,
-            width: 250,
-            height: 250,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
-        });
+        container.innerHTML = '<div style="padding: 20px;">⏳ Генерация QR-кода...</div>';
         
         document.getElementById('qrModal').classList.add('active');
+        
+        const { dataUrl, qrData } = await generateSkillQR(skillId, skillName);
+        
+        if (dataUrl) {
+            container.innerHTML = `<img src="${dataUrl}" style="width: 100%; height: 100%;" alt="QR Code">`;
+            
+            // Сохраняем в skill
+            const skill = getGlobalSkillById(skillId);
+            if (skill) {
+                skill.qrCode = dataUrl;
+                skill.qrCodeData = qrData;
+                addGlobalSkill(skill);
+            }
+        } else {
+            container.innerHTML = '<div style="color: red;">❌ Ошибка генерации QR</div>';
+        }
     };
     
     window.closeQRModal = function() {
@@ -3955,33 +3988,33 @@
         if (!currentQRSkillId || !currentQRSkillName) return;
         
         const skill = getGlobalSkillById(currentQRSkillId);
-        if (!skill) return;
+        const qrData = skill?.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`;
         
-        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`}`;
+        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${qrData}`;
         
         if (navigator.share) {
             navigator.share({
                 title: currentQRSkillName,
                 text: shareText,
-                url: skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`
+                url: qrData
             }).catch(err => console.log('Share canceled'));
         } else {
-            // Копируем в буфер обмена
             navigator.clipboard.writeText(shareText).then(() => {
                 showNotification('✅ Ссылка скопирована в буфер обмена!');
             }).catch(() => {
-                alert('Ссылка: ' + (skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`));
+                alert('Ссылка: ' + qrData);
             });
         }
     };
     
-    // ========== СКАНЕР QR-КОДОВ ==========
+    // ========== СКАНЕР QR-КОДОВ С jsQR ==========
     
     window.openScanner = async function() {
         triggerHapticFeedback();
         
         const modal = document.getElementById('scannerModal');
         modal.classList.add('active');
+        isScanning = true;
         
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -3991,8 +4024,11 @@
             const video = document.getElementById('scannerVideo');
             video.srcObject = stream;
             
-            // Запускаем сканирование
-            startQRScanning();
+            // Ждем загрузки видео и начинаем сканирование
+            video.onloadedmetadata = () => {
+                video.play();
+                startQRScanning();
+            };
         } catch (error) {
             console.error('❌ Ошибка доступа к камере:', error);
             alert('❌ Не удалось получить доступ к камере. Вы можете ввести ID умейки вручную.');
@@ -4001,11 +4037,11 @@
     
     window.closeScanner = function() {
         triggerHapticFeedback();
+        isScanning = false;
         
         const modal = document.getElementById('scannerModal');
         modal.classList.remove('active');
         
-        // Останавливаем камеру
         if (scannerStream) {
             scannerStream.getTracks().forEach(track => track.stop());
             scannerStream = null;
@@ -4018,7 +4054,7 @@
         const context = canvas.getContext('2d');
         
         function scan() {
-            if (!scannerStream) return;
+            if (!isScanning || !scannerStream) return;
             
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
                 canvas.width = video.videoWidth;
@@ -4027,14 +4063,67 @@
                 
                 const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
                 
-                // Здесь можно добавить библиотеку для распознавания QR (jsQR)
-                // Для простоты используем ручной ввод
+                // Используем jsQR для распознавания
+                const code = jsQR(imageData.data, canvas.width, canvas.height, {
+                    inversionAttempts: 'dontInvert',
+                });
+                
+                if (code) {
+                    console.log('✅ QR-код распознан:', code.data);
+                    processScannedCode(code.data);
+                    return; // Останавливаем сканирование после успеха
+                }
             }
             
             requestAnimationFrame(scan);
         }
         
         scan();
+    }
+    
+    function processScannedCode(data) {
+        console.log('🔗 Обработка отсканированного кода:', data);
+        
+        // Останавливаем сканирование
+        isScanning = false;
+        if (scannerStream) {
+            scannerStream.getTracks().forEach(track => track.stop());
+            scannerStream = null;
+        }
+        
+        closeScanner();
+        
+        // Извлекаем skillId из URL или данных
+        let skillId = null;
+        
+        if (data.includes('skill_')) {
+            const match = data.match(/skill_([a-zA-Z0-9_]+)/);
+            if (match) {
+                skillId = match[1];
+            }
+        } else if (data.startsWith('http')) {
+            // Пробуем извлечь из полного URL
+            try {
+                const url = new URL(data);
+                const startParam = url.searchParams.get('start');
+                if (startParam && startParam.includes('skill_')) {
+                    skillId = startParam.replace('skill_', '');
+                }
+            } catch (e) {
+                console.error('❌ Ошибка парсинга URL:', e);
+            }
+        }
+        
+        if (skillId) {
+            const skill = getGlobalSkillById(skillId) || findSkillByPartialId(skillId);
+            if (skill) {
+                openSkillFromQR(skill);
+            } else {
+                alert('❌ Умейка не найдена в базе. Возможно, она была удалена.');
+            }
+        } else {
+            alert('❌ Неверный формат QR-кода');
+        }
     }
     
     window.processManualScan = function() {
@@ -4046,26 +4135,7 @@
             return;
         }
         
-        // Ищем умейку по ID или URL
-        let skillId = input;
-        
-        // Если введена полная ссылка, извлекаем ID
-        if (input.includes('skill_')) {
-            const match = input.match(/skill_([a-zA-Z0-9_]+)/);
-            if (match) {
-                skillId = match[1];
-            }
-        }
-        
-        // Ищем умейку
-        const skill = getGlobalSkillById(skillId) || findSkillByPartialId(skillId);
-        
-        if (skill) {
-            closeScanner();
-            openSkillFromQR(skill);
-        } else {
-            alert('❌ Умейка не найдена. Проверьте ID или ссылку.');
-        }
+        processScannedCode(input);
     };
     
     function findSkillByPartialId(partialId) {
@@ -4081,10 +4151,8 @@
             const skillId = startParam.replace('skill_', '');
             console.log('🔗 Обнаружен deeplink для skill:', skillId);
             
-            // Находим умейку
             const skill = getGlobalSkillById(skillId);
             if (skill) {
-                // Открываем карточку умейки с возможностью создания сделки
                 setTimeout(() => {
                     openSkillFromQR(skill);
                 }, 1000);
@@ -4093,11 +4161,13 @@
     }
     
     function openSkillFromQR(skill) {
-        // Показываем модальное окно с информацией об умейке
+        // Сохраняем информацию о пригласившем
+        processInviterFromQR(skill);
+        
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
         modal.style.display = 'flex';
-        modal.style.zIndex = '5000';
+        modal.style.z-index = '5000';
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 400px;">
                 <button class="modal-close" onclick="this.parentElement.parentElement.remove();">×</button>
@@ -4138,7 +4208,7 @@
             inviterSkillId: inviterSkillId,
             inviterSkillName: inviterSkillName,
             inviterName: inviterName,
-            source: source, // 'qr' или 'link'
+            source: source,
             invitedAt: new Date().toISOString()
         };
         setLocalStorage(`inviter_${currentUserId}`, data);
@@ -4146,7 +4216,6 @@
     }
     
     function processInviterFromQR(skill) {
-        // Сохраняем информацию о пригласившем
         saveInviterData(
             skill.userId,
             skill._id,
@@ -4154,14 +4223,11 @@
             skill.username,
             'qr'
         );
-        
         console.log('✅ Сохранена информация о пригласившем через QR:', skill.username);
     }
     
     function processInviterFromLink(referrerId) {
-        // Получаем данные реферера
         const referrerData = getOrCreateUserProfile(referrerId);
-        
         saveInviterData(
             referrerId,
             null,
@@ -4169,7 +4235,6 @@
             referrerData.firstName || 'Пользователь',
             'link'
         );
-        
         console.log('✅ Сохранена информация о пригласившем через ссылку:', referrerData.firstName);
     }
     
@@ -4180,7 +4245,6 @@
         if (!container) return;
         
         if (!inviterData) {
-            // Нет пригласившего
             container.innerHTML = `
                 <div class="no-inviter-section">
                     <div class="no-inviter-icon">🤝</div>
@@ -4190,7 +4254,6 @@
             return;
         }
         
-        // Есть пригласивший
         const sourceText = inviterData.source === 'qr' ? 'через QR-код' : 'по реферальной ссылке';
         const skillText = inviterData.inviterSkillName ? `<div class="inviter-skill">Умейка: ${inviterData.inviterSkillName}</div>` : '';
         
@@ -4222,7 +4285,6 @@
         const inviterData = getOrCreateUserProfile(inviterId);
         const inviterInfo = getInviterData();
         
-        // Показываем информацию о пригласившем
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
         modal.style.display = 'flex';
@@ -4512,7 +4574,6 @@
         const userData = getOrCreateUserProfile(currentUserId);
         setLocalStorage(`user_${currentUserId}`, userData);
         
-        // Обновляем блок пригласившего
         displayInviterBlock();
     }
 
@@ -4612,7 +4673,6 @@
             const referrerId = urlParams.get('ref') || urlParams.get('start');
             
             if (referrerId && referrerId !== currentUserId && !referrerId.startsWith('skill_')) {
-                // Это реферальная ссылка (не QR-код умейки)
                 processInviterFromLink(referrerId);
                 
                 const referrerData = getOrCreateUserProfile(referrerId);
@@ -4760,6 +4820,18 @@
     function getGlobalSkillById(skillId) {
         const globalSkills = getGlobalSkills();
         return globalSkills.find(s => s._id === skillId);
+    }
+
+    // ========== СИНХРОНИЗАЦИЯ ГЛОБАЛЬНЫХ УМЕЕК ==========
+    
+    function syncGlobalSkills() {
+        // Принудительная синхронизация между вкладками
+        const skills = getGlobalSkills();
+        setGlobalSkills(skills);
+        
+        // Уведомляем другие части приложения
+        window.dispatchEvent(new CustomEvent('skillsUpdated', { detail: skills }));
+        console.log('🔄 Глобальные умейки синхронизированы:', skills.length);
     }
 
     async function compressImage(file, maxWidth = 800, maxHeight = 600, quality = 0.7) {
@@ -4992,6 +5064,8 @@
         return false;
     }
 
+    // ========== ОСНОВНАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ УМЕЙКИ ==========
+    
     window.addSkill = async function() {
         triggerHapticFeedback();
         
@@ -5054,8 +5128,21 @@
                 skillData.photoTimestamp = new Date().toISOString();
             }
 
+            // Генерируем QR-код заранее
+            const skillId = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            skillData._id = skillId;
+            skillData.createdAt = new Date().toISOString();
+            skillData.local = true;
+            
+            // Генерируем QR-код
+            const { dataUrl: qrDataUrl, qrData } = await generateSkillQR(skillId, skillData.skill);
+            skillData.qrCode = qrDataUrl;
+            skillData.qrCodeData = qrData;
+
             console.log('📤 Итоговые данные для отправки:', skillData);
 
+            let serverSaved = false;
+            
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -5075,55 +5162,32 @@
                     const result = await response.json();
                     console.log('📱 Ответ сервера при добавлении:', result);
                     
-                    if (result.success) {
-                        // Генерируем QR-код для новой умейки
-                        const newSkill = result.skill || skillData;
-                        newSkill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${newSkill._id}`;
-                        addGlobalSkill(newSkill);
+                    if (result.success && result.skill) {
+                        // Используем ID с сервера, но сохраняем QR
+                        const serverSkill = result.skill;
+                        serverSkill.qrCode = skillData.qrCode;
+                        serverSkill.qrCodeData = skillData.qrCodeData;
                         
-                        alert('✅ Умейка успешно опубликована!');
+                        addGlobalSkill(serverSkill);
+                        saveSkillToLocalStorage(serverSkill);
+                        serverSaved = true;
                         
-                        document.getElementById('skillName').value = '';
-                        document.getElementById('skillExperience').value = '';
-                        document.getElementById('skillPrice').value = '';
-                        document.getElementById('skillCity').value = '';
-                        removeSkillPhoto();
-                        currentSkillPhoto = null;
-                        
-                        currentRadius = 10;
-                        selectRadius(10);
-                        
-                        currentMasterStatus = 'ready';
-                        selectMasterStatus('ready');
-                    
-                        setTimeout(() => {
-                            loadMySkills();
-                            loadProfileSkills();
-                        }, 500);
-                    
-                        if (map) {
-                            setTimeout(() => loadSkillsOnMap(), 1000);
-                        }
-                        return;
+                        alert('✅ Умейка успешно опубликована и видна всем!');
                     }
                 }
             } catch (serverError) {
                 console.log('⚠️ Сервер недоступен, сохраняем локально:', serverError);
             }
             
-            const localSkill = {
-                ...skillData,
-                _id: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                createdAt: new Date().toISOString(),
-                local: true,
-                qrCodeData: `${TELEGRAM_BOT_URL}?start=skill_local_${Date.now()}`
-            };
+            if (!serverSaved) {
+                // Сохраняем локально с сгенерированным QR
+                addGlobalSkill(skillData);
+                saveSkillToLocalStorage(skillData);
+                
+                alert('✅ Умейка сохранена локально (сервер недоступен). Она видна всем пользователям этого устройства.');
+            }
             
-            saveSkillToLocalStorage(localSkill);
-            addGlobalSkill(localSkill);
-            
-            alert('✅ Умейка сохранена локально (сервер недоступен)');
-            
+            // Очищаем форму
             document.getElementById('skillName').value = '';
             document.getElementById('skillExperience').value = '';
             document.getElementById('skillPrice').value = '';
@@ -5137,11 +5201,16 @@
             currentMasterStatus = 'ready';
             selectMasterStatus('ready');
         
+            // Принудительная синхронизация
+            syncGlobalSkills();
+            
+            // Обновляем списки
             setTimeout(() => {
                 loadMySkills();
                 loadProfileSkills();
             }, 500);
         
+            // Обновляем карту если открыта
             if (map) {
                 setTimeout(() => loadSkillsOnMap(), 1000);
             }
@@ -5177,8 +5246,10 @@
                         if (existing.qrCodeData) skill.qrCodeData = existing.qrCodeData;
                         globalSkills[existingIndex] = skill;
                     } else {
-                        // Добавляем QR данные для новых умейек
-                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                        // Генерируем QR для новых умейек если нет
+                        if (!skill.qrCodeData) {
+                            skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                        }
                         globalSkills.push(skill);
                     }
                 });
@@ -5195,6 +5266,8 @@
         }
     }
 
+    // ========== ЗАГРУЗКА УМЕЕК С QR-КОДАМИ ==========
+    
     async function loadMySkills() {
         try {
             console.log('📡 Загрузка моих умейок...');
@@ -5222,7 +5295,8 @@
                     if (result.success && result.skills) {
                         skills = result.skills;
                         
-                        skills = skills.map(skill => {
+                        // Генерируем QR-коды для умейк без них
+                        for (let skill of skills) {
                             const globalSkill = getGlobalSkillById(skill._id);
                             if (globalSkill) {
                                 if (globalSkill.updatedAt) {
@@ -5234,12 +5308,15 @@
                                 if (globalSkill.qrCode) skill.qrCode = globalSkill.qrCode;
                                 if (globalSkill.qrCodeData) skill.qrCodeData = globalSkill.qrCodeData;
                             }
-                            // Убедимся что QR данные есть
-                            if (!skill.qrCodeData) {
-                                skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                            // Генерируем QR если нет
+                            if (!skill.qrCode || !skill.qrCodeData) {
+                                const { dataUrl, qrData } = await generateSkillQR(skill._id, skill.skill);
+                                skill.qrCode = dataUrl;
+                                skill.qrCodeData = qrData;
+                                // Обновляем в глобальном хранилище
+                                addGlobalSkill(skill);
                             }
-                            return skill;
-                        });
+                        }
                     }
                 }
             } catch (serverError) {
@@ -5255,9 +5332,6 @@
             const existingIds = new Set(skills.map(s => s._id));
             myGlobalSkills.forEach(skill => {
                 if (!existingIds.has(skill._id)) {
-                    if (!skill.qrCodeData) {
-                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
-                    }
                     skills.push(skill);
                 }
             });
@@ -5273,10 +5347,19 @@
             skills = uniqueSkills;
             
             if (skills.length > 0) {
-                skillsList.innerHTML = skills.map(skill => {
+                // Генерируем HTML для каждой умейки с QR-кодом
+                const skillsHtml = await Promise.all(skills.map(async (skill) => {
                     const statusBadge = getStatusBadge(skill.status);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
                     const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
+                    
+                    // Генерируем QR если нет
+                    if (!skill.qrCode) {
+                        const { dataUrl } = await generateSkillQR(skill._id, skill.skill);
+                        skill.qrCode = dataUrl;
+                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                        addGlobalSkill(skill);
+                    }
                     
                     return `
                     <div class="skill-card">
@@ -5285,7 +5368,7 @@
                             <div class="skill-rating">${'⭐'.repeat(5)}</div>
                         </div>
                         
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`)}" 
+                        <img src="${skill.qrCode}" 
                              class="skill-qr-code" 
                              alt="QR"
                              onclick="event.stopPropagation(); triggerHapticFeedback(); showQRModal('${skill._id}', '${skill.skill.replace(/'/g, "\\'")}');">
@@ -5323,7 +5406,9 @@
                             </button>
                         </div>
                     </div>
-                `}).join('');
+                `}));
+                
+                skillsList.innerHTML = skillsHtml.join('');
             } else {
                 skillsList.innerHTML = `
                     <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
@@ -5369,7 +5454,7 @@
                     if (result.success) {
                         skills = result.skills;
                         
-                        skills = skills.map(skill => {
+                        for (let skill of skills) {
                             const globalSkill = getGlobalSkillById(skill._id);
                             if (globalSkill) {
                                 if (globalSkill.updatedAt) {
@@ -5378,52 +5463,59 @@
                                     }
                                 }
                                 if (globalSkill.qrCode) skill.qrCode = globalSkill.qrCode;
-                                if (globalSkill.qrCodeData) skill.qrCodeData = globalSkill.qrCodeData;
-                            }
-                            if (!skill.qrCodeData) {
-                                skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
-                            }
-                            return skill;
-                        });
+                                                        if (globalSkill.qrCodeData) skill.qrCodeData = globalSkill.qrCodeData;
                     }
-                }
-            } catch (serverError) {
-                console.log('⚠️ Сервер недоступен для загрузки умейок в профиль');
-            }
-            
-            const localUserSkills = loadSkillsFromLocalStorage(currentUserId);
-            skills = [...skills, ...localUserSkills.filter(s => s.local)];
-            
-            const globalSkills = getGlobalSkills();
-            const myGlobalSkills = globalSkills.filter(s => s.userId === currentUserId);
-            
-            const existingIds = new Set(skills.map(s => s._id));
-            myGlobalSkills.forEach(skill => {
-                if (!existingIds.has(skill._id)) {
+                    // Убедимся что QR данные есть
                     if (!skill.qrCodeData) {
                         skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
                     }
-                    skills.push(skill);
-                }
-            });
-            
-            const uniqueSkills = [];
-            const seenIds = new Set();
-            for (const skill of skills) {
-                if (!seenIds.has(skill._id)) {
-                    seenIds.add(skill._id);
-                    uniqueSkills.push(skill);
-                }
+                    return skill;
+                });
+                
+                // Генерируем QR-коды для умейек без них
+                skills.forEach(skill => {
+                    if (!skill.qrCode) {
+                        ensureQRCode(skill._id, skill.skill);
+                    }
+                });
             }
-            skills = uniqueSkills;
-            
-            if (skills.length > 0) {
-                skillsList.innerHTML = skills.map(skill => {
-                    const statusBadge = getStatusBadge(skill.status);
-                    const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
-                    const cityInfo = skill.city ? `<div class="city-info" style="background: rgba(102,126,234,0.08); margin: 10px 0; padding: 8px 12px; border-radius: 8px; font-size: 14px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
-                    
-                    return `
+        } catch (serverError) {
+            console.log('⚠️ Сервер недоступен для загрузки умейок в профиль');
+        }
+        
+        const localUserSkills = loadSkillsFromLocalStorage(currentUserId);
+        skills = [...skills, ...localUserSkills.filter(s => s.local)];
+        
+        const globalSkills = getGlobalSkills();
+        const myGlobalSkills = globalSkills.filter(s => s.userId === currentUserId);
+        
+        const existingIds = new Set(skills.map(s => s._id));
+        myGlobalSkills.forEach(skill => {
+            if (!existingIds.has(skill._id)) {
+                if (!skill.qrCodeData) {
+                    skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                }
+                skills.push(skill);
+            }
+        });
+        
+        const uniqueSkills = [];
+        const seenIds = new Set();
+        for (const skill of skills) {
+            if (!seenIds.has(skill._id)) {
+                seenIds.add(skill._id);
+                uniqueSkills.push(skill);
+            }
+        }
+        skills = uniqueSkills;
+        
+        if (skills.length > 0) {
+            skillsList.innerHTML = skills.map(skill => {
+                const statusBadge = getStatusBadge(skill.status);
+                const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                const cityInfo = skill.city ? `<div class="city-info" style="background: rgba(102,126,234,0.08); margin: 10px 0; padding: 8px 12px; border-radius: 8px; font-size: 14px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
+                
+                return `
                     <div class="profile-skill-card">
                         <div class="profile-skill-header">
                             <div class="skill-title">${skill.skill} ${isLocal}</div>
@@ -7130,57 +7222,311 @@
                 'completed': 'Завершена'
             }[deal.status] || 'Неизвестно';
             
+            const statusClass = {
+                'draft': 'status-draft',
+                'pending': 'status-pending',
+                'active': 'status-active',
+                'completed': 'status-completed'
+            }[deal.status] || 'status-draft';
+            
             const qualityText = {
                 'premium': 'Премиум',
                 'standard': 'Стандарт',
                 'economy': 'Эконом'
             }[deal.quality] || 'Не указано';
             
-            const paymentStatusText = {
-                'pending': '⏳ Ожидает оплаты',
-                'paid': '✅ Оплачено (в эскроу)',
-                'released': '💸 Выплачено мастеру',
-                'refunded': '↩️ Возвращено клиенту'
-            }[deal.paymentStatus || 'pending'];
+            const showSignButton = deal.status === 'pending' && 
+                ((isClient && !deal.clientSigned) || (isMaster && !deal.masterSigned));
             
-            const details = `
-                <strong>Название:</strong> ${deal.title}<br><br>
-                <strong>Описание:</strong> ${deal.description}<br><br>
-                <strong>Статус:</strong> ${statusText}<br><br>
-                <strong>Статус оплаты:</strong> ${paymentStatusText}<br><br>
-                <strong>Ваша роль:</strong> ${roleText}<br><br>
-                <strong>Срок выполнения:</strong> ${deal.period}<br><br>
-                <strong>Сумма:</strong> ${deal.amount} ⭐<br><br>
-                <strong>Уровень качества:</strong> ${qualityText}<br><br>
-                <strong>Дополнительные условия:</strong> ${deal.options?.join(', ') || 'Не указаны'}<br><br>
-                <strong>Клиент:</strong> ${deal.clientName}<br><br>
-                <strong>Мастер:</strong> ${deal.masterName}<br><br>
-                ${deal.masterSkill ? `<strong>Услуга:</strong> ${deal.masterSkill}<br><br>` : ''}
-                ${deal.masterContact ? `<strong>Контакт мастера:</strong> ${deal.masterContact}<br><br>` : ''}
-                <strong>Дата создания:</strong> ${new Date(deal.createdAt).toLocaleString('ru-RU')}<br><br>
-                ${deal.completedAt ? `<strong>Дата завершения:</strong> ${new Date(deal.completedAt).toLocaleString('ru-RU')}<br><br>` : ''}
-                <strong>Статус подписи клиента:</strong> ${deal.clientSigned ? '✅ Подписана' : '❌ Не подписана'}<br><br>
-                <strong>Статус подписи мастера:</strong> ${deal.masterSigned ? '✅ Подписана' : '❌ Не подписана'}<br><br>
-                ${deal.paymentStatus === 'paid' || deal.paymentStatus === 'released' ? `
-                    <strong>Заморожено в эскроу:</strong> ${deal.escrowBalance} ⭐<br><br>
-                    <strong>Комиссия системы (5%):</strong> ${deal.commissionAmount} ⭐<br><br>
-                    <strong>Выплачено мастеру:</strong> ${deal.masterPayout} ⭐<br><br>
-                ` : `
-                    <strong>Комиссия системы (5%):</strong> ${deal.commission} ⭐<br><br>
-                    <strong>Итого к оплате:</strong> ${deal.total} ⭐<br><br>
-                `}
+            const showCompleteButton = deal.status === 'active' && isMaster;
+            const showPayButton = isClient && deal.status === 'pending' && (!deal.paymentStatus || deal.paymentStatus === 'pending');
+            const showEscrowInfo = deal.paymentStatus === 'paid' || deal.paymentStatus === 'released';
+            const showDeleteButton = deal.status === 'completed';
+            
+            return `
+                <div class="deal-card">
+                    <div class="deal-header">
+                        <div class="deal-title">${deal.title}</div>
+                        <div class="deal-status ${statusClass}">${statusText}</div>
+                    </div>
+                    
+                    <p style="margin: 10px 0; color: #666; font-size: 14px;">${roleText}</p>
+                    <p style="margin: 10px 0; color: #666;">${deal.description}</p>
+                    
+                    ${getPaymentStatusBadge(deal.paymentStatus || 'pending')}
+                    
+                    <div class="deal-details">
+                        <div class="deal-detail">
+                            <span style="color: #667eea;">💰</span>
+                            <span>${deal.amount} ₽</span>
+                        </div>
+                        <div class="deal-detail">
+                            <span style="color: #667eea;">⏱️</span>
+                            <span>${deal.period}</span>
+                        </div>
+                        <div class="deal-detail">
+                            <span style="color: #667eea;">⭐</span>
+                            <span>${qualityText}</span>
+                        </div>
+                        <div class="deal-detail">
+                            <span style="color: #667eea;">📅</span>
+                            <span>${new Date(deal.createdAt).toLocaleDateString('ru-RU')}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 10px 0; padding: 10px; background: #f7fafc; border-radius: 8px;">
+                        <div style="margin: 5px 0; font-weight: bold;">${isClient ? 'Мастер' : 'Клиент'}:</div>
+                        <div style="margin: 5px 0; color: #666;">
+                            ${isClient ? deal.masterName : deal.clientName}
+                        </div>
+                        ${isClient && deal.masterSkill ? `
+                            <div style="margin: 5px 0; color: #48bb78; font-weight: bold;">
+                                Услуга: ${deal.masterSkill}
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    ${showEscrowInfo ? `
+                        <div class="escrow-info">
+                            <div class="escrow-title">
+                                🔒 Гарант сделки
+                            </div>
+                            <div class="escrow-details">
+                                ${deal.paymentStatus === 'paid' ? 
+                                    `💰 ${deal.escrowBalance || deal.amount} Stars заморожено до завершения работ` :
+                                    `✅ Выплачено мастеру: ${deal.masterPayout || Math.round(deal.amount * 0.95)} Stars`
+                                }
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="signatures">
+                        <div class="signature ${deal.clientSigned ? 'signed' : 'unsigned'}">
+                            <span>👤</span>
+                            <span>Клиент ${deal.clientSigned ? 'подписал' : 'не подписал'}</span>
+                        </div>
+                        <div class="signature ${deal.masterSigned ? 'signed' : 'unsigned'}">
+                            <span>🔧</span>
+                            <span>Мастер ${deal.masterSigned ? 'подписал' : 'не подписал'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="deal-commission" style="background: #f7fafc; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Сумма:</span>
+                            <span>${deal.amount} ⭐</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; color: #48bb78;">
+                            <span>Комиссия (5%):</span>
+                            <span>${Math.round(deal.amount * 0.05)} ⭐</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 5px;">
+                            <span>Итого к оплате:</span>
+                            <span>${Math.round(deal.amount * 1.05)} ⭐</span>
+                        </div>
+                    </div>
+                    
+                    <div class="deal-actions">
+                        ${showSignButton ? `
+                            <button class="deal-button sign-button" onclick="triggerHapticFeedback(); signDeal('${deal.id}');">
+                                ✍️ Подписать сделку
+                            </button>
+                        ` : ''}
+                        
+                        ${showPayButton ? `
+                            <button class="deal-button pay-button" onclick="triggerHapticFeedback(); payForDeal('${deal.id}');">
+                                💳 Оплатить сделку
+                            </button>
+                        ` : ''}
+                        
+                        ${showCompleteButton ? `
+                            <button class="deal-button complete-button" onclick="triggerHapticFeedback(); completeDeal('${deal.id}');">
+                                ✅ Завершить сделку
+                            </button>
+                        ` : ''}
+                        
+                        <button class="deal-button view-button" onclick="triggerHapticFeedback(); viewDealDetails('${deal.id}');">
+                            👁️ Подробнее
+                        </button>
+                        
+                        ${showDeleteButton ? `
+                            <button class="deal-button delete-deal" onclick="triggerHapticFeedback(); deleteDeal('${deal.id}');">
+                                🗑️ Удалить сделку
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
             `;
-            
-            alert(details);
-            
-        } catch (error) {
-            console.error('❌ Ошибка просмотра сделки:', error);
-            alert('❌ Ошибка просмотра сделки: ' + error.message);
-        }
-    };
+        }).join('');
+        
+    } catch (error) {
+        console.error('❌ Ошибка загрузки сделок:', error);
+        document.getElementById('dealsList').innerHTML = `
+            <div class="error-message">
+                ❌ Ошибка загрузки сделок<br>
+                <small>${error.message}</small>
+            </div>
+        `;
+    }
+}
 
-    window.showCreateDealSection = function() {
-        triggerHapticFeedback();
+window.createDealFromSkill = function(skillId, skillName, masterName, masterId, masterContact) {
+    triggerHapticFeedback();
+    
+    console.log('📝 Создание сделки с мастером:', {
+        skillId, skillName, masterName, masterId, masterContact
+    });
+    
+    currentDealMaster = {
+        skillId: skillId,
+        skillName: skillName,
+        masterName: masterName,
+        masterId: masterId,
+        masterContact: masterContact
+    };
+    
+    const userData = getOrCreateUserProfile(currentUserId);
+    const clientName = userData.firstName || 'Клиент';
+    
+    getOrCreateUserProfile(masterId, masterName);
+    
+    document.getElementById('dealMasterId').value = masterId;
+    document.getElementById('dealMasterName').value = masterName;
+    document.getElementById('dealMasterSkill').value = skillName;
+    document.getElementById('dealMasterContact').value = masterContact;
+    
+    document.getElementById('dealTitle').value = `${skillName} - ${masterName}`;
+    document.getElementById('dealDescription').value = `Сделка между ${clientName} (клиент) и ${masterName} (мастер) на услугу "${skillName}"`;
+    
+    showSection('createDealSection');
+};
+
+window.selectQuality = function(quality) {
+    triggerHapticFeedback();
+    selectedQuality = quality;
+    
+    document.querySelectorAll('.quality-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    document.getElementById('quality' + quality.charAt(0).toUpperCase() + quality.slice(1)).classList.add('selected');
+    
+    updateDealCommission();
+};
+
+window.toggleOption = function(option) {
+    triggerHapticFeedback();
+    const element = document.getElementById('option' + option.charAt(0).toUpperCase() + option.slice(1));
+    
+    if (element.classList.contains('selected')) {
+        element.classList.remove('selected');
+        selectedOptions = selectedOptions.filter(item => item !== option);
+    } else {
+        if (selectedOptions.length >= 2) {
+            alert('❌ Вы можете выбрать только 2 дополнительных условия');
+            return;
+        }
+        element.classList.add('selected');
+        selectedOptions.push(option);
+    }
+    
+    updateDealCommission();
+};
+
+function updateDealCommission() {
+    const dealAmount = document.getElementById('dealAmount').value || 0;
+    
+    if (dealAmount > 0) {
+        const commission = dealAmount * 0.05;
+        const total = parseInt(dealAmount) + commission;
+        
+        document.getElementById('dealAmountDisplay').textContent = dealAmount;
+        document.getElementById('commissionAmount').textContent = Math.round(commission);
+        document.getElementById('totalAmount').textContent = Math.round(total);
+        document.getElementById('dealCommission').style.display = 'block';
+    } else {
+        document.getElementById('dealCommission').style.display = 'none';
+    }
+}
+
+window.createDeal = function() {
+    triggerHapticFeedback();
+    
+    try {
+        const title = document.getElementById('dealTitle').value.trim();
+        const description = document.getElementById('dealDescription').value.trim();
+        const period = document.getElementById('dealPeriod').value.trim();
+        const amount = document.getElementById('dealAmount').value;
+        
+        const masterId = document.getElementById('dealMasterId').value;
+        const masterName = document.getElementById('dealMasterName').value;
+        const masterSkill = document.getElementById('dealMasterSkill').value;
+        const masterContact = document.getElementById('dealMasterContact').value;
+        
+        const userData = getOrCreateUserProfile(currentUserId);
+        const clientName = userData.firstName || 'Клиент';
+        
+        if (!title || !description || !period || !amount) {
+            alert('❌ Заполните все обязательные поля (отмечены *)');
+            return;
+        }
+        
+        if (!selectedQuality) {
+            alert('❌ Выберите уровень качества');
+            return;
+        }
+        
+        if (selectedOptions.length !== 2) {
+            alert('❌ Выберите 2 дополнительных условия');
+            return;
+        }
+        
+        if (!masterId || !masterName) {
+            alert('❌ Ошибка: данные мастера не найдены');
+            return;
+        }
+        
+        console.log('📤 Создаю сделку с мастером:', {
+            masterId, masterName, masterSkill, masterContact
+        });
+        
+        const newDeal = {
+            id: generateDealId(),
+            title: title,
+            description: description,
+            period: period,
+            amount: parseInt(amount),
+            quality: selectedQuality,
+            options: [...selectedOptions],
+            commission: Math.round(amount * 0.05),
+            total: Math.round(amount * 1.05),
+            status: 'pending',
+            paymentStatus: 'pending',
+            escrowBalance: 0,
+            commissionAmount: 0,
+            masterPayout: 0,
+            clientSigned: false,
+            masterSigned: false,
+            createdAt: new Date().toISOString(),
+            clientId: currentUserId,
+            clientName: clientName,
+            masterId: masterId,
+            masterName: masterName,
+            masterSkill: masterSkill,
+            masterContact: masterContact,
+            skillId: currentDealMaster?.skillId || null
+        };
+        
+        console.log('✅ Создана сделка:', newDeal);
+        
+        addGlobalDeal(newDeal);
+        
+        userData.dealsCount = (userData.dealsCount || 0) + 1;
+        setLocalStorage(`user_${currentUserId}`, userData);
+        
+        const masterData = getOrCreateUserProfile(masterId, masterName);
+        masterData.dealsCount = (masterData.dealsCount || 0) + 1;
+        setLocalStorage(`user_${masterId}`, masterData);
         
         document.getElementById('dealTitle').value = '';
         document.getElementById('dealDescription').value = '';
@@ -7199,255 +7545,464 @@
         
         document.getElementById('dealCommission').style.display = 'none';
         
-        currentDealMaster = null;
-        document.getElementById('dealMasterId').value = '';
-        document.getElementById('dealMasterName').value = '';
-        document.getElementById('dealMasterSkill').value = '';
-        document.getElementById('dealMasterContact').value = '';
+        alert('✅ Сделка успешно создана! Теперь её должен подписать мастер и вы должны оплатить.');
         
-        showSection('createDealSection');
-    };
+        showProfileSection();
+        showProfileTab('deals');
+        showDealsTab('pending');
+        
+    } catch (error) {
+        console.error('❌ Ошибка создания сделки:', error);
+        alert('❌ Ошибка создания сделки: ' + error.message);
+    }
+};
 
-    window.setProjectRating = function(rating) {
-        triggerHapticFeedback();
-        projectRating = rating;
-        const stars = document.getElementById('projectRatingStars');
-        stars.innerHTML = '';
-        
-        for (let i = 1; i <= 5; i++) {
-            stars.innerHTML += i <= rating ? 
-                '<span style="cursor: pointer; color: #FFD700;" onclick="triggerHapticFeedback(); setProjectRating(' + i + ');">★</span>' :
-                '<span style="cursor: pointer;" onclick="triggerHapticFeedback(); setProjectRating(' + i + ');">☆</span>';
+window.signDeal = function(dealId) {
+    triggerHapticFeedback();
+    
+    try {
+        const deal = getDealById(dealId);
+        if (!deal) {
+            alert('❌ Сделка не найдена');
+            return;
         }
-    };
+        
+        const isClient = deal.clientId === currentUserId;
+        const isMaster = deal.masterId === currentUserId;
+        
+        if (!isClient && !isMaster) {
+            alert('❌ Вы не являетесь участником этой сделки');
+            return;
+        }
+        
+        const updates = {};
+        if (isClient) {
+            updates.clientSigned = true;
+        } else if (isMaster) {
+            updates.masterSigned = true;
+        }
+        
+        const clientSigned = isClient ? true : deal.clientSigned;
+        const masterSigned = isMaster ? true : deal.masterSigned;
+        
+        if (clientSigned && masterSigned) {
+            updates.status = 'active';
+            alert('🎉 Обе стороны подписали сделку! Теперь клиент должен оплатить сделку для активации.');
+        } else {
+            alert('✅ Вы успешно подписали сделку! Ожидайте подписи второй стороны и оплаты.');
+        }
+        
+        updateGlobalDeal(dealId, updates);
+        
+        loadDeals();
+        
+    } catch (error) {
+        console.error('❌ Ошибка подписи сделки:', error);
+        alert('❌ Ошибка подписи сделки: ' + error.message);
+    }
+};
 
-    // ========== ФУНКЦИИ ОТЗЫВОВ О ПРОЕКТЕ ==========
+window.completeDeal = function(dealId) {
+    triggerHapticFeedback();
     
-    function getProjectReviews() {
-        return getLocalStorage('ymeyka_project_reviews') || [];
-    }
-    
-    function saveProjectReview(review) {
-        const reviews = getProjectReviews();
-        reviews.push(review);
-        setLocalStorage('ymeyka_project_reviews', reviews);
-        return review;
-    }
-    
-    function calculateProjectStats() {
-        const reviews = getProjectReviews();
-        const globalDeals = getGlobalDeals();
-        const globalSkills = getGlobalSkills();
-        
-        const uniqueMasters = new Set(globalSkills.map(s => s.userId)).size;
-        
-        const dealsCount = globalDeals.length;
-        
-        let averageRating = 0;
-        if (reviews.length > 0) {
-            const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-            averageRating = sum / reviews.length;
-        }
-        
-        const completedDeals = globalDeals.filter(d => d.status === 'completed');
-        const satisfiedClients = completedDeals.filter(d => d.paymentStatus !== 'refunded').length;
-        const satisfactionRate = completedDeals.length > 0 
-            ? Math.round((satisfiedClients / completedDeals.length) * 100) 
-            : 0;
-        
-        return {
-            mastersCount: uniqueMasters || Math.floor(Math.random() * 500) + 500,
-            dealsCount: dealsCount || Math.floor(Math.random() * 1000) + 1000,
-            averageRating: averageRating || 4.9,
-            satisfactionRate: satisfactionRate || 98,
-            reviewsCount: reviews.length
-        };
-    }
-    
-    function updateAboutStats() {
-        const stats = calculateProjectStats();
-        
-        document.getElementById('statMastersCount').textContent = stats.mastersCount.toLocaleString('ru-RU');
-        document.getElementById('statDealsCount').textContent = stats.dealsCount.toLocaleString('ru-RU');
-        document.getElementById('statRating').textContent = stats.averageRating.toFixed(1);
-        document.getElementById('statSatisfaction').textContent = stats.satisfactionRate + '%';
-    }
-    
-    function checkReviewEligibility() {
-        const userData = getOrCreateUserProfile(currentUserId);
-        const hasCompletedDeals = (userData.completedDeals || 0) > 0;
-        
-        const submitBtn = document.getElementById('submitReviewBtn');
-        const warningMsg = document.getElementById('reviewRestrictionMessage');
-        
-        if (!hasCompletedDeals) {
-            submitBtn.disabled = true;
-            submitBtn.classList.add('disabled');
-            warningMsg.style.display = 'block';
-        } else {
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('disabled');
-            warningMsg.style.display = 'none';
-        }
-    }
-    
-    window.submitProjectReview = function() {
-        triggerHapticFeedback();
-        
-        const comment = document.getElementById('projectReviewComment').value.trim();
-        const userData = getOrCreateUserProfile(currentUserId);
-        
-        if ((userData.completedDeals || 0) === 0) {
-            alert('❌ Оставить отзыв могут только участники с завершёнными сделками');
-            return;
-        }
-        
-        if (projectRating === 0) {
-            alert('❌ Пожалуйста, поставьте оценку');
-            return;
-        }
-        
-        if (!comment) {
-            alert('❌ Пожалуйста, напишите отзыв');
-            return;
-        }
-        
-        const review = {
-            id: 'review_' + Date.now(),
-            rating: projectRating,
-            comment: comment,
-            userId: currentUserId,
-            userName: userData.firstName || 'Пользователь',
-            userAvatar: userData.avatar || null,
-            createdAt: new Date().toISOString(),
-            hasCompletedDeals: true
-        };
-        
-        saveProjectReview(review);
-        
-        alert('✅ Спасибо за ваш отзыв!');
-        
-        document.getElementById('projectReviewComment').value = '';
-        setProjectRating(0);
-        
-        updateAboutStats();
-    };
-    
-    window.openReviewsModal = function() {
-        triggerHapticFeedback();
-        
-        const reviews = getProjectReviews();
-        const stats = calculateProjectStats();
-        
-        document.getElementById('reviewsAverageRating').textContent = stats.averageRating.toFixed(1);
-        document.getElementById('reviewsTotalCount').textContent = `${stats.reviewsCount} отзывов`;
-        
-        const starsContainer = document.getElementById('reviewsAverageStars');
-        let starsHtml = '';
-        for (let i = 1; i <= 5; i++) {
-            starsHtml += i <= Math.round(stats.averageRating) ? '★' : '☆';
-        }
-        starsContainer.textContent = starsHtml;
-        
-        const listContainer = document.getElementById('reviewsList');
-        
-        if (reviews.length === 0) {
-            listContainer.innerHTML = `
-                <div class="no-reviews">
-                    <div class="no-reviews-icon">💭</div>
-                    <div>Пока нет отзывов</div>
-                    <div style="font-size: 14px; opacity: 0.7; margin-top: 10px;">Будьте первым!</div>
-                </div>
-            `;
-        } else {
-            const sortedReviews = [...reviews].sort((a, b) => 
-                new Date(b.createdAt) - new Date(a.createdAt)
-            );
+    if (confirm('✅ Завершить сделку? После завершения деньги будут переведены мастеру (за вычетом комиссии 5%).')) {
+        try {
+            triggerHapticFeedback();
             
-            listContainer.innerHTML = sortedReviews.map(review => {
-                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-                const avatar = review.userAvatar 
-                    ? `<img src="${review.userAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
-                    : review.userName.charAt(0).toUpperCase();
+            const deal = getDealById(dealId);
+            if (!deal) {
+                alert('❌ Сделка не найдена');
+                return;
+            }
+            
+            const isMaster = deal.masterId === currentUserId;
+            if (!isMaster) {
+                alert('❌ Только мастер может завершить сделку');
+                return;
+            }
+            
+            if (deal.status !== 'active') {
+                alert('❌ Можно завершить только активные сделки');
+                return;
+            }
+            
+            if (deal.paymentStatus !== 'paid') {
+                alert('❌ Сделка не оплачена клиентом');
+                return;
+            }
+            
+            if (releasePayment(dealId)) {
+                updateGlobalDeal(dealId, {
+                    status: 'completed',
+                    completedAt: new Date().toISOString()
+                });
                 
-                return `
-                    <div class="review-item">
-                        <div class="review-header">
-                            <div class="review-author">
-                                <div class="review-avatar">${avatar}</div>
-                                <div>
-                                    <div class="review-name">${review.userName}</div>
-                                    <div class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU')}</div>
-                                </div>
-                            </div>
-                            <div class="review-rating">${stars}</div>
-                        </div>
-                        <div class="review-text">${review.comment}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        document.getElementById('reviewsModal').classList.add('active');
-    };
-    
-    window.closeReviewsModal = function() {
-        triggerHapticFeedback();
-        document.getElementById('reviewsModal').classList.remove('active');
-    };
-
-    // ========== ФУНКЦИЯ УДАЛЕНИЯ СДЕЛКИ ==========
-    window.deleteDeal = function(dealId) {
-        triggerHapticFeedback();
-        
-        if (confirm('❌ Удалить эту завершённую сделку?')) {
-            try {
-                const globalDeals = getGlobalDeals();
-                const dealIndex = globalDeals.findIndex(deal => deal.id === dealId);
+                addCoin();
                 
-                if (dealIndex === -1) {
-                    alert('❌ Сделка не найдена');
-                    return;
-                }
+                const userData = getOrCreateUserProfile(currentUserId);
+                userData.completedDeals = (userData.completedDeals || 0) + 1;
+                userData.rating = (userData.rating || 0) + 0.5;
+                setLocalStorage(`user_${currentUserId}`, userData);
                 
-                const deal = globalDeals[dealIndex];
+                const clientData = getOrCreateUserProfile(deal.clientId, deal.clientName);
+                clientData.completedDeals = (clientData.completedDeals || 0) + 1;
+                clientData.rating = (clientData.rating || 0) + 0.5;
+                setLocalStorage(`user_${deal.clientId}`, clientData);
                 
-                if (deal.status !== 'completed') {
-                    alert('❌ Можно удалять только завершённые сделки');
-                    return;
-                }
-                
-                const isClient = deal.clientId === currentUserId;
-                const isMaster = deal.masterId === currentUserId;
-                
-                if (!isClient && !isMaster) {
-                    alert('❌ Вы не являетесь участником этой сделки');
-                    return;
-                }
-                
-                globalDeals.splice(dealIndex, 1);
-                setGlobalDeals(globalDeals);
-                
-                console.log(`✅ Сделка ${dealId} удалена из глобального хранилища`);
+                alert('✅ Сделка успешно завершена! Средства переведены на ваш баланс (за вычетом комиссии 5%). Получена +1 🪙 монета!');
                 
                 loadDeals();
-                
-                showNotification('✅ Сделка успешно удалена!');
-                
-            } catch (error) {
-                console.error('❌ Ошибка удаления сделки:', error);
-                alert('❌ Ошибка удаления сделки: ' + error.message);
+                loadUserProfile();
+                updateWalletUI();
             }
+            
+        } catch (error) {
+            console.error('❌ Ошибка завершения сделки:', error);
+            alert('❌ Ошибка завершения сделки: ' + error.message);
         }
-    };
+    }
+};
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const dealAmount = document.getElementById('dealAmount');
-        if (dealAmount) {
-            dealAmount.addEventListener('input', updateDealCommission);
+window.viewDealDetails = function(dealId) {
+    triggerHapticFeedback();
+    
+    try {
+        const deal = getDealById(dealId);
+        
+        if (!deal) {
+            alert('❌ Сделка не найдена');
+            return;
         }
+        
+        const isClient = deal.clientId === currentUserId;
+        const isMaster = deal.masterId === currentUserId;
+        const roleText = isClient ? 'Вы: Клиент' : (isMaster ? 'Вы: Мастер' : 'Неизвестно');
+        
+        const statusText = {
+            'draft': 'Черновик',
+            'pending': 'Ожидает подписи',
+            'active': 'Активна',
+            'completed': 'Завершена'
+        }[deal.status] || 'Неизвестно';
+        
+        const qualityText = {
+            'premium': 'Премиум',
+            'standard': 'Стандарт',
+            'economy': 'Эконом'
+        }[deal.quality] || 'Не указано';
+        
+        const paymentStatusText = {
+            'pending': '⏳ Ожидает оплаты',
+            'paid': '✅ Оплачено (в эскроу)',
+            'released': '💸 Выплачено мастеру',
+            'refunded': '↩️ Возвращено клиенту'
+        }[deal.paymentStatus || 'pending'];
+        
+        const details = `
+            <strong>Название:</strong> ${deal.title}<br><br>
+            <strong>Описание:</strong> ${deal.description}<br><br>
+            <strong>Статус:</strong> ${statusText}<br><br>
+            <strong>Статус оплаты:</strong> ${paymentStatusText}<br><br>
+            <strong>Ваша роль:</strong> ${roleText}<br><br>
+            <strong>Срок выполнения:</strong> ${deal.period}<br><br>
+            <strong>Сумма:</strong> ${deal.amount} ⭐<br><br>
+            <strong>Уровень качества:</strong> ${qualityText}<br><br>
+            <strong>Дополнительные условия:</strong> ${deal.options?.join(', ') || 'Не указаны'}<br><br>
+            <strong>Клиент:</strong> ${deal.clientName}<br><br>
+            <strong>Мастер:</strong> ${deal.masterName}<br><br>
+            ${deal.masterSkill ? `<strong>Услуга:</strong> ${deal.masterSkill}<br><br>` : ''}
+            ${deal.masterContact ? `<strong>Контакт мастера:</strong> ${deal.masterContact}<br><br>` : ''}
+            <strong>Дата создания:</strong> ${new Date(deal.createdAt).toLocaleString('ru-RU')}<br><br>
+            ${deal.completedAt ? `<strong>Дата завершения:</strong> ${new Date(deal.completedAt).toLocaleString('ru-RU')}<br><br>` : ''}
+            <strong>Статус подписи клиента:</strong> ${deal.clientSigned ? '✅ Подписана' : '❌ Не подписана'}<br><br>
+            <strong>Статус подписи мастера:</strong> ${deal.masterSigned ? '✅ Подписана' : '❌ Не подписана'}<br><br>
+            ${deal.paymentStatus === 'paid' || deal.paymentStatus === 'released' ? `
+                <strong>Заморожено в эскроу:</strong> ${deal.escrowBalance} ⭐<br><br>
+                <strong>Комиссия системы (5%):</strong> ${deal.commissionAmount} ⭐<br><br>
+                <strong>Выплачено мастеру:</strong> ${deal.masterPayout} ⭐<br><br>
+            ` : `
+                <strong>Комиссия системы (5%):</strong> ${deal.commission} ⭐<br><br>
+                <strong>Итого к оплате:</strong> ${deal.total} ⭐<br><br>
+            `}
+        `;
+        
+        alert(details);
+        
+    } catch (error) {
+        console.error('❌ Ошибка просмотра сделки:', error);
+        alert('❌ Ошибка просмотра сделки: ' + error.message);
+    }
+};
+
+window.showCreateDealSection = function() {
+    triggerHapticFeedback();
+    
+    document.getElementById('dealTitle').value = '';
+    document.getElementById('dealDescription').value = '';
+    document.getElementById('dealPeriod').value = '';
+    document.getElementById('dealAmount').value = '';
+    selectedQuality = '';
+    selectedOptions = [];
+    
+    document.querySelectorAll('.quality-option').forEach(option => {
+        option.classList.remove('selected');
     });
+    
+    document.querySelectorAll('.option-checkbox').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    document.getElementById('dealCommission').style.display = 'none';
+    
+    currentDealMaster = null;
+    document.getElementById('dealMasterId').value = '';
+    document.getElementById('dealMasterName').value = '';
+    document.getElementById('dealMasterSkill').value = '';
+    document.getElementById('dealMasterContact').value = '';
+    
+    showSection('createDealSection');
+};
 
-    </script>
+window.setProjectRating = function(rating) {
+    triggerHapticFeedback();
+    projectRating = rating;
+    const stars = document.getElementById('projectRatingStars');
+    stars.innerHTML = '';
+    
+    for (let i = 1; i <= 5; i++) {
+        stars.innerHTML += i <= rating ? 
+            '<span style="cursor: pointer; color: #FFD700;" onclick="triggerHapticFeedback(); setProjectRating(' + i + ');">★</span>' :
+            '<span style="cursor: pointer;" onclick="triggerHapticFeedback(); setProjectRating(' + i + ');">☆</span>';
+    }
+};
+
+// ========== ФУНКЦИИ ОТЗЫВОВ О ПРОЕКТЕ ==========
+
+function getProjectReviews() {
+    return getLocalStorage('ymeyka_project_reviews') || [];
+}
+
+function saveProjectReview(review) {
+    const reviews = getProjectReviews();
+    reviews.push(review);
+    setLocalStorage('ymeyka_project_reviews', reviews);
+    return review;
+}
+
+function calculateProjectStats() {
+    const reviews = getProjectReviews();
+    const globalDeals = getGlobalDeals();
+    const globalSkills = getGlobalSkills();
+    
+    const uniqueMasters = new Set(globalSkills.map(s => s.userId)).size;
+    
+    const dealsCount = globalDeals.length;
+    
+    let averageRating = 0;
+    if (reviews.length > 0) {
+        const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+        averageRating = sum / reviews.length;
+    }
+    
+    const completedDeals = globalDeals.filter(d => d.status === 'completed');
+    const satisfiedClients = completedDeals.filter(d => d.paymentStatus !== 'refunded').length;
+    const satisfactionRate = completedDeals.length > 0 
+        ? Math.round((satisfiedClients / completedDeals.length) * 100) 
+        : 0;
+    
+    return {
+        mastersCount: uniqueMasters || Math.floor(Math.random() * 500) + 500,
+        dealsCount: dealsCount || Math.floor(Math.random() * 1000) + 1000,
+        averageRating: averageRating || 4.9,
+        satisfactionRate: satisfactionRate || 98,
+        reviewsCount: reviews.length
+    };
+}
+
+function updateAboutStats() {
+    const stats = calculateProjectStats();
+    
+    document.getElementById('statMastersCount').textContent = stats.mastersCount.toLocaleString('ru-RU');
+    document.getElementById('statDealsCount').textContent = stats.dealsCount.toLocaleString('ru-RU');
+    document.getElementById('statRating').textContent = stats.averageRating.toFixed(1);
+    document.getElementById('statSatisfaction').textContent = stats.satisfactionRate + '%';
+}
+
+function checkReviewEligibility() {
+    const userData = getOrCreateUserProfile(currentUserId);
+    const hasCompletedDeals = (userData.completedDeals || 0) > 0;
+    
+    const submitBtn = document.getElementById('submitReviewBtn');
+    const warningMsg = document.getElementById('reviewRestrictionMessage');
+    
+    if (!hasCompletedDeals) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('disabled');
+        warningMsg.style.display = 'block';
+    } else {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('disabled');
+        warningMsg.style.display = 'none';
+    }
+}
+
+window.submitProjectReview = function() {
+    triggerHapticFeedback();
+    
+    const comment = document.getElementById('projectReviewComment').value.trim();
+    const userData = getOrCreateUserProfile(currentUserId);
+    
+    if ((userData.completedDeals || 0) === 0) {
+        alert('❌ Оставить отзыв могут только участники с завершёнными сделками');
+        return;
+    }
+    
+    if (projectRating === 0) {
+        alert('❌ Пожалуйста, поставьте оценку');
+        return;
+    }
+    
+    if (!comment) {
+        alert('❌ Пожалуйста, напишите отзыв');
+        return;
+    }
+    
+    const review = {
+        id: 'review_' + Date.now(),
+        rating: projectRating,
+        comment: comment,
+        userId: currentUserId,
+        userName: userData.firstName || 'Пользователь',
+        userAvatar: userData.avatar || null,
+        createdAt: new Date().toISOString(),
+        hasCompletedDeals: true
+    };
+    
+    saveProjectReview(review);
+    
+    alert('✅ Спасибо за ваш отзыв!');
+    
+    document.getElementById('projectReviewComment').value = '';
+    setProjectRating(0);
+    
+    updateAboutStats();
+};
+
+window.openReviewsModal = function() {
+    triggerHapticFeedback();
+    
+    const reviews = getProjectReviews();
+    const stats = calculateProjectStats();
+    
+    document.getElementById('reviewsAverageRating').textContent = stats.averageRating.toFixed(1);
+    document.getElementById('reviewsTotalCount').textContent = `${stats.reviewsCount} отзывов`;
+    
+    const starsContainer = document.getElementById('reviewsAverageStars');
+    let starsHtml = '';
+    for (let i = 1; i <= 5; i++) {
+        starsHtml += i <= Math.round(stats.averageRating) ? '★' : '☆';
+    }
+    starsContainer.textContent = starsHtml;
+    
+    const listContainer = document.getElementById('reviewsList');
+    
+    if (reviews.length === 0) {
+        listContainer.innerHTML = `
+            <div class="no-reviews">
+                <div class="no-reviews-icon">💭</div>
+                <div>Пока нет отзывов</div>
+                <div style="font-size: 14px; opacity: 0.7; margin-top: 10px;">Будьте первым!</div>
+            </div>
+        `;
+    } else {
+        const sortedReviews = [...reviews].sort((a, b) => 
+            new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        
+        listContainer.innerHTML = sortedReviews.map(review => {
+            const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+            const avatar = review.userAvatar 
+                ? `<img src="${review.userAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
+                : review.userName.charAt(0).toUpperCase();
+            
+            return `
+                <div class="review-item">
+                    <div class="review-header">
+                        <div class="review-author">
+                            <div class="review-avatar">${avatar}</div>
+                            <div>
+                                <div class="review-name">${review.userName}</div>
+                                <div class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU')}</div>
+                            </div>
+                        </div>
+                        <div class="review-rating">${stars}</div>
+                    </div>
+                    <div class="review-text">${review.comment}</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    document.getElementById('reviewsModal').classList.add('active');
+};
+
+window.closeReviewsModal = function() {
+    triggerHapticFeedback();
+    document.getElementById('reviewsModal').classList.remove('active');
+};
+
+// ========== ФУНКЦИЯ УДАЛЕНИЯ СДЕЛКИ ==========
+window.deleteDeal = function(dealId) {
+    triggerHapticFeedback();
+    
+    if (confirm('❌ Удалить эту завершённую сделку?')) {
+        try {
+            const globalDeals = getGlobalDeals();
+            const dealIndex = globalDeals.findIndex(deal => deal.id === dealId);
+            
+            if (dealIndex === -1) {
+                alert('❌ Сделка не найдена');
+                return;
+            }
+            
+            const deal = globalDeals[dealIndex];
+            
+            if (deal.status !== 'completed') {
+                alert('❌ Можно удалять только завершённые сделки');
+                return;
+            }
+            
+            const isClient = deal.clientId === currentUserId;
+            const isMaster = deal.masterId === currentUserId;
+            
+            if (!isClient && !isMaster) {
+                alert('❌ Вы не являетесь участником этой сделки');
+                return;
+            }
+            
+            globalDeals.splice(dealIndex, 1);
+            setGlobalDeals(globalDeals);
+            
+            console.log(`✅ Сделка ${dealId} удалена из глобального хранилища`);
+            
+            loadDeals();
+            
+            showNotification('✅ Сделка успешно удалена!');
+            
+        } catch (error) {
+            console.error('❌ Ошибка удаления сделки:', error);
+            alert('❌ Ошибка удаления сделки: ' + error.message);
+        }
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const dealAmount = document.getElementById('dealAmount');
+    if (dealAmount) {
+        dealAmount.addEventListener('input', updateDealCommission);
+    }
+});
+
+</script>
 </body>
 </html>
