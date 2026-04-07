@@ -1,3 +1,6 @@
+Вот полный исправленный код с интегрированным сканером QR-кодов через jsQR:
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,6 +9,7 @@
     <title>Ymeyka - Мастера рядом</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -2506,6 +2510,18 @@
             font-weight: 600;
             cursor: pointer;
         }
+        
+        /* ========== СТАТУС СКАНЕРА ========== */
+        #qrScannerStatus {
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        #qrScannerCanvas {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -3265,7 +3281,7 @@
     <div id="scannerModal" class="scanner-modal">
         <div class="scanner-header">
             <div class="scanner-title">📷 Сканер QR-кода</div>
-            <button class="scanner-close" onclick="closeScanner();">×</button>
+            <button class="scanner-close" onclick="closeScannerModal();">×</button>
         </div>
         <div class="scanner-video-container">
             <video id="scannerVideo" autoplay playsinline></video>
@@ -3273,8 +3289,12 @@
                 <div class="scanner-frame"></div>
             </div>
         </div>
+        <canvas id="qrScannerCanvas" style="display: none;"></canvas>
         <div class="scanner-hint">
-            Наведите камеру на QR-код Ymeyka
+            Наведите камеру на QR-код умейки
+        </div>
+        <div id="qrScannerStatus" class="scanner-hint" style="color: #48bb78; margin-top: 10px;">
+            Сканирование...
         </div>
         <div class="scanner-input-section">
             <input type="text" id="scannerManualInput" class="scanner-input" placeholder="Или введите ID умейки вручную...">
@@ -3310,7 +3330,10 @@
     let pendingPaymentDealId = null;
     let currentQRSkillId = null;
     let currentQRSkillName = null;
+    
+    // Переменные для сканера
     let scannerStream = null;
+    let scannerAnimationFrame = null;
     
     // Счетчик кликов по логотипу для открытия админ-панели
     let logoClickCount = 0;
@@ -3846,124 +3869,129 @@
         }
     };
     
-    // ========== СКАНЕР QR-КОДОВ ==========
+    // ========== СКАНЕР QR-КОДОВ (НОВАЯ ВЕРСИЯ С jsQR) ==========
     
-    window.openScanner = async function() {
+    window.openScanner = function() {
         triggerHapticFeedback();
         
         const modal = document.getElementById('scannerModal');
         modal.classList.add('active');
         
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: 'environment' } 
-            });
-            scannerStream = stream;
-            const video = document.getElementById('scannerVideo');
-            video.srcObject = stream;
-            
-            // Запускаем сканирование
-            startQRScanning();
-        } catch (error) {
-            console.error('❌ Ошибка доступа к камере:', error);
-            alert('❌ Не удалось получить доступ к камере. Вы можете ввести ID умейки вручную.');
-        }
+        startQRScanning();
     };
     
-    window.closeScanner = function() {
-        triggerHapticFeedback();
-        
-        const modal = document.getElementById('scannerModal');
-        modal.classList.remove('active');
-        
-        // Останавливаем камеру
-        if (scannerStream) {
-            scannerStream.getTracks().forEach(track => track.stop());
-            scannerStream = null;
-        }
-    };
+    // Глобальные переменные для сканера
+    let scannerStreamGlobal = null;
+    let scannerAnimationFrameGlobal = null;
     
-    function startQRScanning() {
+    async function startQRScanning() {
         const video = document.getElementById('scannerVideo');
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        
-        function scan() {
-            if (!scannerStream) return;
-            
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                
-                // Здесь можно добавить библиотеку для распознавания QR (jsQR)
-                // Для простоты используем ручной ввод
-            }
-            
-            requestAnimationFrame(scan);
-        }
-        
-        scan();
-    }
+        const canvas = document.getElementById('qrScannerCanvas');
+        const ctx = canvas.getContext('2d');
+        const statusEl = document.getElementById('qrScannerStatus');
     
-    window.processManualScan = function() {
-        triggerHapticFeedback();
-        
-        const input = document.getElementById('scannerManualInput').value.trim();
-        if (!input) {
-            alert('❌ Введите ID умейки');
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            statusEl.textContent = 'Камера недоступна в этом браузере.';
             return;
         }
-        
-        // Ищем умейку по ID или URL
-        let skillId = input;
-        
-        // Если введена полная ссылка, извлекаем ID
-        if (input.includes('skill_')) {
-            const match = input.match(/skill_([a-zA-Z0-9_]+)/);
-            if (match) {
-                skillId = match[1];
-            }
-        }
-        
-        // Ищем умейку
-        const skill = getGlobalSkillById(skillId) || findSkillByPartialId(skillId);
-        
-        if (skill) {
-            closeScanner();
-            openSkillFromQR(skill);
-        } else {
-            alert('❌ Умейка не найдена. Проверьте ID или ссылку.');
-        }
-    };
     
-    function findSkillByPartialId(partialId) {
-        const allSkills = getGlobalSkills();
-        return allSkills.find(s => s._id.includes(partialId));
+        try {
+            scannerStreamGlobal = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' },
+                audio: false
+            });
+            video.srcObject = scannerStreamGlobal;
+    
+            video.setAttribute('playsinline', true);
+            await video.play();
+    
+            statusEl.textContent = 'Наведи камеру на QR-код умейки.';
+    
+            const scan = () => {
+                if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+                    scannerAnimationFrameGlobal = requestAnimationFrame(scan);
+                    return;
+                }
+    
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: 'dontInvert'
+                });
+    
+                if (code && code.data) {
+                    statusEl.textContent = 'QR-код найден, обрабатываю...';
+    
+                    // Останавливаем камеру
+                    if (scannerStreamGlobal) {
+                        scannerStreamGlobal.getTracks().forEach(t => t.stop());
+                        scannerStreamGlobal = null;
+                    }
+                    if (scannerAnimationFrameGlobal) {
+                        cancelAnimationFrame(scannerAnimationFrameGlobal);
+                        scannerAnimationFrameGlobal = null;
+                    }
+    
+                    handleScannedResult(code.data);
+                    return;
+                }
+    
+                scannerAnimationFrameGlobal = requestAnimationFrame(scan);
+            };
+    
+            scan();
+        } catch (err) {
+            console.error('Ошибка доступа к камере', err);
+            statusEl.textContent = 'Не удалось получить доступ к камере.';
+        }
     }
     
-    function handleDeepLink() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const startParam = urlParams.get('start');
-        
-        if (startParam && startParam.startsWith('skill_')) {
-            const skillId = startParam.replace('skill_', '');
-            console.log('🔗 Обнаружен deeplink для skill:', skillId);
-            
-            // Находим умейку
-            const skill = getGlobalSkillById(skillId);
+    function handleScannedResult(data) {
+        // Ожидаем ссылку вида:
+        // https://t.me/ymeyka_bot?start=skill_XXXX
+        try {
+            const url = new URL(data);
+            const startParam = url.searchParams.get('start');
+    
+            if (startParam && startParam.startsWith('skill_')) {
+                const skillId = startParam.replace('skill_', '');
+    
+                // Находим умейку
+                const skill = getGlobalSkillById(skillId);
+                
+                if (skill) {
+                    // Показываем модальное окно с информацией об умейке
+                    showSkillFromQR(skill);
+                    closeScannerModal();
+                } else {
+                    alert('❌ Умейка не найдена в базе данных.\nID: ' + skillId);
+                    // Перезапускаем сканирование
+                    startQRScanning();
+                }
+            } else {
+                alert('QR-код не похож на QR умейки.\nДанные: ' + data);
+                document.getElementById('qrScannerStatus').textContent = 'Наведи камеру на QR-код умейки.';
+                // Можно снова запустить сканирование, если хочешь:
+                startQRScanning();
+            }
+        } catch (e) {
+            // data не URL, возможно просто текст/ID
+            const skill = getGlobalSkillById(data);
             if (skill) {
-                // Открываем карточку умейки с возможностью создания сделки
-                setTimeout(() => {
-                    openSkillFromQR(skill);
-                }, 1000);
+                showSkillFromQR(skill);
+                closeScannerModal();
+            } else {
+                alert('Распознан текст: ' + data);
+                document.getElementById('qrScannerStatus').textContent = 'Наведи камеру на QR-код умейки.';
+                startQRScanning();
             }
         }
     }
     
-    function openSkillFromQR(skill) {
+    function showSkillFromQR(skill) {
         // Показываем модальное окно с информацией об умейке
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
@@ -3995,6 +4023,88 @@
             </div>
         `;
         document.body.appendChild(modal);
+    }
+    
+    function closeScannerModal() {
+        const modal = document.getElementById('scannerModal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+    
+        const statusEl = document.getElementById('qrScannerStatus');
+        if (statusEl) {
+            statusEl.textContent = 'Сканирование остановлено.';
+        }
+    
+        if (scannerStreamGlobal) {
+            scannerStreamGlobal.getTracks().forEach(t => t.stop());
+            scannerStreamGlobal = null;
+        }
+        if (scannerAnimationFrameGlobal) {
+            cancelAnimationFrame(scannerAnimationFrameGlobal);
+            scannerAnimationFrameGlobal = null;
+        }
+        
+        // Очищаем видео
+        const video = document.getElementById('scannerVideo');
+        if (video && video.srcObject) {
+            video.srcObject = null;
+        }
+    }
+    
+    window.processManualScan = function() {
+        triggerHapticFeedback();
+        
+        const input = document.getElementById('scannerManualInput').value.trim();
+        if (!input) {
+            alert('❌ Введите ID умейки или ссылку');
+            return;
+        }
+        
+        // Ищем умейку по ID или URL
+        let skillId = input;
+        
+        // Если введена полная ссылка, извлекаем ID
+        if (input.includes('skill_')) {
+            const match = input.match(/skill_([a-zA-Z0-9_]+)/);
+            if (match) {
+                skillId = match[1];
+            }
+        }
+        
+        // Ищем умейку
+        const skill = getGlobalSkillById(skillId) || findSkillByPartialId(skillId);
+        
+        if (skill) {
+            closeScannerModal();
+            showSkillFromQR(skill);
+        } else {
+            alert('❌ Умейка не найдена. Проверьте ID или ссылку.');
+        }
+    };
+    
+    function findSkillByPartialId(partialId) {
+        const allSkills = getGlobalSkills();
+        return allSkills.find(s => s._id && s._id.includes(partialId));
+    }
+    
+    function handleDeepLink() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const startParam = urlParams.get('start');
+        
+        if (startParam && startParam.startsWith('skill_')) {
+            const skillId = startParam.replace('skill_', '');
+            console.log('🔗 Обнаружен deeplink для skill:', skillId);
+            
+            // Находим умейку
+            const skill = getGlobalSkillById(skillId);
+            if (skill) {
+                // Открываем карточку умейки с возможностью создания сделки
+                setTimeout(() => {
+                    showSkillFromQR(skill);
+                }, 1000);
+            }
+        }
     }
 
     // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
@@ -7224,3 +7334,4 @@
     </script>
 </body>
 </html>
+```
