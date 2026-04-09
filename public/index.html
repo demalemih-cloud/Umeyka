@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ymeyka - Мастера рядом</title>
+    <title>Umeyka - Мастера рядом</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -72,178 +71,6 @@
             font-size: 14px;
             cursor: pointer;
             backdrop-filter: blur(10px);
-        }
-        
-        /* ========== КНОПКА СКАНЕРА QR ========== */
-        .qr-scanner-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: none;
-            color: white;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 20px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-            transition: all 0.3s ease;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 44px;
-            height: 44px;
-        }
-        
-        .qr-scanner-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
-        
-        .qr-scanner-button:active {
-            transform: scale(0.95);
-        }
-        
-        /* ========== МОДАЛЬНОЕ ОКНО СКАНЕРА ========== */
-        .scanner-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 5000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .scanner-modal.active {
-            display: flex;
-        }
-        
-        .scanner-container {
-            width: 100%;
-            max-width: 400px;
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .scanner-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            text-align: center;
-            color: white;
-        }
-        
-        .scanner-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .scanner-subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        #qr-reader {
-            width: 100%;
-            min-height: 300px;
-        }
-        
-        #qr-reader video {
-            border-radius: 0 0 20px 20px;
-        }
-        
-        .scanner-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-        
-        .scanner-close:hover {
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .scanner-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            border: 3px solid #48bb78;
-            border-radius: 20px;
-            pointer-events: none;
-            box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
-        }
-        
-        .scanner-overlay::before,
-        .scanner-overlay::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-color: #48bb78;
-            border-style: solid;
-        }
-        
-        .scanner-overlay::before {
-            top: -3px;
-            left: -3px;
-            border-width: 3px 0 0 3px;
-            border-radius: 15px 0 0 0;
-        }
-        
-        .scanner-overlay::after {
-            bottom: -3px;
-            right: -3px;
-            border-width: 0 3px 3px 0;
-            border-radius: 0 0 15px 0;
-        }
-        
-        .scanner-result {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(72, 187, 120, 0.95);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 30px;
-            font-weight: 600;
-            display: none;
-            animation: slideUp 0.3s ease;
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
         }
         
         .logo {
@@ -2353,7 +2180,7 @@
         }
 
         /* ========== НОВЫЕ СТИЛИ ДЛЯ МАРКЕРОВ КАРТЫ ========== */
-        .ymeyka-marker-container {
+        .umeyka-marker-container {
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -2369,26 +2196,26 @@
             justify-content: center;
         }
 
-        .ymeyka-marker-container:hover {
+        .umeyka-marker-container:hover {
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
 
-        .ymeyka-marker-container.status-ready {
+        .umeyka-marker-container.status-ready {
             border-color: #48bb78;
         }
 
-        .ymeyka-marker-container.status-busy {
+        .umeyka-marker-container.status-busy {
             border-color: #f56565;
         }
 
-        .ymeyka-marker-photo {
+        .umeyka-marker-photo {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .ymeyka-marker-fallback {
+        .umeyka-marker-fallback {
             width: 100%;
             height: 100%;
             display: flex;
@@ -2515,12 +2342,9 @@
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
             <div class="header" id="logoHeader">
-                <button class="qr-scanner-button" onclick="triggerHapticFeedback(); openQRScanner();" title="Сканировать QR-код">
-                    📷
-                </button>
                 <button class="about-button" onclick="triggerHapticFeedback(); showAboutSection();">ℹ️ О проекте</button>
                 <div class="logo">🤝✨</div>
-                <div class="app-title">Ymeyka</div>
+                <div class="app-title">Umeyka</div>
                 <div class="app-description">Мастера на все руки рядом с вами</div>
                 <div class="rating">
                     <span class="stars">★★★★★</span>
@@ -2549,20 +2373,6 @@
                     🗺️ Поиск по карте
                 </button>
                 <div id="map"></div>
-            </div>
-        </div>
-
-        <!-- МОДАЛЬНОЕ ОКНО СКАНЕРА QR -->
-        <div id="scannerModal" class="scanner-modal">
-            <div class="scanner-container">
-                <div class="scanner-header">
-                    <button class="scanner-close" onclick="triggerHapticFeedback(); closeQRScanner();">×</button>
-                    <div class="scanner-title">📷 Сканер QR-кода</div>
-                    <div class="scanner-subtitle">Наведите камеру на QR-код умейки</div>
-                </div>
-                <div id="qr-reader"></div>
-                <div class="scanner-overlay"></div>
-                <div class="scanner-result" id="scannerResult">✅ QR-код распознан!</div>
             </div>
         </div>
 
@@ -2787,7 +2597,7 @@
                         </div>
                         
                         <div class="referral-description">
-                            Приглашайте друзей в Ymeyka и получайте звёзды за каждого приглашённого!
+                            Приглашайте друзей в Umeyka и получайте звёзды за каждого приглашённого!
                         </div>
                         
                         <div class="referral-stats" id="referralStats">
@@ -2858,10 +2668,10 @@
                         </div>
                     </a>
                     
-                    <a href="https://t.me/ymeyka_bot" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
+                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
                         <div class="channel-icon">✨</div>
                         <div class="channel-info">
-                            <div class="channel-name">Ymeyka</div>
+                            <div class="channel-name">Umeyka</div>
                             <div class="channel-description">Официальный канал проекта</div>
                         </div>
                     </a>
@@ -3014,10 +2824,10 @@
             
             <div class="form-section">
                 <div class="about-section">
-                    <div class="about-title">🤝 О проекте Ymeyka</div>
+                    <div class="about-title">🤝 О проекте Umeyka</div>
                     
                     <p style="margin-bottom: 15px; line-height: 1.6;">
-                        <strong>Ymeyka</strong> - это инновационная платформа, которая соединяет мастеров и клиентов, 
+                        <strong>Umeyka</strong> - это инновационная платформа, которая соединяет мастеров и клиентов, 
                         создавая экосистему доверия и качества.
                     </p>
                     
@@ -3094,10 +2904,10 @@
                         </div>
                     </a>
                     
-                    <a href="https://t.me/ymeyka_bot" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
+                    <a href="https://t.me/Umeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
                         <div class="channel-icon">✨</div>
                         <div class="channel-info">
-                            <div class="channel-name">Ymeyka</div>
+                            <div class="channel-name">Umeyka</div>
                             <div class="channel-description">Официальный канал проекта</div>
                         </div>
                     </a>
@@ -3281,7 +3091,7 @@
 
     <script>
     // ========== КОНФИГУРАЦИЯ ==========
-    const API_URL = 'https://ymeyka-oocn.onrender.com';
+    const API_URL = 'https://umeyka-oocn.onrender.com';
     const TELEGRAM_BOT_URL = 'https://t.me/ymeyka_bot';
     let currentUserId = null;
     let currentAvatar = null;
@@ -3307,7 +3117,6 @@
     let pendingPaymentDealId = null;
     let currentQRSkillId = null;
     let currentQRSkillName = null;
-    let html5QrCode = null;
     
     // Счетчик кликов по логотипу для открытия админ-панели
     let logoClickCount = 0;
@@ -3384,12 +3193,12 @@
         wallet.transactions.unshift(transaction);
         saveWalletData(wallet);
         
-        const globalTx = getLocalStorage('ymeyka_global_transactions') || [];
+        const globalTx = getLocalStorage('umeyka_global_transactions') || [];
         globalTx.push({
             ...transaction,
             userId: currentUserId
         });
-        setLocalStorage('ymeyka_global_transactions', globalTx);
+        setLocalStorage('umeyka_global_transactions', globalTx);
         
         return transaction;
     }
@@ -3825,7 +3634,7 @@
         const skill = getGlobalSkillById(currentQRSkillId);
         if (!skill) return;
         
-        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`}`;
+        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Umeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`}`;
         
         if (navigator.share) {
             navigator.share({
@@ -3842,99 +3651,6 @@
             });
         }
     };
-    
-    // ========== СКАНЕР QR-КОДА ==========
-    
-    window.openQRScanner = async function() {
-        triggerHapticFeedback();
-        
-        const modal = document.getElementById('scannerModal');
-        modal.classList.add('active');
-        
-        try {
-            html5QrCode = new Html5Qrcode("qr-reader");
-            
-            const config = { 
-                fps: 10, 
-                qrbox: { width: 200, height: 200 },
-                aspectRatio: 1.0
-            };
-            
-            await html5QrCode.start(
-                { facingMode: "environment" },
-                config,
-                onScanSuccess,
-                onScanFailure
-            );
-            
-        } catch (error) {
-            console.error('❌ Ошибка запуска сканера:', error);
-            alert('❌ Не удалось запустить камеру. Убедитесь, что вы дали разрешение на использование камеры.');
-        }
-    };
-    
-    window.closeQRScanner = async function() {
-        triggerHapticFeedback();
-        
-        const modal = document.getElementById('scannerModal');
-        modal.classList.remove('active');
-        
-        if (html5QrCode) {
-            try {
-                await html5QrCode.stop();
-                html5QrCode = null;
-            } catch (error) {
-                console.error('❌ Ошибка остановки сканера:', error);
-            }
-        }
-        
-        // Скрываем результат
-        document.getElementById('scannerResult').style.display = 'none';
-    };
-    
-    function onScanSuccess(decodedText, decodedResult) {
-        console.log('✅ QR-код распознан:', decodedText);
-        
-        // Показываем успешное распознавание
-        const resultElement = document.getElementById('scannerResult');
-        resultElement.style.display = 'block';
-        
-        // Останавливаем сканер
-        setTimeout(async () => {
-            await closeQRScanner();
-            
-            // Обрабатываем результат
-            handleScannedQRCode(decodedText);
-        }, 500);
-    }
-    
-    function onScanFailure(error) {
-        // Не показываем ошибки при сканировании - это нормально
-        // console.warn('⚠️ Ошибка сканирования:', error);
-    }
-    
-    function handleScannedQRCode(qrData) {
-        // Проверяем, является ли это deeplink на умейку
-        if (qrData.includes('t.me/ymeyka_bot?start=skill_') || qrData.includes('start=skill_')) {
-            const skillIdMatch = qrData.match(/skill_([^&\s]+)/);
-            if (skillIdMatch) {
-                const skillId = skillIdMatch[1];
-                console.log('🔗 Обнаружен deeplink для skill:', skillId);
-                
-                // Находим умейку
-                const skill = getGlobalSkillById(skillId);
-                if (skill) {
-                    openSkillFromQR(skill);
-                } else {
-                    alert('❌ Умейка не найдена. Возможно, она была удалена.');
-                }
-                return;
-            }
-        }
-        
-        // Если это просто URL или текст
-        alert('📱 Отсканировано:\n' + qrData);
-    }
     
     function handleDeepLink() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -4394,11 +4110,11 @@
     };
 
     function getGlobalDeals() {
-        return getLocalStorage('ymeyka_global_deals') || [];
+        return getLocalStorage('umeyka_global_deals') || [];
     }
     
     function setGlobalDeals(deals) {
-        return setLocalStorage('ymeyka_global_deals', deals);
+        return setLocalStorage('umeyka_global_deals', deals);
     }
     
     function getUserDeals(userId) {
@@ -4453,11 +4169,11 @@
     }
 
     function getGlobalSkills() {
-        return getLocalStorage('ymeyka_global_skills') || [];
+        return getLocalStorage('umeyka_global_skills') || [];
     }
     
     function setGlobalSkills(skills) {
-        return setLocalStorage('ymeyka_global_skills', skills);
+        return setLocalStorage('umeyka_global_skills', skills);
     }
     
     function addGlobalSkill(skill) {
@@ -5525,14 +5241,14 @@
         // Если есть фото - показываем фото, иначе fallback с иконкой
         if (skill.photo) {
             return `
-                <div class="ymeyka-marker-container ${statusClass}">
-                    <img src="${skill.photo}" class="ymeyka-marker-photo" alt="${skill.skill}">
+                <div class="umeyka-marker-container ${statusClass}">
+                    <img src="${skill.photo}" class="umeyka-marker-photo" alt="${skill.skill}">
                 </div>
             `;
         } else {
             return `
-                <div class="ymeyka-marker-container ${statusClass}">
-                    <div class="ymeyka-marker-fallback">${fallbackIcon}</div>
+                <div class="umeyka-marker-container ${statusClass}">
+                    <div class="umeyka-marker-fallback">${fallbackIcon}</div>
                 </div>
             `;
         }
@@ -5597,7 +5313,7 @@
                     
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
                         icon: L.divIcon({
-                            className: 'ymeyka-marker',
+                            className: 'umeyka-marker',
                             html: markerHtml,
                             iconSize: [50, 50],
                             iconAnchor: [25, 25]
@@ -5637,27 +5353,6 @@
                     .setContent('<div style="color: red; padding: 10px;">❌ Ошибка загрузки данных. Проверьте подключение к интернету.</div>')
                     .openOn(map);
             }
-        }
-    }
-
-    function createSkillMarkerHtml(skill, isUserSkill) {
-        const status = skill.status || 'ready';
-        const statusClass = status === 'ready' ? 'status-ready' : 'status-busy';
-        const fallbackIcon = isUserSkill ? '👤' : '🔧';
-        
-        // Если есть фото - показываем фото, иначе fallback с иконкой
-        if (skill.photo) {
-            return `
-                <div class="ymeyka-marker-container ${statusClass}">
-                    <img src="${skill.photo}" class="ymeyka-marker-photo" alt="${skill.skill}">
-                </div>
-            `;
-        } else {
-            return `
-                <div class="ymeyka-marker-container ${statusClass}">
-                    <div class="ymeyka-marker-fallback">${fallbackIcon}</div>
-                </div>
-            `;
         }
     }
 
@@ -5817,7 +5512,7 @@
         
         const referralLink = generateReferralLink();
         
-        const shareText = `Привет! Хочу порекомендовать полезное приложение — Ymeyka. Ymeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
+        const shareText = `Привет! Хочу порекомендовать полезное приложение — Umeyka. Umeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
         
         const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
         
@@ -5950,7 +5645,7 @@
         }
         
         if (currentUserId) {
-            localStorage.setItem('ymeyka_user_id', currentUserId);
+            localStorage.setItem('umeyka_user_id', currentUserId);
             console.log('💾 User ID сохранен в localStorage:', currentUserId);
             
             loadSkillsFromLocalStorage(currentUserId);
@@ -5987,12 +5682,14 @@
         console.log('🔓 Открытие админ-панели (6 кликов)');
         
         // Открываем админку в новой вкладке/окне
-        const adminUrl = 'ymeyka-admin.html';
+        const adminUrl = 'umeyka-admin.html';
         window.open(adminUrl, '_blank');
     }
     
+    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (продолжение) ==========
+    
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Ymeyka app loaded successfully!');
+        console.log('🚀 Umeyka app loaded successfully!');
         
         currentMasterStatus = 'ready';
         currentEditMasterStatus = 'ready';
@@ -6992,1216 +6689,13 @@
     // ========== ФУНКЦИИ ОТЗЫВОВ О ПРОЕКТЕ ==========
     
     function getProjectReviews() {
-        return getLocalStorage('ymeyka_project_reviews') || [];
+        return getLocalStorage('umeyka_project_reviews') || [];
     }
     
     function saveProjectReview(review) {
         const reviews = getProjectReviews();
         reviews.push(review);
-        setLocalStorage('ymeyka_project_reviews', reviews);
-        return review;
-    }
-    
-    function calculateProjectStats() {
-        const reviews = getProjectReviews();
-        const globalDeals = getGlobalDeals();
-        const globalSkills = getGlobalSkills();
-        
-        // Количество мастеров (уникальные userId из skills)
-        const uniqueMasters = new Set(globalSkills.map(s => s.userId)).size;
-        
-        // Количество сделок
-        const dealsCount = globalDeals.length;
-        
-        // Средний рейтинг проекта
-        let averageRating = 0;
-        if (reviews.length > 0) {
-            const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-            averageRating = sum / reviews.length;
-        }
-        
-        // Процент довольных клиентов (завершённые сделки без споров)
-        const completedDeals = globalDeals.filter(d => d.status === 'completed');
-        const satisfiedClients = completedDeals.filter(d => d.paymentStatus !== 'refunded').length;
-        const satisfactionRate = completedDeals.length > 0 
-            ? Math.round((satisfiedClients / completedDeals.length) * 100) 
-            : 0;
-        
-        return {
-            mastersCount: uniqueMasters || Math.floor(Math.random() * 500) + 500, // Fallback для демо
-            dealsCount: dealsCount || Math.floor(Math.random() * 1000) + 1000, // Fallback для демо
-            averageRating: averageRating || 4.9,
-            satisfactionRate: satisfactionRate || 98,
-            reviewsCount: reviews.length
-        };
-    }
-    
-    function updateAboutStats() {
-        const stats = calculateProjectStats();
-        
-        document.getElementById('statMastersCount').textContent = stats.mastersCount.toLocaleString('ru-RU');
-        document.getElementById('statDealsCount').textContent = stats.dealsCount.toLocaleString('ru-RU');
-        document.getElementById('statRating').textContent = stats.averageRating.toFixed(1);
-        document.getElementById('statSatisfaction').textContent = stats.satisfactionRate + '%';
-    }
-    
-    function checkReviewEligibility() {
-        const userData = getOrCreateUserProfile(currentUserId);
-        const hasCompletedDeals = (userData.completedDeals || 0) > 0;
-        
-        const submitBtn = document.getElementById('submitReviewBtn');
-        const warningMsg = document.getElementById('reviewRestrictionMessage');
-        
-        if (!hasCompletedDeals) {
-            submitBtn.disabled = true;
-            submitBtn.classList.add('disabled');
-            warningMsg.style.display = 'block';
-        } else {
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('disabled');
-            warningMsg.style.display = 'none';
-        }
-    }
-    
-    window.submitProjectReview = function() {
-        triggerHapticFeedback();
-        
-        const comment = document.getElementById('projectReviewComment').value.trim();
-        const userData = getOrCreateUserProfile(currentUserId);
-        
-        // Проверка на завершённые сделки
-        if ((userData.completedDeals || 0) === 0) {
-            alert('❌ Оставить отзыв могут только участники с завершёнными сделками');
-            return;
-        }
-        
-        if (projectRating === 0) {
-            alert('❌ Пожалуйста, поставьте оценку');
-            return;
-        }
-        
-        if (!comment) {
-            alert('❌ Пожалуйста, напишите отзыв');
-            return;
-        }
-        
-        const review = {
-            id: 'review_' + Date.now(),
-            rating: projectRating,
-            comment: comment,
-            userId: currentUserId,
-            userName: userData.firstName || 'Пользователь',
-            userAvatar: userData.avatar || null,
-            createdAt: new Date().toISOString(),
-            hasCompletedDeals: true
-        };
-        
-        saveProjectReview(review);
-        
-        alert('✅ Спасибо за ваш отзыв!');
-        
-        // Сброс формы
-        document.getElementById('projectReviewComment').value = '';
-        setProjectRating(0);
-        
-        // Обновление статистики
-        updateAboutStats();
-    };
-    
-    window.openReviewsModal = function() {
-        triggerHapticFeedback();
-        
-        const reviews = getProjectReviews();
-        const stats = calculateProjectStats();
-        
-        // Обновление заголовка модального окна
-        document.getElementById('reviewsAverageRating').textContent = stats.averageRating.toFixed(1);
-        document.getElementById('reviewsTotalCount').textContent = `${stats.reviewsCount} отзывов`;
-        
-        // Звёзды среднего рейтинга
-        const starsContainer = document.getElementById('reviewsAverageStars');
-        let starsHtml = '';
-        for (let i = 1; i <= 5; i++) {
-            starsHtml += i <= Math.round(stats.averageRating) ? '★' : '☆';
-        }
-        starsContainer.textContent = starsHtml;
-        
-        // Список отзывов
-        const listContainer = document.getElementById('reviewsList');
-        
-        if (reviews.length === 0) {
-            listContainer.innerHTML = `
-                <div class="no-reviews">
-                    <div class="no-reviews-icon">💭</div>
-                    <div>Пока нет отзывов</div>
-                    <div style="font-size: 14px; opacity: 0.7; margin-top: 10px;">Будьте первым!</div>
-                </div>
-            `;
-        } else {
-            // Сортируем по дате (новые сверху)
-            const sortedReviews = [...reviews].sort((a, b) => 
-                new Date(b.createdAt) - new Date(a.createdAt)
-            );
-            
-            listContainer.innerHTML = sortedReviews.map(review => {
-                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
-                const avatar = review.userAvatar 
-                    ? `<img src="${review.userAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
-                    : review.userName.charAt(0).toUpperCase();
-                
-                return `
-                    <div class="review-item">
-                        <div class="review-header">
-                            <div class="review-author">
-                                <div class="review-avatar">${avatar}</div>
-                                <div>
-                                    <div class="review-name">${review.userName}</div>
-                                    <div class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU')}</div>
-                                </div>
-                            </div>
-                            <div class="review-rating">${stars}</div>
-                        </div>
-                        <div class="review-text">${review.comment}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        document.getElementById('reviewsModal').classList.add('active');
-    };
-    
-    window.closeReviewsModal = function() {
-        triggerHapticFeedback();
-        document.getElementById('reviewsModal').classList.remove('active');
-    };
-
-    // ========== ФУНКЦИЯ УДАЛЕНИЯ СДЕЛКИ ==========
-    window.deleteDeal = function(dealId) {
-        triggerHapticFeedback();
-        
-        if (confirm('❌ Удалить эту завершённую сделку?')) {
-            try {
-                const globalDeals = getGlobalDeals();
-                const dealIndex = globalDeals.findIndex(deal => deal.id === dealId);
-                
-                if (dealIndex === -1) {
-                    alert('❌ Сделка не найдена');
-                    return;
-                }
-                
-                const deal = globalDeals[dealIndex];
-                
-                // Проверяем, что сделка завершена
-                if (deal.status !== 'completed') {
-                    alert('❌ Можно удалять только завершённые сделки');
-                    return;
-                }
-                
-                // Проверяем, что пользователь является участником сделки
-                const isClient = deal.clientId === currentUserId;
-                const isMaster = deal.masterId === currentUserId;
-                
-                if (!isClient && !isMaster) {
-                    alert('❌ Вы не являетесь участником этой сделки');
-                    return;
-                }
-                
-                // Удаляем сделку из глобального хранилища
-                globalDeals.splice(dealIndex, 1);
-                setGlobalDeals(globalDeals);
-                
-                console.log(`✅ Сделка ${dealId} удалена из глобального хранилища`);
-                
-                // Обновляем список сделок
-                loadDeals();
-                
-                // Показываем уведомление
-                showNotification('✅ Сделка успешно удалена!');
-                
-            } catch (error) {
-                console.error('❌ Ошибка удаления сделки:', error);
-                alert('❌ Ошибка удаления сделки: ' + error.message);
-            }
-        }
-    };
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const dealAmount = document.getElementById('dealAmount');
-        if (dealAmount) {
-            dealAmount.addEventListener('input', updateDealCommission);
-        }
-    });
-
-    window.searchSkills = async function() {
-        triggerHapticFeedback();
-        
-        const searchQuery = document.getElementById('searchInput').value.trim();
-        const searchCity = document.getElementById('searchCity').value.trim();
-        const searchResults = document.getElementById('searchResults');
-        
-        if (!searchQuery && !searchCity) {
-            searchResults.innerHTML = '<div class="error-message">❌ Введите поисковый запрос или выберите город</div>';
-            return;
-        }
-        
-        searchResults.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
-        
-        try {
-            let skills = [];
-            
-            try {
-                let url = `${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery || '')}`;
-                if (searchCity) {
-                    url += `&city=${encodeURIComponent(searchCity)}`;
-                }
-                
-                const response = await fetch(url);
-                const result = await response.json();
-                
-                if (result.success) {
-                    skills = result.skills;
-                    
-                    skills = skills.map(skill => {
-                        const globalSkill = getGlobalSkillById(skill._id);
-                        if (globalSkill && globalSkill.updatedAt) {
-                            if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
-                                skill.status = globalSkill.status;
-                            }
-                        }
-                        if (!skill.qrCodeData) {
-                            skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
-                        }
-                        return skill;
-                    });
-                }
-            } catch (serverError) {
-                console.log('⚠️ Сервер недоступен для поиска');
-            }
-            
-            const globalSkills = getGlobalSkills();
-            let matchingGlobal = globalSkills;
-            
-            if (searchQuery) {
-                matchingGlobal = matchingGlobal.filter(s => 
-                    s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
-                );
-            }
-            
-            if (searchCity) {
-                matchingGlobal = matchingGlobal.filter(s => 
-                    s.city && s.city.toLowerCase() === searchCity.toLowerCase()
-                );
-            }
-            
-            const existingIds = new Set(skills.map(s => s._id));
-            matchingGlobal.forEach(skill => {
-                if (!existingIds.has(skill._id)) {
-                    if (!skill.qrCodeData) {
-                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
-                    }
-                    skills.push(skill);
-                }
-            });
-            
-            const userId = currentUserId || 'demo-user';
-            const localSkills = loadSkillsFromLocalStorage(userId);
-            let matchingLocal = localSkills.filter(s => s.local);
-            
-            if (searchQuery) {
-                matchingLocal = matchingLocal.filter(s => 
-                    s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
-                );
-            }
-            
-            if (searchCity) {
-                matchingLocal = matchingLocal.filter(s => 
-                    s.city && s.city.toLowerCase() === searchCity.toLowerCase()
-                );
-            }
-            
-            skills = [...skills, ...matchingLocal.filter(s => !existingIds.has(s._id))];
-            
-            const uniqueSkills = [];
-            const seenIds = new Set();
-            for (const skill of skills) {
-                if (!seenIds.has(skill._id)) {
-                    seenIds.add(skill._id);
-                    uniqueSkills.push(skill);
-                }
-            }
-            skills = uniqueSkills;
-            
-            if (skills.length > 0) {
-                searchResults.innerHTML = skills.map(skill => {
-                    const statusBadge = getStatusBadge(skill.status);
-                    const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
-                    const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
-                    
-                    return `
-                    <div class="skill-card">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill} ${isLocal}</div>
-                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                        </div>
-                        
-                        <div class="skill-price">${skill.price} ₽</div>
-                        
-                        ${statusBadge}
-                        
-                        ${cityInfo}
-                        
-                        <div class="skill-contact-info">
-                            <div class="contact-label">📞 Контакты:</div>
-                            <div class="contact-item">
-                                <span class="contact-icon">📱</span>
-                                <span class="contact-text">${skill.experience || 'Не указано'}</span>
-                            </div>
-                        </div>
-                        
-                        ${skill.photo ? `
-                            <div class="skill-photo">
-                                <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
-                            </div>
-                        ` : ''}
-                        
-                        <div style="color: #666; margin: 15px 0 20px;">
-                            👤 ${skill.username}
-                        </div>
-                        
-                        <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');">
-                            📞 Подробные контакты
-                        </button>
-                        
-                        <button class="create-deal-button" onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.userId}', '${skill.experience || ''}');">
-                            📝 Составить сделку
-                        </button>
-                    </div>
-                `}).join('');
-            } else {
-                searchResults.innerHTML = `
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено</div>
-                        <div style="opacity: 0.7;">Попробуйте изменить поисковый запрос${searchCity ? ' или выбрать другой город' : ''}</div>
-                    </div>
-                `;
-            }
-        } catch (error) {
-            console.error('Ошибка поиска:', error);
-            searchResults.innerHTML = `
-                <div class="error-message">
-                    ❌ Ошибка поиска<br>
-                    <small>Проверьте подключение к интернету</small>
-                </div>
-            `;
-        }
-    };
-
-    function loadUserProfile() {
-        const userData = getOrCreateUserProfile(currentUserId);
-        const referralData = getReferralData();
-        const coins = getCoinsData();
-        
-        document.getElementById('userName').textContent = userData.firstName || 'Пользователь';
-        document.getElementById('userBio').textContent = userData.bio || 'Расскажите о себе...';
-        
-        if (userData.avatar) {
-            document.getElementById('userAvatar').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-        }
-        
-        updateUserStats(userData, referralData, coins);
-    }
-
-    function updateUserStats(userData, referralData, coins) {
-        const statsGrid = document.getElementById('userStats');
-        if (!statsGrid) return;
-        
-        const stars = referralData?.starsEarned || 0;
-        const goldCoins = coins || 0;
-        
-        statsGrid.innerHTML = `
-            <div class="stat-card">
-                <div class="stat-value">${stars}</div>
-                <div class="stat-label">⭐ Звёзды</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${goldCoins}</div>
-                <div class="stat-label">🪙 Монеты</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${userData.completedDeals || 0}</div>
-                <div class="stat-label">✅ Завершено сделок</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${userData.skills?.length || 0}</div>
-                <div class="stat-label">✨ Умейки</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${referralData?.referralCount || 0}</div>
-                <div class="stat-label">👥 Приглашено друзей</div>
-            </div>
-        `;
-    }
-
-    window.editProfile = function() {
-        triggerHapticFeedback();
-        const userData = getOrCreateUserProfile(currentUserId);
-        
-        document.getElementById('editFirstName').value = userData.firstName || '';
-        document.getElementById('editAge').value = userData.age || '';
-        document.getElementById('editExperience').value = userData.experience || '';
-        document.getElementById('editContact').value = userData.contact || '';
-        document.getElementById('editBio').value = userData.bio || '';
-        
-        if (userData.avatar) {
-            document.getElementById('avatarPreview').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-        }
-        
-        showSection('editProfileSection');
-    };
-
-    window.saveProfile = function() {
-        triggerHapticFeedback();
-        
-        const firstName = document.getElementById('editFirstName').value.trim();
-        const bio = document.getElementById('editBio').value.trim();
-        
-        if (!firstName || !bio) {
-            alert('❌ Пожалуйста, заполните обязательные поля (Имя и О себе)');
-            return;
-        }
-        
-        const userData = getOrCreateUserProfile(currentUserId);
-        
-        userData.firstName = firstName;
-        userData.age = document.getElementById('editAge').value;
-        userData.experience = document.getElementById('editExperience').value;
-        userData.contact = document.getElementById('editContact').value;
-        userData.bio = bio;
-        
-        if (currentAvatar) {
-            userData.avatar = currentAvatar;
-        }
-        
-        setLocalStorage(`user_${currentUserId}`, userData);
-        
-        alert('✅ Профиль сохранен!');
-        showProfileSection();
-        loadUserProfile();
-    };
-
-    window.changeAvatar = function() {
-        triggerHapticFeedback();
-        document.getElementById('avatarInput').click();
-    };
-
-    window.handleAvatarUpload = function(event) {
-        triggerHapticFeedback();
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        if (!file.type.match('image.*')) {
-            alert('❌ Пожалуйста, выберите изображение');
-            return;
-        }
-        
-        if (file.size > 5 * 1024 * 1024) {
-            alert('❌ Файл слишком большой. Максимальный размер: 5MB');
-            return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            currentAvatar = e.target.result;
-            document.getElementById('avatarPreview').innerHTML = `
-                <img src="${currentAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-            `;
-        };
-        reader.readAsDataURL(file);
-    };
-
-    window.showProfileTab = function(tabName) {
-        triggerHapticFeedback();
-        currentProfileTab = tabName;
-        
-        // Скрываем все вкладки
-        document.getElementById('profileStats').style.display = 'none';
-        document.getElementById('profileSkills').style.display = 'none';
-        document.getElementById('profileDeals').style.display = 'none';
-        document.getElementById('profileReferral').style.display = 'none';
-        
-        // Показываем выбранную вкладку
-        document.getElementById('profileStats').style.display = tabName === 'stats' ? 'block' : 'none';
-        document.getElementById('profileSkills').style.display = tabName === 'skills' ? 'block' : 'none';
-        document.getElementById('profileDeals').style.display = tabName === 'deals' ? 'block' : 'none';
-        document.getElementById('profileReferral').style.display = tabName === 'referral' ? 'block' : 'none';
-        
-        // Загружаем данные для вкладки
-        if (tabName === 'skills') {
-            loadProfileSkills();
-        } else if (tabName === 'deals') {
-            loadDeals();
-        } else if (tabName === 'referral') {
-            updateReferralStats();
-        } else if (tabName === 'stats') {
-            loadUserProfile();
-        }
-    };
-
-    window.showDealsTab = function(tabName) {
-        triggerHapticFeedback();
-        currentDealTab = tabName;
-        
-        // Обновляем активность кнопок
-        document.querySelectorAll('.deals-tab-button').forEach(btn => btn.classList.remove('active'));
-        
-        if (tabName === 'pending') {
-            document.getElementById('pendingDealsTab').classList.add('active');
-        } else if (tabName === 'active') {
-            document.getElementById('activeDealsTab').classList.add('active');
-        } else if (tabName === 'completed') {
-            document.getElementById('completedDealsTab').classList.add('active');
-        }
-        
-        loadDeals();
-    };
-
-    function generateDealId() {
-        return 'deal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
-
-    function loadDeals() {
-        try {
-            const dealsList = document.getElementById('dealsList');
-            if (!dealsList) return;
-            
-            dealsList.innerHTML = '<div class="loading">📄 Загрузка сделок...</div>';
-            
-            const userDeals = getUserDeals(currentUserId);
-            console.log(`📊 Найдено сделок для пользователя ${currentUserId}:`, userDeals.length);
-            
-            let filteredDeals = [];
-            
-            switch(currentDealTab) {
-                case 'pending':
-                    filteredDeals = userDeals.filter(deal => deal.status === 'pending');
-                    break;
-                case 'active':
-                    filteredDeals = userDeals.filter(deal => deal.status === 'active');
-                    break;
-                case 'completed':
-                    filteredDeals = userDeals.filter(deal => deal.status === 'completed');
-                    break;
-                default:
-                    filteredDeals = userDeals;
-            }
-            
-            console.log(`📊 Отфильтровано сделок для вкладки ${currentDealTab}:`, filteredDeals.length);
-            
-            if (filteredDeals.length === 0) {
-                let message = '';
-                switch(currentDealTab) {
-                    case 'pending':
-                        message = 'Нет сделок, ожидающих подписи';
-                        break;
-                    case 'active':
-                        message = 'Нет активных сделок';
-                        break;
-                    case 'completed':
-                        message = 'Нет завершенных сделок';
-                        break;
-                    default:
-                        message = 'У вас пока нет сделок';
-                }
-                
-                dealsList.innerHTML = `
-                    <div style="text-align: center; color: #666; padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">📄</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">${message}</div>
-                        ${currentDealTab === 'pending' ? '<div style="opacity: 0.7;">Создайте новую сделку или дождитесь предложения</div>' : ''}
-                    </div>
-                `;
-                return;
-            }
-            
-            dealsList.innerHTML = filteredDeals.map(deal => {
-                const isClient = deal.clientId === currentUserId;
-                const isMaster = deal.masterId === currentUserId;
-                const roleText = isClient ? 'Вы: Клиент' : (isMaster ? 'Вы: Мастер' : 'Неизвестно');
-                
-                const statusText = {
-                    'draft': 'Черновик',
-                    'pending': 'Ожидает подписи',
-                    'active': 'Активна',
-                    'completed': 'Завершена'
-                }[deal.status] || 'Неизвестно';
-                
-                const statusClass = {
-                    'draft': 'status-draft',
-                    'pending': 'status-pending',
-                    'active': 'status-active',
-                    'completed': 'status-completed'
-                }[deal.status] || 'status-draft';
-                
-                const qualityText = {
-                    'premium': 'Премиум',
-                    'standard': 'Стандарт',
-                    'economy': 'Эконом'
-                }[deal.quality] || 'Не указано';
-                
-                const showSignButton = deal.status === 'pending' && 
-                    ((isClient && !deal.clientSigned) || (isMaster && !deal.masterSigned));
-                
-                const showCompleteButton = deal.status === 'active' && isMaster;
-                const showPayButton = isClient && deal.status === 'pending' && (!deal.paymentStatus || deal.paymentStatus === 'pending');
-                const showEscrowInfo = deal.paymentStatus === 'paid' || deal.paymentStatus === 'released';
-                const showDeleteButton = deal.status === 'completed';
-                
-                return `
-                    <div class="deal-card">
-                        <div class="deal-header">
-                            <div class="deal-title">${deal.title}</div>
-                            <div class="deal-status ${statusClass}">${statusText}</div>
-                        </div>
-                        
-                        <p style="margin: 10px 0; color: #666; font-size: 14px;">${roleText}</p>
-                        <p style="margin: 10px 0; color: #666;">${deal.description}</p>
-                        
-                        ${getPaymentStatusBadge(deal.paymentStatus || 'pending')}
-                        
-                        <div class="deal-details">
-                            <div class="deal-detail">
-                                <span style="color: #667eea;">💰</span>
-                                <span>${deal.amount} ₽</span>
-                            </div>
-                            <div class="deal-detail">
-                                <span style="color: #667eea;">⏱️</span>
-                                <span>${deal.period}</span>
-                            </div>
-                            <div class="deal-detail">
-                                <span style="color: #667eea;">⭐</span>
-                                <span>${qualityText}</span>
-                            </div>
-                            <div class="deal-detail">
-                                <span style="color: #667eea;">📅</span>
-                                <span>${new Date(deal.createdAt).toLocaleDateString('ru-RU')}</span>
-                            </div>
-                        </div>
-                        
-                        <div style="margin: 10px 0; padding: 10px; background: #f7fafc; border-radius: 8px;">
-                            <div style="margin: 5px 0; font-weight: bold;">${isClient ? 'Мастер' : 'Клиент'}:</div>
-                            <div style="margin: 5px 0; color: #666;">
-                                ${isClient ? deal.masterName : deal.clientName}
-                            </div>
-                            ${isClient && deal.masterSkill ? `
-                                <div style="margin: 5px 0; color: #48bb78; font-weight: bold;">
-                                    Услуга: ${deal.masterSkill}
-                                </div>
-                            ` : ''}
-                        </div>
-                        
-                        ${showEscrowInfo ? `
-                            <div class="escrow-info">
-                                <div class="escrow-title">
-                                    🔒 Гарант сделки
-                                </div>
-                                <div class="escrow-details">
-                                    ${deal.paymentStatus === 'paid' ? 
-                                        `💰 ${deal.escrowBalance || deal.amount} Stars заморожено до завершения работ` :
-                                        `✅ Выплачено мастеру: ${deal.masterPayout || Math.round(deal.amount * 0.95)} Stars`
-                                    }
-                                </div>
-                            </div>
-                        ` : ''}
-                        
-                        <div class="signatures">
-                            <div class="signature ${deal.clientSigned ? 'signed' : 'unsigned'}">
-                                <span>👤</span>
-                                <span>Клиент ${deal.clientSigned ? 'подписал' : 'не подписал'}</span>
-                            </div>
-                            <div class="signature ${deal.masterSigned ? 'signed' : 'unsigned'}">
-                                <span>🔧</span>
-                                <span>Мастер ${deal.masterSigned ? 'подписал' : 'не подписал'}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="deal-commission" style="background: #f7fafc; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px;">
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>Сумма:</span>
-                                <span>${deal.amount} ⭐</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; color: #48bb78;">
-                                <span>Комиссия (5%):</span>
-                                <span>${Math.round(deal.amount * 0.05)} ⭐</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 5px;">
-                                <span>Итого к оплате:</span>
-                                <span>${Math.round(deal.amount * 1.05)} ⭐</span>
-                            </div>
-                        </div>
-                        
-                        <div class="deal-actions">
-                            ${showSignButton ? `
-                                <button class="deal-button sign-button" onclick="triggerHapticFeedback(); signDeal('${deal.id}');">
-                                    ✍️ Подписать сделку
-                                </button>
-                            ` : ''}
-                            
-                            ${showPayButton ? `
-                                <button class="deal-button pay-button" onclick="triggerHapticFeedback(); payForDeal('${deal.id}');">
-                                    💳 Оплатить сделку
-                                </button>
-                            ` : ''}
-                            
-                            ${showCompleteButton ? `
-                                <button class="deal-button complete-button" onclick="triggerHapticFeedback(); completeDeal('${deal.id}');">
-                                    ✅ Завершить сделку
-                                </button>
-                            ` : ''}
-                            
-                            <button class="deal-button view-button" onclick="triggerHapticFeedback(); viewDealDetails('${deal.id}');">
-                                👁️ Подробнее
-                            </button>
-                            
-                            ${showDeleteButton ? `
-                                <button class="deal-button delete-deal" onclick="triggerHapticFeedback(); deleteDeal('${deal.id}');">
-                                    🗑️ Удалить сделку
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-        } catch (error) {
-            console.error('❌ Ошибка загрузки сделок:', error);
-            document.getElementById('dealsList').innerHTML = `
-                <div class="error-message">
-                    ❌ Ошибка загрузки сделок<br>
-                    <small>${error.message}</small>
-                </div>
-            `;
-        }
-    }
-
-    window.createDealFromSkill = function(skillId, skillName, masterName, masterId, masterContact) {
-        triggerHapticFeedback();
-        
-        console.log('📝 Создание сделки с мастером:', {
-            skillId, skillName, masterName, masterId, masterContact
-        });
-        
-        currentDealMaster = {
-            skillId: skillId,
-            skillName: skillName,
-            masterName: masterName,
-            masterId: masterId,
-            masterContact: masterContact
-        };
-        
-        const userData = getOrCreateUserProfile(currentUserId);
-        const clientName = userData.firstName || 'Клиент';
-        
-        getOrCreateUserProfile(masterId, masterName);
-        
-        document.getElementById('dealMasterId').value = masterId;
-        document.getElementById('dealMasterName').value = masterName;
-        document.getElementById('dealMasterSkill').value = skillName;
-        document.getElementById('dealMasterContact').value = masterContact;
-        
-        document.getElementById('dealTitle').value = `${skillName} - ${masterName}`;
-        document.getElementById('dealDescription').value = `Сделка между ${clientName} (клиент) и ${masterName} (мастер) на услугу "${skillName}"`;
-        
-        showSection('createDealSection');
-    };
-
-    window.selectQuality = function(quality) {
-        triggerHapticFeedback();
-        selectedQuality = quality;
-        
-        document.querySelectorAll('.quality-option').forEach(option => {
-            option.classList.remove('selected');
-        });
-        
-        document.getElementById('quality' + quality.charAt(0).toUpperCase() + quality.slice(1)).classList.add('selected');
-        
-        updateDealCommission();
-    };
-
-    window.toggleOption = function(option) {
-        triggerHapticFeedback();
-        const element = document.getElementById('option' + option.charAt(0).toUpperCase() + option.slice(1));
-        
-        if (element.classList.contains('selected')) {
-            element.classList.remove('selected');
-            selectedOptions = selectedOptions.filter(item => item !== option);
-        } else {
-            if (selectedOptions.length >= 2) {
-                alert('❌ Вы можете выбрать только 2 дополнительных условия');
-                return;
-            }
-            element.classList.add('selected');
-            selectedOptions.push(option);
-        }
-        
-        updateDealCommission();
-    };
-
-    function updateDealCommission() {
-        const dealAmount = document.getElementById('dealAmount').value || 0;
-        
-        if (dealAmount > 0) {
-            const commission = dealAmount * 0.05;
-            const total = parseInt(dealAmount) + commission;
-            
-            document.getElementById('dealAmountDisplay').textContent = dealAmount;
-            document.getElementById('commissionAmount').textContent = Math.round(commission);
-            document.getElementById('totalAmount').textContent = Math.round(total);
-            document.getElementById('dealCommission').style.display = 'block';
-        } else {
-            document.getElementById('dealCommission').style.display = 'none';
-        }
-    }
-
-    window.createDeal = function() {
-        triggerHapticFeedback();
-        
-        try {
-            const title = document.getElementById('dealTitle').value.trim();
-            const description = document.getElementById('dealDescription').value.trim();
-            const period = document.getElementById('dealPeriod').value.trim();
-            const amount = document.getElementById('dealAmount').value;
-            
-            const masterId = document.getElementById('dealMasterId').value;
-            const masterName = document.getElementById('dealMasterName').value;
-            const masterSkill = document.getElementById('dealMasterSkill').value;
-            const masterContact = document.getElementById('dealMasterContact').value;
-            
-            const userData = getOrCreateUserProfile(currentUserId);
-            const clientName = userData.firstName || 'Клиент';
-            
-            if (!title || !description || !period || !amount) {
-                alert('❌ Заполните все обязательные поля (отмечены *)');
-                return;
-            }
-            
-            if (!selectedQuality) {
-                alert('❌ Выберите уровень качества');
-                return;
-            }
-            
-            if (selectedOptions.length !== 2) {
-                alert('❌ Выберите 2 дополнительных условия');
-                return;
-            }
-            
-            if (!masterId || !masterName) {
-                alert('❌ Ошибка: данные мастера не найдены');
-                return;
-            }
-            
-            console.log('📤 Создаю сделку с мастером:', {
-                masterId, masterName, masterSkill, masterContact
-            });
-            
-            const newDeal = {
-                id: generateDealId(),
-                title: title,
-                description: description,
-                period: period,
-                amount: parseInt(amount),
-                quality: selectedQuality,
-                options: [...selectedOptions],
-                commission: Math.round(amount * 0.05),
-                total: Math.round(amount * 1.05),
-                status: 'pending',
-                paymentStatus: 'pending',
-                escrowBalance: 0,
-                commissionAmount: 0,
-                masterPayout: 0,
-                clientSigned: false,
-                masterSigned: false,
-                createdAt: new Date().toISOString(),
-                clientId: currentUserId,
-                clientName: clientName,
-                masterId: masterId,
-                masterName: masterName,
-                masterSkill: masterSkill,
-                masterContact: masterContact,
-                skillId: currentDealMaster?.skillId || null
-            };
-            
-            console.log('✅ Создана сделка:', newDeal);
-            
-            addGlobalDeal(newDeal);
-            
-            userData.dealsCount = (userData.dealsCount || 0) + 1;
-            setLocalStorage(`user_${currentUserId}`, userData);
-            
-            const masterData = getOrCreateUserProfile(masterId, masterName);
-            masterData.dealsCount = (masterData.dealsCount || 0) + 1;
-            setLocalStorage(`user_${masterId}`, masterData);
-            
-            document.getElementById('dealTitle').value = '';
-            document.getElementById('dealDescription').value = '';
-            document.getElementById('dealPeriod').value = '';
-            document.getElementById('dealAmount').value = '';
-            selectedQuality = '';
-            selectedOptions = [];
-            
-            document.querySelectorAll('.quality-option').forEach(option => {
-                option.classList.remove('selected');
-            });
-            
-            document.querySelectorAll('.option-checkbox').forEach(option => {
-                option.classList.remove('selected');
-            });
-            
-            document.getElementById('dealCommission').style.display = 'none';
-            
-            alert('✅ Сделка успешно создана! Теперь её должен подписать мастер и вы должны оплатить.');
-            
-            showProfileSection();
-            showProfileTab('deals');
-            showDealsTab('pending');
-            
-        } catch (error) {
-            console.error('❌ Ошибка создания сделки:', error);
-            alert('❌ Ошибка создания сделки: ' + error.message);
-        }
-    };
-
-    window.signDeal = function(dealId) {
-        triggerHapticFeedback();
-        
-        try {
-            const deal = getDealById(dealId);
-            if (!deal) {
-                alert('❌ Сделка не найдена');
-                return;
-            }
-            
-            const isClient = deal.clientId === currentUserId;
-            const isMaster = deal.masterId === currentUserId;
-            
-            if (!isClient && !isMaster) {
-                alert('❌ Вы не являетесь участником этой сделки');
-                return;
-            }
-            
-            const updates = {};
-            if (isClient) {
-                updates.clientSigned = true;
-            } else if (isMaster) {
-                updates.masterSigned = true;
-            }
-            
-            const clientSigned = isClient ? true : deal.clientSigned;
-            const masterSigned = isMaster ? true : deal.masterSigned;
-            
-            if (clientSigned && masterSigned) {
-                updates.status = 'active';
-                alert('🎉 Обе стороны подписали сделку! Теперь клиент должен оплатить сделку для активации.');
-            } else {
-                alert('✅ Вы успешно подписали сделку! Ожидайте подписи второй стороны и оплаты.');
-            }
-            
-            updateGlobalDeal(dealId, updates);
-            
-            loadDeals();
-            
-        } catch (error) {
-            console.error('❌ Ошибка подписи сделки:', error);
-            alert('❌ Ошибка подписи сделки: ' + error.message);
-        }
-    };
-
-    window.completeDeal = function(dealId) {
-        triggerHapticFeedback();
-        
-        if (confirm('✅ Завершить сделку? После завершения деньги будут переведены мастеру (за вычетом комиссии 5%).')) {
-            try {
-                triggerHapticFeedback();
-                
-                const deal = getDealById(dealId);
-                if (!deal) {
-                    alert('❌ Сделка не найдена');
-                    return;
-                }
-                
-                const isMaster = deal.masterId === currentUserId;
-                if (!isMaster) {
-                    alert('❌ Только мастер может завершить сделку');
-                    return;
-                }
-                
-                if (deal.status !== 'active') {
-                    alert('❌ Можно завершить только активные сделки');
-                    return;
-                }
-                
-                if (deal.paymentStatus !== 'paid') {
-                    alert('❌ Сделка не оплачена клиентом');
-                    return;
-                }
-                
-                if (releasePayment(dealId)) {
-                    updateGlobalDeal(dealId, {
-                        status: 'completed',
-                        completedAt: new Date().toISOString()
-                    });
-                    
-                    addCoin();
-                    
-                    const userData = getOrCreateUserProfile(currentUserId);
-                    userData.completedDeals = (userData.completedDeals || 0) + 1;
-                    userData.rating = (userData.rating || 0) + 0.5;
-                    setLocalStorage(`user_${currentUserId}`, userData);
-                    
-                    const clientData = getOrCreateUserProfile(deal.clientId, deal.clientName);
-                    clientData.completedDeals = (clientData.completedDeals || 0) + 1;
-                    clientData.rating = (clientData.rating || 0) + 0.5;
-                    setLocalStorage(`user_${deal.clientId}`, clientData);
-                    
-                    alert('✅ Сделка успешно завершена! Средства переведены на ваш баланс (за вычетом комиссии 5%). Получена +1 🪙 монета!');
-                    
-                    loadDeals();
-                    loadUserProfile();
-                    updateWalletUI();
-                }
-                
-            } catch (error) {
-                console.error('❌ Ошибка завершения сделки:', error);
-                alert('❌ Ошибка завершения сделки: ' + error.message);
-            }
-        }
-    };
-
-    window.viewDealDetails = function(dealId) {
-        triggerHapticFeedback();
-        
-        try {
-            const deal = getDealById(dealId);
-            
-            if (!deal) {
-                alert('❌ Сделка не найдена');
-                return;
-            }
-            
-            const isClient = deal.clientId === currentUserId;
-            const isMaster = deal.masterId === currentUserId;
-            const roleText = isClient ? 'Вы: Клиент' : (isMaster ? 'Вы: Мастер' : 'Неизвестно');
-            
-            const statusText = {
-                'draft': 'Черновик',
-                'pending': 'Ожидает подписи',
-                'active': 'Активна',
-                'completed': 'Завершена'
-            }[deal.status] || 'Неизвестно';
-            
-            const qualityText = {
-                'premium': 'Премиум',
-                'standard': 'Стандарт',
-                'economy': 'Эконом'
-            }[deal.quality] || 'Не указано';
-            
-            const paymentStatusText = {
-                'pending': '⏳ Ожидает оплаты',
-                'paid': '✅ Оплачено (в эскроу)',
-                'released': '💸 Выплачено мастеру',
-                'refunded': '↩️ Возвращено клиенту'
-            }[deal.paymentStatus || 'pending'];
-            
-            const details = `
-                <strong>Название:</strong> ${deal.title}<br><br>
-                <strong>Описание:</strong> ${deal.description}<br><br>
-                <strong>Статус:</strong> ${statusText}<br><br>
-                <strong>Статус оплаты:</strong> ${paymentStatusText}<br><br>
-                <strong>Ваша роль:</strong> ${roleText}<br><br>
-                <strong>Срок выполнения:</strong> ${deal.period}<br><br>
-                <strong>Сумма:</strong> ${deal.amount} ⭐<br><br>
-                <strong>Уровень качества:</strong> ${qualityText}<br><br>
-                <strong>Дополнительные условия:</strong> ${deal.options?.join(', ') || 'Не указаны'}<br><br>
-                <strong>Клиент:</strong> ${deal.clientName}<br><br>
-                <strong>Мастер:</strong> ${deal.masterName}<br><br>
-                ${deal.masterSkill ? `<strong>Услуга:</strong> ${deal.masterSkill}<br><br>` : ''}
-                ${deal.masterContact ? `<strong>Контакт мастера:</strong> ${deal.masterContact}<br><br>` : ''}
-                <strong>Дата создания:</strong> ${new Date(deal.createdAt).toLocaleString('ru-RU')}<br><br>
-                ${deal.completedAt ? `<strong>Дата завершения:</strong> ${new Date(deal.completedAt).toLocaleString('ru-RU')}<br><br>` : ''}
-                <strong>Статус подписи клиента:</strong> ${deal.clientSigned ? '✅ Подписана' : '❌ Не подписана'}<br><br>
-                <strong>Статус подписи мастера:</strong> ${deal.masterSigned ? '✅ Подписана' : '❌ Не подписана'}<br><br>
-                ${deal.paymentStatus === 'paid' || deal.paymentStatus === 'released' ? `
-                    <strong>Заморожено в эскроу:</strong> ${deal.escrowBalance} ⭐<br><br>
-                    <strong>Комиссия системы (5%):</strong> ${deal.commissionAmount} ⭐<br><br>
-                    <strong>Выплачено мастеру:</strong> ${deal.masterPayout} ⭐<br><br>
-                ` : `
-                    <strong>Комиссия системы (5%):</strong> ${deal.commission} ⭐<br><br>
-                    <strong>Итого к оплате:</strong> ${deal.total} ⭐<br><br>
-                `}
-            `;
-            
-            alert(details);
-            
-        } catch (error) {
-            console.error('❌ Ошибка просмотра сделки:', error);
-            alert('❌ Ошибка просмотра сделки: ' + error.message);
-        }
-    };
-
-    window.showCreateDealSection = function() {
-        triggerHapticFeedback();
-        
-        document.getElementById('dealTitle').value = '';
-        document.getElementById('dealDescription').value = '';
-        document.getElementById('dealPeriod').value = '';
-        document.getElementById('dealAmount').value = '';
-        selectedQuality = '';
-        selectedOptions = [];
-        
-        document.querySelectorAll('.quality-option').forEach(option => {
-            option.classList.remove('selected');
-        });
-        
-        document.querySelectorAll('.option-checkbox').forEach(option => {
-            option.classList.remove('selected');
-        });
-        
-        document.getElementById('dealCommission').style.display = 'none';
-        
-        currentDealMaster = null;
-        document.getElementById('dealMasterId').value = '';
-        document.getElementById('dealMasterName').value = '';
-        document.getElementById('dealMasterSkill').value = '';
-        document.getElementById('dealMasterContact').value = '';
-        
-        showSection('createDealSection');
-    };
-
-    window.setProjectRating = function(rating) {
-        triggerHapticFeedback();
-        projectRating = rating;
-        const stars = document.getElementById('projectRatingStars');
-        stars.innerHTML = '';
-        
-        for (let i = 1; i <= 5; i++) {
-            stars.innerHTML += i <= rating ? 
-                '<span style="cursor: pointer; color: #FFD700;" onclick="triggerHapticFeedback(); setProjectRating(' + i + ');">★</span>' :
-                '<span style="cursor: pointer;" onclick="triggerHapticFeedback(); setProjectRating(' + i + ');">☆</span>';
-        }
-    };
-
-    // ========== ФУНКЦИИ ОТЗЫВОВ О ПРОЕКТЕ ==========
-    
-    function getProjectReviews() {
-        return getLocalStorage('ymeyka_project_reviews') || [];
-    }
-    
-    function saveProjectReview(review) {
-        const reviews = getProjectReviews();
-        reviews.push(review);
-        setLocalStorage('ymeyka_project_reviews', reviews);
+        setLocalStorage('umeyka_project_reviews', reviews);
         return review;
     }
     
