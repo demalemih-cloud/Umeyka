@@ -6,6 +6,7 @@
     <title>Ymeyka - Мастера рядом</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -30,6 +31,123 @@
             margin: 0 auto;
             padding: 0;
         }
+        
+        /* ========== КНОПКА СКАНЕРА ========== */
+        .qr-scanner-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .qr-scanner-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* ========== МОДАЛЬНОЕ ОКНО СКАНЕРА ========== */
+        .scanner-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .scanner-modal-overlay.active {
+            display: flex;
+        }
+        
+        .scanner-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+        
+        .scanner-modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+        
+        .scanner-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+        
+        .scanner-container video {
+            width: 100%;
+            height: auto;
+        }
+        
+        .scanner-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .scanner-close:hover {
+            background: #f7fafc;
+        }
+        
+        .scanner-error {
+            color: #e53e3e;
+            margin-top: 15px;
+            font-size: 14px;
+            padding: 10px;
+            background: #fed7d7;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .scanner-button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* ========== ОСТАЛЬНЫЕ СТИЛИ (СОХРАНЕНЫ) ========== */
+        /* ... (все остальные стили из оригинального кода остаются без изменений) ... */
         
         /* ========== ИСПРАВЛЕНИЕ #1: ЦЕНТРИРОВАНИЕ КНОПКИ РЕДАКТИРОВАНИЯ ПРОФИЛЯ ========== */
         #userProfile {
@@ -2342,6 +2460,7 @@
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
             <div class="header" id="logoHeader">
+                <button class="qr-scanner-button" onclick="triggerHapticFeedback(); openQRScanner();">📷 Сканер</button>
                 <button class="about-button" onclick="triggerHapticFeedback(); showAboutSection();">ℹ️ О проекте</button>
                 <div class="logo">🤝✨</div>
                 <div class="app-title">Ymeyka</div>
@@ -2373,6 +2492,17 @@
                     🗺️ Поиск по карте
                 </button>
                 <div id="map"></div>
+            </div>
+        </div>
+
+        <!-- МОДАЛЬНОЕ ОКНО СКАНЕРА QR-КОДОВ -->
+        <div id="scannerModal" class="scanner-modal-overlay">
+            <div class="scanner-modal-content">
+                <button class="scanner-close" onclick="triggerHapticFeedback(); closeQRScanner();">×</button>
+                <div class="scanner-modal-title">📷 Сканирование QR-кода</div>
+                <div id="qr-reader" class="scanner-container"></div>
+                <div id="scannerError" class="scanner-error"></div>
+                <button class="scanner-button" onclick="triggerHapticFeedback(); closeQRScanner();">Закрыть</button>
             </div>
         </div>
 
@@ -3117,11 +3247,234 @@
     let pendingPaymentDealId = null;
     let currentQRSkillId = null;
     let currentQRSkillName = null;
+    let html5QrCode = null;
     
     // Счетчик кликов по логотипу для открытия админ-панели
     let logoClickCount = 0;
     let logoClickTimer = null;
 
+    // ========== QR-СКАНЕР ==========
+    
+    window.openQRScanner = async function() {
+        triggerHapticFeedback();
+        
+        const modal = document.getElementById('scannerModal');
+        const errorDiv = document.getElementById('scannerError');
+        
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+        
+        modal.classList.add('active');
+        
+        // Небольшая задержка для отображения модального окна
+        setTimeout(async () => {
+            try {
+                // Проверяем поддержку камеры
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('Ваш браузер не поддерживает доступ к камере');
+                }
+                
+                // Инициализируем сканер
+                html5QrCode = new Html5Qrcode("qr-reader");
+                
+                const config = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0
+                };
+                
+                await html5QrCode.start(
+                    { facingMode: "environment" }, // Задняя камера
+                    config,
+                    (decodedText, decodedResult) => {
+                        console.log('✅ QR-код распознан:', decodedText);
+                        handleScannedQRCode(decodedText);
+                    },
+                    (errorMessage) => {
+                        // Игнорируем ошибки во время сканирования
+                        console.log('QR сканирование:', errorMessage);
+                    }
+                ).catch(err => {
+                    console.error('❌ Ошибка запуска сканера:', err);
+                    errorDiv.style.display = 'block';
+                    errorDiv.textContent = '❌ Не удалось получить доступ к камере. Убедитесь, что вы разрешили доступ.';
+                });
+                
+            } catch (error) {
+                console.error('❌ Ошибка инициализации сканера:', error);
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = '❌ Ошибка: ' + error.message;
+            }
+        }, 100);
+    };
+    
+    window.closeQRScanner = async function() {
+        triggerHapticFeedback();
+        
+        if (html5QrCode && html5QrCode.isScanning) {
+            try {
+                await html5QrCode.stop();
+                html5QrCode.clear();
+            } catch (error) {
+                console.error('Ошибка остановки сканера:', error);
+            }
+            html5QrCode = null;
+        }
+        
+        const modal = document.getElementById('scannerModal');
+        modal.classList.remove('active');
+        
+        const errorDiv = document.getElementById('scannerError');
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+    };
+    
+    async function handleScannedQRCode(qrData) {
+        console.log('🔍 Обработка QR-кода:', qrData);
+        
+        try {
+            // Извлекаем skillId из ссылки
+            let skillId = null;
+            
+            // Формат: https://t.me/ymeyka_bot?start=skill_{skillId}
+            if (qrData.includes('start=skill_')) {
+                const match = qrData.match(/start=skill_([^&]+)/);
+                if (match && match[1]) {
+                    skillId = match[1];
+                }
+            }
+            
+            if (!skillId) {
+                showScannerError('Не удалось распознать QR-код умейки');
+                return;
+            }
+            
+            console.log('🎯 Найден skillId:', skillId);
+            
+            // Находим умейку в глобальном хранилище
+            const skill = getGlobalSkillById(skillId);
+            
+            if (!skill) {
+                // Пробуем загрузить с сервера
+                try {
+                    const response = await fetch(`${API_URL}/api/skills/${skillId}`);
+                    const result = await response.json();
+                    if (result.success && result.skill) {
+                        // Добавляем в глобальное хранилище
+                        addGlobalSkill(result.skill);
+                        openSkillFromQR(result.skill);
+                    } else {
+                        showScannerError('Умейка не найдена');
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки умейки:', error);
+                    showScannerError('Умейка не найдена');
+                }
+                return;
+            }
+            
+            // Открываем карточку умейки
+            openSkillFromQR(skill);
+            
+            // Закрываем сканер
+            await closeQRScanner();
+            
+        } catch (error) {
+            console.error('❌ Ошибка обработки QR-кода:', error);
+            showScannerError('Ошибка обработки QR-кода');
+        }
+    }
+    
+    function showScannerError(message) {
+        const errorDiv = document.getElementById('scannerError');
+        errorDiv.textContent = '❌ ' + message;
+        errorDiv.style.display = 'block';
+        
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 3000);
+    }
+    
+    function openSkillFromQR(skill) {
+        // Показываем модальное окно с информацией об умейке
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.style.display = 'flex';
+        modal.style.zIndex = '5000';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 400px;">
+                <button class="modal-close" onclick="this.parentElement.parentElement.remove();">×</button>
+                <div class="modal-title">✨ Найдена умейка</div>
+                
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 48px; margin-bottom: 10px;">🔧</div>
+                    <h3 style="color: #2d3748; margin-bottom: 10px;">${escapeHtml(skill.skill)}</h3>
+                    <p style="color: #48bb78; font-size: 24px; font-weight: bold;">${skill.price} ₽</p>
+                </div>
+                
+                <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <p style="color: #2d3748; margin: 5px 0;"><strong>👤 Мастер:</strong> ${escapeHtml(skill.username)}</p>
+                    <p style="color: #2d3748; margin: 5px 0;"><strong>📍 Город:</strong> ${escapeHtml(skill.city || 'Не указан')}</p>
+                    <p style="color: #2d3748; margin: 5px 0;"><strong>📞 Контакт:</strong> ${escapeHtml(skill.experience || 'Не указан')}</p>
+                </div>
+                
+                <button class="submit-button" onclick="triggerHapticFeedback(); this.parentElement.parentElement.remove(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill)}', '${escapeHtml(skill.username)}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');" style="margin-bottom: 10px;">
+                    📝 Создать сделку
+                </button>
+                <button class="modal-button modal-cancel" onclick="this.parentElement.parentElement.remove();">
+                    Закрыть
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/['"]/g, function(m) {
+            if (m === "'") return '&#39;';
+            if (m === '"') return '&quot;';
+            return m;
+        });
+    }
+    
+    function handleDeepLink() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const startParam = urlParams.get('start');
+        
+        if (startParam && startParam.startsWith('skill_')) {
+            const skillId = startParam.replace('skill_', '');
+            console.log('🔗 Обнаружен deeplink для skill:', skillId);
+            
+            // Находим умейку
+            const skill = getGlobalSkillById(skillId);
+            if (skill) {
+                // Открываем карточку умейки с возможностью создания сделки
+                setTimeout(() => {
+                    openSkillFromQR(skill);
+                }, 1000);
+            } else {
+                // Пробуем загрузить с сервера
+                fetch(`${API_URL}/api/skills/${skillId}`)
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success && result.skill) {
+                            addGlobalSkill(result.skill);
+                            setTimeout(() => {
+                                openSkillFromQR(result.skill);
+                            }, 1000);
+                        }
+                    })
+                    .catch(error => console.error('Ошибка загрузки умейки по deeplink:', error));
+            }
+        }
+    }
+    
     // ========== БАЗА ДАННЫХ ГОРОДОВ ==========
     const citiesDatabase = {
         'Евпатория': { lat: 45.1906, lon: 33.3666 },
@@ -3532,13 +3885,11 @@
     function generateQRCode(skillId, skillName) {
         const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
         
-        // Создаем временный контейнер для генерации QR
         const tempContainer = document.createElement('div');
         tempContainer.id = 'tempQR';
         tempContainer.style.display = 'none';
         document.body.appendChild(tempContainer);
         
-        // Генерируем QR-код
         const qrcode = new QRCode(tempContainer, {
             text: qrData,
             width: 250,
@@ -3548,13 +3899,11 @@
             correctLevel: QRCode.CorrectLevel.H
         });
         
-        // Получаем data URL изображения
         setTimeout(() => {
             const qrImg = tempContainer.querySelector('img');
             if (qrImg) {
                 const qrDataUrl = qrImg.src;
                 
-                // Сохраняем в skill
                 const skill = getGlobalSkillById(skillId);
                 if (skill) {
                     skill.qrCode = qrDataUrl;
@@ -3583,7 +3932,6 @@
         if (!skill.qrCode) {
             const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
             skill.qrCodeData = qrData;
-            // QR будет сгенерирован при открытии модалки
             addGlobalSkill(skill);
         }
         return skill;
@@ -3606,7 +3954,6 @@
         const container = document.getElementById('qrCodeContainer');
         container.innerHTML = '';
         
-        // Генерируем QR-код
         const qrcode = new QRCode(container, {
             text: skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${skillId}`,
             width: 250,
@@ -3643,7 +3990,6 @@
                 url: skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`
             }).catch(err => console.log('Share canceled'));
         } else {
-            // Копируем в буфер обмена
             navigator.clipboard.writeText(shareText).then(() => {
                 showNotification('✅ Ссылка скопирована в буфер обмена!');
             }).catch(() => {
@@ -3651,59 +3997,6 @@
             });
         }
     };
-    
-    function handleDeepLink() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const startParam = urlParams.get('start');
-        
-        if (startParam && startParam.startsWith('skill_')) {
-            const skillId = startParam.replace('skill_', '');
-            console.log('🔗 Обнаружен deeplink для skill:', skillId);
-            
-            // Находим умейку
-            const skill = getGlobalSkillById(skillId);
-            if (skill) {
-                // Открываем карточку умейки с возможностью создания сделки
-                setTimeout(() => {
-                    openSkillFromQR(skill);
-                }, 1000);
-            }
-        }
-    }
-    
-    function openSkillFromQR(skill) {
-        // Показываем модальное окно с информацией об умейке
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay';
-        modal.style.display = 'flex';
-        modal.style.zIndex = '5000';
-        modal.innerHTML = `
-            <div class="modal-content" style="max-width: 400px;">
-                <button class="modal-close" onclick="this.parentElement.parentElement.remove();">×</button>
-                <div class="modal-title">✨ Найдена умейка</div>
-                
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <div style="font-size: 48px; margin-bottom: 10px;">🔧</div>
-                    <h3 style="color: #2d3748; margin-bottom: 10px;">${skill.skill}</h3>
-                    <p style="color: #48bb78; font-size: 24px; font-weight: bold;">${skill.price} ₽</p>
-                </div>
-                
-                <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                    <p style="color: #2d3748; margin: 5px 0;"><strong>👤 Мастер:</strong> ${skill.username}</p>
-                    <p style="color: #2d3748; margin: 5px 0;"><strong>📍 Город:</strong> ${skill.city || 'Не указан'}</p>
-                    <p style="color: #2d3748; margin: 5px 0;"><strong>📞 Контакт:</strong> ${skill.experience || 'Не указан'}</p>
-                </div>
-                
-                <button class="submit-button" onclick="triggerHapticFeedback(); this.parentElement.parentElement.remove(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g, "\\'")}', '${skill.username.replace(/'/g, "\\'")}', '${skill.userId}', '${skill.experience || ''}');" style="margin-bottom: 10px;">
-                    📝 Создать сделку
-                </button>
-                <button class="modal-button modal-cancel" onclick="this.parentElement.parentElement.remove();">
-                    Закрыть
-                </button>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    }
 
     // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
     
@@ -4522,7 +4815,6 @@
                     console.log('📱 Ответ сервера при добавлении:', result);
                     
                     if (result.success) {
-                        // Генерируем QR-код для новой умейки
                         const newSkill = result.skill || skillData;
                         newSkill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${newSkill._id}`;
                         addGlobalSkill(newSkill);
@@ -4618,12 +4910,10 @@
                                 skill.status = existing.status;
                             }
                         }
-                        // Сохраняем QR данные если они есть
                         if (existing.qrCode) skill.qrCode = existing.qrCode;
                         if (existing.qrCodeData) skill.qrCodeData = existing.qrCodeData;
                         globalSkills[existingIndex] = skill;
                     } else {
-                        // Добавляем QR данные для новых умейек
                         skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
                         globalSkills.push(skill);
                     }
@@ -4676,11 +4966,9 @@
                                         skill.status = globalSkill.status;
                                     }
                                 }
-                                // Восстанавливаем QR данные
                                 if (globalSkill.qrCode) skill.qrCode = globalSkill.qrCode;
                                 if (globalSkill.qrCodeData) skill.qrCodeData = globalSkill.qrCodeData;
                             }
-                            // Убедимся что QR данные есть
                             if (!skill.qrCodeData) {
                                 skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
                             }
@@ -5045,7 +5333,6 @@
                 skillData.photo = currentEditingSkill.photo;
             }
             
-            // Сохраняем QR данные
             if (currentEditingSkill) {
                 if (currentEditingSkill.qrCode) skillData.qrCode = currentEditingSkill.qrCode;
                 if (currentEditingSkill.qrCodeData) skillData.qrCodeData = currentEditingSkill.qrCodeData;
@@ -5201,7 +5488,6 @@
                     console.log('📍 Местоположение пользователя:', userLocation);
                     map.setView([latitude, longitude], 13);
                     
-                    // Маркер пользователя с новым стилем
                     const userMarker = L.marker([latitude, longitude], {
                         icon: L.divIcon({
                             className: 'user-marker',
@@ -5232,13 +5518,11 @@
         }
     }
 
-    // ========== НОВАЯ ФУНКЦИЯ СОЗДАНИЯ МАРКЕРА ==========
     function createSkillMarkerHtml(skill, isUserSkill) {
         const status = skill.status || 'ready';
         const statusClass = status === 'ready' ? 'status-ready' : 'status-busy';
         const fallbackIcon = isUserSkill ? '👤' : '🔧';
         
-        // Если есть фото - показываем фото, иначе fallback с иконкой
         if (skill.photo) {
             return `
                 <div class="umeyka-marker-container ${statusClass}">
@@ -5264,13 +5548,11 @@
             
             const userData = getOrCreateUserProfile(currentUserId);
             
-            // Очищаем старые маркеры
             if (markers.length > 0) {
                 markers.forEach(marker => map.removeLayer(marker));
                 markers = [];
             }
             
-            // Добавляем маркер пользователя
             if (userLocation) {
                 const userMarker = L.marker([userLocation.lat, userLocation.lon], {
                     icon: L.divIcon({
@@ -5287,7 +5569,6 @@
                 markers.push(userMarker);
             }
             
-            // Добавляем маркеры умейек с новым дизайном
             skills.forEach((skill, index) => {
                 if (skill.location && skill.location.lat && skill.location.lon) {
                     const rating = skill.rating?.average || 5.0;
@@ -5295,10 +5576,8 @@
                     const status = skill.status || 'ready';
                     const radius = skill.radius || 10;
                     
-                    // Цвет круга радиуса в зависимости от статуса
                     const circleColor = (!status || status === 'ready') ? '#48bb78' : '#f56565';
                     
-                    // Круг радиуса действия
                     const circle = L.circle([skill.location.lat, skill.location.lon], {
                         color: circleColor,
                         fillColor: circleColor,
@@ -5308,7 +5587,6 @@
                     
                     markers.push(circle);
                     
-                    // Создаем HTML для маркера с задержкой анимации
                     const markerHtml = createSkillMarkerHtml(skill, isUserSkill);
                     
                     const marker = L.marker([skill.location.lat, skill.location.lon], {
@@ -5322,7 +5600,6 @@
                     .addTo(map)
                     .bindPopup(createMapSkillPopup(skill, isUserSkill));
                     
-                    // Добавляем задержку анимации для каждого маркера
                     const markerElement = marker.getElement();
                     if (markerElement) {
                         markerElement.style.animationDelay = `${index * 0.05}s`;
@@ -5361,7 +5638,6 @@
         const statusBadge = getStatusBadge(skill.status);
         const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
         
-        // Миниатюра фото для popup (100x60px)
         const photoThumbnail = skill.photo ? `
             <div class="popup-skill-photo">
                 <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
@@ -5579,7 +5855,6 @@
         triggerHapticFeedback();
         showSection('profileSection');
         loadUserProfile();
-        // Скрываем все вкладки при входе в ЛК
         document.getElementById('profileStats').style.display = 'none';
         document.getElementById('profileSkills').style.display = 'none';
         document.getElementById('profileDeals').style.display = 'none';
@@ -5680,8 +5955,6 @@
     
     function openAdminPanel() {
         console.log('🔓 Открытие админ-панели (6 кликов)');
-        
-        // Открываем админку в новой вкладке/окне
         const adminUrl = 'umeyka-admin.html';
         window.open(adminUrl, '_blank');
     }
@@ -5702,7 +5975,6 @@
         
         processReferralLink();
         
-        // Обрабатываем deeplink при загрузке
         handleDeepLink();
         
         const tg = window.Telegram?.WebApp;
@@ -6020,19 +6292,16 @@
         triggerHapticFeedback();
         currentProfileTab = tabName;
         
-        // Скрываем все вкладки
         document.getElementById('profileStats').style.display = 'none';
         document.getElementById('profileSkills').style.display = 'none';
         document.getElementById('profileDeals').style.display = 'none';
         document.getElementById('profileReferral').style.display = 'none';
         
-        // Показываем выбранную вкладку
         document.getElementById('profileStats').style.display = tabName === 'stats' ? 'block' : 'none';
         document.getElementById('profileSkills').style.display = tabName === 'skills' ? 'block' : 'none';
         document.getElementById('profileDeals').style.display = tabName === 'deals' ? 'block' : 'none';
         document.getElementById('profileReferral').style.display = tabName === 'referral' ? 'block' : 'none';
         
-        // Загружаем данные для вкладки
         if (tabName === 'skills') {
             loadProfileSkills();
         } else if (tabName === 'deals') {
@@ -6048,7 +6317,6 @@
         triggerHapticFeedback();
         currentDealTab = tabName;
         
-        // Обновляем активность кнопок
         document.querySelectorAll('.deals-tab-button').forEach(btn => btn.classList.remove('active'));
         
         if (tabName === 'pending') {
@@ -6704,20 +6972,16 @@
         const globalDeals = getGlobalDeals();
         const globalSkills = getGlobalSkills();
         
-        // Количество мастеров (уникальные userId из skills)
         const uniqueMasters = new Set(globalSkills.map(s => s.userId)).size;
         
-        // Количество сделок
         const dealsCount = globalDeals.length;
         
-        // Средний рейтинг проекта
         let averageRating = 0;
         if (reviews.length > 0) {
             const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
             averageRating = sum / reviews.length;
         }
         
-        // Процент довольных клиентов (завершённые сделки без споров)
         const completedDeals = globalDeals.filter(d => d.status === 'completed');
         const satisfiedClients = completedDeals.filter(d => d.paymentStatus !== 'refunded').length;
         const satisfactionRate = completedDeals.length > 0 
@@ -6725,8 +6989,8 @@
             : 0;
         
         return {
-            mastersCount: uniqueMasters || Math.floor(Math.random() * 500) + 500, // Fallback для демо
-            dealsCount: dealsCount || Math.floor(Math.random() * 1000) + 1000, // Fallback для демо
+            mastersCount: uniqueMasters || Math.floor(Math.random() * 500) + 500,
+            dealsCount: dealsCount || Math.floor(Math.random() * 1000) + 1000,
             averageRating: averageRating || 4.9,
             satisfactionRate: satisfactionRate || 98,
             reviewsCount: reviews.length
@@ -6766,7 +7030,6 @@
         const comment = document.getElementById('projectReviewComment').value.trim();
         const userData = getOrCreateUserProfile(currentUserId);
         
-        // Проверка на завершённые сделки
         if ((userData.completedDeals || 0) === 0) {
             alert('❌ Оставить отзыв могут только участники с завершёнными сделками');
             return;
@@ -6797,11 +7060,9 @@
         
         alert('✅ Спасибо за ваш отзыв!');
         
-        // Сброс формы
         document.getElementById('projectReviewComment').value = '';
         setProjectRating(0);
         
-        // Обновление статистики
         updateAboutStats();
     };
     
@@ -6811,11 +7072,9 @@
         const reviews = getProjectReviews();
         const stats = calculateProjectStats();
         
-        // Обновление заголовка модального окна
         document.getElementById('reviewsAverageRating').textContent = stats.averageRating.toFixed(1);
         document.getElementById('reviewsTotalCount').textContent = `${stats.reviewsCount} отзывов`;
         
-        // Звёзды среднего рейтинга
         const starsContainer = document.getElementById('reviewsAverageStars');
         let starsHtml = '';
         for (let i = 1; i <= 5; i++) {
@@ -6823,7 +7082,6 @@
         }
         starsContainer.textContent = starsHtml;
         
-        // Список отзывов
         const listContainer = document.getElementById('reviewsList');
         
         if (reviews.length === 0) {
@@ -6835,7 +7093,6 @@
                 </div>
             `;
         } else {
-            // Сортируем по дате (новые сверху)
             const sortedReviews = [...reviews].sort((a, b) => 
                 new Date(b.createdAt) - new Date(a.createdAt)
             );
@@ -6888,13 +7145,11 @@
                 
                 const deal = globalDeals[dealIndex];
                 
-                // Проверяем, что сделка завершена
                 if (deal.status !== 'completed') {
                     alert('❌ Можно удалять только завершённые сделки');
                     return;
                 }
                 
-                // Проверяем, что пользователь является участником сделки
                 const isClient = deal.clientId === currentUserId;
                 const isMaster = deal.masterId === currentUserId;
                 
@@ -6903,16 +7158,13 @@
                     return;
                 }
                 
-                // Удаляем сделку из глобального хранилища
                 globalDeals.splice(dealIndex, 1);
                 setGlobalDeals(globalDeals);
                 
                 console.log(`✅ Сделка ${dealId} удалена из глобального хранилища`);
                 
-                // Обновляем список сделок
                 loadDeals();
                 
-                // Показываем уведомление
                 showNotification('✅ Сделка успешно удалена!');
                 
             } catch (error) {
@@ -6928,7 +7180,6 @@
             dealAmount.addEventListener('input', updateDealCommission);
         }
     });
-
     </script>
 </body>
 </html>
