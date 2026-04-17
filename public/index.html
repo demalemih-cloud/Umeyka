@@ -96,7 +96,6 @@
             border-radius: 12px;
             overflow: hidden;
             background: #000;
-            min-height: 300px;
         }
         
         .scanner-container video {
@@ -147,20 +146,7 @@
             cursor: pointer;
         }
         
-        /* ========== ОСТАЛЬНЫЕ СТИЛИ ========== */
-        
-        /* ========== ИСПРАВЛЕНИЕ #1: ЦЕНТРИРОВАНИЕ КНОПКИ РЕДАКТИРОВАНИЯ ПРОФИЛЯ ========== */
-        #userProfile {
-            text-align: center;
-        }
-        
-        #userProfile .main-button {
-            margin: 0 auto 15px auto;
-            display: flex;
-            width: 100%;
-            max-width: 300px;
-        }
-        
+        /* ========== ОСТАЛЬНЫЕ СТИЛИ (СОХРАНЕНЫ) ========== */
         .header {
             padding: 30px 20px 20px;
             text-align: center;
@@ -364,30 +350,264 @@
             transition: all 0.3s ease;
         }
 
-        /* ========== СТАТУСЫ МАСТЕРА ========== */
-        .master-status {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 600;
-            margin: 10px 0;
-            width: fit-content;
+        .skill-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+            position: relative;
         }
-        
-        .status-ready {
+
+        .skill-qr-code {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
+            background: white;
+            padding: 4px;
+        }
+
+        .skill-qr-code:hover {
+            transform: scale(1.05);
+        }
+
+        .qr-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 4000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .qr-modal-overlay.active {
+            display: flex;
+        }
+
+        .qr-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .qr-code-large {
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .qr-share-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background: #f7fafc;
+        }
+
+        .modal-title {
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-save {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: white;
-            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+        }
+        .modal-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .modal-cancel {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+            color: #4a5568;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .modal-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .error-message {
+            background: rgba(255,0,0,0.1);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid rgba(255,0,0,0.2);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+        }
+
+        .city-autocomplete {
+            position: relative;
+            width: 100%;
         }
         
-        .status-busy {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .autocomplete-item {
+            padding: 12px 15px;
+            color: #2d3748;
+            cursor: pointer;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.2s;
+        }
+        
+        .autocomplete-item:hover {
+            background: #f7fafc;
+        }
+        
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .radius-selector {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .radius-option {
+            flex: 1;
+            min-width: 70px;
+            padding: 12px 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .radius-option.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: 1px solid rgba(255,255,255,0.3);
+            border-color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
-        
+
         .status-selector {
             display: flex;
             gap: 15px;
@@ -429,58 +649,88 @@
             color: white;
             border-color: white;
         }
-        
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-        }
-        
-        .indicator-ready {
-            background: #48bb78;
-            box-shadow: 0 0 10px #48bb78;
-        }
-        
-        .indicator-busy {
-            background: #f56565;
-            box-shadow: 0 0 10px #f56565;
-        }
-        
-        /* ========== РАДИУС ========== */
-        .radius-selector {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .radius-option {
-            flex: 1;
-            min-width: 70px;
-            padding: 12px 8px;
-            border: 2px solid rgba(255,255,255,0.2);
+
+        .photo-upload-area {
+            border: 2px dashed #667eea;
             border-radius: 10px;
+            padding: 20px;
             text-align: center;
+            margin: 15px 0;
+            background: rgba(102, 126, 234, 0.05);
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 600;
-            font-size: 14px;
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.8);
         }
-        
-        .radius-option.selected {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        .photo-upload-area:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #764ba2;
+        }
+
+        .photo-upload-icon {
+            font-size: 40px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .photo-preview {
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
             color: white;
-            border-color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .photo-info {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .master-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 10px 0;
+            width: fit-content;
         }
         
+        .status-ready {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .status-busy {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
         .city-info {
             background: rgba(255,255,255,0.15);
             padding: 10px 15px;
@@ -491,86 +741,7 @@
             gap: 10px;
             font-size: 14px;
         }
-        
-        .city-autocomplete {
-            position: relative;
-            width: 100%;
-        }
-        
-        .autocomplete-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: 0 0 12px 12px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            display: none;
-        }
-        
-        .autocomplete-item {
-            padding: 12px 15px;
-            color: #2d3748;
-            cursor: pointer;
-            border-bottom: 1px solid #e2e8f0;
-            transition: background 0.2s;
-        }
-        
-        .autocomplete-item:hover {
-            background: #f7fafc;
-        }
-        
-        .autocomplete-item:last-child {
-            border-bottom: none;
-        }
-        
-        /* ========== КАРТОЧКИ УМЕЕК ========== */
-        .skill-card {
-            background: rgba(255,255,255,0.95);
-            color: #2d3748;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 4px solid #667eea;
-            position: relative;
-        }
 
-        .gold-card {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #744210;
-            border: 3px solid #FFD700;
-        }
-        
-        .skill-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-            padding-right: 70px;
-        }
-        
-        .skill-title {
-            font-size: 18px;
-            font-weight: 700;
-            flex: 1;
-        }
-        
-        .skill-rating {
-            color: #FFD700;
-            font-size: 14px;
-        }
-        
-        .skill-price {
-            font-size: 20px;
-            font-weight: 700;
-            color: #48bb78;
-            margin: 15px 0;
-        }
-        
         .skill-contact-info {
             margin: 15px 0;
             padding: 12px;
@@ -612,7 +783,7 @@
             display: block;
             font-size: 16px;
         }
-        
+
         .chat-button {
             width: 100%;
             padding: 15px;
@@ -625,37 +796,70 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
-        #map {
-            height: 400px;
-            border-radius: 15px;
-            margin-top: 15px;
-            border: 2px solid rgba(255,255,255,0.3);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            display: none;
+
+        .create-deal-button {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(237, 137, 54, 0.3);
+            transition: all 0.3s ease;
         }
-        
-        .map-active #map {
-            display: block;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 20px;
-            font-size: 16px;
-        }
-        
-        .error-message {
-            background: rgba(255,0,0,0.1);
-            color: #ff6b6b;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            text-align: center;
-            border: 1px solid rgba(255,0,0,0.2);
+        .create-deal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(237, 137, 54, 0.4);
         }
 
-        /* ========== ЛИЧНЫЙ КАБИНЕТ ========== */
+        .edit-button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .delete-button {
+            background: #f56565;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .skill-photo {
+            width: 100%;
+            height: 200px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .skill-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .profile-skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -679,7 +883,19 @@
             gap: 8px;
         }
 
-        /* ========== НОВЫЕ СТИЛИ ДЛЯ ВКЛАДОК ЛК ========== */
+        .skill-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #48bb78;
+            margin: 15px 0;
+        }
+
+        .skill-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+
         .profile-main-buttons {
             padding: 20px;
             display: flex;
@@ -708,67 +924,12 @@
             transform: scale(0.98);
         }
 
-        /* Редактировать профиль - оранжевый как "Я умейка" */
         .button-edit-profile {
             background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
         }
 
-        .button-edit-profile:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
-        }
-
-        /* Статистика - зелёный как "Я ищу" */
-        .button-stats {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-        }
-
-        .button-stats:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
-
-        /* Мои умейки - фиолетовый как "Личный кабинет" на главной */
-        .button-my-skills {
-            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(159, 122, 234, 0.3);
-        }
-
-        .button-my-skills:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(159, 122, 234, 0.4);
-        }
-
-        /* Сделки - синий */
-        .button-deals {
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
-        }
-
-        .button-deals:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
-        }
-
-        /* Реферальная программа - розовый/красный */
-        .button-referral {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
-        }
-
-        .button-referral:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4);
-        }
-
-        /* Финансы - золотой/жёлтый */
         .button-finance {
             background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
             color: #744210;
@@ -776,43 +937,28 @@
             box-shadow: 0 4px 15px rgba(246, 224, 94, 0.3);
         }
 
-        .button-finance:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(246, 224, 94, 0.4);
+        .button-stats {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
 
-        .button-icon {
-            font-size: 24px;
-            margin-right: 12px;
+        .button-my-skills {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(159, 122, 234, 0.3);
         }
 
-        .edit-button {
-            background: #4299e1;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
+        .button-deals {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
         }
 
-        .delete-button {
-            background: #f56565;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .rating-badge {
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            color: #744210;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
+        .button-referral {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
         }
 
         .stats-grid {
@@ -841,199 +987,6 @@
             color: #666;
         }
 
-        .rating-stars {
-            color: #FFD700;
-            font-size: 16px;
-            margin: 5px 0;
-        }
-
-        .rating-details {
-            background: rgba(255,255,255,0.9);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-        }
-
-        .rating-bar {
-            display: flex;
-            align-items: center;
-            margin: 8px 0;
-        }
-
-        .rating-label {
-            width: 100px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .rating-value {
-            width: 40px;
-            text-align: right;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .rating-progress {
-            flex: 1;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .rating-progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            border-radius: 4px;
-        }
-
-        /* ========== СДЕЛКИ ========== */
-        .deal-card {
-            background: rgba(255,255,255,0.95);
-            color: #2d3748;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 5px solid #667eea;
-        }
-
-        .deal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-
-        .deal-title {
-            font-size: 18px;
-            font-weight: 700;
-            flex: 1;
-        }
-
-        .deal-status {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-draft { background: #e2e8f0; color: #4a5568; }
-        .status-pending { background: #fef3c7; color: #d97706; }
-        .status-active { background: #d1fae5; color: #065f46; }
-        .status-completed { background: #dcfce7; color: #166534; }
-        .status-paid { background: #dbeafe; color: #1e40af; }
-        .status-released { background: #c7d2fe; color: #3730a3; }
-        .status-refunded { background: #fecaca; color: #991b1b; }
-
-        .deal-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .deal-detail {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            padding: 15px;
-            background: #f7fafc;
-            border-radius: 10px;
-        }
-
-        .signature {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .signed { color: #38a169; }
-        .unsigned { color: #e53e3e; }
-
-        .deal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        /* ========== НОВЫЕ СТИЛИ ДЛЯ КНОПОК СДЕЛОК ========== */
-        .deal-button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .deal-button:active {
-            transform: scale(0.98);
-        }
-
-        .sign-button { 
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
-        }
-        .sign-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
-        }
-
-        .view-button { 
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
-        }
-        .view-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(66, 153, 225, 0.4);
-        }
-
-        .complete-button { 
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-            box-shadow: 0 4px 10px rgba(237, 137, 54, 0.3);
-        }
-        .complete-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(237, 137, 54, 0.4);
-        }
-
-        .pay-button { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
-        }
-        .pay-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .withdraw-button { 
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
-        }
-
-        /* ========== СТИЛЬ ДЛЯ КНОПКИ УДАЛЕНИЯ СДЕЛКИ ========== */
-        .delete-deal {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-            box-shadow: 0 4px 10px rgba(245, 101, 101, 0.3);
-        }
-        .delete-deal:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(245, 101, 101, 0.4);
-        }
-
-        /* ========== ФИНАНСОВЫЕ СТИЛИ ========== */
         .wallet-section {
             background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
             padding: 25px 20px;
@@ -1068,11 +1021,6 @@
             text-align: center;
             border: 2px solid #e2e8f0;
             transition: all 0.3s ease;
-        }
-
-        .balance-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .balance-label {
@@ -1191,97 +1139,6 @@
         .transaction-amount.positive { color: #48bb78; }
         .transaction-amount.negative { color: #f56565; }
 
-        .payment-status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin: 10px 0;
-        }
-
-        .payment-pending { background: #fef3c7; color: #d97706; }
-        .payment-paid { background: #d1fae5; color: #065f46; }
-        .payment-released { background: #dbeafe; color: #1e40af; }
-        .payment-refunded { background: #fecaca; color: #991b1b; }
-
-        .escrow-info {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            padding: 15px;
-            border-radius: 12px;
-            margin: 15px 0;
-            border: 2px solid #f59e0b;
-        }
-
-        .escrow-title {
-            font-weight: bold;
-            color: #92400e;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .escrow-details {
-            font-size: 14px;
-            color: #78350f;
-        }
-
-        /* ========== ФОРМА СОЗДАНИЯ СДЕЛКИ ========== */
-        .quality-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .quality-option {
-            padding: 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-        }
-
-        .quality-option.selected {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .additional-options {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .option-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            cursor: pointer;
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
-        }
-
-        .option-checkbox.selected {
-            border-color: #48bb78;
-            background: rgba(72, 187, 120, 0.1);
-        }
-
-        .level-achieved {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            border: 2px solid #10b981;
-        }
-
-        /* ========== РЕФЕРАЛЬНАЯ ПРОГРАММА ========== */
         .referral-section {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
             padding: 25px 20px;
@@ -1294,17 +1151,6 @@
             position: relative;
             overflow: hidden;
             backdrop-filter: blur(10px);
-        }
-
-        .referral-section::before {
-            content: '✨';
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 40px;
-            color: white;
-            opacity: 0.1;
-            z-index: 0;
         }
 
         .referral-title {
@@ -1326,6 +1172,39 @@
             opacity: 0.9;
             position: relative;
             z-index: 1;
+        }
+
+        .referral-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .referral-stat {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .referral-stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .referral-stat-label {
+            font-size: 12px;
+            opacity: 0.9;
         }
 
         .referral-benefits {
@@ -1375,40 +1254,6 @@
             border-radius: 8px;
         }
 
-        .referral-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-stat {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .referral-stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .referral-stat-label {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
-        /* ========== НОВЫЕ СТИЛИ ДЛЯ КНОПОК РЕФЕРАЛЬНОЙ ПРОГРАММЫ ========== */
         .referral-buttons {
             display: flex;
             flex-direction: column;
@@ -1436,11 +1281,6 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        .share-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
-
         .copy-button {
             background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             border: none;
@@ -1457,11 +1297,6 @@
             justify-content: center;
             gap: 10px;
             border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .copy-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
         }
 
         .referral-note {
@@ -1485,74 +1320,30 @@
             margin-left: 5px;
         }
 
-        .referral-tab-button {
-            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%) !important;
-            border: 1px solid rgba(255,255,255,0.3) !important;
-        }
-
-        .referral-tab-button:hover {
-            background: linear-gradient(135deg, #8c6bcf 0%, #6f48c7 100%) !important;
-        }
-
-        /* ========== О ПРОЕКТЕ ========== */
-        .about-section {
-            background: rgba(255,255,255,0.9);
-            padding: 25px;
-            border-radius: 20px;
-            color: #2d3748;
-            margin: 20px 0;
-        }
-
-        .about-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-            color: #667eea;
-        }
-
-        .channel-links {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .channel-link {
+        .wallet-connected {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            text-decoration: none;
-            transition: all 0.3s ease;
+            gap: 10px;
+            color: #065f46;
         }
 
-        .channel-link:active {
-            transform: scale(0.98);
+        .wallet-disconnected {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 2px solid #ef4444;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #991b1b;
         }
 
-        .channel-icon {
-            font-size: 30px;
-        }
-
-        .channel-info {
-            flex: 1;
-        }
-
-        .channel-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .channel-description {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* ========== НОВЫЕ СТИЛИ ДЛЯ ВКЛАДОК СДЕЛОК ========== */
         .deals-tab-buttons {
             display: flex;
             flex-direction: column;
@@ -1579,452 +1370,223 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        .deals-tab-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-
-        .deals-tab-button:active {
-            transform: translateY(0);
-        }
-
         .deals-tab-button.active {
             border: 2px solid rgba(255,255,255,0.5);
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
 
-        /* Ожидают подписи - оранжевый */
         .deals-tab-button.pending {
             background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
         }
-        .deals-tab-button.pending:hover {
-            box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
-        }
 
-        /* Активные - зелёный */
         .deals-tab-button.active-tab {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
-        .deals-tab-button.active-tab:hover {
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
 
-        /* Завершенные - синий */
         .deals-tab-button.completed {
             background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
         }
-        .deals-tab-button.completed:hover {
-            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
-        }
 
-        .skill-photo {
-            width: 100%;
-            height: 200px;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 15px 0;
-            background: #f7fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .skill-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .skill-photo:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .upload-photo-button {
-            width: 100%;
-            padding: 12px;
-            background: #4299e1;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin: 10px 0;
-        }
-
-        .no-photo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #666;
-            font-size: 14px;
-            height: 100%;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #666;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        .modal-close:hover {
-            background: #f7fafc;
-        }
-
-        .modal-title {
+        .deal-card {
+            background: rgba(255,255,255,0.95);
             color: #2d3748;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .modal-button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .modal-save {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
-        }
-        .modal-save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
-        }
-
-        .modal-cancel {
-            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
-            color: #4a5568;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .modal-cancel:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-        }
-
-        .map-popup-content {
-            min-width: 300px;
-            max-width: 300px;
-        }
-
-        .map-skill-photo {
-            width: 100%;
-            height: 150px;
-            border-radius: 8px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-
-        .map-skill-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .map-skill-info {
-            background: #f7fafc;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-        }
-
-        .map-skill-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 15px;
-        }
-
-        .map-skill-button {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .map-contact-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .map-details-button {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-        }
-
-        .map-edit-button {
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-            color: white;
-        }
-
-        .photo-upload-area {
-            border: 2px dashed #667eea;
-            border-radius: 10px;
             padding: 20px;
-            text-align: center;
             margin: 15px 0;
-            background: rgba(102, 126, 234, 0.05);
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
         }
 
-        .photo-upload-area:hover {
-            background: rgba(102, 126, 234, 0.1);
-            border-color: #764ba2;
-        }
-
-        .photo-upload-icon {
-            font-size: 40px;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .photo-preview {
-            position: relative;
-            margin: 10px 0;
-        }
-
-        .photo-preview img {
-            width: 100%;
-            max-height: 300px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-
-        .photo-remove {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
+        .deal-header {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 16px;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
         }
 
-        .photo-info {
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            margin-top: 5px;
-        }
-
-        .contact-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .call-button {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
-            transition: all 0.3s ease;
-        }
-        .call-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
-        }
-
-        .telegram-button {
-            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 136, 204, 0.3);
-            transition: all 0.3s ease;
-        }
-        .telegram-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 136, 204, 0.4);
-        }
-
-        .contact-info {
-            background: #f7fafc;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 10px 0;
-            color: #2d3748;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 8px 0;
-            padding: 8px;
-            background: white;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .contact-icon {
-            font-size: 20px;
-            color: #667eea;
-        }
-
-        .contact-text {
+        .deal-title {
+            font-size: 18px;
+            font-weight: 700;
             flex: 1;
-            font-size: 14px;
-            word-break: break-all;
-            font-weight: 500;
         }
 
-        .copy-contact {
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-            color: white;
-            border: none;
-            border-radius: 4px;
+        .deal-status {
             padding: 6px 12px;
+            border-radius: 20px;
             font-size: 12px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(66, 153, 225, 0.3);
-            transition: all 0.2s ease;
-        }
-        .copy-contact:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(66, 153, 225, 0.4);
+            font-weight: 600;
         }
 
-        .create-deal-button {
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-            color: white;
+        .status-draft { background: #e2e8f0; color: #4a5568; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-completed { background: #dcfce7; color: #166534; }
+        .status-paid { background: #dbeafe; color: #1e40af; }
+        .status-released { background: #c7d2fe; color: #3730a3; }
+        .status-refunded { background: #fecaca; color: #991b1b; }
+
+        .deal-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .deal-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .signature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signed { color: #38a169; }
+        .unsigned { color: #e53e3e; }
+
+        .deal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .deal-button {
+            flex: 1;
+            padding: 15px;
             border: none;
-            padding: 12px;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            margin-top: 10px;
-            box-shadow: 0 4px 10px rgba(237, 137, 54, 0.3);
             transition: all 0.3s ease;
-        }
-        .create-deal-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(237, 137, 54, 0.4);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        /* ========== СТИЛИ ДЛЯ WALLET ========== */
-        .wallet-connected {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            border: 2px solid #10b981;
+        .sign-button { 
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+        }
+
+        .view-button { 
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
+        }
+
+        .complete-button { 
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            box-shadow: 0 4px 10px rgba(237, 137, 54, 0.3);
+        }
+
+        .pay-button { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .delete-deal {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            box-shadow: 0 4px 10px rgba(245, 101, 101, 0.3);
+        }
+
+        .escrow-info {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             padding: 15px;
             border-radius: 12px;
             margin: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #065f46;
+            border: 2px solid #f59e0b;
         }
 
-        .wallet-disconnected {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            border: 2px solid #ef4444;
-            padding: 15px;
-            border-radius: 12px;
+        .escrow-title {
+            font-weight: bold;
+            color: #92400e;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .escrow-details {
+            font-size: 14px;
+            color: #78350f;
+        }
+
+        .payment-status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+
+        .payment-pending { background: #fef3c7; color: #d97706; }
+        .payment-paid { background: #d1fae5; color: #065f46; }
+        .payment-released { background: #dbeafe; color: #1e40af; }
+        .payment-refunded { background: #fecaca; color: #991b1b; }
+
+        .quality-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
             margin: 15px 0;
+        }
+
+        .quality-option {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .quality-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .additional-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .option-checkbox {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #991b1b;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .option-checkbox.selected {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
         }
 
         .payment-confirm-modal {
@@ -2103,22 +1665,70 @@
             color: white;
             box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
         }
-        .payment-confirm-yes:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
-        }
 
         .payment-confirm-no {
             background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
             color: #4a5568;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        .payment-confirm-no:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+
+        .about-section {
+            background: rgba(255,255,255,0.9);
+            padding: 25px;
+            border-radius: 20px;
+            color: #2d3748;
+            margin: 20px 0;
         }
 
-        /* ========== СТИЛИ ДЛЯ ОТЗЫВОВ ========== */
+        .about-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .channel-links {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .channel-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .channel-link:active {
+            transform: scale(0.98);
+        }
+
+        .channel-icon {
+            font-size: 30px;
+        }
+
+        .channel-info {
+            flex: 1;
+        }
+
+        .channel-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .channel-description {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
         .reviews-button {
             background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             border: none;
@@ -2136,10 +1746,6 @@
             gap: 10px;
             margin: 15px 0;
             width: 100%;
-        }
-        .reviews-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
         }
 
         .reviews-modal {
@@ -2270,17 +1876,8 @@
             width: 100%;
             margin-top: 15px;
         }
-        .submit-review-button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-        }
-        .submit-review-button:disabled {
-            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
 
-        .submit-review-button.disabled {
+        .submit-review-button:disabled {
             background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
             cursor: not-allowed;
             opacity: 0.7;
@@ -2297,7 +1894,25 @@
             text-align: center;
         }
 
-        /* ========== НОВЫЕ СТИЛИ ДЛЯ МАРКЕРОВ КАРТЫ ========== */
+        .rating-stars {
+            color: #FFD700;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        #map {
+            height: 400px;
+            border-radius: 15px;
+            margin-top: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            display: none;
+        }
+        
+        .map-active #map {
+            display: block;
+        }
+
         .umeyka-marker-container {
             width: 50px;
             height: 50px;
@@ -2363,7 +1978,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
-        /* Стили для миниатюры фото в popup */
         .popup-skill-photo {
             width: 100px;
             height: 60px;
@@ -2380,78 +1994,135 @@
             object-fit: cover;
         }
 
-        /* ========== СТИЛИ ДЛЯ QR-КОДА ========== */
-        .skill-qr-code {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 60px;
-            height: 60px;
-            cursor: pointer;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            transition: transform 0.2s ease;
-            background: white;
-            padding: 4px;
+        .map-popup-content {
+            min-width: 300px;
+            max-width: 300px;
         }
 
-        .skill-qr-code:hover {
-            transform: scale(1.05);
-        }
-
-        .qr-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 4000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .qr-modal-overlay.active {
+        .map-skill-actions {
             display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
         }
 
-        .qr-modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            max-width: 350px;
+        .map-skill-button {
             width: 100%;
-        }
-
-        .qr-code-large {
-            width: 250px;
-            height: 250px;
-            margin: 20px auto;
-            padding: 15px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .qr-share-button {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            padding: 10px;
             border: none;
-            border-radius: 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .map-contact-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            font-size: 18px;
+        }
+
+        .map-edit-button {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+        }
+
+        .contact-info {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            color: #2d3748;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .contact-icon {
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .contact-text {
+            flex: 1;
+            font-size: 14px;
+            word-break: break-all;
+            font-weight: 500;
+        }
+
+        .copy-contact {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(66, 153, 225, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .contact-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .call-button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .telegram-button {
+            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 136, 204, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        #userProfile {
+            text-align: center;
+        }
+
+        #userProfile .main-button {
+            margin: 0 auto 15px auto;
+            display: flex;
+            width: 100%;
+            max-width: 300px;
         }
     </style>
 </head>
@@ -2563,7 +2234,7 @@
                     <div class="photo-upload-area" onclick="triggerHapticFeedback(); document.getElementById('skillPhotoInput').click();">
                         <div class="photo-upload-icon">📷</div>
                         <div style="color: #2d3748; margin-bottom: 5px;">Нажмите для загрузки фото</div>
-                        <div style="font-size: 12px; color: #666;">JPG, PNG до 1MB</div>
+                        <div class="photo-info">JPG, PNG до 1MB</div>
                     </div>
                     <input type="file" id="skillPhotoInput" accept="image/*" style="display: none;" onchange="handleSkillPhotoUpload(event)">
                     
@@ -2609,7 +2280,6 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
                 
-                <!-- Профиль пользователя -->
                 <div id="userProfile">
                     <div style="text-align: center; margin-bottom: 20px;">
                         <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">
@@ -2621,7 +2291,6 @@
                     </div>
                 </div>
                 
-                <!-- ГЛАВНЫЕ КНОПКИ ЛК (в стиле главного экрана) -->
                 <div class="profile-main-buttons">
                     <button class="profile-button button-edit-profile" onclick="triggerHapticFeedback(); editProfile();">
                         <span class="button-icon">✏️</span>
@@ -2652,24 +2321,6 @@
                         <span class="button-icon">🎁</span>
                         Реферальная программа
                     </button>
-                </div>
-                
-                <!-- Вкладки личного кабинета (скрытые, открываются по кнопкам) -->
-                <div style="display: none;">
-                    <div class="tab-buttons">
-                        <button class="tab-button active" onclick="triggerHapticFeedback(); showProfileTab('stats');" id="statsTab">
-                            📊 Статистика
-                        </button>
-                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('skills');" id="skillsTab">
-                            ✨ Мои умейки
-                        </button>
-                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('deals');" id="dealsTab">
-                            📝 Сделки
-                        </button>
-                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('referral');" id="referralTab">
-                            🎁 Реферальная программа
-                        </button>
-                    </div>
                 </div>
                 
                 <!-- Статистика -->
@@ -2816,7 +2467,6 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">💰 Мои финансы</h2>
                 
-                <!-- Кошелек -->
                 <div class="wallet-section">
                     <div class="wallet-title">
                         💳 Мой кошелек
@@ -3243,7 +2893,6 @@
     let currentRadius = 10;
     let currentEditRadius = 10;
     let localSkills = {};
-    let globalSkillsStatus = {};
     let pendingPaymentDealId = null;
     let currentQRSkillId = null;
     let currentQRSkillName = null;
@@ -3260,25 +2909,18 @@
         
         const modal = document.getElementById('scannerModal');
         const errorDiv = document.getElementById('scannerError');
-        const readerContainer = document.getElementById('qr-reader');
         
         errorDiv.style.display = 'none';
         errorDiv.textContent = '';
         
-        // Очищаем контейнер перед запуском
-        readerContainer.innerHTML = '';
-        
         modal.classList.add('active');
         
-        // Небольшая задержка для отображения модального окна
         setTimeout(async () => {
             try {
-                // Проверяем поддержку камеры
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                     throw new Error('Ваш браузер не поддерживает доступ к камере');
                 }
                 
-                // Инициализируем сканер
                 html5QrCode = new Html5Qrcode("qr-reader");
                 
                 const config = {
@@ -3288,14 +2930,13 @@
                 };
                 
                 await html5QrCode.start(
-                    { facingMode: "environment" }, // Задняя камера
+                    { facingMode: "environment" },
                     config,
                     (decodedText, decodedResult) => {
                         console.log('✅ QR-код распознан:', decodedText);
                         handleScannedQRCode(decodedText);
                     },
                     (errorMessage) => {
-                        // Игнорируем ошибки во время сканирования
                         console.log('QR сканирование:', errorMessage);
                     }
                 ).catch(err => {
@@ -3315,11 +2956,9 @@
     window.closeQRScanner = async function() {
         triggerHapticFeedback();
         
-        if (html5QrCode) {
+        if (html5QrCode && html5QrCode.isScanning) {
             try {
-                if (html5QrCode.isScanning) {
-                    await html5QrCode.stop();
-                }
+                await html5QrCode.stop();
                 html5QrCode.clear();
             } catch (error) {
                 console.error('Ошибка остановки сканера:', error);
@@ -3330,12 +2969,6 @@
         const modal = document.getElementById('scannerModal');
         modal.classList.remove('active');
         
-        // Очищаем контейнер
-        const readerContainer = document.getElementById('qr-reader');
-        if (readerContainer) {
-            readerContainer.innerHTML = '';
-        }
-        
         const errorDiv = document.getElementById('scannerError');
         errorDiv.style.display = 'none';
         errorDiv.textContent = '';
@@ -3345,61 +2978,65 @@
         console.log('🔍 Обработка QR-кода:', qrData);
         
         try {
-            // Извлекаем skillId из ссылки
             let skillId = null;
             
-            // Формат: https://t.me/ymeyka_bot?start=skill_{skillId}
+            // Формат 1: https://t.me/ymeyka_bot?start=skill_{skillId}
             if (qrData.includes('start=skill_')) {
-                const match = qrData.match(/start=skill_([^&]+)/);
+                const match = qrData.match(/start=skill_([^&?]+)/);
                 if (match && match[1]) {
                     skillId = match[1];
                 }
             }
             
-            // Альтернативный формат: просто skillId
-            if (!skillId && qrData.match(/^[a-zA-Z0-9_-]+$/)) {
+            // Формат 2: ymeyka://skill/{skillId}
+            if (!skillId && qrData.includes('ymeyka://skill/')) {
+                const match = qrData.match(/ymeyka:\/\/skill\/([^&?]+)/);
+                if (match && match[1]) {
+                    skillId = match[1];
+                }
+            }
+            
+            // Формат 3: Просто ID
+            if (!skillId && qrData.match(/^[a-zA-Z0-9_]+$/)) {
                 skillId = qrData;
             }
             
             if (!skillId) {
+                console.error('❌ Не удалось извлечь skillId из QR-кода:', qrData);
                 showScannerError('Не удалось распознать QR-код умейки');
                 return;
             }
             
             console.log('🎯 Найден skillId:', skillId);
             
-            // Находим умейку в глобальном хранилище
-            let skill = getGlobalSkillById(skillId);
+            // Закрываем сканер
+            await closeQRScanner();
             
+            // Ищем умейку
+            let skill = null;
+            
+            // Сначала ищем в глобальном хранилище
+            skill = getGlobalSkillById(skillId);
+            
+            // Если не нашли, пробуем загрузить с сервера
             if (!skill) {
-                // Пробуем загрузить с сервера
                 try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 5000);
-                    
-                    const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
-                        signal: controller.signal
-                    });
-                    clearTimeout(timeoutId);
-                    
+                    const response = await fetch(`${API_URL}/api/skills/${skillId}`);
                     const result = await response.json();
                     if (result.success && result.skill) {
-                        // Добавляем в глобальное хранилище
                         skill = result.skill;
+                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
                         addGlobalSkill(skill);
-                    } else {
-                        showScannerError('Умейка не найдена');
-                        return;
                     }
                 } catch (error) {
-                    console.error('Ошибка загрузки умейки:', error);
-                    showScannerError('Умейка не найдена');
-                    return;
+                    console.error('Ошибка загрузки умейки с сервера:', error);
                 }
             }
             
-            // Закрываем сканер
-            await closeQRScanner();
+            if (!skill) {
+                showScannerError('Умейка не найдена');
+                return;
+            }
             
             // Открываем карточку умейки
             openSkillFromQR(skill);
@@ -3421,12 +3058,6 @@
     }
     
     function openSkillFromQR(skill) {
-        if (!skill) {
-            showScannerError('Умейка не найдена');
-            return;
-        }
-        
-        // Показываем модальное окно с информацией об умейке
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
         modal.style.display = 'flex';
@@ -3481,30 +3112,25 @@
             const skillId = startParam.replace('skill_', '');
             console.log('🔗 Обнаружен deeplink для skill:', skillId);
             
-            // Находим умейку
-            const skill = getGlobalSkillById(skillId);
-            if (skill) {
-                // Открываем карточку умейки с возможностью создания сделки
-                setTimeout(() => {
+            setTimeout(() => {
+                const skill = getGlobalSkillById(skillId);
+                if (skill) {
                     openSkillFromQR(skill);
-                }, 1000);
-            } else {
-                // Пробуем загрузить с сервера
-                fetch(`${API_URL}/api/skills/${skillId}`)
-                    .then(response => response.json())
-                    .then(result => {
-                        if (result.success && result.skill) {
-                            addGlobalSkill(result.skill);
-                            setTimeout(() => {
+                } else {
+                    fetch(`${API_URL}/api/skills/${skillId}`)
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success && result.skill) {
+                                addGlobalSkill(result.skill);
                                 openSkillFromQR(result.skill);
-                            }, 1000);
-                        }
-                    })
-                    .catch(error => console.error('Ошибка загрузки умейки по deeplink:', error));
-            }
+                            }
+                        })
+                        .catch(error => console.error('Ошибка загрузки умейки по deeplink:', error));
+                }
+            }, 500);
         }
     }
-    
+
     // ========== БАЗА ДАННЫХ ГОРОДОВ ==========
     const citiesDatabase = {
         'Евпатория': { lat: 45.1906, lon: 33.3666 },
@@ -7203,13 +6829,6 @@
             }
         }
     };
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const dealAmount = document.getElementById('dealAmount');
-        if (dealAmount) {
-            dealAmount.addEventListener('input', updateDealCommission);
-        }
-    });
     </script>
 </body>
 </html>
