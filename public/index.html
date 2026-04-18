@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* ========== БАЗОВЫЕ СТИЛИ ========== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -32,7 +31,6 @@
             padding: 0;
         }
         
-        /* ========== КНОПКА СКАНЕРА ========== */
         .qr-scanner-button {
             position: absolute;
             top: 20px;
@@ -53,7 +51,6 @@
             transform: scale(0.95);
         }
         
-        /* ========== МОДАЛЬНОЕ ОКНО СКАНЕРА ========== */
         .scanner-modal-overlay {
             position: fixed;
             top: 0;
@@ -350,264 +347,29 @@
             transition: all 0.3s ease;
         }
 
-        .skill-card {
-            background: rgba(255,255,255,0.95);
-            color: #2d3748;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 4px solid #667eea;
-            position: relative;
-        }
-
-        .skill-qr-code {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 60px;
-            height: 60px;
-            cursor: pointer;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            transition: transform 0.2s ease;
-            background: white;
-            padding: 4px;
-        }
-
-        .skill-qr-code:hover {
-            transform: scale(1.05);
-        }
-
-        .qr-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 4000;
-            display: none;
+        .master-status {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .qr-modal-overlay.active {
-            display: flex;
-        }
-
-        .qr-modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            max-width: 350px;
-            width: 100%;
-        }
-
-        .qr-code-large {
-            width: 250px;
-            height: 250px;
-            margin: 20px auto;
-            padding: 15px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .qr-share-button {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: #666;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        .modal-close:hover {
-            background: #f7fafc;
-        }
-
-        .modal-title {
-            color: #2d3748;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .modal-button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .modal-save {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
-        }
-        .modal-save:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
-        }
-
-        .modal-cancel {
-            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
-            color: #4a5568;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .modal-cancel:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-        }
-
-        .error-message {
-            background: rgba(255,0,0,0.1);
-            color: #ff6b6b;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            text-align: center;
-            border: 1px solid rgba(255,0,0,0.2);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            font-size: 16px;
-        }
-
-        .city-autocomplete {
-            position: relative;
-            width: 100%;
-        }
-        
-        .autocomplete-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: 0 0 12px 12px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            display: none;
-        }
-        
-        .autocomplete-item {
-            padding: 12px 15px;
-            color: #2d3748;
-            cursor: pointer;
-            border-bottom: 1px solid #e2e8f0;
-            transition: background 0.2s;
-        }
-        
-        .autocomplete-item:hover {
-            background: #f7fafc;
-        }
-        
-        .autocomplete-item:last-child {
-            border-bottom: none;
-        }
-
-        .radius-selector {
-            display: flex;
-            gap: 10px;
-            margin: 15px 0;
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .radius-option {
-            flex: 1;
-            min-width: 70px;
-            padding: 12px 8px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 30px;
             font-size: 14px;
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.8);
+            font-weight: 600;
+            margin: 10px 0;
+            width: fit-content;
         }
         
-        .radius-option.selected {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .status-ready {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: white;
-            border-color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            border: 1px solid rgba(255,255,255,0.3);
         }
-
+        
+        .status-busy {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
         .status-selector {
             display: flex;
             gap: 15px;
@@ -649,88 +411,57 @@
             color: white;
             border-color: white;
         }
-
-        .photo-upload-area {
-            border: 2px dashed #667eea;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .indicator-ready {
+            background: #48bb78;
+            box-shadow: 0 0 10px #48bb78;
+        }
+        
+        .indicator-busy {
+            background: #f56565;
+            box-shadow: 0 0 10px #f56565;
+        }
+        
+        .radius-selector {
+            display: flex;
+            gap: 10px;
             margin: 15px 0;
-            background: rgba(102, 126, 234, 0.05);
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .radius-option {
+            flex: 1;
+            min-width: 70px;
+            padding: 12px 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-        }
-
-        .photo-upload-area:hover {
-            background: rgba(102, 126, 234, 0.1);
-            border-color: #764ba2;
-        }
-
-        .photo-upload-icon {
-            font-size: 40px;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .photo-preview {
-            position: relative;
-            margin: 10px 0;
-        }
-
-        .photo-preview img {
-            width: 100%;
-            max-height: 300px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-
-        .photo-remove {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .photo-info {
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-            margin-top: 5px;
-        }
-
-        .master-status {
-            display: inline-flex;
-            align-items: center;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 14px;
             font-weight: 600;
-            margin: 10px 0;
-            width: fit-content;
+            font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
         }
         
-        .status-ready {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        .radius-option.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: 1px solid rgba(255,255,255,0.3);
+            border-color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
         
-        .status-busy {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
         .city-info {
             background: rgba(255,255,255,0.15);
             padding: 10px 15px;
@@ -741,7 +472,85 @@
             gap: 10px;
             font-size: 14px;
         }
+        
+        .city-autocomplete {
+            position: relative;
+            width: 100%;
+        }
+        
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none;
+        }
+        
+        .autocomplete-item {
+            padding: 12px 15px;
+            color: #2d3748;
+            cursor: pointer;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.2s;
+        }
+        
+        .autocomplete-item:hover {
+            background: #f7fafc;
+        }
+        
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        
+        .skill-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+            position: relative;
+        }
 
+        .gold-card {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #744210;
+            border: 3px solid #FFD700;
+        }
+        
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            padding-right: 70px;
+        }
+        
+        .skill-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+        
+        .skill-rating {
+            color: #FFD700;
+            font-size: 14px;
+        }
+        
+        .skill-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #48bb78;
+            margin: 15px 0;
+        }
+        
         .skill-contact-info {
             margin: 15px 0;
             padding: 12px;
@@ -783,7 +592,7 @@
             display: block;
             font-size: 16px;
         }
-
+        
         .chat-button {
             width: 100%;
             padding: 15px;
@@ -796,68 +605,34 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
-        .create-deal-button {
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            margin-top: 10px;
-            box-shadow: 0 4px 10px rgba(237, 137, 54, 0.3);
-            transition: all 0.3s ease;
+        
+        #map {
+            height: 400px;
+            border-radius: 15px;
+            margin-top: 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            display: none;
         }
-        .create-deal-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(237, 137, 54, 0.4);
+        
+        .map-active #map {
+            display: block;
         }
-
-        .edit-button {
-            background: #4299e1;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
         }
-
-        .delete-button {
-            background: #f56565;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .skill-photo {
-            width: 100%;
-            height: 200px;
+        
+        .error-message {
+            background: rgba(255,0,0,0.1);
+            color: #ff6b6b;
+            padding: 15px;
             border-radius: 10px;
-            overflow: hidden;
-            margin: 15px 0;
-            background: #f7fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .skill-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            margin: 10px 0;
+            text-align: center;
+            border: 1px solid rgba(255,0,0,0.2);
         }
 
         .profile-skill-card {
@@ -881,19 +656,6 @@
         .skill-actions {
             display: flex;
             gap: 8px;
-        }
-
-        .skill-price {
-            font-size: 20px;
-            font-weight: 700;
-            color: #48bb78;
-            margin: 15px 0;
-        }
-
-        .skill-title {
-            font-size: 18px;
-            font-weight: 700;
-            flex: 1;
         }
 
         .profile-main-buttons {
@@ -930,11 +692,9 @@
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
         }
 
-        .button-finance {
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            color: #744210;
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(246, 224, 94, 0.3);
+        .button-edit-profile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
         }
 
         .button-stats {
@@ -943,10 +703,20 @@
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
 
+        .button-stats:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+
         .button-my-skills {
             background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(159, 122, 234, 0.3);
+        }
+
+        .button-my-skills:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(159, 122, 234, 0.4);
         }
 
         .button-deals {
@@ -955,10 +725,61 @@
             box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
         }
 
+        .button-deals:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
+        }
+
         .button-referral {
             background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .button-referral:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4);
+        }
+
+        .button-finance {
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(246, 224, 94, 0.3);
+        }
+
+        .button-finance:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(246, 224, 94, 0.4);
+        }
+
+        .edit-button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .delete-button {
+            background: #f56565;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .rating-badge {
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            color: #744210;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
         }
 
         .stats-grid {
@@ -985,6 +806,195 @@
         .stat-label {
             font-size: 12px;
             color: #666;
+        }
+
+        .rating-stars {
+            color: #FFD700;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .rating-details {
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .rating-label {
+            width: 100px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .rating-value {
+            width: 40px;
+            text-align: right;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .rating-progress {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .rating-progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            border-radius: 4px;
+        }
+
+        .deal-card {
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .deal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .deal-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .deal-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-draft { background: #e2e8f0; color: #4a5568; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-active { background: #d1fae5; color: #065f46; }
+        .status-completed { background: #dcfce7; color: #166534; }
+        .status-paid { background: #dbeafe; color: #1e40af; }
+        .status-released { background: #c7d2fe; color: #3730a3; }
+        .status-refunded { background: #fecaca; color: #991b1b; }
+
+        .deal-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .deal-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .signature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signed { color: #38a169; }
+        .unsigned { color: #e53e3e; }
+
+        .deal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .deal-button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .deal-button:active {
+            transform: scale(0.98);
+        }
+
+        .sign-button { 
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+        }
+        .sign-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .view-button { 
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
+        }
+        .view-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(66, 153, 225, 0.4);
+        }
+
+        .complete-button { 
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            box-shadow: 0 4px 10px rgba(237, 137, 54, 0.3);
+        }
+        .complete-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(237, 137, 54, 0.4);
+        }
+
+        .pay-button { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+        .pay-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .withdraw-button { 
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+        }
+
+        .delete-deal {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            box-shadow: 0 4px 10px rgba(245, 101, 101, 0.3);
+        }
+        .delete-deal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(245, 101, 101, 0.4);
         }
 
         .wallet-section {
@@ -1021,6 +1031,11 @@
             text-align: center;
             border: 2px solid #e2e8f0;
             transition: all 0.3s ease;
+        }
+
+        .balance-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .balance-label {
@@ -1139,6 +1154,95 @@
         .transaction-amount.positive { color: #48bb78; }
         .transaction-amount.negative { color: #f56565; }
 
+        .payment-status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+
+        .payment-pending { background: #fef3c7; color: #d97706; }
+        .payment-paid { background: #d1fae5; color: #065f46; }
+        .payment-released { background: #dbeafe; color: #1e40af; }
+        .payment-refunded { background: #fecaca; color: #991b1b; }
+
+        .escrow-info {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            border: 2px solid #f59e0b;
+        }
+
+        .escrow-title {
+            font-weight: bold;
+            color: #92400e;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .escrow-details {
+            font-size: 14px;
+            color: #78350f;
+        }
+
+        .quality-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .quality-option {
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .quality-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .additional-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .option-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.9);
+            color: #2d3748;
+        }
+
+        .option-checkbox.selected {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .level-achieved {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+        }
+
         .referral-section {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
             padding: 25px 20px;
@@ -1151,6 +1255,17 @@
             position: relative;
             overflow: hidden;
             backdrop-filter: blur(10px);
+        }
+
+        .referral-section::before {
+            content: '✨';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 40px;
+            color: white;
+            opacity: 0.1;
+            z-index: 0;
         }
 
         .referral-title {
@@ -1172,39 +1287,6 @@
             opacity: 0.9;
             position: relative;
             z-index: 1;
-        }
-
-        .referral-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .referral-stat {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .referral-stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-
-        .referral-stat-label {
-            font-size: 12px;
-            opacity: 0.9;
         }
 
         .referral-benefits {
@@ -1254,6 +1336,39 @@
             border-radius: 8px;
         }
 
+        .referral-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .referral-stat {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .referral-stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .referral-stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
         .referral-buttons {
             display: flex;
             flex-direction: column;
@@ -1281,6 +1396,11 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
+        .share-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
+
         .copy-button {
             background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             border: none;
@@ -1297,6 +1417,11 @@
             justify-content: center;
             gap: 10px;
             border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .copy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
         }
 
         .referral-note {
@@ -1320,28 +1445,70 @@
             margin-left: 5px;
         }
 
-        .wallet-connected {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            border: 2px solid #10b981;
-            padding: 15px;
-            border-radius: 12px;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #065f46;
+        .referral-tab-button {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%) !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
         }
 
-        .wallet-disconnected {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            border: 2px solid #ef4444;
-            padding: 15px;
-            border-radius: 12px;
-            margin: 15px 0;
+        .referral-tab-button:hover {
+            background: linear-gradient(135deg, #8c6bcf 0%, #6f48c7 100%) !important;
+        }
+
+        .about-section {
+            background: rgba(255,255,255,0.9);
+            padding: 25px;
+            border-radius: 20px;
+            color: #2d3748;
+            margin: 20px 0;
+        }
+
+        .about-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .channel-links {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .channel-link {
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: #991b1b;
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .channel-link:active {
+            transform: scale(0.98);
+        }
+
+        .channel-icon {
+            font-size: 30px;
+        }
+
+        .channel-info {
+            flex: 1;
+        }
+
+        .channel-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .channel-description {
+            font-size: 14px;
+            opacity: 0.9;
         }
 
         .deals-tab-buttons {
@@ -1370,6 +1537,15 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
+        .deals-tab-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .deals-tab-button:active {
+            transform: translateY(0);
+        }
+
         .deals-tab-button.active {
             border: 2px solid rgba(255,255,255,0.5);
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
@@ -1379,214 +1555,430 @@
             background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
         }
+        .deals-tab-button.pending:hover {
+            box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
+        }
 
         .deals-tab-button.active-tab {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+        .deals-tab-button.active-tab:hover {
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
         }
 
         .deals-tab-button.completed {
             background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
         }
-
-        .deal-card {
-            background: rgba(255,255,255,0.95);
-            color: #2d3748;
-            padding: 20px;
-            margin: 15px 0;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 5px solid #667eea;
+        .deals-tab-button.completed:hover {
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
         }
 
-        .deal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-
-        .deal-title {
-            font-size: 18px;
-            font-weight: 700;
-            flex: 1;
-        }
-
-        .deal-status {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-draft { background: #e2e8f0; color: #4a5568; }
-        .status-pending { background: #fef3c7; color: #d97706; }
-        .status-active { background: #d1fae5; color: #065f46; }
-        .status-completed { background: #dcfce7; color: #166534; }
-        .status-paid { background: #dbeafe; color: #1e40af; }
-        .status-released { background: #c7d2fe; color: #3730a3; }
-        .status-refunded { background: #fecaca; color: #991b1b; }
-
-        .deal-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .deal-detail {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            padding: 15px;
-            background: #f7fafc;
+        .skill-photo {
+            width: 100%;
+            height: 200px;
             border-radius: 10px;
-        }
-
-        .signature {
+            overflow: hidden;
+            margin: 15px 0;
+            background: #f7fafc;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .signed { color: #38a169; }
-        .unsigned { color: #e53e3e; }
-
-        .deal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
+        .skill-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .deal-button {
-            flex: 1;
-            padding: 15px;
+        .skill-photo:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .upload-photo-button {
+            width: 100%;
+            padding: 12px;
+            background: #4299e1;
+            color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .sign-button { 
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
-        }
-
-        .view-button { 
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
-        }
-
-        .complete-button { 
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-            box-shadow: 0 4px 10px rgba(237, 137, 54, 0.3);
-        }
-
-        .pay-button { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
-        }
-
-        .delete-deal {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-            box-shadow: 0 4px 10px rgba(245, 101, 101, 0.3);
-        }
-
-        .escrow-info {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            padding: 15px;
-            border-radius: 12px;
-            margin: 15px 0;
-            border: 2px solid #f59e0b;
-        }
-
-        .escrow-title {
-            font-weight: bold;
-            color: #92400e;
-            margin-bottom: 8px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-        }
-
-        .escrow-details {
-            font-size: 14px;
-            color: #78350f;
-        }
-
-        .payment-status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
             margin: 10px 0;
         }
 
-        .payment-pending { background: #fef3c7; color: #d97706; }
-        .payment-paid { background: #d1fae5; color: #065f46; }
-        .payment-released { background: #dbeafe; color: #1e40af; }
-        .payment-refunded { background: #fecaca; color: #991b1b; }
-
-        .quality-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
+        .no-photo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 14px;
+            height: 100%;
         }
 
-        .quality-option {
-            padding: 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background: #f7fafc;
+        }
+
+        .modal-title {
+            color: #2d3748;
+            margin-bottom: 20px;
             text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: rgba(255,255,255,0.9);
+        }
+
+        .modal-save {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+        }
+        .modal-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .modal-cancel {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
+            color: #4a5568;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .modal-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        .map-popup-content {
+            min-width: 300px;
+            max-width: 300px;
+        }
+
+        .map-skill-photo {
+            width: 100%;
+            height: 150px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .map-skill-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .map-skill-info {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .map-skill-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .map-skill-button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .map-contact-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .map-details-button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .map-edit-button {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+        }
+
+        .photo-upload-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 15px 0;
+            background: rgba(102, 126, 234, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-upload-area:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #764ba2;
+        }
+
+        .photo-upload-icon {
+            font-size: 40px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .photo-preview {
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .photo-info {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .contact-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .call-button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+            transition: all 0.3s ease;
+        }
+        .call-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .telegram-button {
+            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 136, 204, 0.3);
+            transition: all 0.3s ease;
+        }
+        .telegram-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 136, 204, 0.4);
+        }
+
+        .contact-info {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
             color: #2d3748;
         }
 
-        .quality-option.selected {
-            border-color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
-        }
-
-        .additional-options {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .option-checkbox {
+        .contact-item {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            cursor: pointer;
-            background: rgba(255,255,255,0.9);
-            color: #2d3748;
+            margin: 8px 0;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
         }
 
-        .option-checkbox.selected {
-            border-color: #48bb78;
-            background: rgba(72, 187, 120, 0.1);
+        .contact-icon {
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .contact-text {
+            flex: 1;
+            font-size: 14px;
+            word-break: break-all;
+            font-weight: 500;
+        }
+
+        .copy-contact {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(66, 153, 225, 0.3);
+            transition: all 0.2s ease;
+        }
+        .copy-contact:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(66, 153, 225, 0.4);
+        }
+
+        .create-deal-button {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(237, 137, 54, 0.3);
+            transition: all 0.3s ease;
+        }
+        .create-deal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(237, 137, 54, 0.4);
+        }
+
+        .wallet-connected {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #065f46;
+        }
+
+        .wallet-disconnected {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 2px solid #ef4444;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #991b1b;
         }
 
         .payment-confirm-modal {
@@ -1665,68 +2057,19 @@
             color: white;
             box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
         }
+        .payment-confirm-yes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
+        }
 
         .payment-confirm-no {
             background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
             color: #4a5568;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-
-        .about-section {
-            background: rgba(255,255,255,0.9);
-            padding: 25px;
-            border-radius: 20px;
-            color: #2d3748;
-            margin: 20px 0;
-        }
-
-        .about-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-            color: #667eea;
-        }
-
-        .channel-links {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .channel-link {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .channel-link:active {
-            transform: scale(0.98);
-        }
-
-        .channel-icon {
-            font-size: 30px;
-        }
-
-        .channel-info {
-            flex: 1;
-        }
-
-        .channel-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .channel-description {
-            font-size: 14px;
-            opacity: 0.9;
+        .payment-confirm-no:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
 
         .reviews-button {
@@ -1746,6 +2089,10 @@
             gap: 10px;
             margin: 15px 0;
             width: 100%;
+        }
+        .reviews-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
         }
 
         .reviews-modal {
@@ -1876,8 +2223,17 @@
             width: 100%;
             margin-top: 15px;
         }
-
+        .submit-review-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+        }
         .submit-review-button:disabled {
+            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .submit-review-button.disabled {
             background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
             cursor: not-allowed;
             opacity: 0.7;
@@ -1892,25 +2248,6 @@
             color: #92400e;
             font-size: 14px;
             text-align: center;
-        }
-
-        .rating-stars {
-            color: #FFD700;
-            font-size: 16px;
-            margin: 5px 0;
-        }
-
-        #map {
-            height: 400px;
-            border-radius: 15px;
-            margin-top: 15px;
-            border: 2px solid rgba(255,255,255,0.3);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            display: none;
-        }
-        
-        .map-active #map {
-            display: block;
         }
 
         .umeyka-marker-container {
@@ -1994,141 +2331,82 @@
             object-fit: cover;
         }
 
-        .map-popup-content {
-            min-width: 300px;
-            max-width: 300px;
-        }
-
-        .map-skill-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 15px;
-        }
-
-        .map-skill-button {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
+        .skill-qr-code {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 60px;
+            height: 60px;
             cursor: pointer;
-        }
-
-        .map-contact-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .map-edit-button {
-            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-            color: white;
-        }
-
-        .contact-info {
-            background: #f7fafc;
-            padding: 12px;
             border-radius: 8px;
-            margin: 10px 0;
-            color: #2d3748;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 8px 0;
-            padding: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: transform 0.2s ease;
             background: white;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
+            padding: 4px;
         }
 
-        .contact-icon {
-            font-size: 20px;
-            color: #667eea;
+        .skill-qr-code:hover {
+            transform: scale(1.05);
         }
 
-        .contact-text {
-            flex: 1;
-            font-size: 14px;
-            word-break: break-all;
-            font-weight: 500;
-        }
-
-        .copy-contact {
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 12px;
-            font-size: 12px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(66, 153, 225, 0.3);
-            transition: all 0.2s ease;
-        }
-
-        .contact-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .call-button {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
+        .qr-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 4000;
+            display: none;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
-            transition: all 0.3s ease;
+            padding: 20px;
         }
 
-        .telegram-button {
-            background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
+        .qr-modal-overlay.active {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-decoration: none;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0, 136, 204, 0.3);
-            transition: all 0.3s ease;
         }
 
-        #userProfile {
+        .qr-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
             text-align: center;
-        }
-
-        #userProfile .main-button {
-            margin: 0 auto 15px auto;
-            display: flex;
+            max-width: 350px;
             width: 100%;
-            max-width: 300px;
+        }
+
+        .qr-code-large {
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .qr-share-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
             <div class="header" id="logoHeader">
                 <button class="qr-scanner-button" onclick="triggerHapticFeedback(); openQRScanner();">📷 Сканер</button>
@@ -2166,7 +2444,6 @@
             </div>
         </div>
 
-        <!-- МОДАЛЬНОЕ ОКНО СКАНЕРА QR-КОДОВ -->
         <div id="scannerModal" class="scanner-modal-overlay">
             <div class="scanner-modal-content">
                 <button class="scanner-close" onclick="triggerHapticFeedback(); closeQRScanner();">×</button>
@@ -2177,7 +2454,6 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ МАСТЕРА -->
         <div id="masterSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
             <div class="form-section">
@@ -2195,38 +2471,21 @@
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
                     <div class="radius-selector">
-                        <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectRadius(5);">
-                            5 км
-                        </div>
-                        <div class="radius-option selected" data-radius="10" onclick="triggerHapticFeedback(); selectRadius(10);">
-                            10 км
-                        </div>
-                        <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectRadius(25);">
-                            25 км
-                        </div>
-                        <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectRadius(50);">
-                            50 км
-                        </div>
+                        <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectRadius(5);">5 км</div>
+                        <div class="radius-option selected" data-radius="10" onclick="triggerHapticFeedback(); selectRadius(10);">10 км</div>
+                        <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectRadius(25);">25 км</div>
+                        <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectRadius(50);">50 км</div>
                     </div>
-                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
-                        Выберите радиус, в котором вы готовы работать
-                    </div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">Выберите радиус, в котором вы готовы работать</div>
                 </div>
                 
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                     <div class="status-selector">
-                        <div class="status-option ready-option selected" onclick="triggerHapticFeedback(); selectMasterStatus('ready');" id="statusReadyOption">
-                            ✅ Готов
-                        </div>
-                        <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectMasterStatus('busy');" id="statusBusyOption">
-                            ⏰ Занят
-                        </div>
+                        <div class="status-option ready-option selected" onclick="triggerHapticFeedback(); selectMasterStatus('ready');" id="statusReadyOption">✅ Готов</div>
+                        <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectMasterStatus('busy');" id="statusBusyOption">⏰ Занят</div>
                     </div>
-                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
-                        Статус "Готов" - вы доступны для новых заказов<br>
-                        Статус "Занят" - временно не принимаете заказы
-                    </div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">Статус "Готов" - вы доступны для новых заказов<br>Статус "Занят" - временно не принимаете заказы</div>
                 </div>
                 
                 <div style="margin: 15px 0;">
@@ -2234,7 +2493,7 @@
                     <div class="photo-upload-area" onclick="triggerHapticFeedback(); document.getElementById('skillPhotoInput').click();">
                         <div class="photo-upload-icon">📷</div>
                         <div style="color: #2d3748; margin-bottom: 5px;">Нажмите для загрузки фото</div>
-                        <div class="photo-info">JPG, PNG до 1MB</div>
+                        <div style="font-size: 12px; color: #666;">JPG, PNG до 1MB</div>
                     </div>
                     <input type="file" id="skillPhotoInput" accept="image/*" style="display: none;" onchange="handleSkillPhotoUpload(event)">
                     
@@ -2254,7 +2513,6 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ КЛИЕНТА -->
         <div id="clientSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
             <div class="form-section">
@@ -2273,7 +2531,6 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА -->
         <div id="profileSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
             
@@ -2282,9 +2539,7 @@
                 
                 <div id="userProfile">
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">
-                            👤
-                        </div>
+                        <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">👤</div>
                         <h3 id="userName">Пользователь</h3>
                         <p id="userBio" style="opacity: 0.8; margin: 10px 0;">Расскажите о себе...</p>
                         <div id="userBadges" style="margin: 10px 0;"></div>
@@ -2323,13 +2578,20 @@
                     </button>
                 </div>
                 
-                <!-- Статистика -->
+                <div style="display: none;">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="triggerHapticFeedback(); showProfileTab('stats');" id="statsTab">📊 Статистика</button>
+                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('skills');" id="skillsTab">✨ Мои умейки</button>
+                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('deals');" id="dealsTab">📝 Сделки</button>
+                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('referral');" id="referralTab">🎁 Реферальная программа</button>
+                    </div>
+                </div>
+                
                 <div id="profileStats" class="profile-tab">
                     <h3 style="margin-bottom: 15px; text-align: center;">📊 Моя статистика</h3>
                     <div id="userStats" class="stats-grid"></div>
                 </div>
                 
-                <!-- Мои умейки -->
                 <div id="profileSkills" class="profile-tab" style="display: none;">
                     <h3 style="margin-bottom: 15px; text-align: center;">✨ Мои умейки</h3>
                     <div id="profileSkillsList"></div>
@@ -2340,7 +2602,6 @@
                     </button>
                 </div>
                 
-                <!-- Сделки -->
                 <div id="profileDeals" class="profile-tab" style="display: none;">
                     <h3 style="margin-bottom: 15px; text-align: center;">📝 Мои сделки</h3>
                     
@@ -2359,8 +2620,7 @@
                         </button>
                     </div>
                     
-                    <button class="main-button button-master" onclick="triggerHapticFeedback(); showCreateDealSection();" 
-                            style="margin-bottom: 20px;">
+                    <button class="main-button button-master" onclick="triggerHapticFeedback(); showCreateDealSection();" style="margin-bottom: 20px;">
                         <span class="button-icon">➕</span>
                         Создать сделку
                     </button>
@@ -2368,7 +2628,6 @@
                     <div id="dealsList"></div>
                 </div>
                 
-                <!-- РЕФЕРАЛЬНАЯ ПРОГРАММА -->
                 <div id="profileReferral" class="profile-tab" style="display: none;">
                     <div class="referral-section">
                         <div class="referral-title">
@@ -2460,7 +2719,6 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ ФИНАНСОВ -->
         <div id="financeSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showProfileSection();">← Назад</button>
             
@@ -2468,9 +2726,7 @@
                 <h2 style="margin-bottom: 20px; text-align: center;">💰 Мои финансы</h2>
                 
                 <div class="wallet-section">
-                    <div class="wallet-title">
-                        💳 Мой кошелек
-                    </div>
+                    <div class="wallet-title">💳 Мой кошелек</div>
                     
                     <div id="walletStatus" class="wallet-disconnected">
                         <span>🔴</span>
@@ -2497,24 +2753,17 @@
                     </div>
                     
                     <div class="wallet-actions">
-                        <button class="wallet-button deposit" onclick="triggerHapticFeedback(); connectWallet();">
-                            🔗 Подключить / Пополнить Wallet
-                        </button>
-                        <button class="wallet-button withdraw" onclick="triggerHapticFeedback(); withdrawFunds();" id="withdrawButton" style="display: none;">
-                            💸 Вывести средства
-                        </button>
+                        <button class="wallet-button deposit" onclick="triggerHapticFeedback(); connectWallet();">🔗 Подключить / Пополнить Wallet</button>
+                        <button class="wallet-button withdraw" onclick="triggerHapticFeedback(); withdrawFunds();" id="withdrawButton" style="display: none;">💸 Вывести средства</button>
                     </div>
                     
                     <div class="transaction-history" id="transactionHistory">
-                        <div style="text-align: center; color: #666; padding: 20px;">
-                            История операций пуста
-                        </div>
+                        <div style="text-align: center; color: #666; padding: 20px;">История операций пуста</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
         <div id="editProfileSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showProfileSection();">← Назад</button>
     
@@ -2539,7 +2788,6 @@
             </div>
         </div>
 
-        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
         <div id="createDealSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showProfileSection();">← Назад</button>
             
@@ -2560,30 +2808,18 @@
                 <div>
                     <label style="color: white; display: block; margin-bottom: 10px;">⭐ Уровень качества *</label>
                     <div class="quality-options">
-                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('premium');" id="qualityPremium">
-                            Премиум
-                        </div>
-                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('standard');" id="qualityStandard">
-                            Стандарт
-                        </div>
-                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('economy');" id="qualityEconomy">
-                            Эконом
-                        </div>
+                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('premium');" id="qualityPremium">Премиум</div>
+                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('standard');" id="qualityStandard">Стандарт</div>
+                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('economy');" id="qualityEconomy">Эконом</div>
                     </div>
                 </div>
                 
                 <div>
                     <label style="color: white; display: block; margin-bottom: 10px;">✅ Дополнительные условия (выберите 2)</label>
                     <div class="additional-options">
-                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('quality');" id="optionQuality">
-                            ⭐ Качество
-                        </div>
-                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('price');" id="optionPrice">
-                            💰 Цена
-                        </div>
-                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('timeRange');" id="optionTimeRange">
-                            ⏱️ Диапазон Времени
-                        </div>
+                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('quality');" id="optionQuality">⭐ Качество</div>
+                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('price');" id="optionPrice">💰 Цена</div>
+                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('timeRange');" id="optionTimeRange">⏱️ Диапазон Времени</div>
                     </div>
                 </div>
                 
@@ -2598,7 +2834,6 @@
             </div>
         </div>
 
-        <!-- РАЗДЕЛ "О ПРОЕКТЕ" -->
         <div id="aboutSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
             
@@ -2670,9 +2905,7 @@
                     
                     <textarea id="projectReviewComment" class="input-field" placeholder="Ваш отзыв о проекте..." style="height: 100px; resize: vertical; background: white;"></textarea>
                     
-                    <button id="submitReviewBtn" class="submit-review-button" onclick="triggerHapticFeedback(); submitProjectReview();">
-                        📤 Отправить отзыв
-                    </button>
+                    <button id="submitReviewBtn" class="submit-review-button" onclick="triggerHapticFeedback(); submitProjectReview();">📤 Отправить отзыв</button>
                 </div>
 
                 <div class="channel-links">
@@ -2696,7 +2929,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ УМЕЙКИ -->
     <div id="editSkillModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeEditSkillModal();">×</button>
@@ -2716,30 +2948,18 @@
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
                 <div class="radius-selector" style="background: #f7fafc;">
-                    <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectEditRadius(5);">
-                        5 км
-                    </div>
-                    <div class="radius-option" data-radius="10" onclick="triggerHapticFeedback(); selectEditRadius(10);">
-                        10 км
-                    </div>
-                    <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectEditRadius(25);">
-                        25 км
-                    </div>
-                    <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectEditRadius(50);">
-                        50 км
-                    </div>
+                    <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectEditRadius(5);">5 км</div>
+                    <div class="radius-option" data-radius="10" onclick="triggerHapticFeedback(); selectEditRadius(10);">10 км</div>
+                    <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectEditRadius(25);">25 км</div>
+                    <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectEditRadius(50);">50 км</div>
                 </div>
             </div>
             
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                 <div class="status-selector" style="background: #f7fafc;">
-                    <div class="status-option ready-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('ready');" id="editStatusReadyOption">
-                        ✅ Готов
-                    </div>
-                    <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('busy');" id="editStatusBusyOption">
-                        ⏰ Занят
-                    </div>
+                    <div class="status-option ready-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('ready');" id="editStatusReadyOption">✅ Готов</div>
+                    <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('busy');" id="editStatusBusyOption">⏰ Занят</div>
                 </div>
             </div>
             
@@ -2769,31 +2989,22 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО КОНТАКТОВ МАСТЕРА -->
     <div id="contactModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeContactModal();">×</button>
             <div class="modal-title">📞 Контакты мастера</div>
             
-            <div id="contactInfo" class="contact-info">
-            </div>
+            <div id="contactInfo" class="contact-info"></div>
             
             <div class="contact-buttons">
-                <a id="callButton" class="call-button" href="#" target="_blank" onclick="triggerHapticFeedback();">
-                    📞 Позвонить
-                </a>
-                <a id="telegramButton" class="telegram-button" href="#" target="_blank" onclick="triggerHapticFeedback();">
-                    ✈️ Написать в Telegram
-                </a>
+                <a id="callButton" class="call-button" href="#" target="_blank" onclick="triggerHapticFeedback();">📞 Позвонить</a>
+                <a id="telegramButton" class="telegram-button" href="#" target="_blank" onclick="triggerHapticFeedback();">✈️ Написать в Telegram</a>
             </div>
             
-            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeContactModal();" style="margin-top: 15px;">
-                Закрыть
-            </button>
+            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeContactModal();" style="margin-top: 15px;">Закрыть</button>
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ОПЛАТЫ -->
     <div id="paymentConfirmModal" class="payment-confirm-modal" style="display: none;">
         <div class="payment-confirm-content">
             <div class="payment-confirm-title">💳 Подтверждение оплаты</div>
@@ -2822,17 +3033,12 @@
             </div>
             
             <div class="payment-confirm-buttons">
-                <button class="payment-confirm-button payment-confirm-yes" onclick="confirmPayment();">
-                    ✅ Подтвердить
-                </button>
-                <button class="payment-confirm-button payment-confirm-no" onclick="closePaymentConfirm();">
-                    ❌ Отмена
-                </button>
+                <button class="payment-confirm-button payment-confirm-yes" onclick="confirmPayment();">✅ Подтвердить</button>
+                <button class="payment-confirm-button payment-confirm-no" onclick="closePaymentConfirm();">❌ Отмена</button>
             </div>
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ОТЗЫВОВ -->
     <div id="reviewsModal" class="reviews-modal">
         <div class="reviews-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeReviewsModal();">×</button>
@@ -2854,7 +3060,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО QR-КОДА -->
     <div id="qrModal" class="qr-modal-overlay">
         <div class="qr-modal-content">
             <h2 id="qrModalTitle" style="color: #2d3748; margin-bottom: 20px; font-size: 20px;"></h2>
@@ -2870,7 +3075,6 @@
     </div>
 
     <script>
-    // ========== КОНФИГУРАЦИЯ ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
     const TELEGRAM_BOT_URL = 'https://t.me/ymeyka_bot';
     let currentUserId = null;
@@ -2893,19 +3097,25 @@
     let currentRadius = 10;
     let currentEditRadius = 10;
     let localSkills = {};
+    let globalSkillsStatus = {};
     let pendingPaymentDealId = null;
     let currentQRSkillId = null;
     let currentQRSkillName = null;
     let html5QrCode = null;
+    let isProcessingQR = false;
     
-    // Счетчик кликов по логотипу для открытия админ-панели
     let logoClickCount = 0;
     let logoClickTimer = null;
 
-    // ========== QR-СКАНЕР (ИСПРАВЛЕН) ==========
+    // ========== QR-СКАНЕР ==========
     
     window.openQRScanner = async function() {
         triggerHapticFeedback();
+        
+        if (isProcessingQR) {
+            console.log('⏳ Уже обрабатывается QR-код, подождите...');
+            return;
+        }
         
         const modal = document.getElementById('scannerModal');
         const errorDiv = document.getElementById('scannerError');
@@ -2932,9 +3142,26 @@
                 await html5QrCode.start(
                     { facingMode: "environment" },
                     config,
-                    (decodedText, decodedResult) => {
+                    async (decodedText, decodedResult) => {
                         console.log('✅ QR-код распознан:', decodedText);
-                        handleScannedQRCode(decodedText);
+                        
+                        if (isProcessingQR) {
+                            console.log('⏳ Уже обрабатывается QR-код, пропускаем');
+                            return;
+                        }
+                        
+                        isProcessingQR = true;
+                        
+                        try {
+                            await handleScannedQRCode(decodedText);
+                        } catch (err) {
+                            console.error('Ошибка при обработке QR:', err);
+                            showScannerError('Ошибка при обработке QR-кода');
+                        } finally {
+                            setTimeout(() => {
+                                isProcessingQR = false;
+                            }, 3000);
+                        }
                     },
                     (errorMessage) => {
                         console.log('QR сканирование:', errorMessage);
@@ -2943,12 +3170,14 @@
                     console.error('❌ Ошибка запуска сканера:', err);
                     errorDiv.style.display = 'block';
                     errorDiv.textContent = '❌ Не удалось получить доступ к камере. Убедитесь, что вы разрешили доступ.';
+                    isProcessingQR = false;
                 });
                 
             } catch (error) {
                 console.error('❌ Ошибка инициализации сканера:', error);
                 errorDiv.style.display = 'block';
                 errorDiv.textContent = '❌ Ошибка: ' + error.message;
+                isProcessingQR = false;
             }
         }, 100);
     };
@@ -2972,98 +3201,135 @@
         const errorDiv = document.getElementById('scannerError');
         errorDiv.style.display = 'none';
         errorDiv.textContent = '';
+        
+        isProcessingQR = false;
     };
     
     async function handleScannedQRCode(qrData) {
         console.log('🔍 Обработка QR-кода:', qrData);
         
-        try {
-            let skillId = null;
-            
-            // Формат 1: https://t.me/ymeyka_bot?start=skill_{skillId}
-            if (qrData.includes('start=skill_')) {
-                const match = qrData.match(/start=skill_([^&?]+)/);
-                if (match && match[1]) {
-                    skillId = match[1];
-                }
+        let skillId = null;
+        
+        if (qrData.includes('start=skill_')) {
+            const match = qrData.match(/start=skill_([^&?]+)/);
+            if (match && match[1]) {
+                skillId = match[1];
             }
-            
-            // Формат 2: ymeyka://skill/{skillId}
-            if (!skillId && qrData.includes('ymeyka://skill/')) {
-                const match = qrData.match(/ymeyka:\/\/skill\/([^&?]+)/);
-                if (match && match[1]) {
-                    skillId = match[1];
-                }
+        } else if (qrData.includes('/skill/')) {
+            const match = qrData.match(/\/skill\/([^&?]+)/);
+            if (match && match[1]) {
+                skillId = match[1];
             }
-            
-            // Формат 3: Просто ID
-            if (!skillId && qrData.match(/^[a-zA-Z0-9_]+$/)) {
-                skillId = qrData;
-            }
-            
-            if (!skillId) {
-                console.error('❌ Не удалось извлечь skillId из QR-кода:', qrData);
-                showScannerError('Не удалось распознать QR-код умейки');
-                return;
-            }
-            
-            console.log('🎯 Найден skillId:', skillId);
-            
-            // Закрываем сканер
-            await closeQRScanner();
-            
-            // Ищем умейку
-            let skill = null;
-            
-            // Сначала ищем в глобальном хранилище
-            skill = getGlobalSkillById(skillId);
-            
-            // Если не нашли, пробуем загрузить с сервера
-            if (!skill) {
-                try {
-                    const response = await fetch(`${API_URL}/api/skills/${skillId}`);
-                    const result = await response.json();
-                    if (result.success && result.skill) {
-                        skill = result.skill;
-                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
-                        addGlobalSkill(skill);
-                    }
-                } catch (error) {
-                    console.error('Ошибка загрузки умейки с сервера:', error);
-                }
-            }
-            
-            if (!skill) {
-                showScannerError('Умейка не найдена');
-                return;
-            }
-            
-            // Открываем карточку умейки
-            openSkillFromQR(skill);
-            
-        } catch (error) {
-            console.error('❌ Ошибка обработки QR-кода:', error);
-            showScannerError('Ошибка обработки QR-кода');
+        } else if (qrData.match(/^[a-f0-9]{24}$/i)) {
+            skillId = qrData;
         }
+        
+        if (!skillId) {
+            console.error('❌ Не удалось извлечь skillId из QR-кода:', qrData);
+            showScannerError('Не удалось распознать QR-код умейки. Неверный формат.');
+            return;
+        }
+        
+        console.log('🎯 Извлечён skillId:', skillId);
+        
+        showScannerStatus('🔍 Поиск умейки...');
+        
+        let skill = getGlobalSkillById(skillId);
+        
+        if (!skill) {
+            console.log('📡 Умейка не найдена в кэше, загружаем с сервера...');
+            
+            try {
+                const response = await fetch(`${API_URL}/api/skills/${skillId}`);
+                const result = await response.json();
+                
+                if (result.success && result.skill) {
+                    skill = result.skill;
+                    skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                    addGlobalSkill(skill);
+                    console.log('✅ Умейка загружена с сервера:', skill);
+                } else {
+                    console.error('❌ Умейка не найдена на сервере');
+                    showScannerError('Умейка не найдена');
+                    return;
+                }
+            } catch (error) {
+                console.error('❌ Ошибка загрузки умейки с сервера:', error);
+                showScannerError('Ошибка при поиске умейки. Проверьте подключение.');
+                return;
+            }
+        }
+        
+        if (!skill) {
+            console.error('❌ Умейка не найдена');
+            showScannerError('Умейка не найдена');
+            return;
+        }
+        
+        console.log('✅ Умейка найдена, открываем модальное окно:', skill.skill);
+        
+        await closeQRScanner();
+        
+        setTimeout(() => {
+            openSkillFromQR(skill);
+        }, 100);
+    }
+    
+    function showScannerStatus(message) {
+        const errorDiv = document.getElementById('scannerError');
+        errorDiv.textContent = 'ℹ️ ' + message;
+        errorDiv.style.display = 'block';
+        errorDiv.style.background = '#e3f2fd';
+        errorDiv.style.color = '#1976d2';
+        
+        setTimeout(() => {
+            if (errorDiv.textContent.includes(message)) {
+                errorDiv.style.display = 'none';
+                errorDiv.style.background = '';
+                errorDiv.style.color = '';
+            }
+        }, 2000);
     }
     
     function showScannerError(message) {
         const errorDiv = document.getElementById('scannerError');
         errorDiv.textContent = '❌ ' + message;
         errorDiv.style.display = 'block';
+        errorDiv.style.background = '#fed7d7';
+        errorDiv.style.color = '#e53e3e';
         
         setTimeout(() => {
             errorDiv.style.display = 'none';
-        }, 3000);
+            errorDiv.style.background = '';
+            errorDiv.style.color = '';
+        }, 4000);
     }
     
     function openSkillFromQR(skill) {
+        if (!skill) {
+            console.error('❌ Невозможно открыть модальное окно: умейка не передана');
+            return;
+        }
+        
+        const existingModal = document.querySelector('#qrSkillModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
         const modal = document.createElement('div');
+        modal.id = 'qrSkillModal';
         modal.className = 'modal-overlay';
         modal.style.display = 'flex';
         modal.style.zIndex = '5000';
+        
+        const photoHtml = skill.photo ? `
+            <div style="margin: 15px 0; border-radius: 12px; overflow: hidden;">
+                <img src="${skill.photo}" alt="Фото работы" style="width: 100%; max-height: 200px; object-fit: cover;">
+            </div>
+        ` : '';
+        
         modal.innerHTML = `
-            <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-content" style="max-width: 450px;">
                 <button class="modal-close" onclick="this.parentElement.parentElement.remove();">×</button>
                 <div class="modal-title">✨ Найдена умейка</div>
                 
@@ -3073,13 +3339,16 @@
                     <p style="color: #48bb78; font-size: 24px; font-weight: bold;">${skill.price} ₽</p>
                 </div>
                 
+                ${photoHtml}
+                
                 <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
                     <p style="color: #2d3748; margin: 5px 0;"><strong>👤 Мастер:</strong> ${escapeHtml(skill.username)}</p>
                     <p style="color: #2d3748; margin: 5px 0;"><strong>📍 Город:</strong> ${escapeHtml(skill.city || 'Не указан')}</p>
                     <p style="color: #2d3748; margin: 5px 0;"><strong>📞 Контакт:</strong> ${escapeHtml(skill.experience || 'Не указан')}</p>
+                    <p style="color: #2d3748; margin: 5px 0;"><strong>⭐ Статус:</strong> ${skill.status === 'busy' ? '⏰ Занят' : '✅ Готов к работе'}</p>
                 </div>
                 
-                <button class="submit-button" onclick="triggerHapticFeedback(); this.parentElement.parentElement.remove(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill)}', '${escapeHtml(skill.username)}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');" style="margin-bottom: 10px;">
+                <button class="submit-button" onclick="triggerHapticFeedback(); this.closest('.modal-overlay').remove(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill)}', '${escapeHtml(skill.username)}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');" style="margin-bottom: 10px;">
                     📝 Создать сделку
                 </button>
                 <button class="modal-button modal-cancel" onclick="this.parentElement.parentElement.remove();">
@@ -3087,21 +3356,20 @@
                 </button>
             </div>
         `;
+        
         document.body.appendChild(modal);
+        
+        triggerHapticFeedback();
     }
     
     function escapeHtml(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/['"]/g, function(m) {
-            if (m === "'") return '&#39;';
-            if (m === '"') return '&quot;';
-            return m;
-        });
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
     
     function handleDeepLink() {
@@ -3112,25 +3380,31 @@
             const skillId = startParam.replace('skill_', '');
             console.log('🔗 Обнаружен deeplink для skill:', skillId);
             
-            setTimeout(() => {
-                const skill = getGlobalSkillById(skillId);
+            setTimeout(async () => {
+                let skill = getGlobalSkillById(skillId);
+                
+                if (!skill) {
+                    try {
+                        const response = await fetch(`${API_URL}/api/skills/${skillId}`);
+                        const result = await response.json();
+                        if (result.success && result.skill) {
+                            skill = result.skill;
+                            addGlobalSkill(skill);
+                        }
+                    } catch (error) {
+                        console.error('Ошибка загрузки умейки по deeplink:', error);
+                    }
+                }
+                
                 if (skill) {
                     openSkillFromQR(skill);
                 } else {
-                    fetch(`${API_URL}/api/skills/${skillId}`)
-                        .then(response => response.json())
-                        .then(result => {
-                            if (result.success && result.skill) {
-                                addGlobalSkill(result.skill);
-                                openSkillFromQR(result.skill);
-                            }
-                        })
-                        .catch(error => console.error('Ошибка загрузки умейки по deeplink:', error));
+                    alert('❌ Умейка не найдена');
                 }
             }, 500);
         }
     }
-
+    
     // ========== БАЗА ДАННЫХ ГОРОДОВ ==========
     const citiesDatabase = {
         'Евпатория': { lat: 45.1906, lon: 33.3666 },
@@ -5585,7 +5859,7 @@
         return currentUserId;
     };
     
-    // ========== АДМИН-ПАНЕЛЬ (6 кликов по логотипу) ==========
+    // ========== АДМИН-ПАНЕЛЬ ==========
     function initAdminAccess() {
         const logoHeader = document.getElementById('logoHeader');
         if (!logoHeader) return;
@@ -5615,7 +5889,7 @@
         window.open(adminUrl, '_blank');
     }
     
-    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (продолжение) ==========
+    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
     
     document.addEventListener('DOMContentLoaded', function() {
         console.log('🚀 Ymeyka app loaded successfully!');
