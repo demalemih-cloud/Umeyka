@@ -342,15 +342,7 @@
             border: 1px solid rgba(255,255,255,0.3);
         }
         
-        .textarea-field {
-            width: 100%;
-            padding: 18px;
-            margin: 12px 0;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            background: rgba(255,255,255,0.95);
-            border: 1px solid rgba(255,255,255,0.3);
+        textarea.input-field {
             resize: vertical;
             font-family: inherit;
         }
@@ -616,43 +608,6 @@
             font-size: 16px;
         }
         
-        /* Кнопка подробно */
-        .details-button {
-            background: rgba(102, 126, 234, 0.15);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: #667eea;
-            margin-left: 10px;
-            white-space: nowrap;
-        }
-        
-        .details-button:hover {
-            background: rgba(102, 126, 234, 0.3);
-            transform: scale(1.02);
-        }
-        
-        .skill-user-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 15px 0 20px;
-        }
-        
-        .skill-user-name {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #666;
-            font-size: 14px;
-        }
-        
         .chat-button {
             width: 100%;
             padding: 15px;
@@ -664,6 +619,117 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+        }
+        
+        /* Стиль для кнопки "Подробно" */
+        .details-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(102, 126, 234, 0.15);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 8px;
+            gap: 4px;
+        }
+        
+        .details-button:hover {
+            background: rgba(102, 126, 234, 0.3);
+            transform: scale(1.02);
+        }
+        
+        .details-button:active {
+            transform: scale(0.98);
+        }
+        
+        .skill-user-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0 10px;
+        }
+        
+        .skill-user-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* Модальное окно для подробностей */
+        .details-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .details-modal-overlay.active {
+            display: flex;
+        }
+        
+        .details-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .details-modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 15px;
+            padding-right: 30px;
+        }
+        
+        .details-modal-text {
+            color: #4a5568;
+            line-height: 1.6;
+            font-size: 15px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .details-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .details-modal-close:hover {
+            background: #f7fafc;
         }
         
         #map {
@@ -2463,22 +2529,6 @@
             margin-top: 20px;
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
-        
-        .details-modal-content {
-            max-width: 400px;
-        }
-        
-        .details-text {
-            background: #f7fafc;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 15px 0;
-            color: #2d3748;
-            font-size: 16px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
     </style>
 </head>
 <body>
@@ -2541,7 +2591,7 @@
                 <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
                 
                 <!-- НОВОЕ ПОЛЕ: Подробности -->
-                <textarea id="skillDetails" class="textarea-field" placeholder="📝 Подробности (например: Работаю с Apple, Samsung, Xiaomi. Есть запчасти в наличии.)" rows="3" style="height: 80px;"></textarea>
+                <textarea id="skillDetails" class="input-field" placeholder="📝 Подробности (например: Работаю с Apple, Samsung, Xiaomi. Есть запчасти в наличии.)" style="height: 80px; resize: vertical;"></textarea>
                 
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
@@ -3085,7 +3135,7 @@
             <input type="hidden" id="editSkillId">
             
             <input type="text" id="editSkillName" class="input-field" placeholder="Моё умение" required>
-            <textarea id="editSkillDetails" class="textarea-field" placeholder="📝 Подробности" rows="3" style="height: 80px;"></textarea>
+            <textarea id="editSkillDetails" class="input-field" placeholder="📝 Подробности" style="height: 80px; resize: vertical;"></textarea>
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
@@ -3147,6 +3197,16 @@
                 <button class="modal-button modal-save" onclick="triggerHapticFeedback(); saveEditedSkill();">💾 Сохранить</button>
                 <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeEditSkillModal();">Отмена</button>
             </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ПОДРОБНОСТЕЙ -->
+    <div id="detailsModal" class="details-modal-overlay">
+        <div class="details-modal-content">
+            <button class="details-modal-close" onclick="closeDetailsModal();">×</button>
+            <div class="details-modal-title" id="detailsModalTitle">📝 Подробности</div>
+            <div class="details-modal-text" id="detailsModalText"></div>
+            <button class="modal-button modal-cancel" onclick="closeDetailsModal();" style="margin-top: 20px;">Закрыть</button>
         </div>
     </div>
 
@@ -3250,16 +3310,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ПОДРОБНОСТЕЙ УМЕЙКИ -->
-    <div id="detailsModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content details-modal-content">
-            <button class="modal-close" onclick="triggerHapticFeedback(); closeDetailsModal();">×</button>
-            <div class="modal-title">📝 Подробности</div>
-            <div id="detailsModalText" class="details-text"></div>
-            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeDetailsModal();">Закрыть</button>
-        </div>
-    </div>
-
     <script>
     // ========== КОНФИГУРАЦИЯ ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
@@ -3296,29 +3346,34 @@
     let logoClickCount = 0;
     let logoClickTimer = null;
 
-    // ========== ФУНКЦИЯ ОТКРЫТИЯ МОДАЛЬНОГО ОКНА ПОДРОБНОСТЕЙ ==========
-    window.showSkillDetails = function(details) {
+    // ========== ФУНКЦИЯ ДЛЯ ОТКРЫТИЯ МОДАЛЬНОГО ОКНА ПОДРОБНОСТЕЙ ==========
+    window.openDetailsModal = function(skillId) {
         triggerHapticFeedback();
         
-        const modal = document.getElementById('detailsModal');
-        const textElement = document.getElementById('detailsModalText');
-        
-        if (!details || details.trim() === '') {
-            textElement.innerHTML = '📭 Мастер не добавил подробности';
-            textElement.style.color = '#ed8936';
-        } else {
-            textElement.innerHTML = details.replace(/\n/g, '<br>');
-            textElement.style.color = '#2d3748';
+        const skill = getGlobalSkillById(skillId);
+        if (!skill) {
+            alert('❌ Умейка не найдена');
+            return;
         }
         
-        modal.style.display = 'flex';
+        const detailsText = skill.details && skill.details.trim() ? skill.details.trim() : null;
+        
+        document.getElementById('detailsModalTitle').textContent = `📝 ${skill.skill}`;
+        
+        if (detailsText) {
+            document.getElementById('detailsModalText').innerHTML = detailsText.replace(/\n/g, '<br>');
+        } else {
+            document.getElementById('detailsModalText').innerHTML = '<span style="color: #999;">Мастер не добавил подробности</span>';
+        }
+        
+        document.getElementById('detailsModal').classList.add('active');
     };
     
     window.closeDetailsModal = function() {
         triggerHapticFeedback();
-        document.getElementById('detailsModal').style.display = 'none';
+        document.getElementById('detailsModal').classList.remove('active');
     };
-
+    
     // ========== ИСПРАВЛЕННЫЙ QR-СКАНЕР ==========
     
     /**
@@ -3466,16 +3521,10 @@
     
     /**
      * ИСПРАВЛЕННАЯ функция обработки отсканированного QR-кода
-     * Основные улучшения:
-     * 1. Улучшенное извлечение ID
-     * 2. Поиск сначала в кэше, затем на сервере
-     * 3. Сканер закрывается ТОЛЬКО после успешного открытия модального окна
-     * 4. Подробное логирование для диагностики
      */
     async function handleScannedQRCode(qrData) {
         console.log('📱 [Сканер] Получен QR-код:', qrData);
         
-        // Показываем индикатор загрузки в модальном окне
         const errorDiv = document.getElementById('scannerError');
         errorDiv.style.display = 'block';
         errorDiv.style.background = 'rgba(72, 187, 120, 0.2)';
@@ -3483,7 +3532,6 @@
         errorDiv.textContent = '🔍 Обработка QR-кода...';
         
         try {
-            // Извлекаем skillId из QR-кода
             const skillId = extractSkillIdFromQR(qrData);
             
             if (!skillId) {
@@ -3494,7 +3542,6 @@
             
             console.log(`🎯 [Сканер] Найден ID: ${skillId}`);
             
-            // Ищем умейку
             const skill = await getSkillById(skillId);
             
             if (!skill) {
@@ -3505,7 +3552,6 @@
             
             console.log(`✅ [Сканер] Умейка найдена:`, skill);
             
-            // Останавливаем сканер ПЕРЕД открытием модального окна
             if (html5QrCode && html5QrCode.isScanning) {
                 try {
                     await html5QrCode.stop();
@@ -3515,19 +3561,15 @@
                 }
             }
             
-            // Закрываем модальное окно сканера
             const modal = document.getElementById('scannerModal');
             modal.classList.remove('active');
             
-            // Очищаем контейнер сканера
             const readerContainer = document.getElementById('qr-reader');
             if (readerContainer) {
                 readerContainer.innerHTML = '';
             }
             
-            // Небольшая задержка перед открытием модального окна с умейкой
             setTimeout(() => {
-                // Открываем карточку умейки
                 openSkillModal(skill);
             }, 300);
             
@@ -3537,13 +3579,9 @@
         }
     }
     
-    /**
-     * Открытие модального окна с информацией об умейке
-     */
     function openSkillModal(skill) {
         console.log('🪟 [Модалка] Открываю карточку умейки:', skill.skill);
         
-        // Проверяем, не открыто ли уже модальное окно
         const existingModal = document.querySelector('.skill-modal-overlay');
         if (existingModal) {
             existingModal.remove();
@@ -3556,10 +3594,6 @@
         
         const statusBadge = getStatusBadge(skill.status);
         const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px 12px; background: #e6f3ff; border-radius: 8px; font-size: 14px;">📍 ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
-        
-        const detailsButton = skill.details && skill.details.trim() !== '' 
-            ? `<button class="details-button" style="background: rgba(102,126,234,0.15); border: none; padding: 6px 12px; border-radius: 20px; margin-left: 10px;" onclick="event.stopPropagation(); showSkillDetails('${escapeHtml(skill.details).replace(/'/g, "\\'")}');">📝 Подробно</button>`
-            : `<button class="details-button" style="background: rgba(102,126,234,0.15); border: none; padding: 6px 12px; border-radius: 20px; margin-left: 10px;" onclick="event.stopPropagation(); showSkillDetails('');">📝 Подробно</button>`;
         
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 450px; position: relative;">
@@ -3579,9 +3613,11 @@
                 ${cityInfo}
                 
                 <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-                        <p style="color: #2d3748; margin: 8px 0;"><strong>👤 Мастер:</strong> ${escapeHtml(skill.username)}</p>
-                        ${detailsButton}
+                    <div class="skill-user-row">
+                        <div class="skill-user-name">
+                            <span>👤</span> <span>${escapeHtml(skill.username)}</span>
+                        </div>
+                        ${skill.details ? `<button class="details-button" onclick="event.stopPropagation(); window.openDetailsModal('${skill._id}');">📝 Подробно</button>` : ''}
                     </div>
                     <p style="color: #2d3748; margin: 8px 0;"><strong>📞 Контакт:</strong> ${escapeHtml(skill.experience || 'Не указан')}</p>
                     ${skill.rating ? `<p style="color: #2d3748; margin: 8px 0;"><strong>⭐ Рейтинг:</strong> ${skill.rating.average?.toFixed(1) || '5.0'}/5</p>` : ''}
@@ -3605,8 +3641,6 @@
         `;
         
         document.body.appendChild(modal);
-        
-        // Вибрация при успешном открытии
         triggerHapticFeedback();
     }
     
@@ -3636,11 +3670,9 @@
         });
     }
     
-    // Обновленная функция открытия сканера
     window.openQRScanner = async function() {
         triggerHapticFeedback();
         
-        // Убеждаемся, что умейки загружены перед сканированием
         if (!isSkillsLoaded) {
             const errorDiv = document.getElementById('scannerError');
             errorDiv.style.display = 'block';
@@ -3663,21 +3695,17 @@
         
         modal.classList.add('active');
         
-        // Небольшая задержка для отображения модального окна
         setTimeout(async () => {
             try {
-                // Проверяем поддержку камеры
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                     throw new Error('Ваш браузер не поддерживает доступ к камере');
                 }
                 
-                // Очищаем контейнер перед инициализацией
                 const readerContainer = document.getElementById('qr-reader');
                 if (readerContainer) {
                     readerContainer.innerHTML = '';
                 }
                 
-                // Инициализируем сканер
                 html5QrCode = new Html5Qrcode("qr-reader");
                 
                 const config = {
@@ -3694,7 +3722,6 @@
                         handleScannedQRCode(decodedText);
                     },
                     (errorMessage) => {
-                        // Игнорируем ошибки во время сканирования
                         if (!errorMessage.includes('No MultiFormat Readers')) {
                             console.log('📷 [Сканер] Статус:', errorMessage);
                         }
@@ -3742,7 +3769,6 @@
             const skillId = startParam.replace('skill_', '');
             console.log('🔗 [Deeplink] Обнаружена ссылка для skill:', skillId);
             
-            // Ждем загрузки умейок
             const openSkill = async () => {
                 const skill = await getSkillById(skillId);
                 if (skill) {
@@ -5046,7 +5072,6 @@
             console.log('📊 Статус при создании:', currentMasterStatus);
             console.log('📍 Город:', skillCity);
             console.log('📏 Радиус:', currentRadius);
-            console.log('📝 Подробности:', skillDetails);
         
             if (!userId || userId === 'null' || userId === 'undefined') {
                 alert('❌ Ошибка: не определен ID пользователя. Перезагрузите страницу.');
@@ -5058,7 +5083,7 @@
 
             const skillData = {
                 skill: skillName.trim(),
-                details: skillDetails.trim() || '',
+                details: skillDetails ? skillDetails.trim() : '',
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
                 city: skillCity.trim(),
@@ -5224,6 +5249,7 @@
                                         skill.status = globalSkill.status;
                                     }
                                 }
+                                if (globalSkill.details) skill.details = globalSkill.details;
                                 if (globalSkill.qrCode) skill.qrCode = globalSkill.qrCode;
                                 if (globalSkill.qrCodeData) skill.qrCodeData = globalSkill.qrCodeData;
                             }
@@ -5269,9 +5295,6 @@
                     const statusBadge = getStatusBadge(skill.status);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
                     const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
-                    const detailsButton = skill.details && skill.details.trim() !== '' 
-                        ? `<button class="details-button" onclick="event.stopPropagation(); showSkillDetails('${escapeHtml(skill.details).replace(/'/g, "\\'")}');">📝 Подробно</button>`
-                        : `<button class="details-button" onclick="event.stopPropagation(); showSkillDetails('');">📝 Подробно</button>`;
                     
                     return `
                     <div class="skill-card">
@@ -5291,19 +5314,21 @@
                         
                         ${cityInfo}
                         
+                        <div class="skill-user-row">
+                            <div class="skill-user-name">
+                                <span>👤</span> <span>${skill.username}</span>
+                            </div>
+                            <button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">
+                                📝 Подробно
+                            </button>
+                        </div>
+                        
                         <div class="skill-contact-info">
                             <div class="contact-label">📞 Контакты:</div>
                             <div class="contact-item">
                                 <span class="contact-icon">📱</span>
                                 <span class="contact-text">${skill.experience || 'Не указано'}</span>
                             </div>
-                        </div>
-                        
-                        <div class="skill-user-row">
-                            <div class="skill-user-name">
-                                👤 ${skill.username}
-                            </div>
-                            ${detailsButton}
                         </div>
                         
                         ${skill.photo ? `
@@ -5375,6 +5400,7 @@
                                         skill.status = globalSkill.status;
                                     }
                                 }
+                                if (globalSkill.details) skill.details = globalSkill.details;
                                 if (globalSkill.qrCode) skill.qrCode = globalSkill.qrCode;
                                 if (globalSkill.qrCodeData) skill.qrCodeData = globalSkill.qrCodeData;
                             }
@@ -5420,9 +5446,6 @@
                     const statusBadge = getStatusBadge(skill.status);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
                     const cityInfo = skill.city ? `<div class="city-info" style="background: rgba(102,126,234,0.08); margin: 10px 0; padding: 8px 12px; border-radius: 8px; font-size: 14px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
-                    const detailsButton = skill.details && skill.details.trim() !== '' 
-                        ? `<button class="details-button" onclick="event.stopPropagation(); showSkillDetails('${escapeHtml(skill.details).replace(/'/g, "\\'")}');">📝 Подробно</button>`
-                        : `<button class="details-button" onclick="event.stopPropagation(); showSkillDetails('');">📝 Подробно</button>`;
                     
                     return `
                     <div class="profile-skill-card">
@@ -5440,18 +5463,20 @@
                         
                         ${cityInfo}
                         
+                        <div class="skill-user-row">
+                            <div class="skill-user-name">
+                                <span>👤</span> <span>${skill.username}</span>
+                            </div>
+                            <button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">
+                                📝 Подробно
+                            </button>
+                        </div>
+                        
                         <div class="skill-contact-info">
                             <div class="contact-item">
                                 <span class="contact-icon">📱</span>
                                 <span class="contact-text">${skill.experience || 'Не указано'}</span>
                             </div>
-                        </div>
-                        
-                        <div class="skill-user-row">
-                            <div class="skill-user-name">
-                                👤 ${skill.username}
-                            </div>
-                            ${detailsButton}
                         </div>
                         
                         ${skill.photo ? `
@@ -5582,7 +5607,7 @@
             
             const skillData = {
                 skill: skillName.trim(),
-                details: skillDetails.trim() || '',
+                details: skillDetails ? skillDetails.trim() : '',
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
                 city: skillCity.trim(),
@@ -5924,10 +5949,6 @@
             </div>
         ` : '';
         
-        const detailsButton = skill.details && skill.details.trim() !== '' 
-            ? `<button class="details-button" style="background: rgba(102,126,234,0.15); border: none; padding: 4px 10px; border-radius: 20px; font-size: 11px; margin-left: 10px;" onclick="event.stopPropagation(); showSkillDetails('${escapeHtml(skill.details).replace(/'/g, "\\'")}');">📝 Подробно</button>`
-            : `<button class="details-button" style="background: rgba(102,126,234,0.15); border: none; padding: 4px 10px; border-radius: 20px; font-size: 11px; margin-left: 10px;" onclick="event.stopPropagation(); showSkillDetails('');">📝 Подробно</button>`;
-        
         return `
             <div class="map-popup-content">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
@@ -5936,10 +5957,7 @@
                     </div>
                     <div style="flex: 1;">
                         <h3 style="margin: 0; color: #2d3748; font-size: 16px;">${skill.skill}</h3>
-                        <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 5px;">
-                            <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
-                            ${detailsButton}
-                        </div>
+                        <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
                     </div>
                     ${photoThumbnail}
                 </div>
@@ -5952,6 +5970,15 @@
                     ${statusBadge}
                     
                     ${cityInfo}
+                    
+                    <div class="skill-user-row" style="margin: 10px 0;">
+                        <div class="skill-user-name">
+                            <span>👤</span> <span>${skill.username}</span>
+                        </div>
+                        <button class="details-button" onclick="event.stopPropagation(); window.openDetailsModal('${skill._id}');">
+                            📝 Подробно
+                        </button>
+                    </div>
                     
                     <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px; border: 1px solid rgba(102,126,234,0.1);">
                         <div style="font-weight: 600; color: #667eea; margin-bottom: 5px; font-size: 14px;">📞 Контакты:</div>
@@ -6260,7 +6287,6 @@
         
         currentUserId = checkAndSetUserId();
         
-        // КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Загружаем все умейки при старте приложения
         console.log('📦 Начинаю предварительную загрузку всех умейек...');
         await preloadAllSkills();
         console.log('✅ Предварительная загрузка завершена');
@@ -6326,6 +6352,7 @@
                                 skill.status = globalSkill.status;
                             }
                         }
+                        if (globalSkill && globalSkill.details) skill.details = globalSkill.details;
                         if (!skill.qrCodeData) {
                             skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
                         }
@@ -6396,9 +6423,6 @@
                     const statusBadge = getStatusBadge(skill.status);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
                     const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
-                    const detailsButton = skill.details && skill.details.trim() !== '' 
-                        ? `<button class="details-button" onclick="event.stopPropagation(); showSkillDetails('${escapeHtml(skill.details).replace(/'/g, "\\'")}');">📝 Подробно</button>`
-                        : `<button class="details-button" onclick="event.stopPropagation(); showSkillDetails('');">📝 Подробно</button>`;
                     
                     return `
                     <div class="skill-card">
@@ -6413,19 +6437,21 @@
                         
                         ${cityInfo}
                         
+                        <div class="skill-user-row">
+                            <div class="skill-user-name">
+                                <span>👤</span> <span>${skill.username}</span>
+                            </div>
+                            <button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">
+                                📝 Подробно
+                            </button>
+                        </div>
+                        
                         <div class="skill-contact-info">
                             <div class="contact-label">📞 Контакты:</div>
                             <div class="contact-item">
                                 <span class="contact-icon">📱</span>
                                 <span class="contact-text">${skill.experience || 'Не указано'}</span>
                             </div>
-                        </div>
-                        
-                        <div class="skill-user-row">
-                            <div class="skill-user-name">
-                                👤 ${skill.username}
-                            </div>
-                            ${detailsButton}
                         </div>
                         
                         ${skill.photo ? `
