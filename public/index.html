@@ -3761,13 +3761,31 @@
         errorDiv.textContent = '';
     };
     
+    // ========== ИСПРАВЛЕННЫЙ ОБРАБОТЧИК ГЛУБОКИХ ССЫЛОК ==========
+    
+    /**
+     * Функция для обработки глубоких ссылок (deeplink)
+     * Поддерживает:
+     * - start=skill_XXX - для QR-кодов умейки
+     * - start=USER_ID (число) - для реферальных ссылок
+     */
     function handleDeepLink() {
+        console.log('🔗 [Deeplink] Начинаю обработку глубокой ссылки...');
+        
         const urlParams = new URLSearchParams(window.location.search);
         const startParam = urlParams.get('start');
         
-        if (startParam && startParam.startsWith('skill_')) {
+        if (!startParam) {
+            console.log('🔗 [Deeplink] Параметр start не найден');
+            return;
+        }
+        
+        console.log(`🔗 [Deeplink] Обнаружен параметр start: "${startParam}"`);
+        
+        // Обработка QR-кода умейки (формат: skill_XXX)
+        if (startParam.startsWith('skill_')) {
             const skillId = startParam.replace('skill_', '');
-            console.log('🔗 [Deeplink] Обнаружена ссылка для skill:', skillId);
+            console.log('🔗 [Deeplink] Обнаружена ссылка на умейку с ID:', skillId);
             
             const openSkill = async () => {
                 const skill = await getSkillById(skillId);
@@ -3777,6 +3795,7 @@
                     }, 1000);
                 } else {
                     console.error('❌ [Deeplink] Умейка не найдена');
+                    showNotification('❌ Умейка не найдена');
                 }
             };
             
@@ -3784,6 +3803,156 @@
                 openSkill();
             } else {
                 preloadAllSkills().then(openSkill);
+            }
+            return;
+        }
+        
+        // Обработка реферальной ссылки (формат: число - USER_ID)
+        // Проверяем, что это число (не начинается с букв)
+        if (/^\d+$/.test(startParam)) {
+            const referrerId = startParam;
+            console.log('🔗 [Deeplink] Обнаружена реферальная ссылка от пользователя:', referrerId);
+            
+            // Проверяем, что это не текущий пользователь
+            if (currentUserId && referrerId !== currentUserId) {
+                console.log('✅ [Deeplink] Реферальная ссылка от другого пользователя');
+                
+                // Открываем главный экран без модальных окон
+                showMainScreen();
+                
+                // Показываем уведомление о реферальном переходе
+                setTimeout(() => {
+                    showNotification('🎉 Вы перешли по реферальной ссылке! Зарегистрируйтесь, чтобы получить бонус.');
+                }, 500);
+            } else if (!currentUserId) {
+                console.log('✅ [Deeplink] Реферальная ссылка, пользователь ещё не инициализирован');
+                showMainScreen();
+            } else {
+                console.log('⚠️ [Deeplink] Реферальная ссылка ведёт на самого пользователя');
+            }
+            
+            // Обработка реферального перехода будет выполнена в processReferralLink()
+            return;
+        }
+        
+        console.log('🔗 [Deeplink] Неизвестный формат параметра start:', startParam);
+    }
+    
+    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ОБРАБОТКИ РЕФЕРАЛЬНЫХ ССЫЛОК ==========
+    
+    /**
+     * Функция для обработки реферальных ссылок
+     * Вызывается после инициализации пользователя
+     */
+    function processReferralLink() {
+        console.log('🎁 [Referral] Начинаю обработку реферальной ссылки...');
+        
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            // Поддерживаем оба варианта: ref и start
+            let referrerId = urlParams.get('ref') || urlParams.get('start');
+            
+            // Проверяем, что это не ссылка на умейку (skill_XXX)
+            if (referrerId && referrerId.startsWith('skill_')) {
+                console.log('🎁 [Referral] Это ссылка на умейку, а не реферальная');
+                return;
+            }
+            
+            // Проверяем, что это число (USER_ID)
+            if (referrerId && /^\d+$/.test(referrerId)) {
+                console.log(`🎁 [Referral] Найден реферер с ID: ${referrerId}`);
+                
+                // Проверяем, что реферер не равен текущему пользователю
+                if (currentUserId && referrerId !== currentUserId) {
+                    console.log(`✅ [Referral] Реферальный переход от ${referrerId} к ${currentUserId}`);
+                    
+                    // Добавляем друга в список приглашённых
+                    const userData = getOrCreateUserProfile(currentUserId);
+                    const friendName = userData.firstName || 'Пользователь';
+                    
+                    const referralData = getReferralData();
+                    
+                    // Проверяем, не добавлен ли уже этот друг
+                    const existingFriend = referralData.invitedFriends.find(f => f.id === referrerId);
+                    if (!existingFriend) {
+                        referralData.invitedFriends.push({
+                            id: referrerId,
+                            name: `Пользователь ${referrerId.slice(-4)}`,
+                            invitedAt: new Date().toISOString(),
+                            registered: true
+                        });
+                        referralData.referralCount += 1;
+                        referralData.starsEarned += 1;
+                        saveReferralData(referralData);
+                        
+                        console.log(`✅ [Referral] Друг ${referrerId} добавлен в список приглашённых`);
+                        
+                        // Показываем уведомление о получении бонуса
+                        setTimeout(() => {
+                            showNotification('🎉 Вы получили +1 звезду за реферальный переход!');
+                        }, 1000);
+                    } else {
+                        console.log(`⚠️ [Referral] Друг ${referrerId} уже был добавлен ранее`);
+                    }
+                    
+                    // Обновляем звёзды в профиле пользователя
+                    const userProfile = getOrCreateUserProfile(currentUserId);
+                    userProfile.stars = (userProfile.stars || 0) + 1;
+                    setLocalStorage(`user_${currentUserId}`, userProfile);
+                    
+                    // Обновляем статистику наградившего пользователя
+                    const referrerProfile = getOrCreateUserProfile(referrerId);
+                    referrerProfile.referralBonus = (referrerProfile.referralBonus || 0) + 1;
+                    setLocalStorage(`user_${referrerId}`, referrerProfile);
+                    
+                    console.log(`✅ [Referral] Бонус начислен: ${currentUserId} получил звезду, ${referrerId} получил бонус`);
+                    
+                } else if (!currentUserId) {
+                    console.log('⚠️ [Referral] currentUserId ещё не определён, откладываю обработку');
+                    // Сохраняем реферера для обработки после инициализации
+                    localStorage.setItem('pending_referrer', referrerId);
+                } else {
+                    console.log('⚠️ [Referral] Реферальная ссылка ведёт на самого пользователя');
+                }
+            } else {
+                console.log('🎁 [Referral] Параметр start не является числом или не найден');
+            }
+        } catch (error) {
+            console.error('❌ [Referral] Ошибка обработки реферальной ссылки:', error);
+        }
+    }
+    
+    /**
+     * Проверка отложенной реферальной ссылки
+     * Вызывается после полной инициализации пользователя
+     */
+    function checkPendingReferral() {
+        const pendingReferrer = localStorage.getItem('pending_referrer');
+        if (pendingReferrer && currentUserId) {
+            console.log(`🎁 [Referral] Обрабатываю отложенную реферальную ссылку от ${pendingReferrer}`);
+            localStorage.removeItem('pending_referrer');
+            
+            if (pendingReferrer !== currentUserId) {
+                const referralData = getReferralData();
+                const existingFriend = referralData.invitedFriends.find(f => f.id === pendingReferrer);
+                
+                if (!existingFriend) {
+                    referralData.invitedFriends.push({
+                        id: pendingReferrer,
+                        name: `Пользователь ${pendingReferrer.slice(-4)}`,
+                        invitedAt: new Date().toISOString(),
+                        registered: true
+                    });
+                    referralData.referralCount += 1;
+                    referralData.starsEarned += 1;
+                    saveReferralData(referralData);
+                    
+                    const userProfile = getOrCreateUserProfile(currentUserId);
+                    userProfile.stars = (userProfile.stars || 0) + 1;
+                    setLocalStorage(`user_${currentUserId}`, userProfile);
+                    
+                    showNotification('🎉 Вы получили +1 звезду за реферальный переход!');
+                }
             }
         }
     }
@@ -4659,27 +4828,6 @@
         }
         
         return false;
-    }
-
-    function processReferralLink() {
-        try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const referrerId = urlParams.get('ref') || urlParams.get('start');
-            
-            if (referrerId && referrerId !== currentUserId && !referrerId.startsWith('skill_')) {
-                const referrerData = getOrCreateUserProfile(referrerId);
-                
-                addReferralFriend(currentUserId, referrerData.firstName || 'Друг');
-                
-                setTimeout(() => {
-                    markFriendAsRegistered(currentUserId);
-                }, 1000);
-                
-                console.log(`✅ Пользователь ${currentUserId} зарегистрирован по реферальной ссылке от ${referrerId}`);
-            }
-        } catch (error) {
-            console.error('❌ Ошибка обработки реферальной ссылки:', error);
-        }
     }
 
     function getLocalStorage(key) {
@@ -6291,8 +6439,13 @@
         await preloadAllSkills();
         console.log('✅ Предварительная загрузка завершена');
         
+        // Обработка реферальной ссылки (теперь после инициализации пользователя)
         processReferralLink();
         
+        // Проверка отложенной реферальной ссылки
+        checkPendingReferral();
+        
+        // Обработка глубокой ссылки
         handleDeepLink();
         
         const tg = window.Telegram?.WebApp;
