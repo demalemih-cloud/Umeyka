@@ -621,117 +621,6 @@
             transition: all 0.3s ease;
         }
         
-        /* Стиль для кнопки "Подробно" */
-        .details-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(102, 126, 234, 0.15);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 20px;
-            padding: 4px 10px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #667eea;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-left: 8px;
-            gap: 4px;
-        }
-        
-        .details-button:hover {
-            background: rgba(102, 126, 234, 0.3);
-            transform: scale(1.02);
-        }
-        
-        .details-button:active {
-            transform: scale(0.98);
-        }
-        
-        .skill-user-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin: 15px 0 10px;
-        }
-        
-        .skill-user-name {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        /* Модальное окно для подробностей */
-        .details-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 5000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .details-modal-overlay.active {
-            display: flex;
-        }
-        
-        .details-modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            max-width: 400px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
-        
-        .details-modal-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2d3748;
-            margin-bottom: 15px;
-            padding-right: 30px;
-        }
-        
-        .details-modal-text {
-            color: #4a5568;
-            line-height: 1.6;
-            font-size: 15px;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        
-        .details-modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .details-modal-close:hover {
-            background: #f7fafc;
-        }
-        
         #map {
             height: 400px;
             border-radius: 15px;
@@ -2529,6 +2418,26 @@
             margin-top: 20px;
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
+        
+        .details-button {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+        }
+        
+        .details-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -2589,10 +2498,6 @@
                 <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
                 
                 <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
-                
-                <!-- НОВОЕ ПОЛЕ: Подробности -->
-                <textarea id="skillDetails" class="input-field" placeholder="📝 Подробности (например: Работаю с Apple, Samsung, Xiaomi. Есть запчасти в наличии.)" style="height: 80px; resize: vertical;"></textarea>
-                
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
                 
@@ -2600,6 +2505,8 @@
                     <input type="text" id="skillCity" class="input-field" placeholder="🏙️ Город (например: Евпатория)*" required autocomplete="off" oninput="handleCityInput(this.value)">
                     <div id="cityAutocompleteList" class="autocomplete-list"></div>
                 </div>
+                
+                <textarea id="skillDetails" class="input-field" placeholder="📝 Подробности (опционально)&#10;Например: выезжаю на дом, работаю с 9 до 21, гарантия 1 год и т.д." style="height: 100px; resize: vertical;"></textarea>
                 
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
@@ -3135,7 +3042,6 @@
             <input type="hidden" id="editSkillId">
             
             <input type="text" id="editSkillName" class="input-field" placeholder="Моё умение" required>
-            <textarea id="editSkillDetails" class="input-field" placeholder="📝 Подробности" style="height: 80px; resize: vertical;"></textarea>
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
             
@@ -3143,6 +3049,8 @@
                 <input type="text" id="editSkillCity" class="input-field" placeholder="🏙️ Город" required autocomplete="off" oninput="handleEditCityInput(this.value)">
                 <div id="editCityAutocompleteList" class="autocomplete-list"></div>
             </div>
+            
+            <textarea id="editSkillDetails" class="input-field" placeholder="📝 Подробности (опционально)&#10;Например: выезжаю на дом, работаю с 9 до 21, гарантия 1 год и т.д." style="height: 100px; resize: vertical;"></textarea>
             
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
@@ -3201,12 +3109,15 @@
     </div>
 
     <!-- МОДАЛЬНОЕ ОКНО ПОДРОБНОСТЕЙ -->
-    <div id="detailsModal" class="details-modal-overlay">
-        <div class="details-modal-content">
-            <button class="details-modal-close" onclick="closeDetailsModal();">×</button>
-            <div class="details-modal-title" id="detailsModalTitle">📝 Подробности</div>
-            <div class="details-modal-text" id="detailsModalText"></div>
-            <button class="modal-button modal-cancel" onclick="closeDetailsModal();" style="margin-top: 20px;">Закрыть</button>
+    <div id="detailsModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="triggerHapticFeedback(); closeDetailsModal();">×</button>
+            <div class="modal-title">📝 Подробности</div>
+            <div id="detailsContent" style="color: #2d3748; line-height: 1.6; font-size: 16px; white-space: pre-wrap; word-break: break-word;">
+            </div>
+            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeDetailsModal();" style="margin-top: 20px;">
+                Закрыть
+            </button>
         </div>
     </div>
 
@@ -3346,34 +3257,6 @@
     let logoClickCount = 0;
     let logoClickTimer = null;
 
-    // ========== ФУНКЦИЯ ДЛЯ ОТКРЫТИЯ МОДАЛЬНОГО ОКНА ПОДРОБНОСТЕЙ ==========
-    window.openDetailsModal = function(skillId) {
-        triggerHapticFeedback();
-        
-        const skill = getGlobalSkillById(skillId);
-        if (!skill) {
-            alert('❌ Умейка не найдена');
-            return;
-        }
-        
-        const detailsText = skill.details && skill.details.trim() ? skill.details.trim() : null;
-        
-        document.getElementById('detailsModalTitle').textContent = `📝 ${skill.skill}`;
-        
-        if (detailsText) {
-            document.getElementById('detailsModalText').innerHTML = detailsText.replace(/\n/g, '<br>');
-        } else {
-            document.getElementById('detailsModalText').innerHTML = '<span style="color: #999;">Мастер не добавил подробности</span>';
-        }
-        
-        document.getElementById('detailsModal').classList.add('active');
-    };
-    
-    window.closeDetailsModal = function() {
-        triggerHapticFeedback();
-        document.getElementById('detailsModal').classList.remove('active');
-    };
-    
     // ========== ИСПРАВЛЕННЫЙ QR-СКАНЕР ==========
     
     /**
@@ -3521,10 +3404,16 @@
     
     /**
      * ИСПРАВЛЕННАЯ функция обработки отсканированного QR-кода
+     * Основные улучшения:
+     * 1. Улучшенное извлечение ID
+     * 2. Поиск сначала в кэше, затем на сервере
+     * 3. Сканер закрывается ТОЛЬКО после успешного открытия модального окна
+     * 4. Подробное логирование для диагностики
      */
     async function handleScannedQRCode(qrData) {
         console.log('📱 [Сканер] Получен QR-код:', qrData);
         
+        // Показываем индикатор загрузки в модальном окне
         const errorDiv = document.getElementById('scannerError');
         errorDiv.style.display = 'block';
         errorDiv.style.background = 'rgba(72, 187, 120, 0.2)';
@@ -3532,6 +3421,7 @@
         errorDiv.textContent = '🔍 Обработка QR-кода...';
         
         try {
+            // Извлекаем skillId из QR-кода
             const skillId = extractSkillIdFromQR(qrData);
             
             if (!skillId) {
@@ -3542,6 +3432,7 @@
             
             console.log(`🎯 [Сканер] Найден ID: ${skillId}`);
             
+            // Ищем умейку
             const skill = await getSkillById(skillId);
             
             if (!skill) {
@@ -3552,6 +3443,7 @@
             
             console.log(`✅ [Сканер] Умейка найдена:`, skill);
             
+            // Останавливаем сканер ПЕРЕД открытием модального окна
             if (html5QrCode && html5QrCode.isScanning) {
                 try {
                     await html5QrCode.stop();
@@ -3561,15 +3453,19 @@
                 }
             }
             
+            // Закрываем модальное окно сканера
             const modal = document.getElementById('scannerModal');
             modal.classList.remove('active');
             
+            // Очищаем контейнер сканера
             const readerContainer = document.getElementById('qr-reader');
             if (readerContainer) {
                 readerContainer.innerHTML = '';
             }
             
+            // Небольшая задержка перед открытием модального окна с умейкой
             setTimeout(() => {
+                // Открываем карточку умейки
                 openSkillModal(skill);
             }, 300);
             
@@ -3579,9 +3475,47 @@
         }
     }
     
+    /**
+     * Функция открытия модального окна с подробностями умейки
+     */
+    function openDetailsModal(skillId) {
+        triggerHapticFeedback();
+        console.log('📝 [Подробности] Открываю detailsModal для skillId:', skillId);
+        
+        const skill = getGlobalSkillById(skillId);
+        if (!skill) {
+            console.warn('⚠️ [Подробности] Умейка не найдена:', skillId);
+            alert('Информация не найдена');
+            return;
+        }
+        
+        const detailsText = skill.details || 'Мастер не добавил подробности';
+        
+        const modal = document.getElementById('detailsModal');
+        const content = document.getElementById('detailsContent');
+        
+        content.innerHTML = detailsText.replace(/\n/g, '<br>');
+        modal.style.display = 'flex';
+    }
+    
+    /**
+     * Закрытие модального окна подробностей
+     */
+    function closeDetailsModal() {
+        triggerHapticFeedback();
+        const modal = document.getElementById('detailsModal');
+        modal.style.display = 'none';
+        document.getElementById('detailsContent').innerHTML = '';
+    }
+    
+    /**
+     * Открытие модального окна с информацией об умейке
+     * ИСПРАВЛЕНО: добавлен город и кнопка "Подробно"
+     */
     function openSkillModal(skill) {
         console.log('🪟 [Модалка] Открываю карточку умейки:', skill.skill);
         
+        // Проверяем, не открыто ли уже модальное окно
         const existingModal = document.querySelector('.skill-modal-overlay');
         if (existingModal) {
             existingModal.remove();
@@ -3593,7 +3527,20 @@
         modal.style.display = 'flex';
         
         const statusBadge = getStatusBadge(skill.status);
-        const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px 12px; background: #e6f3ff; border-radius: 8px; font-size: 14px;">📍 ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
+        
+        // Город в формате: 📍 {city} | 📍 {radius}км
+        const cityInfo = skill.city ? `
+            <div style="margin: 10px 0; padding: 10px 12px; background: #e6f3ff; border-radius: 10px; font-size: 15px; color: #2c5282;">
+                📍 ${skill.city} | 📍 ${skill.radius || 10} км
+            </div>
+        ` : '';
+        
+        // Кнопка "Подробно" отображается ТОЛЬКО если есть details
+        const detailsButton = (skill.details && skill.details.trim() !== '') ? `
+            <button class="details-button" onclick="triggerHapticFeedback(); openDetailsModal('${skill._id}'); this.closest('.modal-overlay').remove();">
+                📝 Подробно
+            </button>
+        ` : '';
         
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 450px; position: relative;">
@@ -3613,12 +3560,7 @@
                 ${cityInfo}
                 
                 <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                    <div class="skill-user-row">
-                        <div class="skill-user-name">
-                            <span>👤</span> <span>${escapeHtml(skill.username)}</span>
-                        </div>
-                        ${skill.details ? `<button class="details-button" onclick="event.stopPropagation(); window.openDetailsModal('${skill._id}');">📝 Подробно</button>` : ''}
-                    </div>
+                    <p style="color: #2d3748; margin: 8px 0;"><strong>👤 Мастер:</strong> ${escapeHtml(skill.username)}</p>
                     <p style="color: #2d3748; margin: 8px 0;"><strong>📞 Контакт:</strong> ${escapeHtml(skill.experience || 'Не указан')}</p>
                     ${skill.rating ? `<p style="color: #2d3748; margin: 8px 0;"><strong>⭐ Рейтинг:</strong> ${skill.rating.average?.toFixed(1) || '5.0'}/5</p>` : ''}
                 </div>
@@ -3630,6 +3572,7 @@
                 ` : ''}
                 
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                    ${detailsButton}
                     <button class="submit-button" onclick="triggerHapticFeedback(); this.closest('.modal-overlay').remove(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill)}', '${escapeHtml(skill.username)}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');" style="margin: 0;">
                         📝 Создать сделку
                     </button>
@@ -3641,6 +3584,8 @@
         `;
         
         document.body.appendChild(modal);
+        
+        // Вибрация при успешном открытии
         triggerHapticFeedback();
     }
     
@@ -3670,9 +3615,11 @@
         });
     }
     
+    // Обновленная функция открытия сканера
     window.openQRScanner = async function() {
         triggerHapticFeedback();
         
+        // Убеждаемся, что умейки загружены перед сканированием
         if (!isSkillsLoaded) {
             const errorDiv = document.getElementById('scannerError');
             errorDiv.style.display = 'block';
@@ -3695,17 +3642,21 @@
         
         modal.classList.add('active');
         
+        // Небольшая задержка для отображения модального окна
         setTimeout(async () => {
             try {
+                // Проверяем поддержку камеры
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                     throw new Error('Ваш браузер не поддерживает доступ к камере');
                 }
                 
+                // Очищаем контейнер перед инициализацией
                 const readerContainer = document.getElementById('qr-reader');
                 if (readerContainer) {
                     readerContainer.innerHTML = '';
                 }
                 
+                // Инициализируем сканер
                 html5QrCode = new Html5Qrcode("qr-reader");
                 
                 const config = {
@@ -3722,6 +3673,7 @@
                         handleScannedQRCode(decodedText);
                     },
                     (errorMessage) => {
+                        // Игнорируем ошибки во время сканирования
                         if (!errorMessage.includes('No MultiFormat Readers')) {
                             console.log('📷 [Сканер] Статус:', errorMessage);
                         }
@@ -3761,32 +3713,15 @@
         errorDiv.textContent = '';
     };
     
-    // ========== ИСПРАВЛЕННЫЙ ОБРАБОТЧИК ГЛУБОКИХ ССЫЛОК ==========
-    
-    /**
-     * Функция для обработки глубоких ссылок (deeplink)
-     * Поддерживает:
-     * - start=skill_XXX - для QR-кодов умейки
-     * - start=USER_ID (число) - для реферальных ссылок
-     */
     function handleDeepLink() {
-        console.log('🔗 [Deeplink] Начинаю обработку глубокой ссылки...');
-        
         const urlParams = new URLSearchParams(window.location.search);
         const startParam = urlParams.get('start');
         
-        if (!startParam) {
-            console.log('🔗 [Deeplink] Параметр start не найден');
-            return;
-        }
-        
-        console.log(`🔗 [Deeplink] Обнаружен параметр start: "${startParam}"`);
-        
-        // Обработка QR-кода умейки (формат: skill_XXX)
-        if (startParam.startsWith('skill_')) {
+        if (startParam && startParam.startsWith('skill_')) {
             const skillId = startParam.replace('skill_', '');
-            console.log('🔗 [Deeplink] Обнаружена ссылка на умейку с ID:', skillId);
+            console.log('🔗 [Deeplink] Обнаружена ссылка для skill:', skillId);
             
+            // Ждем загрузки умейок
             const openSkill = async () => {
                 const skill = await getSkillById(skillId);
                 if (skill) {
@@ -3795,7 +3730,6 @@
                     }, 1000);
                 } else {
                     console.error('❌ [Deeplink] Умейка не найдена');
-                    showNotification('❌ Умейка не найдена');
                 }
             };
             
@@ -3803,156 +3737,6 @@
                 openSkill();
             } else {
                 preloadAllSkills().then(openSkill);
-            }
-            return;
-        }
-        
-        // Обработка реферальной ссылки (формат: число - USER_ID)
-        // Проверяем, что это число (не начинается с букв)
-        if (/^\d+$/.test(startParam)) {
-            const referrerId = startParam;
-            console.log('🔗 [Deeplink] Обнаружена реферальная ссылка от пользователя:', referrerId);
-            
-            // Проверяем, что это не текущий пользователь
-            if (currentUserId && referrerId !== currentUserId) {
-                console.log('✅ [Deeplink] Реферальная ссылка от другого пользователя');
-                
-                // Открываем главный экран без модальных окон
-                showMainScreen();
-                
-                // Показываем уведомление о реферальном переходе
-                setTimeout(() => {
-                    showNotification('🎉 Вы перешли по реферальной ссылке! Зарегистрируйтесь, чтобы получить бонус.');
-                }, 500);
-            } else if (!currentUserId) {
-                console.log('✅ [Deeplink] Реферальная ссылка, пользователь ещё не инициализирован');
-                showMainScreen();
-            } else {
-                console.log('⚠️ [Deeplink] Реферальная ссылка ведёт на самого пользователя');
-            }
-            
-            // Обработка реферального перехода будет выполнена в processReferralLink()
-            return;
-        }
-        
-        console.log('🔗 [Deeplink] Неизвестный формат параметра start:', startParam);
-    }
-    
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ОБРАБОТКИ РЕФЕРАЛЬНЫХ ССЫЛОК ==========
-    
-    /**
-     * Функция для обработки реферальных ссылок
-     * Вызывается после инициализации пользователя
-     */
-    function processReferralLink() {
-        console.log('🎁 [Referral] Начинаю обработку реферальной ссылки...');
-        
-        try {
-            const urlParams = new URLSearchParams(window.location.search);
-            // Поддерживаем оба варианта: ref и start
-            let referrerId = urlParams.get('ref') || urlParams.get('start');
-            
-            // Проверяем, что это не ссылка на умейку (skill_XXX)
-            if (referrerId && referrerId.startsWith('skill_')) {
-                console.log('🎁 [Referral] Это ссылка на умейку, а не реферальная');
-                return;
-            }
-            
-            // Проверяем, что это число (USER_ID)
-            if (referrerId && /^\d+$/.test(referrerId)) {
-                console.log(`🎁 [Referral] Найден реферер с ID: ${referrerId}`);
-                
-                // Проверяем, что реферер не равен текущему пользователю
-                if (currentUserId && referrerId !== currentUserId) {
-                    console.log(`✅ [Referral] Реферальный переход от ${referrerId} к ${currentUserId}`);
-                    
-                    // Добавляем друга в список приглашённых
-                    const userData = getOrCreateUserProfile(currentUserId);
-                    const friendName = userData.firstName || 'Пользователь';
-                    
-                    const referralData = getReferralData();
-                    
-                    // Проверяем, не добавлен ли уже этот друг
-                    const existingFriend = referralData.invitedFriends.find(f => f.id === referrerId);
-                    if (!existingFriend) {
-                        referralData.invitedFriends.push({
-                            id: referrerId,
-                            name: `Пользователь ${referrerId.slice(-4)}`,
-                            invitedAt: new Date().toISOString(),
-                            registered: true
-                        });
-                        referralData.referralCount += 1;
-                        referralData.starsEarned += 1;
-                        saveReferralData(referralData);
-                        
-                        console.log(`✅ [Referral] Друг ${referrerId} добавлен в список приглашённых`);
-                        
-                        // Показываем уведомление о получении бонуса
-                        setTimeout(() => {
-                            showNotification('🎉 Вы получили +1 звезду за реферальный переход!');
-                        }, 1000);
-                    } else {
-                        console.log(`⚠️ [Referral] Друг ${referrerId} уже был добавлен ранее`);
-                    }
-                    
-                    // Обновляем звёзды в профиле пользователя
-                    const userProfile = getOrCreateUserProfile(currentUserId);
-                    userProfile.stars = (userProfile.stars || 0) + 1;
-                    setLocalStorage(`user_${currentUserId}`, userProfile);
-                    
-                    // Обновляем статистику наградившего пользователя
-                    const referrerProfile = getOrCreateUserProfile(referrerId);
-                    referrerProfile.referralBonus = (referrerProfile.referralBonus || 0) + 1;
-                    setLocalStorage(`user_${referrerId}`, referrerProfile);
-                    
-                    console.log(`✅ [Referral] Бонус начислен: ${currentUserId} получил звезду, ${referrerId} получил бонус`);
-                    
-                } else if (!currentUserId) {
-                    console.log('⚠️ [Referral] currentUserId ещё не определён, откладываю обработку');
-                    // Сохраняем реферера для обработки после инициализации
-                    localStorage.setItem('pending_referrer', referrerId);
-                } else {
-                    console.log('⚠️ [Referral] Реферальная ссылка ведёт на самого пользователя');
-                }
-            } else {
-                console.log('🎁 [Referral] Параметр start не является числом или не найден');
-            }
-        } catch (error) {
-            console.error('❌ [Referral] Ошибка обработки реферальной ссылки:', error);
-        }
-    }
-    
-    /**
-     * Проверка отложенной реферальной ссылки
-     * Вызывается после полной инициализации пользователя
-     */
-    function checkPendingReferral() {
-        const pendingReferrer = localStorage.getItem('pending_referrer');
-        if (pendingReferrer && currentUserId) {
-            console.log(`🎁 [Referral] Обрабатываю отложенную реферальную ссылку от ${pendingReferrer}`);
-            localStorage.removeItem('pending_referrer');
-            
-            if (pendingReferrer !== currentUserId) {
-                const referralData = getReferralData();
-                const existingFriend = referralData.invitedFriends.find(f => f.id === pendingReferrer);
-                
-                if (!existingFriend) {
-                    referralData.invitedFriends.push({
-                        id: pendingReferrer,
-                        name: `Пользователь ${pendingReferrer.slice(-4)}`,
-                        invitedAt: new Date().toISOString(),
-                        registered: true
-                    });
-                    referralData.referralCount += 1;
-                    referralData.starsEarned += 1;
-                    saveReferralData(referralData);
-                    
-                    const userProfile = getOrCreateUserProfile(currentUserId);
-                    userProfile.stars = (userProfile.stars || 0) + 1;
-                    setLocalStorage(`user_${currentUserId}`, userProfile);
-                    
-                    showNotification('🎉 Вы получили +1 звезду за реферальный переход!');
-                }
             }
         }
     }
@@ -4830,6 +4614,27 @@
         return false;
     }
 
+    function processReferralLink() {
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const referrerId = urlParams.get('ref') || urlParams.get('start');
+            
+            if (referrerId && referrerId !== currentUserId && !referrerId.startsWith('skill_')) {
+                const referrerData = getOrCreateUserProfile(referrerId);
+                
+                addReferralFriend(currentUserId, referrerData.firstName || 'Друг');
+                
+                setTimeout(() => {
+                    markFriendAsRegistered(currentUserId);
+                }, 1000);
+                
+                console.log(`✅ Пользователь ${currentUserId} зарегистрирован по реферальной ссылке от ${referrerId}`);
+            }
+        } catch (error) {
+            console.error('❌ Ошибка обработки реферальной ссылки:', error);
+        }
+    }
+
     function getLocalStorage(key) {
         try {
             const data = localStorage.getItem(key);
@@ -5198,10 +5003,10 @@
         
         try {
             const skillName = document.getElementById('skillName').value;
-            const skillDetails = document.getElementById('skillDetails').value;
             const skillExperience = document.getElementById('skillExperience').value;
             const skillPrice = document.getElementById('skillPrice').value;
             const skillCity = document.getElementById('skillCity').value;
+            const skillDetails = document.getElementById('skillDetails').value;
             
             if (!skillName.trim() || !skillExperience.trim() || !skillPrice || !skillCity.trim()) {
                 alert('❌ Заполните все обязательные поля (отмечены *)');
@@ -5231,7 +5036,6 @@
 
             const skillData = {
                 skill: skillName.trim(),
-                details: skillDetails ? skillDetails.trim() : '',
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
                 city: skillCity.trim(),
@@ -5239,7 +5043,8 @@
                 location: location,
                 userId: userId,
                 username: userData.firstName || 'Аноним',
-                status: currentMasterStatus
+                status: currentMasterStatus,
+                details: skillDetails.trim() || ''
             };
 
             console.log('📤 Отправляю данные на сервер:', skillData);
@@ -5286,10 +5091,10 @@
                         alert('✅ Умейка успешно опубликована!');
                         
                         document.getElementById('skillName').value = '';
-                        document.getElementById('skillDetails').value = '';
                         document.getElementById('skillExperience').value = '';
                         document.getElementById('skillPrice').value = '';
                         document.getElementById('skillCity').value = '';
+                        document.getElementById('skillDetails').value = '';
                         removeSkillPhoto();
                         currentSkillPhoto = null;
                         
@@ -5329,10 +5134,10 @@
             alert('✅ Умейка сохранена локально (сервер недоступен)');
             
             document.getElementById('skillName').value = '';
-            document.getElementById('skillDetails').value = '';
             document.getElementById('skillExperience').value = '';
             document.getElementById('skillPrice').value = '';
             document.getElementById('skillCity').value = '';
+            document.getElementById('skillDetails').value = '';
             removeSkillPhoto();
             currentSkillPhoto = null;
             
@@ -5397,7 +5202,6 @@
                                         skill.status = globalSkill.status;
                                     }
                                 }
-                                if (globalSkill.details) skill.details = globalSkill.details;
                                 if (globalSkill.qrCode) skill.qrCode = globalSkill.qrCode;
                                 if (globalSkill.qrCodeData) skill.qrCodeData = globalSkill.qrCodeData;
                             }
@@ -5462,21 +5266,16 @@
                         
                         ${cityInfo}
                         
-                        <div class="skill-user-row">
-                            <div class="skill-user-name">
-                                <span>👤</span> <span>${skill.username}</span>
-                            </div>
-                            <button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">
-                                📝 Подробно
-                            </button>
-                        </div>
-                        
                         <div class="skill-contact-info">
                             <div class="contact-label">📞 Контакты:</div>
                             <div class="contact-item">
                                 <span class="contact-icon">📱</span>
                                 <span class="contact-text">${skill.experience || 'Не указано'}</span>
                             </div>
+                        </div>
+                        
+                        <div style="color: #666; margin: 15px 0 20px;">
+                            👤 ${skill.username}
                         </div>
                         
                         ${skill.photo ? `
@@ -5548,7 +5347,6 @@
                                         skill.status = globalSkill.status;
                                     }
                                 }
-                                if (globalSkill.details) skill.details = globalSkill.details;
                                 if (globalSkill.qrCode) skill.qrCode = globalSkill.qrCode;
                                 if (globalSkill.qrCodeData) skill.qrCodeData = globalSkill.qrCodeData;
                             }
@@ -5611,15 +5409,6 @@
                         
                         ${cityInfo}
                         
-                        <div class="skill-user-row">
-                            <div class="skill-user-name">
-                                <span>👤</span> <span>${skill.username}</span>
-                            </div>
-                            <button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">
-                                📝 Подробно
-                            </button>
-                        </div>
-                        
                         <div class="skill-contact-info">
                             <div class="contact-item">
                                 <span class="contact-icon">📱</span>
@@ -5681,10 +5470,10 @@
             
             document.getElementById('editSkillId').value = skillId;
             document.getElementById('editSkillName').value = skill.skill || '';
-            document.getElementById('editSkillDetails').value = skill.details || '';
             document.getElementById('editSkillExperience').value = skill.experience || '';
             document.getElementById('editSkillPrice').value = skill.price || '';
             document.getElementById('editSkillCity').value = skill.city || '';
+            document.getElementById('editSkillDetails').value = skill.details || '';
             
             currentEditRadius = skill.radius || 10;
             selectEditRadius(currentEditRadius);
@@ -5718,10 +5507,10 @@
         
         document.getElementById('editSkillId').value = '';
         document.getElementById('editSkillName').value = '';
-        document.getElementById('editSkillDetails').value = '';
         document.getElementById('editSkillExperience').value = '';
         document.getElementById('editSkillPrice').value = '';
         document.getElementById('editSkillCity').value = '';
+        document.getElementById('editSkillDetails').value = '';
         
         const preview = document.getElementById('editSkillPhotoPreview');
         preview.style.display = 'none';
@@ -5733,10 +5522,10 @@
         try {
             const skillId = document.getElementById('editSkillId').value;
             const skillName = document.getElementById('editSkillName').value;
-            const skillDetails = document.getElementById('editSkillDetails').value;
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
             const skillCity = document.getElementById('editSkillCity').value;
+            const skillDetails = document.getElementById('editSkillDetails').value;
             
             if (!skillId) {
                 alert('❌ Ошибка: не указан ID умейки');
@@ -5755,12 +5544,12 @@
             
             const skillData = {
                 skill: skillName.trim(),
-                details: skillDetails ? skillDetails.trim() : '',
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
                 city: skillCity.trim(),
                 radius: currentEditRadius,
                 status: currentEditMasterStatus,
+                details: skillDetails.trim() || '',
                 updatedAt: new Date().toISOString()
             };
             
@@ -6097,6 +5886,12 @@
             </div>
         ` : '';
         
+        const detailsButton = (skill.details && skill.details.trim() !== '') ? `
+            <button onclick="triggerHapticFeedback(); openDetailsModal('${skill._id}');" class="map-skill-button map-details-button">
+                📝 Подробно
+            </button>
+        ` : '';
+        
         return `
             <div class="map-popup-content">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
@@ -6119,15 +5914,6 @@
                     
                     ${cityInfo}
                     
-                    <div class="skill-user-row" style="margin: 10px 0;">
-                        <div class="skill-user-name">
-                            <span>👤</span> <span>${skill.username}</span>
-                        </div>
-                        <button class="details-button" onclick="event.stopPropagation(); window.openDetailsModal('${skill._id}');">
-                            📝 Подробно
-                        </button>
-                    </div>
-                    
                     <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px; border: 1px solid rgba(102,126,234,0.1);">
                         <div style="font-weight: 600; color: #667eea; margin-bottom: 5px; font-size: 14px;">📞 Контакты:</div>
                         <div style="display:flex; align-items:center; gap:10px; margin:8px 0; padding: 8px; background: white; border-radius: 6px; border: 1px solid #e2e8f0;">
@@ -6147,6 +5933,7 @@
                             class="map-skill-button map-contact-button">
                         📞 Подробные контакты
                     </button>
+                    ${detailsButton}
                     ${isUserSkill ? `
                         <button onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');"
                                 class="map-skill-button map-edit-button">
@@ -6435,17 +6222,13 @@
         
         currentUserId = checkAndSetUserId();
         
+        // КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: Загружаем все умейки при старте приложения
         console.log('📦 Начинаю предварительную загрузку всех умейек...');
         await preloadAllSkills();
         console.log('✅ Предварительная загрузка завершена');
         
-        // Обработка реферальной ссылки (теперь после инициализации пользователя)
         processReferralLink();
         
-        // Проверка отложенной реферальной ссылки
-        checkPendingReferral();
-        
-        // Обработка глубокой ссылки
         handleDeepLink();
         
         const tg = window.Telegram?.WebApp;
@@ -6505,7 +6288,6 @@
                                 skill.status = globalSkill.status;
                             }
                         }
-                        if (globalSkill && globalSkill.details) skill.details = globalSkill.details;
                         if (!skill.qrCodeData) {
                             skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
                         }
@@ -6576,6 +6358,11 @@
                     const statusBadge = getStatusBadge(skill.status);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
                     const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
+                    const detailsButton = (skill.details && skill.details.trim() !== '') ? `
+                        <button class="details-button" style="margin-bottom: 10px;" onclick="triggerHapticFeedback(); openDetailsModal('${skill._id}');">
+                            📝 Подробно
+                        </button>
+                    ` : '';
                     
                     return `
                     <div class="skill-card">
@@ -6590,15 +6377,6 @@
                         
                         ${cityInfo}
                         
-                        <div class="skill-user-row">
-                            <div class="skill-user-name">
-                                <span>👤</span> <span>${skill.username}</span>
-                            </div>
-                            <button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">
-                                📝 Подробно
-                            </button>
-                        </div>
-                        
                         <div class="skill-contact-info">
                             <div class="contact-label">📞 Контакты:</div>
                             <div class="contact-item">
@@ -6612,6 +6390,12 @@
                                 <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
                             </div>
                         ` : ''}
+                        
+                        <div style="color: #666; margin: 15px 0 20px;">
+                            👤 ${skill.username}
+                        </div>
+                        
+                        ${detailsButton}
                         
                         <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');">
                             📞 Подробные контакты
