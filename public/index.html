@@ -2527,6 +2527,130 @@
             margin-top: 20px;
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
+
+        /* Стили для карточек визитки */
+        .visiting-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .visiting-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .visiting-card-qr {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .visiting-card-qr img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .visiting-card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+            padding-right: 95px;
+        }
+
+        .visiting-card-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: #48bb78;
+            margin: 10px 0;
+        }
+
+        .visiting-card-info {
+            color: #4a5568;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .visiting-card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .visiting-card-button {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .visiting-card-button.share {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+
+        .visiting-card-button.edit {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+        }
+
+        .visiting-card-button.delete {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: white;
+        }
+
+        .empty-visiting-card {
+            text-align: center;
+            padding: 50px 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            color: #2d3748;
+        }
+
+        .empty-visiting-card-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .empty-visiting-card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .visiting-card-actions {
+                flex-direction: column;
+            }
+            .visiting-card-qr {
+                width: 70px;
+                height: 70px;
+            }
+            .visiting-card-title {
+                font-size: 18px;
+                padding-right: 85px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2559,6 +2683,12 @@
                     <span class="button-icon">👤</span>
                     Личный кабинет
                 </button>
+                <!-- НОВАЯ КНОПКА ВИЗИТКА -->
+                <button class="main-button" onclick="triggerHapticFeedback(); showVisitingCard();" 
+                        style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);">
+                    <span class="button-icon">📇</span>
+                    Визитка
+                </button>
             </div>
             
             <div class="map-section">
@@ -2588,7 +2718,6 @@
                 
                 <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
                 
-                <!-- НОВОЕ ПОЛЕ: Подробности -->
                 <textarea id="skillDetails" class="input-field" placeholder="📝 Подробности (например: Работаю с Apple, Samsung, Xiaomi. Есть запчасти в наличии.)" style="height: 80px; resize: vertical;"></textarea>
                 
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
@@ -2687,7 +2816,6 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
                 
-                <!-- Профиль пользователя -->
                 <div id="userProfile">
                     <div style="text-align: center; margin-bottom: 20px;">
                         <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">
@@ -2699,7 +2827,6 @@
                     </div>
                 </div>
                 
-                <!-- ГЛАВНЫЕ КНОПКИ ЛК (в стиле главного экрана) -->
                 <div class="profile-main-buttons">
                     <button class="profile-button button-edit-profile" onclick="triggerHapticFeedback(); editProfile();">
                         <span class="button-icon">✏️</span>
@@ -2732,7 +2859,6 @@
                     </button>
                 </div>
                 
-                <!-- Вкладки личного кабинета (скрытые, открываются по кнопкам) -->
                 <div style="display: none;">
                     <div class="tab-buttons">
                         <button class="tab-button active" onclick="triggerHapticFeedback(); showProfileTab('stats');" id="statsTab">
@@ -2750,13 +2876,11 @@
                     </div>
                 </div>
                 
-                <!-- Статистика -->
                 <div id="profileStats" class="profile-tab">
                     <h3 style="margin-bottom: 15px; text-align: center;">📊 Моя статистика</h3>
                     <div id="userStats" class="stats-grid"></div>
                 </div>
                 
-                <!-- Мои умейки -->
                 <div id="profileSkills" class="profile-tab" style="display: none;">
                     <h3 style="margin-bottom: 15px; text-align: center;">✨ Мои умейки</h3>
                     <div id="profileSkillsList"></div>
@@ -2767,7 +2891,6 @@
                     </button>
                 </div>
                 
-                <!-- Сделки -->
                 <div id="profileDeals" class="profile-tab" style="display: none;">
                     <h3 style="margin-bottom: 15px; text-align: center;">📝 Мои сделки</h3>
                     
@@ -2795,7 +2918,6 @@
                     <div id="dealsList"></div>
                 </div>
                 
-                <!-- РЕФЕРАЛЬНАЯ ПРОГРАММА -->
                 <div id="profileReferral" class="profile-tab" style="display: none;">
                     <div class="referral-section">
                         <div class="referral-title">
@@ -2894,7 +3016,6 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">💰 Мои финансы</h2>
                 
-                <!-- Кошелек -->
                 <div class="wallet-section">
                     <div class="wallet-title">
                         💳 Мой кошелек
@@ -3122,6 +3243,19 @@
                 </div>
             </div>
         </div>
+
+        <!-- СЕКЦИЯ ВИЗИТКИ -->
+        <div id="visitingCardSection" class="section">
+            <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">📇 Моя визитка</h2>
+                <div id="visitingCardList"></div>
+                <button class="main-button" onclick="triggerHapticFeedback(); showSection('masterSection');" style="margin-top: 20px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                    <span class="button-icon">➕</span>
+                    Добавить новую умейку
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ УМЕЙКИ -->
@@ -3340,7 +3474,6 @@
     let isSkillsLoaded = false;
     let globalSkillsCache = [];
     
-    // Счетчик кликов по логотипу для открытия админ-панели
     let logoClickCount = 0;
     let logoClickTimer = null;
 
@@ -3374,22 +3507,16 @@
     
     // ========== ИСПРАВЛЕННЫЙ QR-СКАНЕР ==========
     
-    /**
-     * Функция для предварительной загрузки всех умейок при старте приложения
-     * Это ключевое исправление - умейки загружаются в глобальное хранилище ДО сканирования
-     */
     async function preloadAllSkills() {
         console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейок...');
         
         try {
-            // Загружаем умейки с сервера
             const response = await fetch(`${API_URL}/api/skills`);
             const result = await response.json();
             
             if (result.success && result.skills) {
                 console.log(`✅ [Загрузка] Загружено ${result.skills.length} умейок с сервера`);
                 
-                // Сохраняем в глобальное хранилище
                 const globalSkills = getGlobalSkills();
                 result.skills.forEach(skill => {
                     const existingIndex = globalSkills.findIndex(s => s._id === skill._id);
@@ -3401,13 +3528,11 @@
                 });
                 setGlobalSkills(globalSkills);
                 
-                // Обновляем кэш
                 globalSkillsCache = globalSkills;
                 isSkillsLoaded = true;
                 
                 console.log(`💾 [Загрузка] Глобальное хранилище содержит ${globalSkills.length} умейок`);
                 
-                // Выводим список ID для отладки
                 console.log('📋 [Загрузка] ID всех умейок:', globalSkills.map(s => s._id));
                 
                 return globalSkills;
@@ -3423,15 +3548,9 @@
         }
     }
     
-    /**
-     * Функция для получения умейки по ID с приоритетом:
-     * 1. Глобальное хранилище (кэш)
-     * 2. Прямой запрос к серверу
-     */
     async function getSkillById(skillId) {
         console.log(`🔍 [Поиск] Ищу умейку с ID: ${skillId}`);
         
-        // 1. Сначала проверяем глобальное хранилище
         let skill = getGlobalSkillById(skillId);
         
         if (skill) {
@@ -3439,7 +3558,6 @@
             return skill;
         }
         
-        // 2. Если не нашли, пробуем загрузить с сервера напрямую
         console.log(`🔄 [Поиск] Умейка не найдена в кэше, запрашиваю с сервера...`);
         
         try {
@@ -3457,7 +3575,6 @@
                 if (result.success && result.skill) {
                     console.log(`✅ [Поиск] Умейка загружена с сервера:`, result.skill);
                     
-                    // Добавляем в глобальное хранилище для будущих запросов
                     addGlobalSkill(result.skill);
                     
                     return result.skill;
@@ -3475,13 +3592,9 @@
         }
     }
     
-    /**
-     * Извлечение skillId из QR-кода в различных форматах
-     */
     function extractSkillIdFromQR(qrData) {
         console.log(`🔧 [Парсинг] Извлекаю ID из: ${qrData}`);
         
-        // Формат 1: https://t.me/ymeyka_bot?start=skill_ID
         if (qrData.includes('start=skill_')) {
             const match = qrData.match(/start=skill_([^&]+)/);
             if (match && match[1]) {
@@ -3490,7 +3603,6 @@
             }
         }
         
-        // Формат 2: https://umeyka-oocn.onrender.com/skill/ID
         if (qrData.includes('/skill/')) {
             const match = qrData.match(/\/skill\/([^\/?]+)/);
             if (match && match[1]) {
@@ -3499,14 +3611,12 @@
             }
         }
         
-        // Формат 3: просто ID (24 символа, буквы и цифры)
         const simpleIdMatch = qrData.match(/^[a-zA-Z0-9]{24}$/);
         if (simpleIdMatch) {
             console.log(`✅ [Парсинг] Извлечен ID как простой строки: ${simpleIdMatch[0]}`);
             return simpleIdMatch[0];
         }
         
-        // Формат 4: ID может быть в конце URL после последнего слеша
         const lastSlashMatch = qrData.match(/\/([^\/]+)$/);
         if (lastSlashMatch && lastSlashMatch[1] && lastSlashMatch[1].length >= 20) {
             console.log(`✅ [Парсинг] Извлечен ID из конца URL: ${lastSlashMatch[1]}`);
@@ -3517,9 +3627,6 @@
         return null;
     }
     
-    /**
-     * ИСПРАВЛЕННАЯ функция обработки отсканированного QR-кода
-     */
     async function handleScannedQRCode(qrData) {
         console.log('📱 [Сканер] Получен QR-код:', qrData);
         
@@ -3577,41 +3684,33 @@
         }
     }
     
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ openSkillModal ==========
     function openSkillModal(skill) {
         console.log('🪟 [Модалка] Открываю карточку умейки:', skill.skill);
         
-        // Удаляем предыдущее модальное окно, если оно есть
         const existingModal = document.querySelector('.skill-modal-overlay');
         if (existingModal) {
             existingModal.remove();
         }
         
-        // Создаём новое модальное окно
         const modal = document.createElement('div');
         modal.className = 'modal-overlay skill-modal-overlay';
         modal.style.zIndex = '5000';
         modal.style.display = 'flex';
         
-        // Получаем статус-бейдж
         const statusBadge = getStatusBadge(skill.status);
         
-        // --- ДОБАВЛЯЕМ ИНФОРМАЦИЮ О ГОРОДЕ ---
-        // Формат: 📍 {city} | 📍 {radius}км
         const cityInfo = skill.city 
             ? `<div style="margin: 10px 0; padding: 8px 12px; background: #e6f3ff; border-radius: 8px; font-size: 14px; color: #2d3748;">
                    📍 ${escapeHtml(skill.city)} | 📍 ${skill.radius || 10}км
                </div>` 
             : '';
         
-        // --- ДОБАВЛЯЕМ КНОПКУ "ПОДРОБНО" (ТОЛЬКО ЕСЛИ ЕСТЬ ТЕКСТ) ---
         const detailsButtonHtml = skill.details && skill.details.trim() 
             ? `<button class="details-button" onclick="event.stopPropagation(); window.openDetailsModal('${skill._id}');" style="margin-left: 0; margin-top: 5px;">
                    📝 Подробно
                </button>`
             : '';
         
-        // Формируем HTML модального окна
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 450px; position: relative;">
                 <button class="modal-close" onclick="this.closest('.modal-overlay').remove();">×</button>
@@ -3778,14 +3877,136 @@
         errorDiv.textContent = '';
     };
     
-    // ========== ИСПРАВЛЕННЫЙ ОБРАБОТЧИК ГЛУБОКИХ ССЫЛОК ==========
+    // ========== ФУНКЦИИ ВИЗИТКИ ==========
     
-    /**
-     * Функция для обработки глубоких ссылок (deeplink)
-     * Поддерживает:
-     * - start=skill_XXX - для QR-кодов умейки
-     * - start=USER_ID (число) - для реферальных ссылок
-     */
+    window.showVisitingCard = function() {
+        triggerHapticFeedback();
+        showSection('visitingCardSection');
+        loadVisitingCard();
+    };
+    
+    function loadVisitingCard() {
+        console.log('📇 Загрузка визитки пользователя');
+        
+        const container = document.getElementById('visitingCardList');
+        if (!container) return;
+        
+        const globalSkills = getGlobalSkills();
+        const userSkills = globalSkills.filter(skill => skill.userId === currentUserId);
+        
+        console.log(`📇 Найдено ${userSkills.length} умейок пользователя`);
+        
+        if (userSkills.length === 0) {
+            container.innerHTML = `
+                <div class="empty-visiting-card">
+                    <div class="empty-visiting-card-icon">📇</div>
+                    <div class="empty-visiting-card-title">У вас пока нет умейок в визитке</div>
+                    <button class="main-button" onclick="triggerHapticFeedback(); showSection('masterSection');" style="margin-top: 20px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                        <span class="button-icon">➕</span>
+                        Добавить первую умейку
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = userSkills.map(skill => {
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`${TELEGRAM_BOT_URL}?start=skill_${skill._id}`)}`;
+            const shareLink = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+            const statusBadge = getStatusBadge(skill.status);
+            const cityInfo = skill.city ? `<div class="visiting-card-info">🏙️ ${escapeHtml(skill.city)} | 📍 ${skill.radius || 10}км</div>` : '';
+            
+            return `
+                <div class="visiting-card" data-skill-id="${skill._id}">
+                    <div class="visiting-card-qr">
+                        <img src="${qrUrl}" alt="QR-код умейки">
+                    </div>
+                    <div class="visiting-card-title">${escapeHtml(skill.skill)}</div>
+                    <div class="visiting-card-price">${skill.price} ₽</div>
+                    ${statusBadge}
+                    ${cityInfo}
+                    <div class="visiting-card-info">📞 ${escapeHtml(skill.experience || 'Контакт не указан')}</div>
+                    ${skill.photo ? `<div style="margin: 10px 0;"><img src="${skill.photo}" style="width: 100%; border-radius: 10px; max-height: 150px; object-fit: cover;"></div>` : ''}
+                    <div class="visiting-card-actions">
+                        <button class="visiting-card-button share" onclick="triggerHapticFeedback(); shareSkill('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}');">
+                            📤 Поделиться
+                        </button>
+                        <button class="visiting-card-button edit" onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');">
+                            ✏️ Редактировать
+                        </button>
+                        <button class="visiting-card-button delete" onclick="triggerHapticFeedback(); deleteFromVisitingCard('${skill._id}');">
+                            🗑️ Удалить из визитки
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    window.shareSkill = function(skillId, skillName) {
+        triggerHapticFeedback();
+        
+        const shareLink = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
+        const shareText = `Посмотрите мою умейку "${skillName}" в Ymeyka! ${shareLink}`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: skillName,
+                text: shareText,
+                url: shareLink
+            }).catch(err => console.log('Share canceled:', err));
+        } else {
+            const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareLink)}&text=${encodeURIComponent(shareText)}`;
+            window.open(tgShareUrl, '_blank');
+        }
+    };
+    
+    window.deleteFromVisitingCard = async function(skillId) {
+        triggerHapticFeedback();
+        
+        if (!confirm('🗑️ Удалить эту умейку из визитки? Умейка будет полностью удалена.')) {
+            return;
+        }
+        
+        try {
+            let deleteSuccess = false;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        deleteSuccess = true;
+                        console.log('✅ Умейка удалена с сервера');
+                    }
+                }
+            } catch (serverError) {
+                console.log('⚠️ Сервер недоступен, удаляем локально');
+            }
+            
+            deleteSkillFromLocalStorage(skillId);
+            
+            const globalSkills = getGlobalSkills();
+            const updatedGlobalSkills = globalSkills.filter(s => s._id !== skillId);
+            setGlobalSkills(updatedGlobalSkills);
+            
+            await preloadAllSkills();
+            
+            loadVisitingCard();
+            
+            showNotification('✅ Умейка удалена из визитки');
+            
+        } catch (error) {
+            console.error('❌ Ошибка удаления умейки:', error);
+            alert('❌ Ошибка удаления умейки');
+        }
+    };
+    
+    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
+    
     function handleDeepLink() {
         console.log('🔗 [Deeplink] Начинаю обработку глубокой ссылки...');
         
@@ -3799,7 +4020,6 @@
         
         console.log(`🔗 [Deeplink] Обнаружен параметр start: "${startParam}"`);
         
-        // Обработка QR-кода умейки (формат: skill_XXX)
         if (startParam.startsWith('skill_')) {
             const skillId = startParam.replace('skill_', '');
             console.log('🔗 [Deeplink] Обнаружена ссылка на умейку с ID:', skillId);
@@ -3824,20 +4044,15 @@
             return;
         }
         
-        // Обработка реферальной ссылки (формат: число - USER_ID)
-        // Проверяем, что это число (не начинается с букв)
         if (/^\d+$/.test(startParam)) {
             const referrerId = startParam;
             console.log('🔗 [Deeplink] Обнаружена реферальная ссылка от пользователя:', referrerId);
             
-            // Проверяем, что это не текущий пользователь
             if (currentUserId && referrerId !== currentUserId) {
                 console.log('✅ [Deeplink] Реферальная ссылка от другого пользователя');
                 
-                // Открываем главный экран без модальных окон
                 showMainScreen();
                 
-                // Показываем уведомление о реферальном переходе
                 setTimeout(() => {
                     showNotification('🎉 Вы перешли по реферальной ссылке! Зарегистрируйтесь, чтобы получить бонус.');
                 }, 500);
@@ -3848,48 +4063,35 @@
                 console.log('⚠️ [Deeplink] Реферальная ссылка ведёт на самого пользователя');
             }
             
-            // Обработка реферального перехода будет выполнена в processReferralLink()
             return;
         }
         
         console.log('🔗 [Deeplink] Неизвестный формат параметра start:', startParam);
     }
     
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ОБРАБОТКИ РЕФЕРАЛЬНЫХ ССЫЛОК ==========
-    
-    /**
-     * Функция для обработки реферальных ссылок
-     * Вызывается после инициализации пользователя
-     */
     function processReferralLink() {
         console.log('🎁 [Referral] Начинаю обработку реферальной ссылки...');
         
         try {
             const urlParams = new URLSearchParams(window.location.search);
-            // Поддерживаем оба варианта: ref и start
             let referrerId = urlParams.get('ref') || urlParams.get('start');
             
-            // Проверяем, что это не ссылка на умейку (skill_XXX)
             if (referrerId && referrerId.startsWith('skill_')) {
                 console.log('🎁 [Referral] Это ссылка на умейку, а не реферальная');
                 return;
             }
             
-            // Проверяем, что это число (USER_ID)
             if (referrerId && /^\d+$/.test(referrerId)) {
                 console.log(`🎁 [Referral] Найден реферер с ID: ${referrerId}`);
                 
-                // Проверяем, что реферер не равен текущему пользователю
                 if (currentUserId && referrerId !== currentUserId) {
                     console.log(`✅ [Referral] Реферальный переход от ${referrerId} к ${currentUserId}`);
                     
-                    // Добавляем друга в список приглашённых
                     const userData = getOrCreateUserProfile(currentUserId);
                     const friendName = userData.firstName || 'Пользователь';
                     
                     const referralData = getReferralData();
                     
-                    // Проверяем, не добавлен ли уже этот друг
                     const existingFriend = referralData.invitedFriends.find(f => f.id === referrerId);
                     if (!existingFriend) {
                         referralData.invitedFriends.push({
@@ -3904,7 +4106,6 @@
                         
                         console.log(`✅ [Referral] Друг ${referrerId} добавлен в список приглашённых`);
                         
-                        // Показываем уведомление о получении бонуса
                         setTimeout(() => {
                             showNotification('🎉 Вы получили +1 звезду за реферальный переход!');
                         }, 1000);
@@ -3912,12 +4113,10 @@
                         console.log(`⚠️ [Referral] Друг ${referrerId} уже был добавлен ранее`);
                     }
                     
-                    // Обновляем звёзды в профиле пользователя
                     const userProfile = getOrCreateUserProfile(currentUserId);
                     userProfile.stars = (userProfile.stars || 0) + 1;
                     setLocalStorage(`user_${currentUserId}`, userProfile);
                     
-                    // Обновляем статистику наградившего пользователя
                     const referrerProfile = getOrCreateUserProfile(referrerId);
                     referrerProfile.referralBonus = (referrerProfile.referralBonus || 0) + 1;
                     setLocalStorage(`user_${referrerId}`, referrerProfile);
@@ -3926,7 +4125,6 @@
                     
                 } else if (!currentUserId) {
                     console.log('⚠️ [Referral] currentUserId ещё не определён, откладываю обработку');
-                    // Сохраняем реферера для обработки после инициализации
                     localStorage.setItem('pending_referrer', referrerId);
                 } else {
                     console.log('⚠️ [Referral] Реферальная ссылка ведёт на самого пользователя');
@@ -3939,10 +4137,6 @@
         }
     }
     
-    /**
-     * Проверка отложенной реферальной ссылки
-     * Вызывается после полной инициализации пользователя
-     */
     function checkPendingReferral() {
         const pendingReferrer = localStorage.getItem('pending_referrer');
         if (pendingReferrer && currentUserId) {
@@ -6301,6 +6495,7 @@
         document.getElementById('editProfileSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
+        document.getElementById('visitingCardSection').style.display = 'none';
         document.querySelector('.map-section').classList.remove('map-active');
     };
     
@@ -6319,6 +6514,7 @@
         document.getElementById('editProfileSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
+        document.getElementById('visitingCardSection').style.display = 'none';
         document.getElementById(sectionId).style.display = 'block';
         
         if (sectionId === 'masterSection') {
@@ -6408,7 +6604,6 @@
         return currentUserId;
     };
     
-    // ========== АДМИН-ПАНЕЛЬ (6 кликов по логотипу) ==========
     function initAdminAccess() {
         const logoHeader = document.getElementById('logoHeader');
         if (!logoHeader) return;
@@ -6438,8 +6633,6 @@
         window.open(adminUrl, '_blank');
     }
     
-    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (продолжение) ==========
-    
     document.addEventListener('DOMContentLoaded', async function() {
         console.log('🚀 Ymeyka app loaded successfully!');
         
@@ -6456,13 +6649,10 @@
         await preloadAllSkills();
         console.log('✅ Предварительная загрузка завершена');
         
-        // Обработка реферальной ссылки (теперь после инициализации пользователя)
         processReferralLink();
         
-        // Проверка отложенной реферальной ссылки
         checkPendingReferral();
         
-        // Обработка глубокой ссылки
         handleDeepLink();
         
         const tg = window.Telegram?.WebApp;
@@ -7448,8 +7638,6 @@
         }
     };
 
-    // ========== ФУНКЦИИ ОТЗЫВОВ О ПРОЕКТЕ ==========
-    
     function getProjectReviews() {
         return getLocalStorage('umeyka_project_reviews') || [];
     }
@@ -7623,7 +7811,6 @@
         document.getElementById('reviewsModal').classList.remove('active');
     };
 
-    // ========== ФУНКЦИЯ УДАЛЕНИЯ СДЕЛКИ ==========
     window.deleteDeal = function(dealId) {
         triggerHapticFeedback();
         
