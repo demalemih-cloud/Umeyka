@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ymeyka - Мастера рядом</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -219,14 +219,11 @@
             margin-right: 8px;
         }
         
-        /* НОВАЯ СЕТКА 2x2 ДЛЯ ГЛАВНЫХ КНОПОК */
-        .main-buttons-grid {
+        .main-buttons {
             padding: 40px 20px 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            max-width: 500px;
-            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         
         .main-button {
@@ -244,8 +241,6 @@
             text-decoration: none;
             transition: all 0.3s ease;
             cursor: pointer;
-            min-height: 100px;
-            width: 100%;
         }
         
         .main-button:active {
@@ -258,23 +253,14 @@
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
         }
+
+        .button-master:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
+        }
         
         .button-client {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-        }
-        
-        .button-profile {
-            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(159, 122, 234, 0.3);
-        }
-        
-        .button-visitka {
-            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
         }
         
         .button-icon {
@@ -283,9 +269,7 @@
         }
         
         .map-section {
-            padding: 10px 20px 30px;
-            max-width: 500px;
-            margin: 0 auto;
+            padding: 20px;
         }
         
         .map-button {
@@ -299,11 +283,6 @@
             font-weight: 600;
             cursor: pointer;
             margin-bottom: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .map-button:active {
-            transform: scale(0.98);
         }
         
         .section {
@@ -2666,8 +2645,7 @@
                 </div>
             </div>
             
-            <!-- НОВАЯ СЕТКА 2x2 ДЛЯ КНОПОК -->
-            <div class="main-buttons-grid">
+            <div class="main-buttons">
                 <button class="main-button button-master" onclick="triggerHapticFeedback(); showSection('masterSection');">
                     <span class="button-icon">✨</span>
                     Я умейка
@@ -2676,10 +2654,12 @@
                     <span class="button-icon">🔍</span>
                     Я ищу
                 </button>
-                <button class="main-button button-profile" onclick="triggerHapticFeedback(); showProfileSection();">
+                <button class="main-button" onclick="triggerHapticFeedback(); showProfileSection();" 
+                        style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">
                     <span class="button-icon">👤</span>
                     Личный кабинет
                 </button>
+                <!-- НОВАЯ КНОПКА ВИЗИТКА -->
                 <button class="main-button button-visitka" onclick="triggerHapticFeedback(); openVisitkaModal();">
                     <span class="button-icon">🪪</span>
                     Визитка
