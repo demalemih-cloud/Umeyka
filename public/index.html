@@ -184,10 +184,29 @@
             backdrop-filter: blur(10px);
         }
         
-        .logo {
-            font-size: 50px;
+        /* Новый стилизованный логотип YM */
+        .logo-ym {
+            font-size: 72px;
+            font-weight: 800;
             margin-bottom: 10px;
+            display: inline-block;
+            background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            letter-spacing: 4px;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: transform 0.2s ease;
             pointer-events: none;
+        }
+        
+        /* Альтернативный вариант с обводкой, если градиент не подходит - просто белый */
+        @supports not (background-clip: text) {
+            .logo-ym {
+                color: white;
+                text-shadow: 0 2px 15px rgba(0,0,0,0.3);
+            }
         }
         
         .app-title {
@@ -2636,7 +2655,8 @@
             <div class="header" id="logoHeader">
                 <button class="qr-scanner-button" onclick="triggerHapticFeedback(); openQRScanner();">📷 Сканер</button>
                 <button class="about-button" onclick="triggerHapticFeedback(); showAboutSection();">ℹ️ О проекте</button>
-                <div class="logo">🤝✨</div>
+                <!-- НОВЫЙ ЛОГОТИП: YM вместо рукопожатия и звезд -->
+                <div class="logo-ym">YM</div>
                 <div class="app-title">Ymeyka</div>
                 <div class="app-description">Мастера на все руки рядом с вами</div>
                 <div class="rating">
