@@ -361,71 +361,7 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
             transition: all 0.3s ease;
         }
-        
-        /* Стили для карты выбора местоположения */
-        .location-map-container {
-            margin: 20px 0;
-            border-radius: 15px;
-            overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.3);
-        }
-        
-        .location-map {
-            height: 300px;
-            width: 100%;
-        }
-        
-        .location-info {
-            background: rgba(255,255,255,0.15);
-            padding: 12px;
-            border-radius: 10px;
-            margin: 10px 0;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .location-coords {
-            font-family: monospace;
-            opacity: 0.9;
-        }
-        
-        .use-current-location {
-            background: rgba(72, 187, 120, 0.3);
-            border: 1px solid rgba(72, 187, 120, 0.6);
-            padding: 8px 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s ease;
-        }
-        
-        .use-current-location:hover {
-            background: rgba(72, 187, 120, 0.5);
-        }
-        
-        .radius-visualization {
-            margin: 15px 0;
-            text-align: center;
-        }
-        
-        .radius-circle-preview {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: rgba(102, 126, 234, 0.3);
-            border: 2px solid #667eea;
-            margin: 0 auto 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: white;
-        }
-        
+
         .master-status {
             display: inline-flex;
             align-items: center;
@@ -2691,29 +2627,6 @@
         .visitka-skill-detail-modal.active {
             display: flex;
         }
-        
-        /* Стили для выбора местоположения на карте */
-        .location-selection-marker {
-            filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
-        }
-        
-        .radius-circle {
-            stroke: #667eea;
-            stroke-width: 2;
-            fill: rgba(102, 126, 234, 0.1);
-            pointer-events: none;
-        }
-        
-        .radius-label {
-            background: rgba(102, 126, 234, 0.9);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-            white-space: nowrap;
-            border: 1px solid white;
-        }
     </style>
 </head>
 <body>
@@ -2746,6 +2659,7 @@
                     <span class="button-icon">👤</span>
                     Личный кабинет
                 </button>
+                <!-- НОВАЯ КНОПКА ВИЗИТКА -->
                 <button class="main-button button-visitka" onclick="triggerHapticFeedback(); openVisitkaModal();">
                     <span class="button-icon">🪪</span>
                     Визитка
@@ -2754,7 +2668,7 @@
             
             <div class="map-section">
                 <button class="map-button" onclick="triggerHapticFeedback(); openMap();">
-                    🗺️ Поиск по карте
+                    🗺️ На карте
                 </button>
                 <div id="map"></div>
             </div>
@@ -2779,6 +2693,7 @@
                 
                 <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
                 
+                <!-- НОВОЕ ПОЛЕ: Подробности -->
                 <textarea id="skillDetails" class="input-field" placeholder="📝 Подробности (например: Работаю с Apple, Samsung, Xiaomi. Есть запчасти в наличии.)" style="height: 80px; resize: vertical;"></textarea>
                 
                 <input type="text" id="skillExperience" class="input-field" placeholder="📞 Мой контакт (например: +7 999 123-45-67)*" required>
@@ -2789,49 +2704,24 @@
                     <div id="cityAutocompleteList" class="autocomplete-list"></div>
                 </div>
                 
-                <!-- НОВЫЙ БЛОК: Карта для выбора местоположения -->
-                <div class="location-map-container">
-                    <div id="locationMap" class="location-map"></div>
-                    <div class="location-info">
-                        <div>
-                            📍 <span id="selectedLocationText">Местоположение не выбрано</span>
-                            <br>
-                            <span class="location-coords" id="selectedCoords"></span>
-                        </div>
-                        <div class="use-current-location" onclick="useCurrentLocationForMap();">
-                            📱 Моё местоположение
-                        </div>
-                    </div>
-                    <div class="radius-visualization">
-                        <div id="radiusCirclePreview" class="radius-circle-preview" style="width: 100px; height: 100px; border-radius: 50%;"></div>
-                        <div style="font-size: 12px;">🔵 Радиус: <span id="radiusPreviewValue">10</span> км</div>
-                    </div>
-                </div>
-                
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
                     <div class="radius-selector">
-                        <div class="radius-option" data-radius="1" onclick="triggerHapticFeedback(); selectRadius(1); updateRadiusPreview(1);">
-                            1 км
-                        </div>
-                        <div class="radius-option" data-radius="3" onclick="triggerHapticFeedback(); selectRadius(3); updateRadiusPreview(3);">
-                            3 км
-                        </div>
-                        <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectRadius(5); updateRadiusPreview(5);">
+                        <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectRadius(5);">
                             5 км
                         </div>
-                        <div class="radius-option selected" data-radius="10" onclick="triggerHapticFeedback(); selectRadius(10); updateRadiusPreview(10);">
+                        <div class="radius-option selected" data-radius="10" onclick="triggerHapticFeedback(); selectRadius(10);">
                             10 км
                         </div>
-                        <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectRadius(25); updateRadiusPreview(25);">
+                        <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectRadius(25);">
                             25 км
                         </div>
-                        <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectRadius(50); updateRadiusPreview(50);">
+                        <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectRadius(50);">
                             50 км
                         </div>
-                        <div class="radius-option" data-radius="100" onclick="triggerHapticFeedback(); selectRadius(100); updateRadiusPreview(100);">
-                            100 км
-                        </div>
+                    </div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
+                        Выберите радиус, в котором вы готовы работать
                     </div>
                 </div>
                 
@@ -2844,6 +2734,10 @@
                         <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectMasterStatus('busy');" id="statusBusyOption">
                             ⏰ Занят
                         </div>
+                    </div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
+                        Статус "Готов" - вы доступны для новых заказов<br>
+                        Статус "Занят" - временно не принимаете заказы
                     </div>
                 </div>
                 
@@ -2898,6 +2792,7 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
                 
+                <!-- Профиль пользователя -->
                 <div id="userProfile">
                     <div style="text-align: center; margin-bottom: 20px;">
                         <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">
@@ -2909,6 +2804,7 @@
                     </div>
                 </div>
                 
+                <!-- ГЛАВНЫЕ КНОПКИ ЛК (в стиле главного экрана) -->
                 <div class="profile-main-buttons">
                     <button class="profile-button button-edit-profile" onclick="triggerHapticFeedback(); editProfile();">
                         <span class="button-icon">✏️</span>
@@ -2941,6 +2837,7 @@
                     </button>
                 </div>
                 
+                <!-- Вкладки личного кабинета (скрытые, открываются по кнопкам) -->
                 <div style="display: none;">
                     <div class="tab-buttons">
                         <button class="tab-button active" onclick="triggerHapticFeedback(); showProfileTab('stats');" id="statsTab">
@@ -2958,11 +2855,13 @@
                     </div>
                 </div>
                 
+                <!-- Статистика -->
                 <div id="profileStats" class="profile-tab">
                     <h3 style="margin-bottom: 15px; text-align: center;">📊 Моя статистика</h3>
                     <div id="userStats" class="stats-grid"></div>
                 </div>
                 
+                <!-- Мои умейки -->
                 <div id="profileSkills" class="profile-tab" style="display: none;">
                     <h3 style="margin-bottom: 15px; text-align: center;">✨ Мои умейки</h3>
                     <div id="profileSkillsList"></div>
@@ -2973,6 +2872,7 @@
                     </button>
                 </div>
                 
+                <!-- Сделки -->
                 <div id="profileDeals" class="profile-tab" style="display: none;">
                     <h3 style="margin-bottom: 15px; text-align: center;">📝 Мои сделки</h3>
                     
@@ -3000,6 +2900,7 @@
                     <div id="dealsList"></div>
                 </div>
                 
+                <!-- РЕФЕРАЛЬНАЯ ПРОГРАММА -->
                 <div id="profileReferral" class="profile-tab" style="display: none;">
                     <div class="referral-section">
                         <div class="referral-title">
@@ -3091,12 +2992,14 @@
             </div>
         </div>
 
+        <!-- СЕКЦИЯ ФИНАНСОВ -->
         <div id="financeSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showProfileSection();">← Назад</button>
             
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">💰 Мои финансы</h2>
                 
+                <!-- Кошелек -->
                 <div class="wallet-section">
                     <div class="wallet-title">
                         💳 Мой кошелек
@@ -3144,6 +3047,7 @@
             </div>
         </div>
 
+        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
         <div id="editProfileSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showProfileSection();">← Назад</button>
     
@@ -3168,6 +3072,7 @@
             </div>
         </div>
 
+        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
         <div id="createDealSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showProfileSection();">← Назад</button>
             
@@ -3226,6 +3131,7 @@
             </div>
         </div>
 
+        <!-- РАЗДЕЛ "О ПРОЕКТЕ" -->
         <div id="aboutSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
             
@@ -3323,6 +3229,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ВИЗИТКИ -->
     <div id="visitkaModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 450px;">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeVisitkaModal();">×</button>
@@ -3348,6 +3255,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ВИЗИТКИ МАСТЕРА (при сканировании) -->
     <div id="masterVisitkaModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 450px;">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeMasterVisitkaModal();">×</button>
@@ -3365,6 +3273,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ УМЕЙКИ В ВИЗИТКЕ -->
     <div id="visitkaSkillDetailModal" class="visitka-skill-detail-modal">
         <div class="modal-content" style="max-width: 400px;">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeVisitkaSkillDetailModal();">×</button>
@@ -3384,6 +3293,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ УМЕЙКИ -->
     <div id="editSkillModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeEditSkillModal();">×</button>
@@ -3404,12 +3314,6 @@
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
                 <div class="radius-selector" style="background: #f7fafc;">
-                    <div class="radius-option" data-radius="1" onclick="triggerHapticFeedback(); selectEditRadius(1);">
-                        1 км
-                    </div>
-                    <div class="radius-option" data-radius="3" onclick="triggerHapticFeedback(); selectEditRadius(3);">
-                        3 км
-                    </div>
                     <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectEditRadius(5);">
                         5 км
                     </div>
@@ -3421,9 +3325,6 @@
                     </div>
                     <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectEditRadius(50);">
                         50 км
-                    </div>
-                    <div class="radius-option" data-radius="100" onclick="triggerHapticFeedback(); selectEditRadius(100);">
-                        100 км
                     </div>
                 </div>
             </div>
@@ -3466,6 +3367,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ПОДРОБНОСТЕЙ -->
     <div id="detailsModal" class="details-modal-overlay">
         <div class="details-modal-content">
             <button class="details-modal-close" onclick="closeDetailsModal();">×</button>
@@ -3475,6 +3377,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО КОНТАКТОВ МАСТЕРА -->
     <div id="contactModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeContactModal();">×</button>
@@ -3498,6 +3401,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ОПЛАТЫ -->
     <div id="paymentConfirmModal" class="payment-confirm-modal" style="display: none;">
         <div class="payment-confirm-content">
             <div class="payment-confirm-title">💳 Подтверждение оплаты</div>
@@ -3536,6 +3440,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ОТЗЫВОВ -->
     <div id="reviewsModal" class="reviews-modal">
         <div class="reviews-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeReviewsModal();">×</button>
@@ -3557,6 +3462,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО QR-КОДА -->
     <div id="qrModal" class="qr-modal-overlay">
         <div class="qr-modal-content">
             <h2 id="qrModalTitle" style="color: #2d3748; margin-bottom: 20px; font-size: 20px;"></h2>
@@ -3603,12 +3509,6 @@
     let isSkillsLoaded = false;
     let globalSkillsCache = [];
     
-    // Переменные для карты выбора местоположения
-    let locationMap = null;
-    let locationMarker = null;
-    let selectedLocation = null;
-    let locationRadiusCircle = null;
-    
     // Переменные для визитки
     let visitkaEditMode = false;
     let visitkaSelectedSkills = [];
@@ -3619,192 +3519,42 @@
     let logoClickCount = 0;
     let logoClickTimer = null;
 
-    // ========== НОВЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ С КАРТОЙ ВЫБОРА МЕСТОПОЛОЖЕНИЯ ==========
-    
-    function initLocationMap() {
-        console.log('🗺️ Инициализация карты для выбора местоположения');
-        
-        const mapContainer = document.getElementById('locationMap');
-        if (!mapContainer) return;
-        
-        if (locationMap) {
-            locationMap.remove();
-            locationMap = null;
-        }
-        
-        const defaultCenter = [55.7558, 37.6173];
-        
-        locationMap = L.map('locationMap').setView(defaultCenter, 12);
-        
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            subdomains: 'abcd',
-            maxZoom: 20,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
-        }).addTo(locationMap);
-        
-        const markerIcon = L.divIcon({
-            className: 'location-selection-marker',
-            html: '<div style="background: #667eea; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;"><span style="color: white; font-size: 16px;">📍</span></div>',
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
-        });
-        
-        locationMarker = L.marker(defaultCenter, {
-            icon: markerIcon,
-            draggable: true
-        }).addTo(locationMap);
-        
-        locationMarker.on('dragend', function(e) {
-            const latLng = locationMarker.getLatLng();
-            selectedLocation = { lat: latLng.lat, lon: latLng.lng };
-            updateLocationDisplay();
-            updateRadiusCircle();
-        });
-        
-        locationMap.on('click', function(e) {
-            selectedLocation = { lat: e.latlng.lat, lon: e.latlng.lng };
-            locationMarker.setLatLng([selectedLocation.lat, selectedLocation.lon]);
-            updateLocationDisplay();
-            updateRadiusCircle();
-        });
-        
-        if (userLocation) {
-            locationMap.setView([userLocation.lat, userLocation.lon], 13);
-            locationMarker.setLatLng([userLocation.lat, userLocation.lon]);
-            selectedLocation = { lat: userLocation.lat, lon: userLocation.lon };
-            updateLocationDisplay();
-            updateRadiusCircle();
-        }
-        
-        setTimeout(() => {
-            locationMap.invalidateSize();
-        }, 100);
-    }
-    
-    function updateLocationDisplay() {
-        if (!selectedLocation) {
-            document.getElementById('selectedLocationText').textContent = 'Местоположение не выбрано';
-            document.getElementById('selectedCoords').textContent = '';
-            return;
-        }
-        
-        document.getElementById('selectedLocationText').textContent = `Местоположение выбрано`;
-        document.getElementById('selectedCoords').textContent = `${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lon.toFixed(4)}`;
-        
-        const cityName = getCityNameFromCoords(selectedLocation.lat, selectedLocation.lon);
-        if (cityName) {
-            document.getElementById('skillCity').value = cityName;
-        }
-    }
-    
-    function updateRadiusCircle() {
-        if (!locationMap || !selectedLocation) return;
-        
-        if (locationRadiusCircle) {
-            locationMap.removeLayer(locationRadiusCircle);
-        }
-        
-        const radiusMeters = currentRadius * 1000;
-        
-        locationRadiusCircle = L.circle([selectedLocation.lat, selectedLocation.lon], {
-            color: '#667eea',
-            fillColor: '#667eea',
-            fillOpacity: 0.1,
-            radius: radiusMeters,
-            weight: 2,
-            opacity: 0.6
-        }).addTo(locationMap);
-        
-        const radiusKm = (radiusMeters / 1000).toFixed(1);
-        
-        const previewCircle = document.getElementById('radiusCirclePreview');
-        const maxSize = 100;
-        const scale = Math.min(1, currentRadius / 100);
-        const size = 30 + (maxSize - 30) * scale;
-        previewCircle.style.width = `${size}px`;
-        previewCircle.style.height = `${size}px`;
-        previewCircle.innerHTML = `${currentRadius} км`;
-        
-        document.getElementById('radiusPreviewValue').textContent = currentRadius;
-    }
-    
-    function updateRadiusPreview(radius) {
-        currentRadius = radius;
-        updateRadiusCircle();
-    }
-    
-    function getCityNameFromCoords(lat, lon) {
-        let closestCity = null;
-        let minDistance = Infinity;
-        
-        for (const [cityName, coords] of Object.entries(citiesDatabase)) {
-            const distance = Math.sqrt(
-                Math.pow(lat - coords.lat, 2) + 
-                Math.pow(lon - coords.lon, 2)
-            );
-            
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestCity = cityName;
-            }
-        }
-        
-        if (minDistance < 0.5) {
-            return closestCity;
-        }
-        
-        return null;
-    }
-    
-    function useCurrentLocationForMap() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    const { latitude, longitude } = position.coords;
-                    selectedLocation = { lat: latitude, lon: longitude };
-                    
-                    if (locationMap) {
-                        locationMap.setView([latitude, longitude], 14);
-                        locationMarker.setLatLng([latitude, longitude]);
-                        updateLocationDisplay();
-                        updateRadiusCircle();
-                    }
-                    
-                    userLocation = { lat: latitude, lon: longitude };
-                },
-                error => {
-                    console.error('Ошибка геолокации:', error);
-                    alert('❌ Не удалось определить ваше местоположение. Пожалуйста, выберите его на карте вручную.');
-                }
-            );
-        } else {
-            alert('❌ Геолокация не поддерживается вашим браузером');
-        }
-    }
-    
     // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ВИЗИТКОЙ ==========
     
+    /**
+     * Получение выбранных умейок для визитки из localStorage
+     */
     function getVisitkaSelectedSkills() {
         const key = `visa_selected_skills_${currentUserId}`;
         const saved = getLocalStorage(key);
         if (saved && Array.isArray(saved)) {
             return saved;
         }
+        // По умолчанию - все умейки пользователя
         const userSkills = getUserSkills();
         return userSkills.map(s => s._id);
     }
     
+    /**
+     * Сохранение выбранных умейок для визитки
+     */
     function saveVisitkaSelectedSkills(skillIds) {
         const key = `visa_selected_skills_${currentUserId}`;
         setLocalStorage(key, skillIds);
         visitkaSelectedSkills = skillIds;
     }
     
+    /**
+     * Получение всех умейок пользователя
+     */
     function getUserSkills() {
         const globalSkills = getGlobalSkills();
         return globalSkills.filter(s => s.userId === currentUserId);
     }
     
+    /**
+     * Открытие модального окна визитки
+     */
     async function openVisitkaModal() {
         triggerHapticFeedback();
         
@@ -3814,11 +3564,15 @@
         modal.style.display = 'flex';
         content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки...</div></div>';
         
+        // Загружаем актуальные данные
         await preloadAllSkills();
         
         renderVisitkaModal();
     }
     
+    /**
+     * Рендер содержимого визитки
+     */
     function renderVisitkaModal() {
         const userSkills = getUserSkills();
         const userData = getOrCreateUserProfile(currentUserId);
@@ -3849,6 +3603,7 @@
         document.getElementById('visitkaEditBtn').style.display = 'flex';
         document.getElementById('visitkaShareBtn').style.display = 'flex';
         
+        // Генерация QR-кода для визитки
         const qrUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
         
         content.innerHTML = `
@@ -3873,6 +3628,7 @@
             </div>
         `;
         
+        // Генерация QR-кода
         setTimeout(() => {
             const container = document.getElementById('visitkaQRCode');
             if (container) {
@@ -3889,6 +3645,9 @@
         }, 100);
     }
     
+    /**
+     * Рендер списка умейок с чекбоксами (для режима редактирования)
+     */
     function renderVisitkaSkillsList(skills) {
         if (visitkaEditMode) {
             return skills.map(skill => {
@@ -3925,6 +3684,9 @@
         }
     }
     
+    /**
+     * Переключение режима редактирования визитки
+     */
     function toggleVisitkaEditMode() {
         triggerHapticFeedback();
         visitkaEditMode = !visitkaEditMode;
@@ -3938,11 +3700,15 @@
         if (visitkaEditMode) {
             skillsListContainer.innerHTML = renderVisitkaSkillsList(userSkills);
         } else {
+            // Сохраняем выбранные умейки
             saveVisitkaSelectedSkills(visitkaSelectedSkills);
             skillsListContainer.innerHTML = renderVisitkaSkillsList(userSkills);
         }
     }
     
+    /**
+     * Переключение выбора умейки для визитки
+     */
     function toggleVisitkaSkill(skillId, isChecked) {
         triggerHapticFeedback();
         if (isChecked) {
@@ -3954,6 +3720,9 @@
         }
     }
     
+    /**
+     * Показать детали умейки из визитки
+     */
     function showVisitkaSkillDetail(skillId) {
         triggerHapticFeedback();
         
@@ -3984,12 +3753,18 @@
         modal.classList.add('active');
     }
     
+    /**
+     * Закрыть модальное окно деталей умейки в визитке
+     */
     function closeVisitkaSkillDetailModal() {
         triggerHapticFeedback();
         document.getElementById('visitkaSkillDetailModal').classList.remove('active');
         currentVisitkaSkill = null;
     }
     
+    /**
+     * Связаться с мастером из визитки
+     */
     function contactMasterFromVisitka() {
         if (!currentVisitkaSkill) return;
         
@@ -4004,6 +3779,9 @@
         closeVisitkaSkillDetailModal();
     }
     
+    /**
+     * Создать сделку из визитки
+     */
     function createDealFromVisitkaSkill() {
         if (!currentVisitkaSkill) return;
         
@@ -4019,6 +3797,9 @@
         closeVisitkaModal();
     }
     
+    /**
+     * Поделиться визиткой
+     */
     function shareVisitka() {
         triggerHapticFeedback();
         
@@ -4043,6 +3824,9 @@
         }
     }
     
+    /**
+     * Закрыть модальное окно визитки
+     */
     function closeVisitkaModal() {
         triggerHapticFeedback();
         document.getElementById('visitkaModal').style.display = 'none';
@@ -4050,6 +3834,9 @@
         document.getElementById('visitkaEditBtn').textContent = '✏️ Редактировать';
     }
     
+    /**
+     * Открыть визитку мастера по userId (при сканировании QR)
+     */
     async function openMasterVisitka(userId) {
         triggerHapticFeedback();
         
@@ -4060,6 +3847,7 @@
         modal.style.display = 'flex';
         content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки мастера...</div></div>';
         
+        // Загружаем все умейки
         await preloadAllSkills();
         
         const allSkills = getGlobalSkills();
@@ -4069,6 +3857,7 @@
         
         title.textContent = `📇 Визитка мастера ${escapeHtml(userName)}`;
         
+        // Получаем выбранные умейки мастера для визитки
         const masterSelectedKey = `visa_selected_skills_${userId}`;
         const masterSelected = getLocalStorage(masterSelectedKey);
         let displaySkills = masterSkills;
@@ -4122,6 +3911,9 @@
         `;
     }
     
+    /**
+     * Показать детали умейки мастера из визитки
+     */
     function showMasterVisitkaSkillDetail(skillId) {
         triggerHapticFeedback();
         
@@ -4154,12 +3946,16 @@
         modal.classList.add('active');
     }
     
+    /**
+     * Закрыть модальное окно визитки мастера
+     */
     function closeMasterVisitkaModal() {
         triggerHapticFeedback();
         document.getElementById('masterVisitkaModal').style.display = 'none';
         currentMasterVisitkaData = null;
     }
 
+    // ========== ФУНКЦИЯ ДЛЯ ОТКРЫТИЯ МОДАЛЬНОГО ОКНА ПОДРОБНОСТЕЙ ==========
     window.openDetailsModal = function(skillId) {
         triggerHapticFeedback();
         
@@ -4187,16 +3983,24 @@
         document.getElementById('detailsModal').classList.remove('active');
     };
     
+    // ========== ИСПРАВЛЕННЫЙ QR-СКАНЕР ==========
+    
+    /**
+     * Функция для предварительной загрузки всех умейок при старте приложения
+     * Это ключевое исправление - умейки загружаются в глобальное хранилище ДО сканирования
+     */
     async function preloadAllSkills() {
         console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейок...');
         
         try {
+            // Загружаем умейки с сервера
             const response = await fetch(`${API_URL}/api/skills`);
             const result = await response.json();
             
             if (result.success && result.skills) {
                 console.log(`✅ [Загрузка] Загружено ${result.skills.length} умейок с сервера`);
                 
+                // Сохраняем в глобальное хранилище
                 const globalSkills = getGlobalSkills();
                 result.skills.forEach(skill => {
                     const existingIndex = globalSkills.findIndex(s => s._id === skill._id);
@@ -4208,10 +4012,14 @@
                 });
                 setGlobalSkills(globalSkills);
                 
+                // Обновляем кэш
                 globalSkillsCache = globalSkills;
                 isSkillsLoaded = true;
                 
                 console.log(`💾 [Загрузка] Глобальное хранилище содержит ${globalSkills.length} умейок`);
+                
+                // Выводим список ID для отладки
+                console.log('📋 [Загрузка] ID всех умейок:', globalSkills.map(s => s._id));
                 
                 return globalSkills;
             } else {
@@ -4226,9 +4034,15 @@
         }
     }
     
+    /**
+     * Функция для получения умейки по ID с приоритетом:
+     * 1. Глобальное хранилище (кэш)
+     * 2. Прямой запрос к серверу
+     */
     async function getSkillById(skillId) {
         console.log(`🔍 [Поиск] Ищу умейку с ID: ${skillId}`);
         
+        // 1. Сначала проверяем глобальное хранилище
         let skill = getGlobalSkillById(skillId);
         
         if (skill) {
@@ -4236,6 +4050,7 @@
             return skill;
         }
         
+        // 2. Если не нашли, пробуем загрузить с сервера напрямую
         console.log(`🔄 [Поиск] Умейка не найдена в кэше, запрашиваю с сервера...`);
         
         try {
@@ -4252,7 +4067,10 @@
                 const result = await response.json();
                 if (result.success && result.skill) {
                     console.log(`✅ [Поиск] Умейка загружена с сервера:`, result.skill);
+                    
+                    // Добавляем в глобальное хранилище для будущих запросов
                     addGlobalSkill(result.skill);
+                    
                     return result.skill;
                 } else {
                     console.warn(`⚠️ [Поиск] Сервер вернул ошибку:`, result.error);
@@ -4268,9 +4086,13 @@
         }
     }
     
+    /**
+     * Извлечение ID из QR-кода (поддерживает оба формата: skill_ID и user_ID)
+     */
     function extractIdFromQR(qrData) {
         console.log(`🔧 [Парсинг] Извлекаю ID из: ${qrData}`);
         
+        // Формат 1: https://t.me/ymeyka_bot?start=skill_ID
         if (qrData.includes('start=skill_')) {
             const match = qrData.match(/start=skill_([^&]+)/);
             if (match && match[1]) {
@@ -4279,6 +4101,7 @@
             }
         }
         
+        // Формат 2: https://t.me/ymeyka_bot?start=user_ID
         if (qrData.includes('start=user_')) {
             const match = qrData.match(/start=user_([^&]+)/);
             if (match && match[1]) {
@@ -4287,6 +4110,7 @@
             }
         }
         
+        // Формат 3: https://umeyka-oocn.onrender.com/skill/ID
         if (qrData.includes('/skill/')) {
             const match = qrData.match(/\/skill\/([^\/?]+)/);
             if (match && match[1]) {
@@ -4295,12 +4119,14 @@
             }
         }
         
+        // Формат 4: просто ID (24 символа, буквы и цифры)
         const simpleIdMatch = qrData.match(/^[a-zA-Z0-9]{24}$/);
         if (simpleIdMatch) {
             console.log(`✅ [Парсинг] Извлечен ID как простой строки: ${simpleIdMatch[0]}`);
             return { type: 'skill', id: simpleIdMatch[0] };
         }
         
+        // Формат 5: ID может быть в конце URL после последнего слеша
         const lastSlashMatch = qrData.match(/\/([^\/]+)$/);
         if (lastSlashMatch && lastSlashMatch[1] && lastSlashMatch[1].length >= 20) {
             console.log(`✅ [Парсинг] Извлечен ID из конца URL: ${lastSlashMatch[1]}`);
@@ -4311,12 +4137,15 @@
         return null;
     }
     
+    /**
+     * ИСПРАВЛЕННАЯ функция обработки отсканированного QR-кода (поддерживает визитки)
+     */
     async function handleScannedQRCode(qrData) {
         console.log('📱 [Сканер] Получен QR-код:', qrData);
         
         const errorDiv = document.getElementById('scannerError');
         errorDiv.style.display = 'block';
-        errorDiv.style.background = 'rgba(72, 187, 120, 0.2';
+        errorDiv.style.background = 'rgba(72, 187, 120, 0.2)';
         errorDiv.style.color = '#48bb78';
         errorDiv.textContent = '🔍 Обработка QR-кода...';
         
@@ -4332,6 +4161,7 @@
             console.log(`🎯 [Сканер] Тип: ${extracted.type}, ID: ${extracted.id}`);
             
             if (extracted.type === 'user') {
+                // Открываем визитку пользователя
                 await openMasterVisitka(extracted.id);
                 
                 if (html5QrCode && html5QrCode.isScanning) {
@@ -4350,6 +4180,7 @@
                 return;
             }
             
+            // Обработка умейки (существующая логика)
             const skill = await getSkillById(extracted.id);
             
             if (!skill) {
@@ -4387,27 +4218,33 @@
         }
     }
     
+    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ openSkillModal ==========
     function openSkillModal(skill) {
         console.log('🪟 [Модалка] Открываю карточку умейки:', skill.skill);
         
+        // Удаляем предыдущее модальное окно, если оно есть
         const existingModal = document.querySelector('.skill-modal-overlay');
         if (existingModal) {
             existingModal.remove();
         }
         
+        // Создаём новое модальное окно
         const modal = document.createElement('div');
         modal.className = 'modal-overlay skill-modal-overlay';
         modal.style.zIndex = '5000';
         modal.style.display = 'flex';
         
+        // Получаем статус-бейдж
         const statusBadge = getStatusBadge(skill.status);
         
+        // --- ДОБАВЛЯЕМ ИНФОРМАЦИЮ О ГОРОДЕ ---
         const cityInfo = skill.city 
             ? `<div style="margin: 10px 0; padding: 8px 12px; background: #e6f3ff; border-radius: 8px; font-size: 14px; color: #2d3748;">
                    📍 ${escapeHtml(skill.city)} | 📍 ${skill.radius || 10}км
                </div>` 
             : '';
         
+        // --- ДОБАВЛЯЕМ КНОПКУ "ПОДРОБНО" (ТОЛЬКО ЕСЛИ ЕСТЬ ТЕКСТ) ---
         const detailsButtonHtml = skill.details && skill.details.trim() 
             ? `<button class="details-button" onclick="event.stopPropagation(); window.openDetailsModal('${skill._id}');" style="margin-left: 0; margin-top: 5px;">
                    📝 Подробно
@@ -4580,6 +4417,15 @@
         errorDiv.textContent = '';
     };
     
+    // ========== ИСПРАВЛЕННЫЙ ОБРАБОТЧИК ГЛУБОКИХ ССЫЛОК ==========
+    
+    /**
+     * Функция для обработки глубоких ссылок (deeplink)
+     * Поддерживает:
+     * - start=skill_XXX - для QR-кодов умейки
+     * - start=user_XXX - для визиток
+     * - start=USER_ID (число) - для реферальных ссылок
+     */
     function handleDeepLink() {
         console.log('🔗 [Deeplink] Начинаю обработку глубокой ссылки...');
         
@@ -4593,6 +4439,7 @@
         
         console.log(`🔗 [Deeplink] Обнаружен параметр start: "${startParam}"`);
         
+        // Обработка QR-кода умейки (формат: skill_XXX)
         if (startParam.startsWith('skill_')) {
             const skillId = startParam.replace('skill_', '');
             console.log('🔗 [Deeplink] Обнаружена ссылка на умейку с ID:', skillId);
@@ -4617,6 +4464,7 @@
             return;
         }
         
+        // Обработка визитки (формат: user_XXX)
         if (startParam.startsWith('user_')) {
             const userId = startParam.replace('user_', '');
             console.log('🔗 [Deeplink] Обнаружена ссылка на визитку пользователя с ID:', userId);
@@ -4632,6 +4480,7 @@
             return;
         }
         
+        // Обработка реферальной ссылки (формат: число - USER_ID)
         if (/^\d+$/.test(startParam)) {
             const referrerId = startParam;
             console.log('🔗 [Deeplink] Обнаружена реферальная ссылка от пользователя:', referrerId);
@@ -4653,6 +4502,8 @@
         
         console.log('🔗 [Deeplink] Неизвестный формат параметра start:', startParam);
     }
+    
+    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ОБРАБОТКИ РЕФЕРАЛЬНЫХ ССЫЛОК ==========
     
     function processReferralLink() {
         console.log('🎁 [Referral] Начинаю обработку реферальной ссылки...');
@@ -4753,6 +4604,7 @@
         }
     }
 
+    // ========== БАЗА ДАННЫХ ГОРОДОВ ==========
     const citiesDatabase = {
         'Евпатория': { lat: 45.1906, lon: 33.3666 },
         'Севастополь': { lat: 44.6167, lon: 33.5254 },
@@ -4788,6 +4640,8 @@
 
     const allCities = Object.keys(citiesDatabase).sort();
 
+    // ========== ФИНАНСОВАЯ СИСТЕМА ==========
+    
     function getWalletData() {
         const data = getLocalStorage(`wallet_${currentUserId}`);
         return data || {
@@ -4880,7 +4734,7 @@
             `;
         }).join('');
     }
-    
+
     async function connectWallet() {
         triggerHapticFeedback();
         
@@ -4913,7 +4767,7 @@
             alert('❌ Ошибка подключения кошелька');
         }
     }
-    
+
     async function depositFunds() {
         triggerHapticFeedback();
         
@@ -4951,7 +4805,7 @@
             alert('❌ Ошибка пополнения баланса');
         }
     }
-    
+
     async function withdrawFunds() {
         triggerHapticFeedback();
         
@@ -4993,6 +4847,8 @@
         }
     }
 
+    // ========== СИСТЕМА ЭСКРОУ ==========
+    
     function processPayment(dealId) {
         const deal = getDealById(dealId);
         if (!deal) return false;
@@ -5104,6 +4960,8 @@
         return wallet;
     }
 
+    // ========== ИНТЕГРАЦИЯ ОПЛАТЫ В СДЕЛКИ ==========
+    
     window.payForDeal = function(dealId) {
         triggerHapticFeedback();
         
@@ -5132,7 +4990,7 @@
         document.getElementById('confirmDealTotal').textContent = deal.total + ' ⭐';
         document.getElementById('paymentConfirmModal').style.display = 'flex';
     };
-    
+
     function confirmPayment() {
         if (!pendingPaymentDealId) return;
         
@@ -5145,11 +5003,13 @@
         
         pendingPaymentDealId = null;
     }
-    
+
     function closePaymentConfirm() {
         document.getElementById('paymentConfirmModal').style.display = 'none';
         pendingPaymentDealId = null;
     }
+
+    // ========== QR-КОД ФУНКЦИИ ==========
     
     function generateQRCode(skillId, skillName) {
         const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
@@ -5266,6 +5126,8 @@
             });
         }
     };
+
+    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (существующие) ==========
     
     function getCityCoordinates(cityName) {
         if (!cityName) return null;
@@ -5340,17 +5202,6 @@
         triggerHapticFeedback();
         document.getElementById('skillCity').value = city;
         document.getElementById('cityAutocompleteList').style.display = 'none';
-        
-        const coords = getCityCoordinates(city);
-        if (coords && locationMap) {
-            locationMap.setView([coords.lat, coords.lon], 13);
-            if (locationMarker) {
-                locationMarker.setLatLng([coords.lat, coords.lon]);
-            }
-            selectedLocation = { lat: coords.lat, lon: coords.lon };
-            updateLocationDisplay();
-            updateRadiusCircle();
-        }
     }
 
     function selectSearchCity(city) {
@@ -5375,8 +5226,6 @@
                 option.classList.add('selected');
             }
         });
-        
-        updateRadiusCircle();
     }
 
     function selectEditRadius(radius) {
@@ -6010,20 +5859,6 @@
                 alert('❌ Название города должно содержать минимум 2 символа');
                 return;
             }
-            
-            if (!selectedLocation) {
-                if (confirm('⚠️ Вы не выбрали местоположение на карте. Использовать город по умолчанию?')) {
-                    const cityCoords = getCityCoordinates(skillCity);
-                    if (cityCoords) {
-                        selectedLocation = { lat: cityCoords.lat, lon: cityCoords.lon };
-                    } else {
-                        selectedLocation = { lat: 55.7558, lon: 37.6173 };
-                    }
-                } else {
-                    alert('❌ Пожалуйста, выберите местоположение на карте');
-                    return;
-                }
-            }
 
             const userData = getOrCreateUserProfile(currentUserId);
         
@@ -6032,14 +5867,14 @@
             console.log('📊 Статус при создании:', currentMasterStatus);
             console.log('📍 Город:', skillCity);
             console.log('📏 Радиус:', currentRadius);
-            console.log('📍 Выбранное местоположение:', selectedLocation);
         
             if (!userId || userId === 'null' || userId === 'undefined') {
                 alert('❌ Ошибка: не определен ID пользователя. Перезагрузите страницу.');
                 return;
             }
 
-            const location = selectedLocation || getCityCoordinates(skillCity) || userLocation || { lat: 55.7558, lon: 37.6173 };
+            const cityCoords = getCityCoordinates(skillCity);
+            const location = cityCoords || userLocation || { lat: 55.7558, lon: 37.6173 };
 
             const skillData = {
                 skill: skillName.trim(),
@@ -6110,13 +5945,6 @@
                         
                         currentMasterStatus = 'ready';
                         selectMasterStatus('ready');
-                        
-                        selectedLocation = null;
-                        if (locationMarker && locationMap) {
-                            locationMarker.setLatLng([55.7558, 37.6173]);
-                            locationMap.setView([55.7558, 37.6173], 10);
-                        }
-                        updateLocationDisplay();
                     
                         setTimeout(() => {
                             loadMySkills();
@@ -6160,13 +5988,6 @@
             
             currentMasterStatus = 'ready';
             selectMasterStatus('ready');
-            
-            selectedLocation = null;
-            if (locationMarker && locationMap) {
-                locationMarker.setLatLng([55.7558, 37.6173]);
-                locationMap.setView([55.7558, 37.6173], 10);
-            }
-            updateLocationDisplay();
         
             setTimeout(() => {
                 loadMySkills();
@@ -7026,7 +6847,7 @@
                 <div class="contact-item">
                     <div class="contact-icon">📞</div>
                     <div class="contact-text">${phone}</div>
-                    <button class="copy-contact" onclick="triggerHapticFeedback(); copyToClipboard('${phone.replace(/'/g, "\\'")}');">Копировать</button>
+                    <button class="copy-contact" onclick="triggerHapticFeedback(); copyToClipboard('${phone}');">Копировать</button>
                 </div>
             `;
             callButton.href = `tel:${phone.replace(/\s/g, '')}`;
@@ -7040,7 +6861,7 @@
                 <div class="contact-item">
                     <div class="contact-icon">✍️</div>
                     <div class="contact-text">${telegram}</div>
-                    <button class="copy-contact" onclick="triggerHapticFeedback(); copyToClipboard('${telegram.replace(/'/g, "\\'")}');">Копировать</button>
+                    <button class="copy-contact" onclick="triggerHapticFeedback(); copyToClipboard('${telegram}');">Копировать</button>
                 </div>
             `;
             telegramButton.href = `https://t.me/${telegram.replace('@', '')}`;
@@ -7136,19 +6957,6 @@
             currentRadius = 10;
             selectRadius(10);
             loadMySkills();
-            
-            setTimeout(() => {
-                initLocationMap();
-                if (userLocation) {
-                    if (locationMap) {
-                        locationMap.setView([userLocation.lat, userLocation.lon], 13);
-                        locationMarker.setLatLng([userLocation.lat, userLocation.lon]);
-                        selectedLocation = { lat: userLocation.lat, lon: userLocation.lon };
-                        updateLocationDisplay();
-                        updateRadiusCircle();
-                    }
-                }
-            }, 200);
         }
     };
 
@@ -7156,7 +6964,7 @@
         triggerHapticFeedback();
         showSection('profileSection');
         loadUserProfile();
-        document.getElementById('profileStats').style.display = 'block';
+        document.getElementById('profileStats').style.display = 'none';
         document.getElementById('profileSkills').style.display = 'none';
         document.getElementById('profileDeals').style.display = 'none';
         document.getElementById('profileReferral').style.display = 'none';
@@ -7230,6 +7038,7 @@
         return currentUserId;
     };
     
+    // ========== АДМИН-ПАНЕЛЬ (6 кликов по логотипу) ==========
     function initAdminAccess() {
         const logoHeader = document.getElementById('logoHeader');
         if (!logoHeader) return;
@@ -7258,6 +7067,8 @@
         const adminUrl = 'umeyka-admin.html';
         window.open(adminUrl, '_blank');
     }
+    
+    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (продолжение) ==========
     
     document.addEventListener('DOMContentLoaded', async function() {
         console.log('🚀 Ymeyka app loaded successfully!');
@@ -8263,6 +8074,8 @@
                 '<span style="cursor: pointer;" onclick="triggerHapticFeedback(); setProjectRating(' + i + ');">☆</span>';
         }
     };
+
+    // ========== ФУНКЦИИ ОТЗЫВОВ О ПРОЕКТЕ ==========
     
     function getProjectReviews() {
         return getLocalStorage('umeyka_project_reviews') || [];
@@ -8436,7 +8249,8 @@
         triggerHapticFeedback();
         document.getElementById('reviewsModal').classList.remove('active');
     };
-    
+
+    // ========== ФУНКЦИЯ УДАЛЕНИЯ СДЕЛКИ ==========
     window.deleteDeal = function(dealId) {
         triggerHapticFeedback();
         
@@ -8480,6 +8294,13 @@
             }
         }
     };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const dealAmount = document.getElementById('dealAmount');
+        if (dealAmount) {
+            dealAmount.addEventListener('input', updateDealCommission);
+        }
+    });
     </script>
 </body>
 </html>
