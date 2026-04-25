@@ -51,7 +51,82 @@
             transform: scale(0.95);
         }
         
-        .scanner-modal-overlay {
+        /* FLOAT-баллун для кнопки выбора на карте */
+        .location-picker-btn {
+            position: relative;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .location-picker-btn:hover::after {
+            content: "Выберите точную точку на карте - от неё будет отсчитываться радиус вашей работы";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 10px;
+            pointer-events: none;
+            font-weight: normal;
+        }
+        
+        .location-picker-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .selected-location-info {
+            background: rgba(255,255,255,0.15);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .location-badge {
+            background: #48bb78;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .reset-location-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        /* Модальное окно выбора местоположения */
+        .location-picker-modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
@@ -59,6 +134,116 @@
             bottom: 0;
             background: rgba(0,0,0,0.95);
             z-index: 10000;
+            flex-direction: column;
+        }
+        
+        .location-picker-modal.active {
+            display: flex;
+        }
+        
+        .location-picker-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .location-picker-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .location-picker-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .location-picker-close:active {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .location-picker-map-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #locationPickerMap {
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+        }
+        
+        .location-picker-controls {
+            background: white;
+            padding: 15px 20px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .location-picker-controls button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .location-picker-controls .confirm-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+        }
+        
+        .location-picker-controls .cancel-btn {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .location-picker-controls .my-location-btn {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+        }
+        
+        .location-picker-controls button:active {
+            transform: scale(0.98);
+        }
+        
+        .coord-info {
+            position: absolute;
+            bottom: 80px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: monospace;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        
+        .scanner-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 10001;
             display: none;
             align-items: center;
             justify-content: center;
@@ -253,7 +438,7 @@
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
         }
-
+        
         .button-master:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
@@ -361,7 +546,7 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
             transition: all 0.3s ease;
         }
-
+        
         .master-status {
             display: inline-flex;
             align-items: center;
@@ -533,7 +718,7 @@
             border-left: 4px solid #667eea;
             position: relative;
         }
-
+        
         .gold-card {
             background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
             color: #744210;
@@ -575,7 +760,7 @@
             color: #2d3748;
             border: 1px solid rgba(102, 126, 234, 0.1);
         }
-
+        
         .skill-contact-info .contact-item {
             display: flex;
             align-items: center;
@@ -586,20 +771,20 @@
             border-radius: 8px;
             border: 1px solid #e2e8f0;
         }
-
+        
         .skill-contact-info .contact-icon {
             font-size: 18px;
             min-width: 24px;
             color: #667eea;
         }
-
+        
         .skill-contact-info .contact-text {
             word-break: break-all;
             flex: 1;
             font-size: 14px;
             font-weight: 500;
         }
-
+        
         .skill-contact-info .contact-label {
             font-weight: 600;
             color: #667eea;
@@ -758,7 +943,7 @@
             text-align: center;
             border: 1px solid rgba(255,0,0,0.2);
         }
-
+        
         .profile-skill-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -768,7 +953,7 @@
             border-left: 4px solid #667eea;
             position: relative;
         }
-
+        
         .profile-skill-header {
             display: flex;
             justify-content: space-between;
@@ -776,12 +961,12 @@
             margin-bottom: 8px;
             padding-right: 70px;
         }
-
+        
         .skill-actions {
             display: flex;
             gap: 8px;
         }
-
+        
         .profile-main-buttons {
             padding: 20px;
             display: flex;
@@ -789,7 +974,7 @@
             gap: 15px;
             margin-bottom: 20px;
         }
-
+        
         .profile-button {
             display: flex;
             align-items: center;
@@ -805,50 +990,50 @@
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-
+        
         .profile-button:active {
             transform: scale(0.98);
         }
-
+        
         .button-edit-profile {
             background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
         }
-
+        
         .button-edit-profile:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
         }
-
+        
         .button-stats {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
-
+        
         .button-stats:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
         }
-
+        
         .button-my-skills {
             background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(159, 122, 234, 0.3);
         }
-
+        
         .button-my-skills:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(159, 122, 234, 0.4);
         }
-
+        
         .button-deals {
             background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
         }
-
+        
         .button-deals:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
@@ -859,35 +1044,35 @@
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
         }
-
+        
         .button-visitka:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
         }
-
+        
         .button-referral {
             background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
         }
-
+        
         .button-referral:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(245, 101, 101, 0.4);
         }
-
+        
         .button-finance {
             background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
             color: #744210;
             border: 1px solid rgba(255,255,255,0.3);
             box-shadow: 0 4px 15px rgba(246, 224, 94, 0.3);
         }
-
+        
         .button-finance:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(246, 224, 94, 0.4);
         }
-
+        
         .edit-button {
             background: #4299e1;
             color: white;
@@ -897,7 +1082,7 @@
             cursor: pointer;
             font-weight: 600;
         }
-
+        
         .delete-button {
             background: #f56565;
             color: white;
@@ -907,7 +1092,7 @@
             cursor: pointer;
             font-weight: 600;
         }
-
+        
         .rating-badge {
             background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
             color: #744210;
@@ -916,14 +1101,14 @@
             font-size: 12px;
             font-weight: bold;
         }
-
+        
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin: 15px 0;
         }
-
+        
         .stat-card {
             background: rgba(255,255,255,0.9);
             color: #2d3748;
@@ -931,50 +1116,50 @@
             border-radius: 10px;
             text-align: center;
         }
-
+        
         .stat-value {
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 5px;
         }
-
+        
         .stat-label {
             font-size: 12px;
             color: #666;
         }
-
+        
         .rating-stars {
             color: #FFD700;
             font-size: 16px;
             margin: 5px 0;
         }
-
+        
         .rating-details {
             background: rgba(255,255,255,0.9);
             padding: 15px;
             border-radius: 10px;
             margin: 10px 0;
         }
-
+        
         .rating-bar {
             display: flex;
             align-items: center;
             margin: 8px 0;
         }
-
+        
         .rating-label {
             width: 100px;
             font-size: 14px;
             color: #666;
         }
-
+        
         .rating-value {
             width: 40px;
             text-align: right;
             font-weight: bold;
             margin-right: 10px;
         }
-
+        
         .rating-progress {
             flex: 1;
             height: 8px;
@@ -982,13 +1167,13 @@
             border-radius: 4px;
             overflow: hidden;
         }
-
+        
         .rating-progress-fill {
             height: 100%;
             background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
             border-radius: 4px;
         }
-
+        
         .deal-card {
             background: rgba(255,255,255,0.95);
             color: #2d3748;
@@ -998,27 +1183,27 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             border-left: 5px solid #667eea;
         }
-
+        
         .deal-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-bottom: 15px;
         }
-
+        
         .deal-title {
             font-size: 18px;
             font-weight: 700;
             flex: 1;
         }
-
+        
         .deal-status {
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
         }
-
+        
         .status-draft { background: #e2e8f0; color: #4a5568; }
         .status-pending { background: #fef3c7; color: #d97706; }
         .status-active { background: #d1fae5; color: #065f46; }
@@ -1026,21 +1211,21 @@
         .status-paid { background: #dbeafe; color: #1e40af; }
         .status-released { background: #c7d2fe; color: #3730a3; }
         .status-refunded { background: #fecaca; color: #991b1b; }
-
+        
         .deal-details {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin: 15px 0;
         }
-
+        
         .deal-detail {
             display: flex;
             align-items: center;
             gap: 8px;
             font-size: 14px;
         }
-
+        
         .signatures {
             display: flex;
             justify-content: space-between;
@@ -1049,22 +1234,22 @@
             background: #f7fafc;
             border-radius: 10px;
         }
-
+        
         .signature {
             display: flex;
             align-items: center;
             gap: 8px;
         }
-
+        
         .signed { color: #38a169; }
         .unsigned { color: #e53e3e; }
-
+        
         .deal-actions {
             display: flex;
             gap: 10px;
             margin-top: 15px;
         }
-
+        
         .deal-button {
             flex: 1;
             padding: 15px;
@@ -1077,11 +1262,11 @@
             color: white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-
+        
         .deal-button:active {
             transform: scale(0.98);
         }
-
+        
         .sign-button { 
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
@@ -1090,7 +1275,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
         }
-
+        
         .view-button { 
             background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
@@ -1099,7 +1284,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(66, 153, 225, 0.4);
         }
-
+        
         .complete-button { 
             background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
             box-shadow: 0 4px 10px rgba(237, 137, 54, 0.3);
@@ -1108,7 +1293,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(237, 137, 54, 0.4);
         }
-
+        
         .pay-button { 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
@@ -1117,12 +1302,12 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
         }
-
+        
         .withdraw-button { 
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
         }
-
+        
         .delete-deal {
             background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
             box-shadow: 0 4px 10px rgba(245, 101, 101, 0.3);
@@ -1131,7 +1316,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(245, 101, 101, 0.4);
         }
-
+        
         .wallet-section {
             background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
             padding: 25px 20px;
@@ -1141,7 +1326,7 @@
             border: 2px solid rgba(102, 126, 234, 0.3);
             box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
         }
-
+        
         .wallet-title {
             font-size: 22px;
             font-weight: 700;
@@ -1151,14 +1336,14 @@
             gap: 10px;
             color: #667eea;
         }
-
+        
         .balance-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
             margin: 20px 0;
         }
-
+        
         .balance-card {
             background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
             padding: 20px;
@@ -1167,12 +1352,12 @@
             border: 2px solid #e2e8f0;
             transition: all 0.3s ease;
         }
-
+        
         .balance-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-
+        
         .balance-label {
             font-size: 12px;
             color: #666;
@@ -1180,24 +1365,24 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
+        
         .balance-value {
             font-size: 28px;
             font-weight: bold;
             color: #2d3748;
         }
-
+        
         .balance-value.available { color: #48bb78; }
         .balance-value.frozen { color: #ed8936; }
         .balance-value.total { color: #667eea; }
-
+        
         .wallet-actions {
             display: flex;
             flex-direction: column;
             gap: 12px;
             margin-top: 20px;
         }
-
+        
         .wallet-button {
             width: 100%;
             padding: 18px;
@@ -1214,11 +1399,11 @@
             color: white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-
+        
         .wallet-button:active {
             transform: scale(0.98);
         }
-
+        
         .wallet-button.deposit {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
@@ -1227,7 +1412,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
         }
-
+        
         .wallet-button.withdraw {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
@@ -1236,13 +1421,13 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
         }
-
+        
         .transaction-history {
             margin-top: 25px;
             max-height: 300px;
             overflow-y: auto;
         }
-
+        
         .transaction-item {
             display: flex;
             justify-content: space-between;
@@ -1253,42 +1438,42 @@
             margin-bottom: 10px;
             border-left: 4px solid #667eea;
         }
-
+        
         .transaction-item.income {
             border-left-color: #48bb78;
         }
-
+        
         .transaction-item.expense {
             border-left-color: #f56565;
         }
-
+        
         .transaction-item.commission {
             border-left-color: #ed8936;
         }
-
+        
         .transaction-info {
             flex: 1;
         }
-
+        
         .transaction-title {
             font-weight: 600;
             color: #2d3748;
             margin-bottom: 4px;
         }
-
+        
         .transaction-date {
             font-size: 12px;
             color: #666;
         }
-
+        
         .transaction-amount {
             font-weight: bold;
             font-size: 16px;
         }
-
+        
         .transaction-amount.positive { color: #48bb78; }
         .transaction-amount.negative { color: #f56565; }
-
+        
         .payment-status-badge {
             display: inline-flex;
             align-items: center;
@@ -1298,12 +1483,12 @@
             font-weight: 600;
             margin: 10px 0;
         }
-
+        
         .payment-pending { background: #fef3c7; color: #d97706; }
         .payment-paid { background: #d1fae5; color: #065f46; }
         .payment-released { background: #dbeafe; color: #1e40af; }
         .payment-refunded { background: #fecaca; color: #991b1b; }
-
+        
         .escrow-info {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             padding: 15px;
@@ -1311,7 +1496,7 @@
             margin: 15px 0;
             border: 2px solid #f59e0b;
         }
-
+        
         .escrow-title {
             font-weight: bold;
             color: #92400e;
@@ -1320,19 +1505,19 @@
             align-items: center;
             gap: 8px;
         }
-
+        
         .escrow-details {
             font-size: 14px;
             color: #78350f;
         }
-
+        
         .quality-options {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
             margin: 15px 0;
         }
-
+        
         .quality-option {
             padding: 15px;
             border: 2px solid #e2e8f0;
@@ -1343,19 +1528,19 @@
             background: rgba(255,255,255,0.9);
             color: #2d3748;
         }
-
+        
         .quality-option.selected {
             border-color: #667eea;
             background: rgba(102, 126, 234, 0.1);
         }
-
+        
         .additional-options {
             display: grid;
             grid-template-columns: 1fr;
             gap: 10px;
             margin: 15px 0;
         }
-
+        
         .option-checkbox {
             display: flex;
             align-items: center;
@@ -1367,17 +1552,17 @@
             background: rgba(255,255,255,0.9);
             color: #2d3748;
         }
-
+        
         .option-checkbox.selected {
             border-color: #48bb78;
             background: rgba(72, 187, 120, 0.1);
         }
-
+        
         .level-achieved {
             background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
             border: 2px solid #10b981;
         }
-
+        
         .referral-section {
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
             padding: 25px 20px;
@@ -1391,7 +1576,7 @@
             overflow: hidden;
             backdrop-filter: blur(10px);
         }
-
+        
         .referral-section::before {
             content: '✨';
             position: absolute;
@@ -1402,7 +1587,7 @@
             opacity: 0.1;
             z-index: 0;
         }
-
+        
         .referral-title {
             font-size: 22px;
             font-weight: 700;
@@ -1414,7 +1599,7 @@
             position: relative;
             z-index: 1;
         }
-
+        
         .referral-description {
             font-size: 16px;
             line-height: 1.5;
@@ -1423,7 +1608,7 @@
             position: relative;
             z-index: 1;
         }
-
+        
         .referral-benefits {
             display: flex;
             justify-content: center;
@@ -1433,7 +1618,7 @@
             position: relative;
             z-index: 1;
         }
-
+        
         .referral-benefit {
             background: rgba(255, 255, 255, 0.2);
             padding: 12px 15px;
@@ -1448,7 +1633,7 @@
             min-width: 200px;
             justify-content: center;
         }
-
+        
         .referral-link-container {
             background: rgba(255, 255, 255, 0.95);
             padding: 20px;
@@ -1458,7 +1643,7 @@
             position: relative;
             z-index: 1;
         }
-
+        
         .referral-link {
             color: #667eea;
             font-family: 'Courier New', monospace;
@@ -1470,7 +1655,7 @@
             background: rgba(102, 126, 234, 0.1);
             border-radius: 8px;
         }
-
+        
         .referral-stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -1479,7 +1664,7 @@
             position: relative;
             z-index: 1;
         }
-
+        
         .referral-stat {
             background: rgba(255, 255, 255, 0.2);
             padding: 15px;
@@ -1488,7 +1673,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-
+        
         .referral-stat-value {
             font-size: 24px;
             font-weight: bold;
@@ -1498,12 +1683,12 @@
             justify-content: center;
             gap: 5px;
         }
-
+        
         .referral-stat-label {
             font-size: 12px;
             opacity: 0.9;
         }
-
+        
         .referral-buttons {
             display: flex;
             flex-direction: column;
@@ -1512,7 +1697,7 @@
             position: relative;
             z-index: 1;
         }
-
+        
         .share-button {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             border: none;
@@ -1530,12 +1715,12 @@
             gap: 10px;
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-
+        
         .share-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
         }
-
+        
         .copy-button {
             background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             border: none;
@@ -1553,12 +1738,12 @@
             gap: 10px;
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
-
+        
         .copy-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
         }
-
+        
         .referral-note {
             font-size: 14px;
             opacity: 0.8;
@@ -1568,7 +1753,7 @@
             position: relative;
             z-index: 1;
         }
-
+        
         .referral-bonus {
             display: inline-block;
             background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
@@ -1579,16 +1764,16 @@
             font-weight: bold;
             margin-left: 5px;
         }
-
+        
         .referral-tab-button {
             background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%) !important;
             border: 1px solid rgba(255,255,255,0.3) !important;
         }
-
+        
         .referral-tab-button:hover {
             background: linear-gradient(135deg, #8c6bcf 0%, #6f48c7 100%) !important;
         }
-
+        
         .about-section {
             background: rgba(255,255,255,0.9);
             padding: 25px;
@@ -1596,7 +1781,7 @@
             color: #2d3748;
             margin: 20px 0;
         }
-
+        
         .about-title {
             font-size: 24px;
             font-weight: bold;
@@ -1604,14 +1789,14 @@
             text-align: center;
             color: #667eea;
         }
-
+        
         .channel-links {
             display: grid;
             grid-template-columns: 1fr;
             gap: 15px;
             margin: 20px 0;
         }
-
+        
         .channel-link {
             display: flex;
             align-items: center;
@@ -1623,29 +1808,29 @@
             text-decoration: none;
             transition: all 0.3s ease;
         }
-
+        
         .channel-link:active {
             transform: scale(0.98);
         }
-
+        
         .channel-icon {
             font-size: 30px;
         }
-
+        
         .channel-info {
             flex: 1;
         }
-
+        
         .channel-name {
             font-weight: bold;
             margin-bottom: 5px;
         }
-
+        
         .channel-description {
             font-size: 14px;
             opacity: 0.9;
         }
-
+        
         .deals-tab-buttons {
             display: flex;
             flex-direction: column;
@@ -1653,7 +1838,7 @@
             margin: 0 0 20px 0;
             padding: 0 20px;
         }
-
+        
         .deals-tab-button {
             width: 100%;
             padding: 20px;
@@ -1671,21 +1856,21 @@
             gap: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-
+        
         .deals-tab-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
-
+        
         .deals-tab-button:active {
             transform: translateY(0);
         }
-
+        
         .deals-tab-button.active {
             border: 2px solid rgba(255,255,255,0.5);
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
-
+        
         .deals-tab-button.pending {
             background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
             box-shadow: 0 4px 15px rgba(237, 137, 54, 0.3);
@@ -1693,7 +1878,7 @@
         .deals-tab-button.pending:hover {
             box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
         }
-
+        
         .deals-tab-button.active-tab {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
@@ -1701,7 +1886,7 @@
         .deals-tab-button.active-tab:hover {
             box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
         }
-
+        
         .deals-tab-button.completed {
             background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
@@ -1709,7 +1894,7 @@
         .deals-tab-button.completed:hover {
             box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
         }
-
+        
         .skill-photo {
             width: 100%;
             height: 200px;
@@ -1723,18 +1908,18 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
+        
         .skill-photo img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
+        
         .skill-photo:hover {
             transform: scale(1.02);
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-
+        
         .upload-photo-button {
             width: 100%;
             padding: 12px;
@@ -1751,7 +1936,7 @@
             gap: 8px;
             margin: 10px 0;
         }
-
+        
         .no-photo {
             display: flex;
             flex-direction: column;
@@ -1761,7 +1946,7 @@
             font-size: 14px;
             height: 100%;
         }
-
+        
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -1775,7 +1960,7 @@
             justify-content: center;
             padding: 20px;
         }
-
+        
         .modal-content {
             background: white;
             border-radius: 20px;
@@ -1786,7 +1971,7 @@
             overflow-y: auto;
             position: relative;
         }
-
+        
         .modal-close {
             position: absolute;
             top: 15px;
@@ -1803,11 +1988,11 @@
             justify-content: center;
             border-radius: 50%;
         }
-
+        
         .modal-close:hover {
             background: #f7fafc;
         }
-
+        
         .modal-title {
             color: #2d3748;
             margin-bottom: 20px;
@@ -1815,13 +2000,13 @@
             font-size: 24px;
             font-weight: bold;
         }
-
+        
         .modal-buttons {
             display: flex;
             gap: 10px;
             margin-top: 20px;
         }
-
+        
         .modal-button {
             flex: 1;
             padding: 15px;
@@ -1832,7 +2017,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
+        
         .modal-save {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: white;
@@ -1842,7 +2027,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
         }
-
+        
         .modal-cancel {
             background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
             color: #4a5568;
@@ -1852,12 +2037,12 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
-
+        
         .map-popup-content {
             min-width: 300px;
             max-width: 300px;
         }
-
+        
         .map-skill-photo {
             width: 100%;
             height: 150px;
@@ -1865,27 +2050,27 @@
             overflow: hidden;
             margin: 10px 0;
         }
-
+        
         .map-skill-photo img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
+        
         .map-skill-info {
             background: #f7fafc;
             padding: 12px;
             border-radius: 8px;
             margin: 10px 0;
         }
-
+        
         .map-skill-actions {
             display: flex;
             flex-direction: column;
             gap: 8px;
             margin-top: 15px;
         }
-
+        
         .map-skill-button {
             width: 100%;
             padding: 10px;
@@ -1895,22 +2080,22 @@
             font-weight: 600;
             cursor: pointer;
         }
-
+        
         .map-contact-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-
+        
         .map-details-button {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: white;
         }
-
+        
         .map-edit-button {
             background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
             color: white;
         }
-
+        
         .photo-upload-area {
             border: 2px dashed #667eea;
             border-radius: 10px;
@@ -1921,30 +2106,30 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
+        
         .photo-upload-area:hover {
             background: rgba(102, 126, 234, 0.1);
             border-color: #764ba2;
         }
-
+        
         .photo-upload-icon {
             font-size: 40px;
             color: #667eea;
             margin-bottom: 10px;
         }
-
+        
         .photo-preview {
             position: relative;
             margin: 10px 0;
         }
-
+        
         .photo-preview img {
             width: 100%;
             max-height: 300px;
             object-fit: cover;
             border-radius: 10px;
         }
-
+        
         .photo-remove {
             position: absolute;
             top: 10px;
@@ -1961,21 +2146,21 @@
             cursor: pointer;
             font-size: 16px;
         }
-
+        
         .photo-info {
             font-size: 12px;
             color: #666;
             text-align: center;
             margin-top: 5px;
         }
-
+        
         .contact-buttons {
             display: flex;
             flex-direction: column;
             gap: 10px;
             margin-top: 15px;
         }
-
+        
         .call-button {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: white;
@@ -1998,7 +2183,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
         }
-
+        
         .telegram-button {
             background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
             color: white;
@@ -2021,7 +2206,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0, 136, 204, 0.4);
         }
-
+        
         .contact-info {
             background: #f7fafc;
             padding: 12px;
@@ -2029,7 +2214,7 @@
             margin: 10px 0;
             color: #2d3748;
         }
-
+        
         .contact-item {
             display: flex;
             align-items: center;
@@ -2040,19 +2225,19 @@
             border-radius: 6px;
             border: 1px solid #e2e8f0;
         }
-
+        
         .contact-icon {
             font-size: 20px;
             color: #667eea;
         }
-
+        
         .contact-text {
             flex: 1;
             font-size: 14px;
             word-break: break-all;
             font-weight: 500;
         }
-
+        
         .copy-contact {
             background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             color: white;
@@ -2068,7 +2253,7 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(66, 153, 225, 0.4);
         }
-
+        
         .create-deal-button {
             background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
             color: white;
@@ -2091,7 +2276,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(237, 137, 54, 0.4);
         }
-
+        
         .wallet-connected {
             background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
             border: 2px solid #10b981;
@@ -2103,7 +2288,7 @@
             gap: 10px;
             color: #065f46;
         }
-
+        
         .wallet-disconnected {
             background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
             border: 2px solid #ef4444;
@@ -2115,7 +2300,7 @@
             gap: 10px;
             color: #991b1b;
         }
-
+        
         .payment-confirm-modal {
             position: fixed;
             top: 0;
@@ -2129,7 +2314,7 @@
             justify-content: center;
             padding: 20px;
         }
-
+        
         .payment-confirm-content {
             background: white;
             border-radius: 20px;
@@ -2138,14 +2323,14 @@
             width: 100%;
             text-align: center;
         }
-
+        
         .payment-confirm-title {
             font-size: 24px;
             font-weight: bold;
             color: #2d3748;
             margin-bottom: 20px;
         }
-
+        
         .payment-confirm-details {
             background: #f7fafc;
             padding: 20px;
@@ -2153,14 +2338,14 @@
             margin: 20px 0;
             text-align: left;
         }
-
+        
         .payment-confirm-row {
             display: flex;
             justify-content: space-between;
             margin: 10px 0;
             color: #4a5568;
         }
-
+        
         .payment-confirm-total {
             font-size: 20px;
             font-weight: bold;
@@ -2169,13 +2354,13 @@
             padding-top: 15px;
             border-top: 2px solid #e2e8f0;
         }
-
+        
         .payment-confirm-buttons {
             display: flex;
             gap: 10px;
             margin-top: 20px;
         }
-
+        
         .payment-confirm-button {
             flex: 1;
             padding: 15px;
@@ -2186,7 +2371,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
+        
         .payment-confirm-yes {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: white;
@@ -2196,7 +2381,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
         }
-
+        
         .payment-confirm-no {
             background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%);
             color: #4a5568;
@@ -2206,7 +2391,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
-
+        
         .reviews-button {
             background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
             border: none;
@@ -2229,7 +2414,7 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(66, 153, 225, 0.4);
         }
-
+        
         .reviews-modal {
             position: fixed;
             top: 0;
@@ -2243,11 +2428,11 @@
             justify-content: center;
             padding: 20px;
         }
-
+        
         .reviews-modal.active {
             display: flex;
         }
-
+        
         .reviews-content {
             background: white;
             border-radius: 20px;
@@ -2258,26 +2443,26 @@
             overflow-y: auto;
             position: relative;
         }
-
+        
         .reviews-header {
             text-align: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 2px solid #e2e8f0;
         }
-
+        
         .reviews-average {
             font-size: 48px;
             font-weight: bold;
             color: #667eea;
             margin: 10px 0;
         }
-
+        
         .reviews-count {
             color: #666;
             font-size: 14px;
         }
-
+        
         .review-item {
             background: #f7fafc;
             padding: 15px;
@@ -2285,20 +2470,20 @@
             margin-bottom: 15px;
             border-left: 4px solid #667eea;
         }
-
+        
         .review-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
-
+        
         .review-author {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
+        
         .review-avatar {
             width: 40px;
             height: 40px;
@@ -2311,39 +2496,39 @@
             font-size: 18px;
             font-weight: bold;
         }
-
+        
         .review-name {
             font-weight: 600;
             color: #2d3748;
         }
-
+        
         .review-date {
             font-size: 12px;
             color: #666;
         }
-
+        
         .review-rating {
             color: #FFD700;
             font-size: 14px;
         }
-
+        
         .review-text {
             color: #4a5568;
             line-height: 1.5;
             font-size: 14px;
         }
-
+        
         .no-reviews {
             text-align: center;
             padding: 40px;
             color: #666;
         }
-
+        
         .no-reviews-icon {
             font-size: 60px;
             margin-bottom: 15px;
         }
-
+        
         .submit-review-button {
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             border: none;
@@ -2367,13 +2552,13 @@
             cursor: not-allowed;
             opacity: 0.7;
         }
-
+        
         .submit-review-button.disabled {
             background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
             cursor: not-allowed;
             opacity: 0.7;
         }
-
+        
         .review-warning {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             border: 2px solid #f59e0b;
@@ -2384,7 +2569,7 @@
             font-size: 14px;
             text-align: center;
         }
-
+        
         .umeyka-marker-container {
             width: 50px;
             height: 50px;
@@ -2400,26 +2585,26 @@
             align-items: center;
             justify-content: center;
         }
-
+        
         .umeyka-marker-container:hover {
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
-
+        
         .umeyka-marker-container.status-ready {
             border-color: #48bb78;
         }
-
+        
         .umeyka-marker-container.status-busy {
             border-color: #f56565;
         }
-
+        
         .umeyka-marker-photo {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
+        
         .umeyka-marker-fallback {
             width: 100%;
             height: 100%;
@@ -2429,7 +2614,7 @@
             font-size: 24px;
             color: white;
         }
-
+        
         @keyframes markerAppear {
             0% {
                 opacity: 0;
@@ -2440,7 +2625,7 @@
                 transform: scale(1);
             }
         }
-
+        
         .user-marker-container {
             width: 16px;
             height: 16px;
@@ -2449,7 +2634,7 @@
             border: 3px solid white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
-
+        
         .popup-skill-photo {
             width: 100px;
             height: 60px;
@@ -2459,13 +2644,13 @@
             float: right;
             margin-left: 10px;
         }
-
+        
         .popup-skill-photo img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-
+        
         .skill-qr-code {
             position: absolute;
             top: 15px;
@@ -2479,11 +2664,11 @@
             background: white;
             padding: 4px;
         }
-
+        
         .skill-qr-code:hover {
             transform: scale(1.05);
         }
-
+        
         .qr-modal-overlay {
             position: fixed;
             top: 0;
@@ -2497,11 +2682,11 @@
             justify-content: center;
             padding: 20px;
         }
-
+        
         .qr-modal-overlay.active {
             display: flex;
         }
-
+        
         .qr-modal-content {
             background: white;
             border-radius: 20px;
@@ -2510,7 +2695,7 @@
             max-width: 350px;
             width: 100%;
         }
-
+        
         .qr-code-large {
             width: 250px;
             height: 250px;
@@ -2520,7 +2705,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-
+        
         .qr-share-button {
             width: 100%;
             padding: 18px;
@@ -2538,7 +2723,7 @@
             margin-top: 20px;
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
-
+        
         /* Визитка стили */
         .visitka-skill-item {
             display: flex;
@@ -2550,57 +2735,57 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-
+        
         .visitka-skill-item:hover {
             background: rgba(102, 126, 234, 0.15);
         }
-
+        
         .visitka-skill-checkbox {
             width: 24px;
             height: 24px;
             margin-right: 12px;
             cursor: pointer;
         }
-
+        
         .visitka-skill-info {
             flex: 1;
         }
-
+        
         .visitka-skill-name {
             font-weight: 600;
             color: #2d3748;
         }
-
+        
         .visitka-skill-details {
             font-size: 12px;
             color: #666;
             margin-top: 4px;
         }
-
+        
         .visitka-skill-price {
             font-weight: bold;
             color: #48bb78;
             font-size: 14px;
         }
-
+        
         .visitka-qr {
             text-align: center;
             margin: 20px 0;
         }
-
+        
         .visitka-user-info {
             text-align: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 1px solid #e2e8f0;
         }
-
+        
         .visitka-user-name {
             font-size: 20px;
             font-weight: bold;
             color: #2d3748;
         }
-
+        
         .visitka-user-stats {
             display: flex;
             justify-content: center;
@@ -2609,7 +2794,7 @@
             font-size: 14px;
             color: #666;
         }
-
+        
         .visitka-skill-detail-modal {
             position: fixed;
             top: 0;
@@ -2623,7 +2808,7 @@
             justify-content: center;
             padding: 20px;
         }
-
+        
         .visitka-skill-detail-modal.active {
             display: flex;
         }
@@ -2685,6 +2870,25 @@
             </div>
         </div>
 
+        <!-- МОДАЛЬНОЕ ОКНО ВЫБОРА МЕСТОПОЛОЖЕНИЯ НА КАРТЕ -->
+        <div id="locationPickerModal" class="location-picker-modal">
+            <div class="location-picker-header">
+                <div class="location-picker-title">📍 Выберите точку на карте</div>
+                <button class="location-picker-close" onclick="closeLocationPicker();">×</button>
+            </div>
+            <div class="location-picker-map-container">
+                <div id="locationPickerMap"></div>
+                <div id="coordInfo" class="coord-info">
+                    📍 Выберите точку...
+                </div>
+            </div>
+            <div class="location-picker-controls">
+                <button class="my-location-btn" onclick="getUserLocationOnPicker();">📍 Моё местоположение</button>
+                <button class="confirm-btn" onclick="saveLocation();">✅ Подтвердить</button>
+                <button class="cancel-btn" onclick="closeLocationPicker();">❌ Отмена</button>
+            </div>
+        </div>
+
         <!-- СЕКЦИЯ МАСТЕРА -->
         <div id="masterSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
@@ -2700,8 +2904,19 @@
                 <input type="number" id="skillPrice" class="input-field" placeholder="Средняя цена в рублях*" required>
                 
                 <div class="city-autocomplete">
-                    <input type="text" id="skillCity" class="input-field" placeholder="🏙️ Город (например: Евпатория)*" required autocomplete="off" oninput="handleCityInput(this.value)">
+                    <input type="text" id="skillCity" class="input-field" placeholder="🏙️ Город (например: Евпатория)" autocomplete="off" oninput="handleCityInput(this.value)">
                     <div id="cityAutocompleteList" class="autocomplete-list"></div>
+                </div>
+                
+                <!-- КНОПКА ВЫБОРА НА КАРТЕ С FLOAT-БАЛЛУНОМ -->
+                <button class="location-picker-btn" onclick="openLocationPicker(false);">
+                    📍 Выбрать точку на карте
+                </button>
+                
+                <!-- Отображение выбранного местоположения -->
+                <div id="selectedLocationInfo" class="selected-location-info" style="display: none;">
+                    <span>📍 <span id="selectedLocationText">Не выбрано</span></span>
+                    <button class="reset-location-btn" onclick="resetSelectedLocation();">Сбросить</button>
                 </div>
                 
                 <div style="margin: 20px 0;">
@@ -3311,6 +3526,17 @@
                 <div id="editCityAutocompleteList" class="autocomplete-list"></div>
             </div>
             
+            <!-- КНОПКА ВЫБОРА НА КАРТЕ В РЕДАКТИРОВАНИИ -->
+            <button class="location-picker-btn" onclick="openLocationPicker(true);">
+                📍 Выбрать точку на карте
+            </button>
+            
+            <!-- Отображение выбранного местоположения в редактировании -->
+            <div id="editSelectedLocationInfo" class="selected-location-info" style="display: none;">
+                <span>📍 <span id="editSelectedLocationText">Не выбрано</span></span>
+                <button class="reset-location-btn" onclick="resetEditSelectedLocation();">Сбросить</button>
+            </div>
+            
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
                 <div class="radius-selector" style="background: #f7fafc;">
@@ -3509,6 +3735,16 @@
     let isSkillsLoaded = false;
     let globalSkillsCache = [];
     
+    // Переменные для выбора местоположения
+    let locationPickerMap = null;
+    let locationPickerMarker = null;
+    let locationPickerCircle = null;
+    let tempSelectedLat = null;
+    let tempSelectedLon = null;
+    let isEditModeLocation = false;
+    let currentSkillPhoto = null;
+    let editSkillPhoto = null;
+    
     // Переменные для визитки
     let visitkaEditMode = false;
     let visitkaSelectedSkills = [];
@@ -3518,6 +3754,262 @@
     // Счетчик кликов по логотипу для открытия админ-панели
     let logoClickCount = 0;
     let logoClickTimer = null;
+
+    // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ВЫБОРОМ МЕСТОПОЛОЖЕНИЯ ==========
+    
+    /**
+     * Открытие модального окна выбора местоположения на карте
+     * @param {boolean} isEdit - режим редактирования
+     */
+    function openLocationPicker(isEdit) {
+        triggerHapticFeedback();
+        
+        isEditModeLocation = isEdit;
+        
+        // Получаем текущие координаты из формы
+        let startLat = null;
+        let startLon = null;
+        let startRadius = isEdit ? currentEditRadius : currentRadius;
+        
+        if (isEdit && currentEditingSkill) {
+            if (currentEditingSkill.location && currentEditingSkill.location.lat) {
+                startLat = currentEditingSkill.location.lat;
+                startLon = currentEditingSkill.location.lon;
+            }
+        } else if (!isEdit && selectedLocation) {
+            startLat = selectedLocation.lat;
+            startLon = selectedLocation.lon;
+        }
+        
+        // Если нет сохранённых координат, используем город из выпадающего списка или местоположение пользователя
+        if (!startLat || !startLon) {
+            const cityField = isEdit ? document.getElementById('editSkillCity') : document.getElementById('skillCity');
+            const cityName = cityField.value;
+            
+            if (cityName && citiesDatabase[cityName]) {
+                startLat = citiesDatabase[cityName].lat;
+                startLon = citiesDatabase[cityName].lon;
+            } else if (userLocation) {
+                startLat = userLocation.lat;
+                startLon = userLocation.lon;
+            } else {
+                startLat = 55.7558;
+                startLon = 37.6173;
+            }
+        }
+        
+        // Показываем модальное окно
+        const modal = document.getElementById('locationPickerModal');
+        modal.classList.add('active');
+        
+        // Инициализируем карту в модальном окне с небольшой задержкой
+        setTimeout(() => {
+            initLocationPickerMap(startLat, startLon, startRadius);
+        }, 100);
+    }
+    
+    /**
+     * Инициализация карты в модальном окне
+     */
+    function initLocationPickerMap(lat, lon, radius) {
+        if (locationPickerMap) {
+            locationPickerMap.remove();
+            locationPickerMap = null;
+        }
+        
+        locationPickerMap = L.map('locationPickerMap').setView([lat, lon], 13);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(locationPickerMap);
+        
+        // Создаём перетаскиваемый маркер
+        locationPickerMarker = L.marker([lat, lon], {
+            draggable: true
+        }).addTo(locationPickerMap);
+        
+        // Создаём круг радиуса
+        locationPickerCircle = L.circle([lat, lon], {
+            color: '#667eea',
+            fillColor: '#667eea',
+            fillOpacity: 0.2,
+            radius: radius * 1000,
+            weight: 2
+        }).addTo(locationPickerMap);
+        
+        // Обновляем координаты при перемещении маркера
+        locationPickerMarker.on('dragend', function(e) {
+            const position = locationPickerMarker.getLatLng();
+            tempSelectedLat = position.lat;
+            tempSelectedLon = position.lng;
+            
+            // Обновляем круг
+            locationPickerCircle.setLatLng(position);
+            
+            // Обновляем информацию о координатах
+            document.getElementById('coordInfo').innerHTML = `📍 ${position.lat.toFixed(5)}, ${position.lng.toFixed(5)}`;
+        });
+        
+        // Обработчик клика по карте для перемещения маркера
+        locationPickerMap.on('click', function(e) {
+            const { lat, lng } = e.latlng;
+            tempSelectedLat = lat;
+            tempSelectedLon = lng;
+            
+            locationPickerMarker.setLatLng([lat, lng]);
+            locationPickerCircle.setLatLng([lat, lng]);
+            
+            document.getElementById('coordInfo').innerHTML = `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        });
+        
+        // Устанавливаем начальные координаты
+        tempSelectedLat = lat;
+        tempSelectedLon = lon;
+        document.getElementById('coordInfo').innerHTML = `📍 ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+    }
+    
+    /**
+     * Обновление круга на карте при изменении радиуса
+     * @param {number} radius - радиус в км
+     */
+    function updateRadiusOnMap(radius) {
+        if (locationPickerMap && locationPickerMarker && locationPickerCircle) {
+            const position = locationPickerMarker.getLatLng();
+            locationPickerCircle.setRadius(radius * 1000);
+        }
+    }
+    
+    /**
+     * Синхронизация радиуса с селектором в модальном окне
+     */
+    function syncRadiusWithSelector() {
+        const radius = isEditModeLocation ? currentEditRadius : currentRadius;
+        updateRadiusOnMap(radius);
+    }
+    
+    /**
+     * Получение местоположения пользователя для модального окна
+     */
+    function getUserLocationOnPicker() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const { latitude, longitude } = position.coords;
+                    tempSelectedLat = latitude;
+                    tempSelectedLon = longitude;
+                    
+                    locationPickerMarker.setLatLng([latitude, longitude]);
+                    locationPickerCircle.setLatLng([latitude, longitude]);
+                    locationPickerMap.setView([latitude, longitude], 13);
+                    
+                    document.getElementById('coordInfo').innerHTML = `📍 ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+                    
+                    showNotification('📍 Ваше местоположение определено');
+                },
+                error => {
+                    console.error('❌ Ошибка геолокации:', error);
+                    showNotification('❌ Не удалось определить местоположение');
+                }
+            );
+        } else {
+            showNotification('❌ Геолокация не поддерживается вашим браузером');
+        }
+    }
+    
+    /**
+     * Сохранение выбранного местоположения
+     */
+    function saveLocation() {
+        if (tempSelectedLat === null || tempSelectedLon === null) {
+            showNotification('❌ Пожалуйста, выберите точку на карте');
+            return;
+        }
+        
+        if (isEditModeLocation) {
+            // Режим редактирования
+            if (currentEditingSkill) {
+                if (!currentEditingSkill.location) {
+                    currentEditingSkill.location = {};
+                }
+                currentEditingSkill.location.lat = tempSelectedLat;
+                currentEditingSkill.location.lon = tempSelectedLon;
+                currentEditingSkill.hasCustomLocation = true;
+                
+                // Показываем информацию в форме редактирования
+                const infoDiv = document.getElementById('editSelectedLocationInfo');
+                const textSpan = document.getElementById('editSelectedLocationText');
+                textSpan.innerHTML = `${tempSelectedLat.toFixed(4)}, ${tempSelectedLon.toFixed(4)}`;
+                infoDiv.style.display = 'flex';
+            }
+        } else {
+            // Режим создания
+            if (!selectedLocation) {
+                selectedLocation = {};
+            }
+            selectedLocation.lat = tempSelectedLat;
+            selectedLocation.lon = tempSelectedLon;
+            hasCustomLocation = true;
+            
+            // Показываем информацию в форме создания
+            const infoDiv = document.getElementById('selectedLocationInfo');
+            const textSpan = document.getElementById('selectedLocationText');
+            textSpan.innerHTML = `${tempSelectedLat.toFixed(4)}, ${tempSelectedLon.toFixed(4)}`;
+            infoDiv.style.display = 'flex';
+        }
+        
+        closeLocationPicker();
+        showNotification('✅ Местоположение сохранено');
+    }
+    
+    /**
+     * Закрытие модального окна выбора местоположения
+     */
+    function closeLocationPicker() {
+        const modal = document.getElementById('locationPickerModal');
+        modal.classList.remove('active');
+        
+        if (locationPickerMap) {
+            locationPickerMap.remove();
+            locationPickerMap = null;
+        }
+        locationPickerMarker = null;
+        locationPickerCircle = null;
+        tempSelectedLat = null;
+        tempSelectedLon = null;
+    }
+    
+    /**
+     * Сброс выбранного местоположения в форме создания
+     */
+    function resetSelectedLocation() {
+        selectedLocation = null;
+        hasCustomLocation = false;
+        
+        const infoDiv = document.getElementById('selectedLocationInfo');
+        infoDiv.style.display = 'none';
+        
+        showNotification('📍 Местоположение сброшено (будет использован город по умолчанию)');
+    }
+    
+    /**
+     * Сброс выбранного местоположения в форме редактирования
+     */
+    function resetEditSelectedLocation() {
+        if (currentEditingSkill) {
+            delete currentEditingSkill.location;
+            delete currentEditingSkill.hasCustomLocation;
+        }
+        
+        const infoDiv = document.getElementById('editSelectedLocationInfo');
+        infoDiv.style.display = 'none';
+        
+        showNotification('📍 Местоположение сброшено (будет использован город по умолчанию)');
+    }
+    
+    // Переменные для выбранного местоположения
+    let selectedLocation = null;
+    let hasCustomLocation = false;
 
     // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ВИЗИТКОЙ ==========
     
@@ -3748,6 +4240,10 @@
             detailsHtml += `<em style="color: #999;">Мастер не добавил подробности</em><br><br>`;
         }
         
+        if (skill.location && skill.location.lat) {
+            detailsHtml += `<strong>📍 Точная точка:</strong><br>${skill.location.lat.toFixed(4)}, ${skill.location.lon.toFixed(4)}<br><br>`;
+        }
+        
         text.innerHTML = detailsHtml;
         
         modal.classList.add('active');
@@ -3834,127 +4330,6 @@
         document.getElementById('visitkaEditBtn').textContent = '✏️ Редактировать';
     }
     
-    /**
-     * Открыть визитку мастера по userId (при сканировании QR)
-     */
-    async function openMasterVisitka(userId) {
-        triggerHapticFeedback();
-        
-        const modal = document.getElementById('masterVisitkaModal');
-        const content = document.getElementById('masterVisitkaContent');
-        const title = document.getElementById('masterVisitkaTitle');
-        
-        modal.style.display = 'flex';
-        content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки мастера...</div></div>';
-        
-        // Загружаем все умейки
-        await preloadAllSkills();
-        
-        const allSkills = getGlobalSkills();
-        const masterSkills = allSkills.filter(s => s.userId === userId);
-        const userData = getOrCreateUserProfile(userId);
-        const userName = userData.firstName || 'Мастер';
-        
-        title.textContent = `📇 Визитка мастера ${escapeHtml(userName)}`;
-        
-        // Получаем выбранные умейки мастера для визитки
-        const masterSelectedKey = `visa_selected_skills_${userId}`;
-        const masterSelected = getLocalStorage(masterSelectedKey);
-        let displaySkills = masterSkills;
-        
-        if (masterSelected && Array.isArray(masterSelected) && masterSelected.length > 0) {
-            displaySkills = masterSkills.filter(s => masterSelected.includes(s._id));
-        }
-        
-        if (displaySkills.length === 0) {
-            content.innerHTML = `
-                <div style="text-align: center; padding: 30px;">
-                    <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
-                    <div style="color: #2d3748; font-size: 16px;">У мастера пока нет умейок в визитке</div>
-                </div>
-            `;
-            return;
-        }
-        
-        currentMasterVisitkaData = {
-            userId: userId,
-            userName: userName,
-            skills: displaySkills
-        };
-        
-        content.innerHTML = `
-            <div class="visitka-user-info">
-                <div class="visitka-user-name">${escapeHtml(userName)}</div>
-                <div class="visitka-user-stats">
-                    <span>✨ ${displaySkills.length} умейк(и)</span>
-                </div>
-            </div>
-            
-            <div style="margin-top: 20px;">
-                <h4 style="color: #2d3748; margin-bottom: 10px;">✨ Умейки мастера</h4>
-                <div id="masterVisitkaSkillsList">
-                    ${displaySkills.map(skill => {
-                        const statusBadge = getStatusBadge(skill.status);
-                        return `
-                            <div class="visitka-skill-item" style="cursor: pointer;" onclick="showMasterVisitkaSkillDetail('${skill._id}')">
-                                <div class="visitka-skill-info" style="flex: 1;">
-                                    <div class="visitka-skill-name">${escapeHtml(skill.skill)}</div>
-                                    <div class="visitka-skill-details">💰 ${skill.price} ₽ | 📍 ${skill.city || 'Не указан'}</div>
-                                    ${statusBadge}
-                                </div>
-                                <div style="color: #667eea;">📝</div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            </div>
-        `;
-    }
-    
-    /**
-     * Показать детали умейки мастера из визитки
-     */
-    function showMasterVisitkaSkillDetail(skillId) {
-        triggerHapticFeedback();
-        
-        if (!currentMasterVisitkaData) return;
-        
-        const skill = currentMasterVisitkaData.skills.find(s => s._id === skillId);
-        if (!skill) return;
-        
-        currentVisitkaSkill = skill;
-        
-        const modal = document.getElementById('visitkaSkillDetailModal');
-        const title = document.getElementById('visitkaSkillDetailTitle');
-        const text = document.getElementById('visitkaSkillDetailText');
-        
-        title.textContent = `📝 ${escapeHtml(skill.skill)}`;
-        
-        let detailsHtml = `<strong>💰 Цена:</strong> ${skill.price} ₽<br><br>`;
-        detailsHtml += `<strong>📍 Город:</strong> ${skill.city || 'Не указан'}<br><br>`;
-        detailsHtml += `<strong>📏 Радиус:</strong> ${skill.radius || 10} км<br><br>`;
-        detailsHtml += `<strong>⭐ Статус:</strong> ${skill.status === 'ready' ? 'Готов к работе' : 'Занят'}<br><br>`;
-        
-        if (skill.details && skill.details.trim()) {
-            detailsHtml += `<strong>📝 Подробности:</strong><br>${escapeHtml(skill.details)}<br><br>`;
-        } else {
-            detailsHtml += `<em style="color: #999;">Мастер не добавил подробности</em><br><br>`;
-        }
-        
-        text.innerHTML = detailsHtml;
-        
-        modal.classList.add('active');
-    }
-    
-    /**
-     * Закрыть модальное окно визитки мастера
-     */
-    function closeMasterVisitkaModal() {
-        triggerHapticFeedback();
-        document.getElementById('masterVisitkaModal').style.display = 'none';
-        currentMasterVisitkaData = null;
-    }
-
     // ========== ФУНКЦИЯ ДЛЯ ОТКРЫТИЯ МОДАЛЬНОГО ОКНА ПОДРОБНОСТЕЙ ==========
     window.openDetailsModal = function(skillId) {
         triggerHapticFeedback();
@@ -3969,11 +4344,18 @@
         
         document.getElementById('detailsModalTitle').textContent = `📝 ${skill.skill}`;
         
+        let detailsHtml = '';
         if (detailsText) {
-            document.getElementById('detailsModalText').innerHTML = detailsText.replace(/\n/g, '<br>');
+            detailsHtml = detailsText.replace(/\n/g, '<br>');
         } else {
-            document.getElementById('detailsModalText').innerHTML = '<span style="color: #999;">Мастер не добавил подробности</span>';
+            detailsHtml = '<span style="color: #999;">Мастер не добавил подробности</span>';
         }
+        
+        if (skill.location && skill.location.lat) {
+            detailsHtml += `<br><br><strong>📍 Точная точка:</strong><br>${skill.location.lat.toFixed(4)}, ${skill.location.lon.toFixed(4)}`;
+        }
+        
+        document.getElementById('detailsModalText').innerHTML = detailsHtml;
         
         document.getElementById('detailsModal').classList.add('active');
     };
