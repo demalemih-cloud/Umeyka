@@ -5978,7 +5978,14 @@
             };
             
             saveSkillToLocalStorage(localSkill);
-            addGlobalSkill(localSkill);
+                        addGlobalSkill(localSkill);
+            
+            // Автоматически добавляем новую умейку в визитку
+            const currentSelectedLocal = getVisitkaSelectedSkills();
+            if (!currentSelectedLocal.includes(localSkill._id)) {
+                currentSelectedLocal.push(localSkill._id);
+                saveVisitkaSelectedSkills(currentSelectedLocal);
+            }
             
             alert('✅ Умейка сохранена локально (сервер недоступен)');
             
