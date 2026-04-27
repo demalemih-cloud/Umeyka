@@ -5625,27 +5625,24 @@
                     const result = await response.json();
                     console.log('📱 Ответ сервера при добавлении:', result);
                     
-                    if (result.success) {
+                                        if (result.success) {
                         const newSkill = result.skill || skillData;
                         newSkill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${newSkill._id}`;
                         addGlobalSkill(newSkill);
                         
+                        // === АВТОДОБАВЛЕНИЕ В ВИЗИТКУ ===
+                        const currentSelected = getVisitkaSelectedSkills();
+                        if (!currentSelected.includes(newSkill._id)) {
+                            currentSelected.push(newSkill._id);
+                            saveVisitkaSelectedSkills(currentSelected);
+                            console.log(`✅ Умейка ${newSkill._id} автоматически добавлена в визитку`);
+                        }
+                        // ================================
+                        
                         alert('✅ Умейка успешно опубликована!');
                         
-                        document.getElementById('skillName').value = '';
-                        document.getElementById('skillDetails').value = '';
-                        document.getElementById('skillExperience').value = '';
-                        document.getElementById('skillPrice').value = '';
-                        document.getElementById('skillCity').value = '';
-                        removeSkillPhoto();
-                        currentSkillPhoto = null;
+                        // ... очистка полей ...
                         
-                        currentRadius = 10;
-                        selectRadius(10);
-                        
-                        currentMasterStatus = 'ready';
-                        selectMasterStatus('ready');
-                    
                         setTimeout(() => {
                             loadMySkills();
                             loadProfileSkills();
@@ -5662,7 +5659,7 @@
                 console.log('⚠️ Сервер недоступен, сохраняем локально:', serverError);
             }
             
-            const localSkill = {
+                        const localSkill = {
                 ...skillData,
                 _id: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
                 createdAt: new Date().toISOString(),
@@ -5670,7 +5667,17 @@
                 qrCodeData: `${TELEGRAM_BOT_URL}?start=skill_local_${Date.now()}`
             };
             
+            saveSkillToLocalStorage(localSkill);
             addGlobalSkill(localSkill);
+            
+            // === АВТОДОБАВЛЕНИЕ В ВИЗИТКУ (локальное сохранение) ===
+            const currentSelected = getVisitkaSelectedSkills();
+            if (!currentSelected.includes(localSkill._id)) {
+                currentSelected.push(localSkill._id);
+                saveVisitkaSelectedSkills(currentSelected);
+                console.log(`✅ Локальная умейка ${localSkill._id} автоматически добавлена в визитку`);
+            }
+            // =======================================================
             
             alert('✅ Умейка сохранена локально (сервер недоступен)');
             
