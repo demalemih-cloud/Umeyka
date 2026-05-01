@@ -3544,18 +3544,34 @@
         visitkaSelectedSkills = skillIds;
     }
     
-    /**
-     * Получение всех умейок пользователя
+        /**
+     * Получение всех умейок пользователя (глобальные + локальные)
      */
     function getUserSkills() {
         const globalSkills = getGlobalSkills();
-        return globalSkills.filter(s => s.userId === currentUserId);
+        const globalUserSkills = globalSkills.filter(s => s.userId === currentUserId);
+        
+        // Также загружаем локальные умейки пользователя
+        const localUserSkills = loadSkillsFromLocalStorage(currentUserId) || [];
+        
+        // Объединяем, убирая дубликаты по _id
+        const allSkills = [...globalUserSkills];
+        const existingIds = new Set(allSkills.map(s => s._id));
+        
+        localUserSkills.forEach(skill => {
+            if (!existingIds.has(skill._id)) {
+                allSkills.push(skill);
+                existingIds.add(skill._id);
+            }
+        });
+        
+        return allSkills;
     }
     
     /**
      * Открытие модального окна визитки
      */
-    async function openVisitkaModal() {
+        async function openVisitkaModal() {
         triggerHapticFeedback();
         
         const modal = document.getElementById('visitkaModal');
@@ -3564,8 +3580,11 @@
         modal.style.display = 'flex';
         content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки...</div></div>';
         
-        // Загружаем актуальные данные
+        // Загружаем актуальные данные с сервера и локальные
         await preloadAllSkills();
+        
+        // Дополнительно загружаем локальные умейки текущего пользователя
+        loadSkillsFromLocalStorage(currentUserId);
         
         renderVisitkaModal();
     }
@@ -3573,12 +3592,15 @@
     /**
      * Рендер содержимого визитки
      */
-    function renderVisitkaModal() {
+        function renderVisitkaModal() {
+        // Принудительно перезагружаем умейки пользователя перед рендером
         const userSkills = getUserSkills();
         const userData = getOrCreateUserProfile(currentUserId);
         const userName = userData.firstName || 'Пользователь';
         const skillsCount = userSkills.length;
         const rating = userData.rating || 0;
+        
+        console.log('📇 [Визитка] Рендер визитки. Умейок пользователя:', skillsCount, 'ID:', userSkills.map(s => s._id));
         
         visitkaSelectedSkills = getVisitkaSelectedSkills();
         
@@ -3989,10 +4011,16 @@
      * Функция для предварительной загрузки всех умейок при старте приложения
      * Это ключевое исправление - умейки загружаются в глобальное хранилище ДО сканирования
      */
-    async function preloadAllSkills() {
+        async function preloadAllSkills() {
         console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейок...');
         
         try {
+            // Сначала сохраняем текущие локальные умейки всех пользователей
+            const currentGlobalSkills = getGlobalSkills();
+            const localSkillsOnly = currentGlobalSkills.filter(s => s.local === true);
+            const localSkillsByUser = {};
+            currentUserId && (localSkillsByUser[currentUserId] = loadSkillsFromLocalStorage(currentUserId) || []);
+            
             // Загружаем умейки с сервера
             const response = await fetch(`${API_URL}/api/skills`);
             const result = await response.json();
@@ -4000,28 +4028,32 @@
             if (result.success && result.skills) {
                 console.log(`✅ [Загрузка] Загружено ${result.skills.length} умейок с сервера`);
                 
-                // Сохраняем в глобальное хранилище
-                const globalSkills = getGlobalSkills();
-                result.skills.forEach(skill => {
-                    const existingIndex = globalSkills.findIndex(s => s._id === skill._id);
-                    if (existingIndex !== -1) {
-                        globalSkills[existingIndex] = skill;
-                    } else {
-                        globalSkills.push(skill);
+                // Начинаем с серверных умейек
+                let mergedSkills = [...result.skills];
+                const serverIds = new Set(result.skills.map(s => s._id));
+                
+                // Добавляем локальные умейки текущего пользователя, которых нет на сервере
+                const currentUserLocalSkills = loadSkillsFromLocalStorage(currentUserId) || [];
+                currentUserLocalSkills.forEach(skill => {
+                    if (!serverIds.has(skill._id)) {
+                        mergedSkills.push(skill);
+                        serverIds.add(skill._id);
                     }
                 });
-                setGlobalSkills(globalSkills);
+                
+                // Сохраняем в глобальное хранилище
+                setGlobalSkills(mergedSkills);
                 
                 // Обновляем кэш
-                globalSkillsCache = globalSkills;
+                globalSkillsCache = mergedSkills;
                 isSkillsLoaded = true;
                 
-                console.log(`💾 [Загрузка] Глобальное хранилище содержит ${globalSkills.length} умейок`);
+                console.log(`💾 [Загрузка] Глобальное хранилище содержит ${mergedSkills.length} умейок (сервер: ${result.skills.length}, локальные: ${mergedSkills.length - result.skills.length})`);
                 
                 // Выводим список ID для отладки
-                console.log('📋 [Загрузка] ID всех умейок:', globalSkills.map(s => s._id));
+                console.log('📋 [Загрузка] ID всех умейок:', mergedSkills.map(s => s._id));
                 
-                return globalSkills;
+                return mergedSkills;
             } else {
                 console.warn('⚠️ [Загрузка] Сервер вернул ошибку:', result.error);
                 isSkillsLoaded = true;
@@ -5930,7 +5962,15 @@
                         newSkill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${newSkill._id}`;
                         addGlobalSkill(newSkill);
                         
-                        alert('✅ Умейка успешно опубликована!');
+                                                alert('✅ Умейка успешно опубликована!');
+                        
+                        // Автоматически добавляем новую умейку в визитку
+                        const currentSelected = getVisitkaSelectedSkills();
+                        if (!currentSelected.includes(newSkill._id)) {
+                            currentSelected.push(newSkill._id);
+                            saveVisitkaSelectedSkills(currentSelected);
+                            console.log('✅ [Визитка] Новая умейка автоматически добавлена в визитку:', newSkill._id);
+                        }
                         
                         document.getElementById('skillName').value = '';
                         document.getElementById('skillDetails').value = '';
@@ -5973,7 +6013,15 @@
             saveSkillToLocalStorage(localSkill);
             addGlobalSkill(localSkill);
             
-            alert('✅ Умейка сохранена локально (сервер недоступен)');
+                        alert('✅ Умейка сохранена локально (сервер недоступен)');
+            
+            // Автоматически добавляем новую локальную умейку в визитку
+            const currentSelectedLocal = getVisitkaSelectedSkills();
+            if (!currentSelectedLocal.includes(localSkill._id)) {
+                currentSelectedLocal.push(localSkill._id);
+                saveVisitkaSelectedSkills(currentSelectedLocal);
+                console.log('✅ [Визитка] Новая локальная умейка автоматически добавлена в визитку:', localSkill._id);
+            }
             
             document.getElementById('skillName').value = '';
             document.getElementById('skillDetails').value = '';
