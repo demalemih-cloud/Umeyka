@@ -3859,7 +3859,7 @@
     /**
      * Открыть визитку мастера по userId (при сканировании QR)
      */
-    async function openMasterVisitka(userId) {
+        async function openMasterVisitka(userId) {
         triggerHapticFeedback();
         
         const modal = document.getElementById('masterVisitkaModal');
@@ -3869,11 +3869,16 @@
         modal.style.display = 'flex';
         content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки мастера...</div></div>';
         
-        // Загружаем все умейки
+        // Загружаем все умейки (сервер + локальные)
         await preloadAllSkills();
+        
+        // Дополнительно загружаем локальные умейки этого пользователя
+        loadSkillsFromLocalStorage(userId);
         
         const allSkills = getGlobalSkills();
         const masterSkills = allSkills.filter(s => s.userId === userId);
+        
+        console.log(`📇 [Визитка] Найдено ${masterSkills.length} умейок для пользователя ${userId}`);
         const userData = getOrCreateUserProfile(userId);
         const userName = userData.firstName || 'Мастер';
         
@@ -3888,11 +3893,13 @@
             displaySkills = masterSkills.filter(s => masterSelected.includes(s._id));
         }
         
-        if (displaySkills.length === 0) {
+                if (displaySkills.length === 0) {
             content.innerHTML = `
                 <div style="text-align: center; padding: 30px;">
                     <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
-                    <div style="color: #2d3748; font-size: 16px;">У мастера пока нет умейок в визитке</div>
+                    <div style="color: #2d3748; font-size: 16px; margin-bottom: 10px;">У мастера пока нет умейок в визитке</div>
+                    <div style="color: #666; font-size: 14px;">Мастер: ${escapeHtml(userName)}</div>
+                    <div style="color: #999; font-size: 12px; margin-top: 15px;">ID: ${userId}</div>
                 </div>
             `;
             return;
@@ -4458,7 +4465,7 @@
      * - start=user_XXX - для визиток
      * - start=USER_ID (число) - для реферальных ссылок
      */
-    function handleDeepLink() {
+        function handleDeepLink() {
         console.log('🔗 [Deeplink] Начинаю обработку глубокой ссылки...');
         
         const urlParams = new URLSearchParams(window.location.search);
@@ -4501,11 +4508,20 @@
             const userId = startParam.replace('user_', '');
             console.log('🔗 [Deeplink] Обнаружена ссылка на визитку пользователя с ID:', userId);
             
+            // Проверяем, не является ли это текущим пользователем
+            if (userId === currentUserId) {
+                console.log('🔗 [Deeplink] Это визитка текущего пользователя, открываем свою визитку');
+                setTimeout(() => {
+                    openVisitkaModal();
+                }, 1500);
+                return;
+            }
+            
             const openVisitka = async () => {
                 await preloadAllSkills();
                 setTimeout(() => {
                     openMasterVisitka(userId);
-                }, 500);
+                }, 800);
             };
             
             openVisitka();
@@ -7118,7 +7134,7 @@
     
     // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (продолжение) ==========
     
-    document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', async function() {
         console.log('🚀 Ymeyka app loaded successfully!');
         
         currentMasterStatus = 'ready';
@@ -7138,7 +7154,11 @@
         
         checkPendingReferral();
         
-        handleDeepLink();
+        // Обрабатываем deeplink с задержкой, чтобы всё загрузилось
+        console.log('⏳ [Deeplink] Запускаю обработку deeplink через 1.5 сек...');
+        setTimeout(() => {
+            handleDeepLink();
+        }, 1500);
         
         const tg = window.Telegram?.WebApp;
         if (tg) {
