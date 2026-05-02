@@ -2627,94 +2627,6 @@
         .visitka-skill-detail-modal.active {
             display: flex;
         }
-     
-        /* Стили категорий архива */
-.archive-category-button {
-    display: flex;
-    align-items: center;
-    padding: 18px 20px;
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 15px;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: left;
-    width: 100%;
-}
-
-.archive-category-button:hover {
-    background: rgba(255,255,255,0.25);
-    transform: translateX(5px);
-}
-
-.archive-category-button:active {
-    transform: scale(0.98);
-    background: rgba(255,255,255,0.3);
-}
-
-.archive-category-icon {
-    font-size: 24px;
-    margin-right: 15px;
-    min-width: 30px;
-    text-align: center;
-}
-
-.archive-category-count {
-    margin-left: auto;
-    background: rgba(255,255,255,0.2);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.archive-category-other {
-    background: linear-gradient(135deg, rgba(159, 122, 234, 0.3) 0%, rgba(128, 90, 213, 0.3) 100%);
-    border: 1px solid rgba(159, 122, 234, 0.4);
-}
-
-/* Сортировка */
-.sort-controls {
-    display: flex;
-    gap: 10px;
-    margin: 15px 0;
-    flex-wrap: wrap;
-}
-
-.sort-button {
-    padding: 10px 16px;
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 10px;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.sort-button.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-color: white;
-}
-
-/* Селект категории */
-select.input-field {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    padding-right: 40px;
-}
-
-select.input-field option {
-    color: #2d3748;
-    background: white;
-    padding: 10px;
-}
     </style>
 </head>
 <body>
@@ -2737,10 +2649,11 @@ select.input-field option {
                 <button class="main-button button-master" onclick="triggerHapticFeedback(); showSection('masterSection');">
                     <span class="button-icon">✨</span>
                     Я умейка
-                <button class="main-button button-client" onclick="triggerHapticFeedback(); showArchiveCategories();">
-    <span class="button-icon">📂</span>
-    Архив
-</button>
+                </button>
+                <button class="main-button button-client" onclick="triggerHapticFeedback(); showSection('clientSection');">
+                    <span class="button-icon">🔍</span>
+                    Я ищу
+                </button>
                 <button class="main-button" onclick="triggerHapticFeedback(); showProfileSection();" 
                         style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">
                     <span class="button-icon">👤</span>
@@ -2778,13 +2691,7 @@ select.input-field option {
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
                 
-                <div style="margin-bottom: 15px;">
-    <div style="color: white; margin-bottom: 10px; font-weight: 600;">📝 Выберите категорию умейки</div>
-    <select id="skillCategory" class="input-field" style="cursor: pointer;" onchange="handleSkillCategoryChange(this.value)">
-        <option value="">-- Выберите категорию --</option>
-    </select>
-</div>
-<input type="text" id="skillName" class="input-field" placeholder="Уточните название (например: Ремонт iPhone)*" required style="display: none;">
+                <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
                 
                 <!-- НОВОЕ ПОЛЕ: Подробности -->
                 <textarea id="skillDetails" class="input-field" placeholder="📝 Подробности (например: Работаю с Apple, Samsung, Xiaomi. Есть запчасти в наличии.)" style="height: 80px; resize: vertical;"></textarea>
@@ -2859,33 +2766,24 @@ select.input-field option {
             </div>
         </div>
 
-        <!-- СЕКЦИЯ АРХИВА (КАТЕГОРИИ) -->
-<div id="clientSection" class="section">
-    <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
-    <div class="form-section">
-        <h2 style="margin-bottom: 20px; text-align: center;">📂 Архив категорий</h2>
-        <div id="archiveCategoriesList" style="display: flex; flex-direction: column; gap: 12px;">
-            <!-- Категории генерируются JS -->
+        <!-- СЕКЦИЯ КЛИЕНТА -->
+        <div id="clientSection" class="section">
+            <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">🔍 Найти мастера</h2>
+                
+                <input type="text" id="searchInput" class="input-field" placeholder="🔎 Что ищем? (например: сантехник, электрик)">
+                
+                <div class="city-autocomplete">
+                    <input type="text" id="searchCity" class="input-field" placeholder="🏙️ Город (опционально)" autocomplete="off" oninput="handleSearchCityInput(this.value)">
+                    <div id="searchCityAutocompleteList" class="autocomplete-list"></div>
+                </div>
+                
+                <button class="submit-button" onclick="triggerHapticFeedback(); searchSkills();">Найти мастеров</button>
+                
+                <div id="searchResults" style="margin-top: 20px;"></div>
+            </div>
         </div>
-    </div>
-</div>
-
-<!-- СЕКЦИЯ РЕЗУЛЬТАТОВ ПОИСКА ПО КАТЕГОРИИ -->
-<div id="archiveResultsSection" class="section">
-    <button class="back-button" onclick="triggerHapticFeedback(); showSection('clientSection');">← Назад к категориям</button>
-    <div class="form-section">
-        <h2 id="archiveCategoryTitle" style="margin-bottom: 20px; text-align: center;">🔍 Результаты</h2>
-        
-        <div class="city-autocomplete">
-            <input type="text" id="archiveSearchCity" class="input-field" placeholder="🏙️ Фильтр по городу (опционально)" autocomplete="off" oninput="handleArchiveCityInput(this.value)">
-            <div id="archiveCityAutocompleteList" class="autocomplete-list"></div>
-        </div>
-        
-        <div id="archiveResults" style="margin-top: 20px;">
-            <div class="loading">⏳ Загрузка...</div>
-        </div>
-    </div>
-</div>
 
         <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА -->
         <div id="profileSection" class="section">
@@ -6021,7 +5919,6 @@ select.input-field option {
                 userId: userId,
                 username: userData.firstName || 'Аноним',
                 status: currentMasterStatus
-                category: document.getElementById('skillCategory').value || 'other',
             };
 
             console.log('📤 Отправляю данные на сервер:', skillData);
@@ -7231,8 +7128,6 @@ select.input-field option {
         
         showMainScreen();
         
-        initSkillCategorySelect();     
-
         currentUserId = checkAndSetUserId();
         
         console.log('📦 Начинаю предварительную загрузку всех умейек...');
@@ -8454,406 +8349,6 @@ select.input-field option {
             dealAmount.addEventListener('input', updateDealCommission);
         }
     });
-
-    // ========== КАТЕГОРИИ АРХИВА ==========
-const SKILL_CATEGORIES = [
-    { id: 'builder', name: 'Строитель', icon: '🏗️' },
-    { id: 'hairdresser', name: 'Парикмахер', icon: '💇' },
-    { id: 'knitting', name: 'Вяжу', icon: '🧶' },
-    { id: 'tech_repair', name: 'Ремонт техники', icon: '🔧' },
-    { id: 'electrician', name: 'Электрик', icon: '⚡' },
-    { id: 'roofer', name: 'Кровельщик', icon: '🏠' },
-    { id: 'finisher', name: 'Отделочник', icon: '🎨' },
-    { id: 'cook', name: 'Повар', icon: '👨‍🍳' },
-    { id: 'digger', name: 'Копаю', icon: '⛏️' },
-    { id: 'doctor', name: 'Доктор', icon: '👨‍⚕️' },
-    { id: 'plumber', name: 'Сантехник', icon: '🚿' },
-    { id: 'welder', name: 'Сварщик', icon: '🔥' },
-    { id: 'carpenter', name: 'Плотник/Столяр', icon: '🪵' },
-    { id: 'auto_mechanic', name: 'Автомеханик', icon: '🚗' },
-    { id: 'photographer', name: 'Фотограф', icon: '📸' },
-    { id: 'tutor', name: 'Репетитор', icon: '📚' },
-    { id: 'cleaner', name: 'Клининг', icon: '🧹' },
-    { id: 'nanny', name: 'Няня/Сиделка', icon: '👶' },
-    { id: 'designer', name: 'Дизайнер', icon: '✏️' },
-    { id: 'programmer', name: 'Программист', icon: '💻' },
-    { id: 'mover', name: 'Грузчик/Переезд', icon: '📦' },
-    { id: 'gardener', name: 'Садовник/Озеленение', icon: '🌳' },
-    { id: 'tailor', name: 'Швея/Пошив', icon: '🪡' },
-    { id: 'masseur', name: 'Массажист', icon: '💆' },
-    { id: 'trainer', name: 'Тренер/Фитнес', icon: '💪' },
-    { id: 'translator', name: 'Переводчик', icon: '🌐' },
-    { id: 'musician', name: 'Музыкант/Уроки', icon: '🎵' },
-    { id: 'other', name: 'Другое', icon: '✨' }
-];
-
-let currentArchiveCategory = null;
-let currentArchiveSort = 'alphabet'; // 'alphabet' | 'price' | 'rating'
-
-// ========== ФУНКЦИИ АРХИВА ==========
-
-/**
- * Инициализация селекта категорий при добавлении умейки
- */
-function initSkillCategorySelect() {
-    const select = document.getElementById('skillCategory');
-    if (!select) return;
-    
-    // Очищаем кроме первого option
-    while (select.options.length > 1) {
-        select.remove(1);
-    }
-    
-    SKILL_CATEGORIES.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat.id;
-        option.textContent = `${cat.icon} ${cat.name}`;
-        select.appendChild(option);
-    });
-}
-
-/**
- * Обработка выбора категории при добавлении умейки
- */
-function handleSkillCategoryChange(categoryId) {
-    const nameInput = document.getElementById('skillName');
-    const category = SKILL_CATEGORIES.find(c => c.id === categoryId);
-    
-    if (categoryId === 'other') {
-        nameInput.style.display = 'block';
-        nameInput.placeholder = 'Введите название умейки*';
-        nameInput.value = '';
-        nameInput.focus();
-    } else if (category) {
-        nameInput.style.display = 'block';
-        nameInput.value = category.name;
-        nameInput.placeholder = `Уточните (например: ${category.name} частный)*`;
-    } else {
-        nameInput.style.display = 'none';
-        nameInput.value = '';
-    }
-}
-
-/**
- * Показать категории архива
- */
-function showArchiveCategories() {
-    triggerHapticFeedback();
-    showSection('clientSection');
-    
-    const container = document.getElementById('archiveCategoriesList');
-    if (!container) return;
-    
-    // Предзагружаем умейки для подсчёта
-    preloadAllSkills().then(() => {
-        const allSkills = getGlobalSkills();
-        
-        container.innerHTML = SKILL_CATEGORIES.map(cat => {
-            // Считаем умейки в категории (по совпадению skill с названием категории или по полю category)
-            const count = allSkills.filter(s => {
-                if (s.category === cat.id) return true;
-                if (!s.category && s.skill) {
-                    const skillLower = s.skill.toLowerCase();
-                    const catNameLower = cat.name.toLowerCase();
-                    // Проверяем содержит ли название умейки имя категории или наоборот
-                    return skillLower.includes(catNameLower) || catNameLower.includes(skillLower);
-                }
-                return false;
-            }).length;
-            
-            const isOther = cat.id === 'other';
-            const extraClass = isOther ? 'archive-category-other' : '';
-            
-            return `
-                <button class="archive-category-button ${extraClass}" onclick="triggerHapticFeedback(); openArchiveCategory('${cat.id}');">
-                    <span class="archive-category-icon">${cat.icon}</span>
-                    <span style="flex: 1;">${cat.name}</span>
-                    <span class="archive-category-count">${count}</span>
-                </button>
-            `;
-        }).join('');
-    });
-}
-
-/**
- * Открыть категорию архива
- */
-async function openArchiveCategory(categoryId) {
-    triggerHapticFeedback();
-    currentArchiveCategory = categoryId;
-    
-    const category = SKILL_CATEGORIES.find(c => c.id === categoryId);
-    if (!category) return;
-    
-    showSection('archiveResultsSection');
-    document.getElementById('archiveCategoryTitle').innerHTML = 
-        `${category.icon} ${category.name}`;
-    
-    // Сбрасываем город
-    document.getElementById('archiveSearchCity').value = '';
-    
-    await loadArchiveResults();
-}
-
-/**
- * Загрузка результатов архива
- */
-async function loadArchiveResults() {
-    const resultsContainer = document.getElementById('archiveResults');
-    const cityFilter = document.getElementById('archiveSearchCity').value.trim();
-    
-    resultsContainer.innerHTML = '<div class="loading">⏳ Загрузка умейек...</div>';
-    
-    try {
-        let skills = [];
-        
-        // Загружаем с сервера
-        try {
-            const response = await fetch(`${API_URL}/api/skills`);
-            const result = await response.json();
-            if (result.success && result.skills) {
-                skills = result.skills;
-            }
-        } catch (e) {
-            console.log('⚠️ Сервер недоступен, используем локальные данные');
-        }
-        
-        // Добавляем локальные
-        const globalSkills = getGlobalSkills();
-        const existingIds = new Set(skills.map(s => s._id));
-        globalSkills.forEach(s => {
-            if (!existingIds.has(s._id)) {
-                skills.push(s);
-            }
-        });
-        
-        // Фильтруем по категории
-        const category = SKILL_CATEGORIES.find(c => c.id === currentArchiveCategory);
-        const categoryName = category ? category.name.toLowerCase() : '';
-        
-        let filtered = skills.filter(s => {
-            // Если есть поле category — точное совпадение
-            if (s.category === currentArchiveCategory) return true;
-            
-            // Иначе ищем по названию
-            if (s.skill) {
-                const skillLower = s.skill.toLowerCase();
-                // Для "другое" — показываем те что не попали ни в одну категорию
-                if (currentArchiveCategory === 'other') {
-                    return !SKILL_CATEGORIES.some(c => {
-                        if (c.id === 'other') return false;
-                        const catName = c.name.toLowerCase();
-                        return skillLower.includes(catName) || catName.includes(skillLower);
-                    });
-                }
-                return skillLower.includes(categoryName) || categoryName.includes(skillLower);
-            }
-            return false;
-        });
-        
-        // Фильтр по городу
-        if (cityFilter) {
-            filtered = filtered.filter(s => 
-                s.city && s.city.toLowerCase().includes(cityFilter.toLowerCase())
-            );
-        }
-        
-        // Сортировка
-        if (currentArchiveSort === 'alphabet') {
-            filtered.sort((a, b) => (a.skill || '').localeCompare(b.skill || '', 'ru'));
-        } else if (currentArchiveSort === 'price') {
-            filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
-        } else if (currentArchiveSort === 'rating') {
-            filtered.sort((a, b) => (b.rating?.average || 0) - (a.rating?.average || 0));
-        }
-        
-        // Рендер
-        if (filtered.length === 0) {
-            resultsContainer.innerHTML = `
-                <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                    <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
-                    <div style="font-size: 18px; margin-bottom: 10px;">В этой категории пока нет умейек</div>
-                    ${cityFilter ? '<div style="opacity: 0.7;">Попробуйте выбрать другой город</div>' : ''}
-                </div>
-            `;
-            return;
-        }
-        
-        // Добавляем контролы сортировки
-        const sortHtml = `
-            <div class="sort-controls">
-                <button class="sort-button ${currentArchiveSort === 'alphabet' ? 'active' : ''}" onclick="triggerHapticFeedback(); setArchiveSort('alphabet');">
-                    🔤 По алфавиту
-                </button>
-                <button class="sort-button ${currentArchiveSort === 'price' ? 'active' : ''}" onclick="triggerHapticFeedback(); setArchiveSort('price');">
-                    💰 По цене
-                </button>
-                <button class="sort-button ${currentArchiveSort === 'rating' ? 'active' : ''}" onclick="triggerHapticFeedback(); setArchiveSort('rating');">
-                    ⭐ По рейтингу
-                </button>
-            </div>
-        `;
-        
-        resultsContainer.innerHTML = sortHtml + filtered.map(skill => {
-            const statusBadge = getStatusBadge(skill.status);
-            const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
-            
-            return `
-                <div class="skill-card" style="cursor: pointer;" onclick="triggerHapticFeedback(); openSkillModal(${JSON.stringify(skill).replace(/"/g, '&quot;')});">
-                    <div class="skill-header">
-                        <div class="skill-title">${escapeHtml(skill.skill)}</div>
-                        <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                    </div>
-                    
-                    <div class="skill-price">${skill.price} ₽</div>
-                    
-                    ${statusBadge}
-                    
-                    ${cityInfo}
-                    
-                    <div class="skill-user-row">
-                        <div class="skill-user-name">
-                            <span>👤</span> <span>${escapeHtml(skill.username)}</span>
-                        </div>
-                        ${skill.details ? `<button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">📝 Подробно</button>` : ''}
-                    </div>
-                    
-                    <div class="skill-contact-info">
-                        <div class="contact-label">📞 Контакты:</div>
-                        <div class="contact-item">
-                            <span class="contact-icon">📱</span>
-                            <span class="contact-text">${skill.experience || 'Не указано'}</span>
-                        </div>
-                    </div>
-                    
-                    ${skill.photo ? `
-                        <div class="skill-photo">
-                            <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
-                        </div>
-                    ` : ''}
-                    
-                    <button class="chat-button" onclick="event.stopPropagation(); triggerHapticFeedback(); openContactModal('${skill._id}', '${escapeHtml(skill.skill)}', '${escapeHtml(skill.username)}', '${skill.experience || ''}', '');">
-                        📞 Контакты
-                    </button>
-                    
-                    <button class="create-deal-button" onclick="event.stopPropagation(); triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill)}', '${escapeHtml(skill.username)}', '${skill.userId}', '${skill.experience || ''}');">
-                        📝 Создать сделку
-                    </button>
-                </div>
-            `;
-        }).join('');
-        
-        // Показываем на карте
-        if (map) {
-            showSkillsOnMap(filtered);
-        }
-        
-    } catch (error) {
-        console.error('❌ Ошибка загрузки архива:', error);
-        resultsContainer.innerHTML = `
-            <div class="error-message">
-                ❌ Ошибка загрузки<br>
-                <small>${error.message}</small>
-            </div>
-        `;
-    }
-}
-
-/**
- * Установить сортировку архива
- */
-function setArchiveSort(sortType) {
-    currentArchiveSort = sortType;
-    loadArchiveResults();
-}
-
-/**
- * Автокомплит города для архива
- */
-function handleArchiveCityInput(value) {
-    const list = document.getElementById('archiveCityAutocompleteList');
-    if (!value || value.length < 2) {
-        list.style.display = 'none';
-        return;
-    }
-    
-    const matches = allCities.filter(city => 
-        city.toLowerCase().includes(value.toLowerCase())
-    ).slice(0, 5);
-    
-    if (matches.length > 0) {
-        list.innerHTML = matches.map(city => `
-            <div class="autocomplete-item" onclick="selectArchiveCity('${city}')">${city}</div>
-        `).join('');
-        list.style.display = 'block';
-    } else {
-        list.style.display = 'none';
-    }
-}
-
-function selectArchiveCity(city) {
-    triggerHapticFeedback();
-    document.getElementById('archiveSearchCity').value = city;
-    document.getElementById('archiveCityAutocompleteList').style.display = 'none';
-    loadArchiveResults(); // Перезагружаем с фильтром
-}
-
-/**
- * Показать умейки на карте (фильтр)
- */
-function showSkillsOnMap(skills) {
-    if (!map) {
-        initMap();
-        return;
-    }
-    
-    // Очищаем старые маркеры (кроме маркера пользователя)
-    markers.forEach(marker => {
-        if (!marker.isUserMarker) {
-            map.removeLayer(marker);
-        }
-    });
-    markers = markers.filter(m => m.isUserMarker);
-    
-    // Добавляем маркеры умейек
-    skills.forEach((skill, index) => {
-        if (skill.location && skill.location.lat && skill.location.lon) {
-            const marker = L.marker([skill.location.lat, skill.location.lon], {
-                icon: L.divIcon({
-                    className: 'umeyka-marker',
-                    html: createSkillMarkerHtml(skill, skill.userId === currentUserId),
-                    iconSize: [50, 50],
-                    iconAnchor: [25, 25]
-                })
-            })
-            .addTo(map)
-            .bindPopup(createMapSkillPopup(skill, skill.userId === currentUserId));
-            
-            markers.push(marker);
-        }
-    });
-    
-    // Подгоняем зум если есть маркеры
-    if (skills.length > 0 && skills.some(s => s.location)) {
-        const group = new L.featureGroup(markers);
-        map.fitBounds(group.getBounds().pad(0.1));
-    }
-}
-
-// ========== МОДИФИКАЦИЯ ФУНКЦИИ addSkill ==========
-
-// В функции addSkill() найди:
-// const skillData = { ... }
-// и ДОБАВЬ поле:
-// category: document.getElementById('skillCategory').value || 'other',
-
-// В функции saveEditedSkill() аналогично добавь:
-// category: document.getElementById('editSkillCategory')?.value || currentEditingSkill?.category || 'other',
-
-// ========== ИНИЦИАЛИЗАЦИЯ ==========
-
-// В DOMContentLoaded добавь вызов:
-initSkillCategorySelect();
     </script>
 </body>
 </html>
