@@ -2691,7 +2691,21 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
                 
-                <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
+                                <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
+                
+                <!-- НОВЫЙ БЛОК: ВЫБОР КАТЕГОРИИ -->
+                <div style="margin: 15px 0;">
+                    <div style="color: white; margin-bottom: 10px; font-weight: 600;">📂 Выберите категорию умения *</div>
+                    <select id="skillCategory" class="input-field" required style="cursor: pointer; appearance: none; background: rgba(255,255,255,0.95);">
+                        <option value="">-- Выберите категорию --</option>
+                    </select>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
+                        Выберите категорию, чтобы клиентам было легче вас найти
+                    </div>
+                </div>
+                
+                <!-- НОВОЕ ПОЛЕ: Подробности -->
+                <textarea id="skillDetails" class="input-field" placeholder="📝 Подробности (например: Работаю с Apple, Samsung, Xiaomi. Есть запчасти в наличии.)" style="height: 80px; resize: vertical;"></textarea>
                 
                 <!-- НОВОЕ ПОЛЕ: Подробности -->
                 <textarea id="skillDetails" class="input-field" placeholder="📝 Подробности (например: Работаю с Apple, Samsung, Xiaomi. Есть запчасти в наличии.)" style="height: 80px; resize: vertical;"></textarea>
@@ -3308,7 +3322,17 @@
             
             <input type="hidden" id="editSkillId">
             
-            <input type="text" id="editSkillName" class="input-field" placeholder="Моё умение" required>
+                        <input type="text" id="editSkillName" class="input-field" placeholder="Моё умение" required>
+            
+            <!-- ВЫБОР КАТЕГОРИИ В РЕДАКТИРОВАНИИ -->
+            <div style="margin: 15px 0;">
+                <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📂 Категория умения *</div>
+                <select id="editSkillCategory" class="input-field" required style="cursor: pointer; background: white;">
+                    <option value="">-- Выберите категорию --</option>
+                </select>
+            </div>
+            
+            <textarea id="editSkillDetails" class="input-field" placeholder="📝 Подробности" style="height: 80px; resize: vertical;"></textarea>
             <textarea id="editSkillDetails" class="input-field" placeholder="📝 Подробности" style="height: 80px; resize: vertical;"></textarea>
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
@@ -5879,15 +5903,23 @@
         return false;
     }
 
-        window.addSkill = async function() {
+            window.addSkill = async function() {
         triggerHapticFeedback();
         
         try {
             const skillName = document.getElementById('skillName').value;
+            const skillCategory = document.getElementById('skillCategory').value;
             const skillDetails = document.getElementById('skillDetails').value;
             const skillExperience = document.getElementById('skillExperience').value;
             const skillPrice = document.getElementById('skillPrice').value;
             const skillCity = document.getElementById('skillCity').value;
+            
+            // ПРОВЕРКА: обязательное поле категории
+            if (!skillCategory) {
+                alert('❌ Пожалуйста, выберите категорию умения');
+                document.getElementById('skillCategory').focus();
+                return;
+            }
             
             if (!skillName.trim() || !skillExperience.trim() || !skillPrice || !skillCity.trim()) {
                 alert('❌ Заполните все обязательные поля (отмечены *)');
@@ -5899,10 +5931,15 @@
                 return;
             }
 
+            // Находим label выбранной категории для отображения
+            const selectedCategory = skillCategories.find(cat => cat.value === skillCategory);
+            const categoryLabel = selectedCategory ? selectedCategory.label : skillCategory;
+
             const userData = getOrCreateUserProfile(currentUserId);
         
             const userId = currentUserId;
             console.log('👤 Добавляю умейку для User ID:', userId);
+            console.log('📁 Категория:', categoryLabel);
             console.log('📊 Статус при создании:', currentMasterStatus);
             console.log('📍 Город:', skillCity);
             console.log('📏 Радиус:', currentRadius);
@@ -5917,6 +5954,8 @@
 
             const skillData = {
                 skill: skillName.trim(),
+                category: skillCategory,
+                categoryLabel: categoryLabel,
                 details: skillDetails ? skillDetails.trim() : '',
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
@@ -5979,7 +6018,9 @@
                             console.log('✅ [Визитка] Новая умейка автоматически добавлена в визитку:', newSkill._id);
                         }
                         
+                        // Очищаем форму
                         document.getElementById('skillName').value = '';
+                        document.getElementById('skillCategory').value = '';
                         document.getElementById('skillDetails').value = '';
                         document.getElementById('skillExperience').value = '';
                         document.getElementById('skillPrice').value = '';
@@ -6009,6 +6050,7 @@
                 console.log('⚠️ Сервер недоступен, сохраняем локально:', serverError);
             }
             
+            // Локальное сохранение с категорией
             const localSkill = {
                 ...skillData,
                 _id: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
@@ -6022,15 +6064,9 @@
             
             alert('✅ Умейка сохранена локально (сервер недоступен)');
             
-            // Автоматически добавляем новую локальную умейку в визитку
-            const currentSelectedLocal = getVisitkaSelectedSkills();
-            if (!currentSelectedLocal.includes(localSkill._id)) {
-                currentSelectedLocal.push(localSkill._id);
-                saveVisitkaSelectedSkills(currentSelectedLocal);
-                console.log('✅ [Визитка] Новая локальная умейка автоматически добавлена в визитку:', localSkill._id);
-            }
-            
+            // Очищаем форму
             document.getElementById('skillName').value = '';
+            document.getElementById('skillCategory').value = '';
             document.getElementById('skillDetails').value = '';
             document.getElementById('skillExperience').value = '';
             document.getElementById('skillPrice').value = '';
@@ -6358,7 +6394,7 @@
         }
     }
 
-    window.openEditSkillModal = async function(skillId) {
+        window.openEditSkillModal = async function(skillId) {
         triggerHapticFeedback();
         
         try {
@@ -6387,6 +6423,14 @@
             document.getElementById('editSkillExperience').value = skill.experience || '';
             document.getElementById('editSkillPrice').value = skill.price || '';
             document.getElementById('editSkillCity').value = skill.city || '';
+            
+            // Устанавливаем категорию для редактирования
+            if (skill.category) {
+                const categorySelect = document.getElementById('editSkillCategory');
+                if (categorySelect) {
+                    categorySelect.value = skill.category;
+                }
+            }
             
             currentEditRadius = skill.radius || 10;
             selectEditRadius(currentEditRadius);
@@ -6429,12 +6473,13 @@
         preview.style.display = 'none';
     };
 
-    window.saveEditedSkill = async function() {
+        window.saveEditedSkill = async function() {
         triggerHapticFeedback();
         
         try {
             const skillId = document.getElementById('editSkillId').value;
             const skillName = document.getElementById('editSkillName').value;
+            const skillCategory = document.getElementById('editSkillCategory') ? document.getElementById('editSkillCategory').value : null;
             const skillDetails = document.getElementById('editSkillDetails').value;
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
@@ -6455,8 +6500,17 @@
                 return;
             }
             
+            // Находим label выбранной категории
+            let categoryLabel = '';
+            if (skillCategory) {
+                const selectedCategory = skillCategories.find(cat => cat.value === skillCategory);
+                categoryLabel = selectedCategory ? selectedCategory.label : skillCategory;
+            }
+            
             const skillData = {
                 skill: skillName.trim(),
+                category: skillCategory,
+                categoryLabel: categoryLabel,
                 details: skillDetails ? skillDetails.trim() : '',
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
@@ -7138,13 +7192,28 @@
     
     // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (продолжение) ==========
     
-    document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', async function() {
         console.log('🚀 Ymeyka app loaded successfully!');
         
         currentMasterStatus = 'ready';
         currentEditMasterStatus = 'ready';
         currentRadius = 10;
         currentEditRadius = 10;
+        
+        // Заполняем выпадающие списки категорий
+        populateCategorySelect();
+        
+        // Заполняем список категорий для редактирования
+        const editCategorySelect = document.getElementById('editSkillCategory');
+        if (editCategorySelect) {
+            editCategorySelect.innerHTML = '<option value="">-- Выберите категорию --</option>';
+            skillCategories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.value;
+                option.textContent = cat.label;
+                editCategorySelect.appendChild(option);
+            });
+        }
         
         showMainScreen();
         
@@ -7246,6 +7315,59 @@
     window.searchByCategory = async function(category) {
         triggerHapticFeedback();
         
+            // ========== КАТЕГОРИИ ДЛЯ АРХИВА И ВЫБОРА ==========
+    const skillCategories = [
+        { value: "plitochnik", label: "🧱 Плиточник" },
+        { value: "stroitel", label: "🏗️ Строитель" },
+        { value: "parikmaher", label: "✂️ Парикмахер" },
+        { value: "remont_tehniki", label: "🔧 Ремонт техники" },
+        { value: "elektrik", label: "⚡ Электрик" },
+        { value: "krovelschik", label: "🏠 Кровельщик" },
+        { value: "otdelochnik", label: "🎨 Отделочник" },
+        { value: "povar", label: "🍳 Повар" },
+        { value: "kopayu", label: "⛏️ Копаю" },
+        { value: "doktor", label: "🏥 Доктор" },
+        { value: "vyazhu", label: "🧶 Вяжу" },
+        { value: "santehnik", label: "🔨 Сантехник" },
+        { value: "dizayner", label: "🎨 Дизайнер интерьера" },
+        { value: "avtoslesar", label: "🚗 Автослесарь" },
+        { value: "computer_master", label: "💻 Компьютерный мастер" },
+        { value: "phone_repair", label: "📱 Ремонт телефонов" },
+        { value: "cleaning", label: "🧹 Уборка/Клининг" },
+        { value: "gruzchik", label: "🚚 Грузчик" },
+        { value: "repetitor", label: "📚 Репетитор" },
+        { value: "trener", label: "🏋️ Тренер/Фитнес" },
+        { value: "kinolog", label: "🐕 Кинолог/Выгул собак" },
+        { value: "sadovnik", label: "🌳 Садовник" },
+        { value: "stolyar", label: "🪚 Столяр/Плотник" },
+        { value: "svarschik", label: "🔩 Сварщик" },
+        { value: "malyar", label: "🖼️ Маляр" },
+        { value: "montagnik", label: "🔊 Монтажник" },
+        { value: "holodilchik", label: "❄️ Холодильщик" },
+        { value: "otoplenie", label: "🔥 Отопление/Газ" },
+        { value: "fotograf", label: "📷 Фотограф" },
+        { value: "videograf", label: "🎥 Видеограф" },
+        { value: "konditer", label: "🎂 Кондитер" },
+        { value: "kosmetolog", label: "🧴 Косметолог" },
+        { value: "massagist", label: "💆 Массажист" },
+        { value: "other", label: "📦 Другое" }
+    ];
+
+    // Функция для заполнения выпадающего списка категорий
+    function populateCategorySelect() {
+        const select = document.getElementById('skillCategory');
+        if (!select) return;
+        
+        select.innerHTML = '<option value="">-- Выберите категорию --</option>';
+        
+        skillCategories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.value;
+            option.textContent = cat.label;
+            select.appendChild(option);
+        });
+    }
+
         // Извлекаем название категории без эмодзи
         const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
         
