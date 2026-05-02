@@ -2766,20 +2766,27 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ КЛИЕНТА -->
+                <!-- СЕКЦИЯ КЛИЕНТА / АРХИВ -->
         <div id="clientSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
             <div class="form-section">
-                <h2 style="margin-bottom: 20px; text-align: center;">🔍 Найти мастера</h2>
+                <h2 style="margin-bottom: 20px; text-align: center;">📚 Архив мастеров</h2>
                 
-                <input type="text" id="searchInput" class="input-field" placeholder="🔎 Что ищем? (например: сантехник, электрик)">
+                <!-- Список категорий -->
+                <div id="categoriesList" style="margin-bottom: 20px;"></div>
                 
-                <div class="city-autocomplete">
-                    <input type="text" id="searchCity" class="input-field" placeholder="🏙️ Город (опционально)" autocomplete="off" oninput="handleSearchCityInput(this.value)">
-                    <div id="searchCityAutocompleteList" class="autocomplete-list"></div>
+                <!-- Результаты поиска по категории -->
+                <div id="categorySearchResults" style="margin-top: 20px;"></div>
+                
+                <!-- Скрытая форма поиска (оставляем для обратной совместимости) -->
+                <div style="display: none;">
+                    <input type="text" id="searchInput" class="input-field" placeholder="🔎 Что ищем?">
+                    <div class="city-autocomplete">
+                        <input type="text" id="searchCity" class="input-field" placeholder="🏙️ Город">
+                        <div id="searchCityAutocompleteList" class="autocomplete-list"></div>
+                    </div>
+                    <button class="submit-button" onclick="triggerHapticFeedback(); searchSkills();">Найти мастеров</button>
                 </div>
-                
-                <button class="submit-button" onclick="triggerHapticFeedback(); searchSkills();">Найти мастеров</button>
                 
                 <div id="searchResults" style="margin-top: 20px;"></div>
             </div>
@@ -5872,7 +5879,7 @@
         return false;
     }
 
-    window.addSkill = async function() {
+        window.addSkill = async function() {
         triggerHapticFeedback();
         
         try {
@@ -5962,7 +5969,7 @@
                         newSkill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${newSkill._id}`;
                         addGlobalSkill(newSkill);
                         
-                                                alert('✅ Умейка успешно опубликована!');
+                        alert('✅ Умейка успешно опубликована!');
                         
                         // Автоматически добавляем новую умейку в визитку
                         const currentSelected = getVisitkaSelectedSkills();
@@ -6013,7 +6020,7 @@
             saveSkillToLocalStorage(localSkill);
             addGlobalSkill(localSkill);
             
-                        alert('✅ Умейка сохранена локально (сервер недоступен)');
+            alert('✅ Умейка сохранена локально (сервер недоступен)');
             
             // Автоматически добавляем новую локальную умейку в визитку
             const currentSelectedLocal = getVisitkaSelectedSkills();
@@ -6982,8 +6989,21 @@
         document.querySelector('.map-section').classList.remove('map-active');
     };
     
-    window.showSection = function(sectionId) {
+       window.showSection = function(sectionId) {
         triggerHapticFeedback();
+        
+        // Если открываем раздел "Архив" (clientSection), показываем категории
+        if (sectionId === 'clientSection') {
+            renderCategories();
+            // Сбрасываем результаты поиска
+            const resultsContainer = document.getElementById('categorySearchResults');
+            const categoriesContainer = document.getElementById('categoriesList');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '';
+                resultsContainer.style.display = 'none';
+            }
+            if (categoriesContainer) categoriesContainer.style.display = 'block';
+        }
         
         if (!document.querySelector('.map-active') && mapRefreshInterval) {
             stopMapAutoRefresh();
@@ -7160,6 +7180,278 @@
         
         initAdminAccess();
     });
+ 
+        // ========== КАТЕГОРИИ ДЛЯ АРХИВА ==========
+    const skillCategories = [
+        "🧱 Плиточник",
+        "🏗️ Строитель",
+        "✂️ Парикмахер",
+        "🔧 Ремонт техники",
+        "⚡ Электрик",
+        "🏠 Кровельщик",
+        "🎨 Отделочник",
+        "🍳 Повар",
+        "⛏️ Копаю",
+        "🏥 Доктор",
+        "🧶 Вяжу",
+        "🔨 Сантехник",
+        "🎨 Дизайнер интерьера",
+        "🚗 Автослесарь",
+        "💻 Компьютерный мастер",
+        "📱 Ремонт телефонов",
+        "🧹 Уборка/Клининг",
+        "🚚 Грузчик",
+        "📚 Репетитор",
+        "🏋️ Тренер/Фитнес",
+        "🐕 Кинолог/Выгул собак",
+        "🌳 Садовник",
+        "🪚 Столяр/Плотник",
+        "🔩 Сварщик",
+        "🖼️ Маляр",
+        "🔊 Монтажник",
+        "❄️ Холодильщик",
+        "🔥 Отопление/Газ",
+        "📷 Фотограф",
+        "🎥 Видеограф",
+        "🎂 Кондитер",
+        "🧴 Косметолог",
+        "💆 Массажист",
+        "📦 Другое"
+    ];
+
+    // Отображение списка категорий
+    function renderCategories() {
+        const container = document.getElementById('categoriesList');
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div style="margin-bottom: 15px;">
+                <div style="color: white; font-size: 16px; margin-bottom: 15px; text-align: center; opacity: 0.9;">
+                    📋 Выберите категорию мастера:
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    ${skillCategories.map(category => `
+                        <button class="main-button" onclick="triggerHapticFeedback(); searchByCategory('${category.replace(/'/g, "\\'")}');" 
+                                style="padding: 18px 20px; font-size: 16px; text-align: left; justify-content: flex-start; background: rgba(255,255,255,0.15); backdrop-filter: blur(20px);">
+                            <span class="button-icon" style="font-size: 22px;">${category.charAt(0)}</span>
+                            ${category}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Поиск по категории
+    window.searchByCategory = async function(category) {
+        triggerHapticFeedback();
+        
+        // Извлекаем название категории без эмодзи
+        const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
+        
+        const resultsContainer = document.getElementById('categorySearchResults');
+        const categoriesContainer = document.getElementById('categoriesList');
+        
+        // Скрываем список категорий, показываем результаты
+        if (categoriesContainer) categoriesContainer.style.display = 'none';
+        resultsContainer.innerHTML = '<div class="loading">🔍 Поиск мастеров по категории "' + cleanCategory + '"...</div>';
+        resultsContainer.style.display = 'block';
+        
+        try {
+            // Получаем все умейки
+            let skills = [];
+            
+            try {
+                const response = await fetch(`${API_URL}/api/skills/search?q=${encodeURIComponent(cleanCategory)}`);
+                const result = await response.json();
+                
+                if (result.success && result.skills) {
+                    skills = result.skills;
+                    skills = skills.map(skill => {
+                        const globalSkill = getGlobalSkillById(skill._id);
+                        if (globalSkill && globalSkill.updatedAt) {
+                            if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
+                                skill.status = globalSkill.status;
+                            }
+                        }
+                        if (globalSkill && globalSkill.details) skill.details = globalSkill.details;
+                        if (!skill.qrCodeData) {
+                            skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                        }
+                        return skill;
+                    });
+                }
+            } catch (serverError) {
+                console.log('⚠️ Сервер недоступен для поиска по категории');
+            }
+            
+            // Также ищем в глобальных умейках и локальных
+            const globalSkills = getGlobalSkills();
+            let matchingGlobal = globalSkills.filter(s => 
+                s.skill.toLowerCase().includes(cleanCategory.toLowerCase())
+            );
+            
+            const existingIds = new Set(skills.map(s => s._id));
+            matchingGlobal.forEach(skill => {
+                if (!existingIds.has(skill._id)) {
+                    if (!skill.qrCodeData) {
+                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                    }
+                    skills.push(skill);
+                }
+            });
+            
+            // Фильтруем по городу, если указан (берём из скрытого поля)
+            const searchCityInput = document.getElementById('searchCity');
+            const searchCity = searchCityInput ? searchCityInput.value.trim() : '';
+            
+            if (searchCity) {
+                skills = skills.filter(s => s.city && s.city.toLowerCase() === searchCity.toLowerCase());
+            }
+            
+            // Сортируем по алфавиту (по имени мастера)
+            skills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
+            
+            if (skills.length > 0) {
+                resultsContainer.innerHTML = `
+                    <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
+                                style="padding: 12px 20px; font-size: 14px; width: auto; margin: 0;">
+                            ← Назад к категориям
+                        </button>
+                        <div style="color: white; font-size: 14px;">Найдено: ${skills.length}</div>
+                    </div>
+                    ${skills.map(skill => {
+                        const statusBadge = getStatusBadge(skill.status);
+                        const cityInfo = skill.city ? `<div class="city-info" style="margin: 8px 0; padding: 6px 10px; background: rgba(102,126,234,0.15); border-radius: 8px; font-size: 13px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
+                        
+                        return `
+                        <div class="skill-card">
+                            <div class="skill-header">
+                                <div class="skill-title">${escapeHtml(skill.skill)}</div>
+                                <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                            </div>
+                            
+                            <div class="skill-price">${skill.price} ₽</div>
+                            
+                            ${statusBadge}
+                            
+                            ${cityInfo}
+                            
+                            <div class="skill-user-row">
+                                <div class="skill-user-name">
+                                    <span>👤</span> <span>${escapeHtml(skill.username)}</span>
+                                </div>
+                                <button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">
+                                    📝 Подробно
+                                </button>
+                            </div>
+                            
+                            <div class="skill-contact-info">
+                                <div class="contact-label">📞 Контакты:</div>
+                                <div class="contact-item">
+                                    <span class="contact-icon">📱</span>
+                                    <span class="contact-text">${escapeHtml(skill.experience || 'Не указано')}</span>
+                                </div>
+                            </div>
+                            
+                            ${skill.photo ? `
+                                <div class="skill-photo">
+                                    <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
+                                </div>
+                            ` : ''}
+                            
+                            <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username).replace(/'/g, "\\'")}', '${escapeHtml(skill.experience || '')}', '');">
+                                📞 Подробные контакты
+                            </button>
+                            
+                            <button class="create-deal-button" onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username).replace(/'/g, "\\'")}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');">
+                                📝 Составить сделку
+                            </button>
+                            
+                            ${skill.location && skill.location.lat && skill.location.lon ? `
+                                <button class="map-skill-button" onclick="triggerHapticFeedback(); showOnMap('${skill.location.lat}', '${skill.location.lon}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}');" 
+                                        style="margin-top: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 100%;">
+                                    🗺️ Показать на карте
+                                </button>
+                            ` : ''}
+                        </div>
+                    `}).join('')}
+                `;
+            } else {
+                resultsContainer.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
+                                style="padding: 12px 20px; font-size: 14px; width: auto; margin: 0;">
+                            ← Назад к категориям
+                        </button>
+                    </div>
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено по категории "${cleanCategory}"</div>
+                        <div style="opacity: 0.7;">Попробуйте выбрать другую категорию</div>
+                    </div>
+                `;
+            }
+            
+        } catch (error) {
+            console.error('Ошибка поиска по категории:', error);
+            resultsContainer.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
+                            style="padding: 12px 20px; font-size: 14px; width: auto; margin: 0;">
+                        ← Назад к категориям
+                    </button>
+                </div>
+                <div class="error-message">
+                    ❌ Ошибка поиска<br>
+                    <small>${error.message}</small>
+                </div>
+            `;
+        }
+    };
+    
+    // Возврат к списку категорий
+    window.backToCategories = function() {
+        triggerHapticFeedback();
+        
+        const resultsContainer = document.getElementById('categorySearchResults');
+        const categoriesContainer = document.getElementById('categoriesList');
+        
+        if (categoriesContainer) categoriesContainer.style.display = 'block';
+        if (resultsContainer) {
+            resultsContainer.innerHTML = '';
+            resultsContainer.style.display = 'none';
+        }
+    };
+    
+    // Показать точку на карте
+    window.showOnMap = function(lat, lon, title) {
+        triggerHapticFeedback();
+        
+        // Открываем карту
+        if (!map) {
+            initMap();
+        }
+        
+        // Показываем карту
+        const mapSection = document.querySelector('.map-section');
+        if (mapSection) {
+            mapSection.classList.add('map-active');
+        }
+        
+        // Центрируем карту на точке
+        map.setView([parseFloat(lat), parseFloat(lon)], 15);
+        
+        // Добавляем маркер
+        L.marker([parseFloat(lat), parseFloat(lon)])
+            .addTo(map)
+            .bindPopup(`<b>📍 ${title}</b><br>Местоположение мастера`)
+            .openPopup();
+        
+        // Показываем уведомление
+        showNotification(`🗺️ Показано на карте: ${title}`);
+    };
 
     window.searchSkills = async function() {
         triggerHapticFeedback();
