@@ -4132,59 +4132,59 @@
      * Это ключевое исправление - умейки загружаются в глобальное хранилище ДО сканирования
      */
         async function preloadAllSkills() {
-        console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейок...');
+    console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейок...');
+    
+    try {
+        // Загружаем умейки с сервера
+        const response = await fetch(`${API_URL}/api/skills`);
+        const result = await response.json();
         
-        try {
-            // Сначала сохраняем текущие локальные умейки всех пользователей
-            const currentGlobalSkills = getGlobalSkills();
-            const localSkillsOnly = currentGlobalSkills.filter(s => s.local === true);
-            const localSkillsByUser = {};
-            currentUserId && (localSkillsByUser[currentUserId] = loadSkillsFromLocalStorage(currentUserId) || []);
+        if (result.success && result.skills) {
+            console.log(`✅ [Загрузка] Загружено ${result.skills.length} умейок с сервера`);
             
-            // Загружаем умейки с сервера
-            const response = await fetch(`${API_URL}/api/skills`);
-            const result = await response.json();
+            // Получаем текущие локальные умейки текущего пользователя
+            const currentUserLocalSkills = loadSkillsFromLocalStorage(currentUserId) || [];
+            const localIds = new Set(currentUserLocalSkills.map(s => s._id));
             
-            if (result.success && result.skills) {
-                console.log(`✅ [Загрузка] Загружено ${result.skills.length} умейок с сервера`);
-                
-                // Начинаем с серверных умейек
-                let mergedSkills = [...result.skills];
-                const serverIds = new Set(result.skills.map(s => s._id));
-                
-                // Добавляем локальные умейки текущего пользователя, которых нет на сервере
-                const currentUserLocalSkills = loadSkillsFromLocalStorage(currentUserId) || [];
-                currentUserLocalSkills.forEach(skill => {
-                    if (!serverIds.has(skill._id)) {
-                        mergedSkills.push(skill);
-                        serverIds.add(skill._id);
-                    }
-                });
-                
-                // Сохраняем в глобальное хранилище
-                setGlobalSkills(mergedSkills);
-                
-                // Обновляем кэш
-                globalSkillsCache = mergedSkills;
-                isSkillsLoaded = true;
-                
-                console.log(`💾 [Загрузка] Глобальное хранилище содержит ${mergedSkills.length} умейок (сервер: ${result.skills.length}, локальные: ${mergedSkills.length - result.skills.length})`);
-                
-                // Выводим список ID для отладки
-                console.log('📋 [Загрузка] ID всех умейок:', mergedSkills.map(s => s._id));
-                
-                return mergedSkills;
-            } else {
-                console.warn('⚠️ [Загрузка] Сервер вернул ошибку:', result.error);
-                isSkillsLoaded = true;
-                return getGlobalSkills();
-            }
-        } catch (error) {
-            console.error('❌ [Загрузка] Ошибка загрузки умейок:', error);
+            // Начинаем с серверных умейек
+            let mergedSkills = result.skills.map(skill => {
+                // Добавляем qrCodeData если нет
+                if (!skill.qrCodeData) {
+                    skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                }
+                return skill;
+            });
+            
+            const serverIds = new Set(result.skills.map(s => s._id));
+            
+            // Добавляем локальные умейки текущего пользователя, которых нет на сервере
+            currentUserLocalSkills.forEach(skill => {
+                if (!serverIds.has(skill._id)) {
+                    mergedSkills.push(skill);
+                }
+            });
+            
+            // Сохраняем в глобальное хранилище
+            setGlobalSkills(mergedSkills);
+            
+            // Обновляем кэш
+            globalSkillsCache = mergedSkills;
+            isSkillsLoaded = true;
+            
+            console.log(`💾 [Загрузка] Глобальное хранилище содержит ${mergedSkills.length} умейок`);
+            
+            return mergedSkills;
+        } else {
+            console.warn('⚠️ [Загрузка] Сервер вернул ошибку:', result.error);
             isSkillsLoaded = true;
             return getGlobalSkills();
         }
+    } catch (error) {
+        console.error('❌ [Загрузка] Ошибка загрузки умейок:', error);
+        isSkillsLoaded = true;
+        return getGlobalSkills();
     }
+}
     
     /**
      * Функция для получения умейки по ID с приоритетом:
@@ -6847,6 +6847,11 @@ ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px
     }
 
     async function loadSkillsOnMap() {
+    // Принудительно перезагружаем данные с сервера
+    if (!isSkillsLoaded) {
+        await preloadAllSkills();
+    }
+
         try {
             console.log('🗺️ Загрузка умейок с сервера для карты');
             
@@ -7404,30 +7409,57 @@ ${skill.category ? `<div style="font-size: 11px; color: #667eea; margin-top: 2px
     const categoriesContainer = document.getElementById('categoriesList');
     
     if (categoriesContainer) categoriesContainer.style.display = 'none';
-    resultsContainer.innerHTML = '<div class="loading">🔍 Поиск мастеров...</div>';
+    resultsContainer.innerHTML = '<div class="loading">🔍 Загрузка мастеров из категории...</div>';
     resultsContainer.style.display = 'block';
     
     try {
-        // Загружаем все умейки
+        // === КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: принудительно перезагружаем все умейки с сервера ===
+        console.log('🔄 [Категория] Принудительная перезагрузка всех умейок с сервера...');
         await preloadAllSkills();
+        
+        // Получаем ВСЕ умейки из глобального хранилища (теперь там актуальные данные)
         const allSkills = getGlobalSkills();
+        console.log(`📊 [Категория] Всего умейок в хранилище: ${allSkills.length}`);
         
-        // Фильтруем по категории (точное совпадение или содержит)
-        let skills = allSkills.filter(s => 
-            s.category === category || 
-            (s.category && s.category.includes(category.replace(/[^\w\sа-яА-Я]/g, '').trim()))
-        );
+        // Извлекаем чистое название категории без эмодзи для поиска
+        const cleanCategory = category.replace(/[^\w\sа-яА-ЯёЁ-]/g, '').trim().toLowerCase();
+        console.log(`🔍 [Категория] Ищу категорию: "${cleanCategory}"`);
         
-        // Также ищем по skill-названию как fallback
+        // Фильтруем по категории (точное совпадение или частичное)
+        let skills = allSkills.filter(s => {
+            if (!s.category) return false;
+            const skillCategory = s.category.replace(/[^\w\sа-яА-ЯёЁ-]/g, '').trim().toLowerCase();
+            return skillCategory === cleanCategory || skillCategory.includes(cleanCategory);
+        });
+        
+        console.log(`✅ [Категория] Найдено по категории: ${skills.length}`);
+        
+        // Если по категории не нашли, ищем по названию умейки как fallback
         if (skills.length === 0) {
-            const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
             skills = allSkills.filter(s => 
-                s.skill.toLowerCase().includes(cleanCategory.toLowerCase())
+                s.skill && s.skill.toLowerCase().includes(cleanCategory)
             );
+            console.log(`⚠️ [Категория] Fallback по skill-названию: ${skills.length}`);
         }
         
-        // Сортируем по имени мастера
-        skills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
+        // Убираем дубликаты
+        const uniqueSkills = [];
+        const seenIds = new Set();
+        for (const skill of skills) {
+            if (!seenIds.has(skill._id)) {
+                seenIds.add(skill._id);
+                uniqueSkills.push(skill);
+            }
+        }
+        skills = uniqueSkills;
+        
+        // Сортируем: сначала готовые, потом по имени
+        skills.sort((a, b) => {
+            const statusA = a.status === 'ready' ? 0 : 1;
+            const statusB = b.status === 'ready' ? 0 : 1;
+            if (statusA !== statusB) return statusA - statusB;
+            return (a.username || '').localeCompare(b.username || '');
+        });
         
         if (skills.length > 0) {
             resultsContainer.innerHTML = `
@@ -7446,7 +7478,7 @@ ${skill.category ? `<div style="font-size: 11px; color: #667eea; margin-top: 2px
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
-                            <div class="skill-title">${skill.skill} ${isLocal}</div>
+                            <div class="skill-title">${escapeHtml(skill.skill)} ${isLocal}</div>
                             <div class="skill-rating">${'⭐'.repeat(5)}</div>
                         </div>
                         
@@ -7460,7 +7492,7 @@ ${skill.category ? `<div style="font-size: 11px; color: #667eea; margin-top: 2px
                         
                         <div class="skill-user-row">
                             <div class="skill-user-name">
-                                <span>👤</span> <span>${escapeHtml(skill.username)}</span>
+                                <span>👤</span> <span>${escapeHtml(skill.username || 'Аноним')}</span>
                             </div>
                             <button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">
                                 📝 Подробно
@@ -7481,11 +7513,11 @@ ${skill.category ? `<div style="font-size: 11px; color: #667eea; margin-top: 2px
                             </div>
                         ` : ''}
                         
-                        <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username).replace(/'/g, "\\'")}', '${escapeHtml(skill.experience || '')}', '');">
+                        <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username || 'Аноним').replace(/'/g, "\\'")}', '${escapeHtml(skill.experience || '')}', '');">
                             📞 Подробные контакты
                         </button>
                         
-                        <button class="create-deal-button" onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username).replace(/'/g, "\\'")}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');">
+                        <button class="create-deal-button" onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username || 'Аноним').replace(/'/g, "\\'")}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');">
                             📝 Составить сделку
                         </button>
                     </div>
@@ -7502,14 +7534,14 @@ ${skill.category ? `<div style="font-size: 11px; color: #667eea; margin-top: 2px
                 </div>
                 <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
                     <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
-                    <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено в категории "${category}"</div>
-                    <div style="opacity: 0.7;">Попробуйте выбрать другую категорию</div>
+                    <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено в категории "${escapeHtml(category)}"</div>
+                    <div style="opacity: 0.7;">Пока нет мастеров в этой категории. Будьте первым!</div>
                 </div>
             `;
         }
         
     } catch (error) {
-        console.error('Ошибка поиска по категории:', error);
+        console.error('❌ Ошибка поиска по категории:', error);
         resultsContainer.innerHTML = `
             <div style="margin-bottom: 15px;">
                 <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
@@ -7518,7 +7550,7 @@ ${skill.category ? `<div style="font-size: 11px; color: #667eea; margin-top: 2px
                 </button>
             </div>
             <div class="error-message">
-                ❌ Ошибка поиска<br>
+                ❌ Ошибка загрузки категории<br>
                 <small>${error.message}</small>
             </div>
         `;
@@ -7614,8 +7646,9 @@ ${skill.category ? `<div style="font-size: 11px; color: #667eea; margin-top: 2px
                 console.log('⚠️ Сервер недоступен для поиска');
             }
             
-            const globalSkills = getGlobalSkills();
-            let matchingGlobal = globalSkills;
+            await preloadAllSkills();
+const globalSkills = getGlobalSkills();
+let matchingGlobal = globalSkills;
             
             if (searchQuery) {
                 matchingGlobal = matchingGlobal.filter(s => 
