@@ -4142,13 +4142,8 @@
         if (result.success && result.skills) {
             console.log(`✅ [Загрузка] Загружено ${result.skills.length} умейок с сервера`);
             
-            // Получаем текущие локальные умейки текущего пользователя
-            const currentUserLocalSkills = loadSkillsFromLocalStorage(currentUserId) || [];
-            const localIds = new Set(currentUserLocalSkills.map(s => s._id));
-            
             // Начинаем с серверных умейек
             let mergedSkills = result.skills.map(skill => {
-                // Добавляем qrCodeData если нет
                 if (!skill.qrCodeData) {
                     skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
                 }
@@ -4157,33 +4152,60 @@
             
             const serverIds = new Set(result.skills.map(s => s._id));
             
-            // Добавляем локальные умейки текущего пользователя, которых нет на сервере
-            currentUserLocalSkills.forEach(skill => {
-                if (!serverIds.has(skill._id)) {
-                    mergedSkills.push(skill);
+            // === НОВОЕ: Загружаем ВСЕ локальные умейки ВСЕХ пользователей ===
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('skills_')) {
+                    const localSkills = getLocalStorage(key) || [];
+                    localSkills.forEach(skill => {
+                        if (!serverIds.has(skill._id)) {
+                            mergedSkills.push(skill);
+                            serverIds.add(skill._id);
+                        }
+                    });
                 }
-            });
+            }
+            // === КОНЕЦ НОВОГО ===
             
-            // Сохраняем в глобальное хранилище
             setGlobalSkills(mergedSkills);
-            
-            // Обновляем кэш
             globalSkillsCache = mergedSkills;
             isSkillsLoaded = true;
             
             console.log(`💾 [Загрузка] Глобальное хранилище содержит ${mergedSkills.length} умейок`);
-            
             return mergedSkills;
         } else {
             console.warn('⚠️ [Загрузка] Сервер вернул ошибку:', result.error);
-            isSkillsLoaded = true;
-            return getGlobalSkills();
         }
     } catch (error) {
         console.error('❌ [Загрузка] Ошибка загрузки умейок:', error);
-        isSkillsLoaded = true;
-        return getGlobalSkills();
     }
+    
+    // === НОВОЕ: Если сервер недоступен — загружаем хотя бы локальные ===
+    let fallbackSkills = [];
+    const seenIds = new Set();
+    
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('skills_')) {
+            const localSkills = getLocalStorage(key) || [];
+            localSkills.forEach(skill => {
+                if (!seenIds.has(skill._id)) {
+                    fallbackSkills.push(skill);
+                    seenIds.add(skill._id);
+                }
+            });
+        }
+    }
+    
+    if (fallbackSkills.length > 0) {
+        console.log(`⚠️ [Загрузка] Сервер недоступен, загружено ${fallbackSkills.length} локальных умейок`);
+        setGlobalSkills(fallbackSkills);
+        globalSkillsCache = fallbackSkills;
+    }
+    // === КОНЕЦ НОВОГО ===
+    
+    isSkillsLoaded = true;
+    return getGlobalSkills();
 }
     
     /**
@@ -6044,7 +6066,7 @@
 
             const skillData = {
                 skill: skillName.trim(),
-                category: skillCategory,  // СОХРАНЯЕМ КАТЕГОРИЮ
+                category: skillCategory, 
                 details: skillDetails ? skillDetails.trim() : '',
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
@@ -6140,12 +6162,15 @@
             }
             
             const localSkill = {
-                ...skillData,
-                _id: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                createdAt: new Date().toISOString(),
-                local: true,
-                qrCodeData: `${TELEGRAM_BOT_URL}?start=skill_local_${Date.now()}`
-            };
+    ...skillData,
+    _id: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+    createdAt: new Date().toISOString(),
+    local: true,
+    qrCodeData: `${TELEGRAM_BOT_URL}?start=skill_local_${Date.now()}`
+};
+
+// Проверяем, что категория сохранена
+console.log('📂 [Категория] Сохраняю локально:', localSkill.category);;
             
             saveSkillToLocalStorage(localSkill);
             addGlobalSkill(localSkill);
@@ -6847,10 +6872,8 @@ ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px
     }
 
     async function loadSkillsOnMap() {
-    // Принудительно перезагружаем данные с сервера
-    if (!isSkillsLoaded) {
-        await preloadAllSkills();
-    }
+    // Обновляем данные перед показом на карте
+    await preloadAllSkills();
 
         try {
             console.log('🗺️ Загрузка умейок с сервера для карты');
@@ -7413,9 +7436,16 @@ ${skill.category ? `<div style="font-size: 11px; color: #667eea; margin-top: 2px
     resultsContainer.style.display = 'block';
     
     try {
-        // === КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: принудительно перезагружаем все умейки с сервера ===
-        console.log('🔄 [Категория] Принудительная перезагрузка всех умейок с сервера...');
-        await preloadAllSkills();
+        try {
+        // === ИСПРАВЛЕНИЕ: загружаем умейки ТОЛЬКО если ещё не загружены ===
+        if (!isSkillsLoaded) {
+            console.log('🔄 [Категория] Первичная загрузка умейок...');
+            await preloadAllSkills();
+        } else {
+            // Перезагружаем, чтобы подхватить новые локальные умейки
+            console.log('🔄 [Категория] Обновление списка умейок...');
+            await preloadAllSkills();
+        }
         
         // Получаем ВСЕ умейки из глобального хранилища (теперь там актуальные данные)
         const allSkills = getGlobalSkills();
