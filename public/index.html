@@ -6436,7 +6436,10 @@
                             <div class="skill-price">${skill.price} ₽</div>
                         </div>
                         
-                        ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin: 8px 0; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`)}" 
+                             class="skill-qr-code" 
+                             alt="QR"
+                             onclick="event.stopPropagation(); triggerHapticFeedback(); showQRModal('${skill._id}', '${skill.skill.replace(/'/g, "\\'")}');">
                         
                         ${statusBadge}
                         
@@ -6956,6 +6959,7 @@
                     </div>
                     <div style="flex: 1;">
                         <h3 style="margin: 0; color: #2d3748; font-size: 16px;">${skill.skill}</h3>
+                        ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 2px 6px; border-radius: 6px; font-size: 11px; margin-top: 4px; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
                         <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
                     </div>
                     ${photoThumbnail}
@@ -7437,7 +7441,7 @@
             // Также ищем в глобальных умейках и локальных
             const globalSkills = getGlobalSkills();
             let matchingGlobal = globalSkills.filter(s => 
-                s.category && s.category.toLowerCase().includes(cleanCategory.toLowerCase())
+                s.skill.toLowerCase().includes(cleanCategory.toLowerCase())
             );
             
             const existingIds = new Set(skills.map(s => s._id));
@@ -7481,7 +7485,7 @@
                                 <div class="skill-rating">${'⭐'.repeat(5)}</div>
                             </div>
                             
-                            ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
+                            ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; display: inline-block;">📂 ${skill.category}</div>` : ''}
                             
                             <div class="skill-price">${skill.price} ₽</div>
                             
@@ -7655,10 +7659,9 @@
             let matchingGlobal = globalSkills;
             
             if (searchQuery) {
-    matchingGlobal = matchingGlobal.filter(s => 
-        s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (s.category && s.category.toLowerCase().includes(searchQuery.toLowerCase()))
+                matchingGlobal = matchingGlobal.filter(s => 
+                    s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
                 );
             }
             
@@ -7683,10 +7686,9 @@
             let matchingLocal = localSkills.filter(s => s.local);
             
             if (searchQuery) {
-    matchingLocal = matchingLocal.filter(s => 
-        s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (s.category && s.category.toLowerCase().includes(searchQuery.toLowerCase()))
+                matchingLocal = matchingLocal.filter(s => 
+                    s.skill.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (s.experience && s.experience.toLowerCase().includes(searchQuery.toLowerCase()))
                 );
             }
             
@@ -7721,7 +7723,7 @@
                                 <div class="skill-rating">${'⭐'.repeat(5)}</div>
                             </div>
                             
-                            ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
+                            ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; display: inline-block;">📂 ${escapeHtml(skill.category)}</div>` : ''}
                         
                         <div class="skill-price">${skill.price} ₽</div>
                         
