@@ -4218,7 +4218,14 @@
             if (response.ok) {
                 const result = await response.json();
                 if (result.success && result.skill) {
-                    console.log(`✅ [Поиск] Умейка загружена с сервера:`, result.skill);
+        // Убедимся что категория есть
+        if (!result.skill.category && result.skill.skill) {
+            // Попробуем определить категорию по названию умейки
+            // или оставим как есть
+        }
+        addGlobalSkill(result.skill);
+        return result.skill;
+    }
                     
                     // Добавляем в глобальное хранилище для будущих запросов
                     addGlobalSkill(result.skill);
@@ -6093,9 +6100,13 @@
                     console.log('📱 Ответ сервера при добавлении:', result);
                     
                     if (result.success) {
-                        const newSkill = result.skill || skillData;
-                        newSkill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${newSkill._id}`;
-                        addGlobalSkill(newSkill);
+                       const newSkill = result.skill || skillData;
+                       // Убедимся что категория сохранена
+                       if (!newSkill.category && skillData.category) {
+                       newSkill.category = skillData.category;
+                       }
+                      newSkill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${newSkill._id}`;
+                      addGlobalSkill(newSkill);
                         
                         alert('✅ Умейка успешно опубликована!');
                         
@@ -6281,7 +6292,7 @@
                     return `
                     <div class="skill-card">
                         <div class="skill-header">
-                            <div class="skill-title">${skill.skill} ${isLocal}</div>
+                            <div class="skill-title">${escapeHtml(skill.skill)}</div>
                             <div class="skill-rating">${'⭐'.repeat(5)}</div>
                         </div>
                         
@@ -6956,15 +6967,14 @@
                     </div>
                     <div style="flex: 1;">
                         <h3 style="margin: 0; color: #2d3748; font-size: 16px;">${skill.skill}</h3>
+                        ${skill.category ? `<div style="font-size: 12px; color: #667eea; margin-top: 4px;">${escapeHtml(skill.category)}</div>` : ''}
                         <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
                     </div>
                     ${photoThumbnail}
                 </div>
                 
                 <div style="margin: 10px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
-                    <p style="margin: 8px 0; font-weight: bold; color: #48bb78;">
-                        ${skill.price} руб.
-                    </p>
+    ${skill.category ? `<div style="font-size: 13px; color: #667eea; font-weight: 600; margin-bottom: 8px;">📂 ${escapeHtml(skill.category)}</div>` : ''}
                     
                     ${statusBadge}
                     
@@ -7143,16 +7153,18 @@
         
         // Если открываем раздел "Архив" (clientSection), показываем категории
         if (sectionId === 'clientSection') {
+        const categoriesContainer = document.getElementById('categoriesList');
+        const resultsContainer = document.getElementById('categorySearchResults');
+        
+        if (categoriesContainer) {
             renderCategories();
-            // Сбрасываем результаты поиска
-            const resultsContainer = document.getElementById('categorySearchResults');
-            const categoriesContainer = document.getElementById('categoriesList');
-            if (resultsContainer) {
-                resultsContainer.innerHTML = '';
-                resultsContainer.style.display = 'none';
-            }
-            if (categoriesContainer) categoriesContainer.style.display = 'block';
+            categoriesContainer.style.display = 'block';
         }
+        if (resultsContainer) {
+            resultsContainer.innerHTML = '';
+            resultsContainer.style.display = 'none';
+        }
+    }
         
         if (!document.querySelector('.map-active') && mapRefreshInterval) {
             stopMapAutoRefresh();
@@ -7436,9 +7448,12 @@
             
             // Также ищем в глобальных умейках и локальных
             const globalSkills = getGlobalSkills();
-            let matchingGlobal = globalSkills.filter(s => 
-                s.category && s.category.toLowerCase().includes(cleanCategory.toLowerCase())
-            );
+            let matchingGlobal = globalSkills.filter(s => {
+            if (!s.category) return false;
+            const skillCatClean = s.category.replace(/[^\w\sа-яА-Я]/g, '').trim().toLowerCase();
+            return skillCatClean.includes(cleanCategory.toLowerCase()) || 
+                       cleanCategory.toLowerCase().includes(skillCatClean);
+            });
             
             const existingIds = new Set(skills.map(s => s._id));
             matchingGlobal.forEach(skill => {
@@ -7477,7 +7492,7 @@
                         return `
                         <div class="skill-card">
                                                         <div class="skill-header">
-                                <div class="skill-title">${skill.skill} ${isLocal}</div>
+                                <div class="skill-title">${escapeHtml(skill.skill)}</div>
                                 <div class="skill-rating">${'⭐'.repeat(5)}</div>
                             </div>
                             
