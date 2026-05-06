@@ -5121,7 +5121,197 @@
         }
     };
 
-    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
+    // ========== НОРМАЛИЗАЦИЯ КАТЕГОРИИ ==========
+    
+    function normalizeCategory(category) {
+        if (!category) return '';
+        return category.replace(/[^\w\sа-яА-Я]/g, '').trim().toLowerCase();
+    }
+
+    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОИСКА ПО КАТЕГОРИИ ==========
+    
+    window.searchByCategory = async function(category) {
+        triggerHapticFeedback();
+        
+        const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
+        
+        const resultsContainer = document.getElementById('categorySearchResults');
+        const categoriesContainer = document.getElementById('categoriesList');
+        
+        if (categoriesContainer) categoriesContainer.style.display = 'none';
+        resultsContainer.innerHTML = '<div class="loading">🔍 Поиск мастеров по категории "' + cleanCategory + '"...</div>';
+        resultsContainer.style.display = 'block';
+        
+        try {
+            await preloadAllSkills();
+            const allGlobalSkills = getGlobalSkills();
+            console.log(`📊 Всего умейок в глобальном хранилище: ${allGlobalSkills.length}`);
+            
+            const normalizedSearchCategory = normalizeCategory(category);
+            
+            const filteredSkills = allGlobalSkills.filter(skill => {
+                if (!skill.category) return false;
+                const normalizedSkillCategory = normalizeCategory(skill.category);
+                return normalizedSkillCategory === normalizedSearchCategory;
+            });
+            
+            console.log(`📊 Найдено умейок в категории "${cleanCategory}": ${filteredSkills.length}`);
+            
+            const uniqueSkills = [];
+            const seenIds = new Set();
+            for (const skill of filteredSkills) {
+                if (!seenIds.has(skill._id)) {
+                    seenIds.add(skill._id);
+                    uniqueSkills.push(skill);
+                }
+            }
+            
+            const finalSkills = uniqueSkills;
+            
+            console.log(`📊 Найдено уникальных умейок: ${finalSkills.length}`);
+            
+            if (finalSkills.length > 0) {
+                resultsContainer.innerHTML = `
+                    <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
+                                style="padding: 12px 20px; font-size: 14px; width: auto; margin: 0;">
+                            ← Назад к категориям
+                        </button>
+                        <div style="color: white; font-size: 14px;">Найдено: ${finalSkills.length}</div>
+                    </div>
+                    ${finalSkills.map(skill => {
+                        const statusBadge = getStatusBadge(skill.status);
+                        const cityInfo = skill.city ? `<div class="city-info" style="margin: 8px 0; padding: 6px 10px; background: rgba(102,126,234,0.15); border-radius: 8px; font-size: 13px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
+                        const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                        const isCurrentUser = skill.userId === currentUserId;
+                        const userLabel = isCurrentUser ? '<span style="background: #48bb78; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Вы</span>' : '';
+                        
+                        return `
+                        <div class="skill-card">
+                            <div class="skill-header">
+                                <div class="skill-title">${escapeHtml(skill.skill)} ${isLocal} ${userLabel}</div>
+                                <div class="skill-rating">${'⭐'.repeat(5)}</div>
+                            </div>
+                            
+                            ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
+                            
+                            <div class="skill-price">${skill.price} ₽</div>
+                            
+                            ${statusBadge}
+                            
+                            ${cityInfo}
+                            
+                            <div class="skill-user-row">
+                                <div class="skill-user-name">
+                                    <span>👤</span> <span>${escapeHtml(skill.username)}</span>
+                                </div>
+                                <button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">
+                                    📝 Подробно
+                                </button>
+                            </div>
+                            
+                            <div class="skill-contact-info">
+                                <div class="contact-label">📞 Контакты:</div>
+                                <div class="contact-item">
+                                    <span class="contact-icon">📱</span>
+                                    <span class="contact-text">${escapeHtml(skill.experience || 'Не указано')}</span>
+                                </div>
+                            </div>
+                            
+                            ${skill.photo ? `
+                                <div class="skill-photo">
+                                    <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
+                                </div>
+                            ` : ''}
+                            
+                            <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username).replace(/'/g, "\\'")}', '${escapeHtml(skill.experience || '')}', '');">
+                                📞 Подробные контакты
+                            </button>
+                            
+                            ${!isCurrentUser ? `
+                                <button class="create-deal-button" onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username).replace(/'/g, "\\'")}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');">
+                                    📝 Составить сделку
+                                </button>
+                            ` : ''}
+                            
+                            ${skill.location && skill.location.lat && skill.location.lon ? `
+                                <button class="map-skill-button" onclick="triggerHapticFeedback(); showOnMap('${skill.location.lat}', '${skill.location.lon}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}');" 
+                                        style="margin-top: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 100%;">
+                                    🗺️ Показать на карте
+                                </button>
+                            ` : ''}
+                        </div>
+                    `}).join('')}
+                `;
+            } else {
+                resultsContainer.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
+                                style="padding: 12px 20px; font-size: 14px; width: auto; margin: 0;">
+                            ← Назад к категориям
+                        </button>
+                    </div>
+                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено по категории "${cleanCategory}"</div>
+                        <div style="opacity: 0.7;">Попробуйте выбрать другую категорию</div>
+                    </div>
+                `;
+            }
+            
+        } catch (error) {
+            console.error('Ошибка поиска по категории:', error);
+            resultsContainer.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
+                            style="padding: 12px 20px; font-size: 14px; width: auto; margin: 0;">
+                        ← Назад к категориям
+                    </button>
+                </div>
+                <div class="error-message">
+                    ❌ Ошибка поиска<br>
+                    <small>${error.message}</small>
+                </div>
+            `;
+        }
+    };
+    
+    window.backToCategories = function() {
+        triggerHapticFeedback();
+        
+        const resultsContainer = document.getElementById('categorySearchResults');
+        const categoriesContainer = document.getElementById('categoriesList');
+        
+        if (categoriesContainer) categoriesContainer.style.display = 'block';
+        if (resultsContainer) {
+            resultsContainer.innerHTML = '';
+            resultsContainer.style.display = 'none';
+        }
+    };
+    
+    window.showOnMap = function(lat, lon, title) {
+        triggerHapticFeedback();
+        
+        if (!map) {
+            initMap();
+        }
+        
+        const mapSection = document.querySelector('.map-section');
+        if (mapSection) {
+            mapSection.classList.add('map-active');
+        }
+        
+        map.setView([parseFloat(lat), parseFloat(lon)], 15);
+        
+        L.marker([parseFloat(lat), parseFloat(lon)])
+            .addTo(map)
+            .bindPopup(`<b>📍 ${title}</b><br>Местоположение мастера`)
+            .openPopup();
+        
+        showNotification(`🗺️ Показано на карте: ${title}`);
+    };
+
+    // ========== ОСТАЛЬНЫЕ ФУНКЦИИ (оставлены без изменений) ==========
     
     function getCityCoordinates(cityName) {
         if (!cityName) return null;
@@ -5834,7 +6024,6 @@
         return false;
     }
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ addSkill
     window.addSkill = async function() {
         triggerHapticFeedback();
         
@@ -5885,7 +6074,7 @@
 
             const skillData = {
                 skill: skillName.trim(),
-                category: skillCategory, // ✅ Сохраняем категорию с эмодзи
+                category: skillCategory,
                 details: skillDetails ? skillDetails.trim() : '',
                 experience: skillExperience.trim(),
                 price: parseInt(skillPrice),
@@ -5936,7 +6125,7 @@
                     if (result.success) {
                         const newSkill = result.skill || skillData;
                         newSkill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${newSkill._id}`;
-                        newSkill.category = skillCategory; // Гарантируем сохранение категории
+                        newSkill.category = skillCategory;
                         addGlobalSkill(newSkill);
                         
                         alert('✅ Умейка успешно опубликована!');
@@ -5948,7 +6137,6 @@
                             console.log('✅ [Визитка] Новая умейка автоматически добавлена в визитку:', newSkill._id);
                         }
                         
-                        // Очистка формы
                         document.getElementById('skillName').value = '';
                         document.getElementById('skillCategory').value = '';
                         document.getElementById('skillDetails').value = '';
@@ -5980,13 +6168,12 @@
                 console.log('⚠️ Сервер недоступен, сохраняем локально:', serverError);
             }
             
-            // Локальное сохранение при недоступности сервера
             const localSkill = {
                 ...skillData,
                 _id: 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
                 createdAt: new Date().toISOString(),
                 local: true,
-                category: skillCategory, // Гарантируем сохранение категории
+                category: skillCategory,
                 qrCodeData: `${TELEGRAM_BOT_URL}?start=skill_local_${Date.now()}`
             };
             
@@ -6002,7 +6189,6 @@
                 console.log('✅ [Визитка] Новая локальная умейка автоматически добавлена в визитку:', localSkill._id);
             }
             
-            // Очистка формы
             document.getElementById('skillName').value = '';
             document.getElementById('skillCategory').value = '';
             document.getElementById('skillDetails').value = '';
@@ -6094,160 +6280,6 @@
             
             const globalSkills = getGlobalSkills();
             const myGlobalSkills = globalSkills.filter(s => s.userId === userId);
-            
-            const existingIds = new Set(skills.map(s => s._id));
-            myGlobalSkills.forEach(skill => {
-                if (!existingIds.has(skill._id)) {
-                    if (!skill.qrCodeData) {
-                        skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
-                    }
-                    skills.push(skill);
-                }
-            });
-            
-            const uniqueSkills = [];
-            const seenIds = new Set();
-            for (const skill of skills) {
-                if (!seenIds.has(skill._id)) {
-                    seenIds.add(skill._id);
-                    uniqueSkills.push(skill);
-                }
-            }
-            skills = uniqueSkills;
-            
-            if (skills.length > 0) {
-                skillsList.innerHTML = skills.map(skill => {
-                    const statusBadge = getStatusBadge(skill.status);
-                    const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
-                    const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
-                    
-                    return `
-                    <div class="skill-card">
-                        <div class="skill-header">
-                            <div class="skill-title">${skill.skill} ${isLocal}</div>
-                            <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                        </div>
-                        
-                        ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
-                        
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`)}" 
-                             class="skill-qr-code" 
-                             alt="QR"
-                             onclick="event.stopPropagation(); triggerHapticFeedback(); showQRModal('${skill._id}', '${skill.skill.replace(/'/g, "\\'")}');">
-                        
-                        <div class="skill-price">${skill.price} ₽</div>
-                        
-                        ${statusBadge}
-                        
-                        ${cityInfo}
-                        
-                        <div class="skill-user-row">
-                            <div class="skill-user-name">
-                                <span>👤</span> <span>${skill.username}</span>
-                            </div>
-                            <button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">
-                                📝 Подробно
-                            </button>
-                        </div>
-                        
-                        <div class="skill-contact-info">
-                            <div class="contact-label">📞 Контакты:</div>
-                            <div class="contact-item">
-                                <span class="contact-icon">📱</span>
-                                <span class="contact-text">${skill.experience || 'Не указано'}</span>
-                            </div>
-                        </div>
-                        
-                        ${skill.photo ? `
-                            <div class="skill-photo">
-                                <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
-                            </div>
-                        ` : ''}
-                        
-                        <div style="display: flex; gap: 10px; margin-top: 15px;">
-                            <button class="edit-button" onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');">
-                                ✏️ Редактировать
-                            </button>
-                            <button class="delete-button" onclick="triggerHapticFeedback(); deleteSkill('${skill._id}');">
-                                🗑️ Удалить
-                            </button>
-                        </div>
-                    </div>
-                `}).join('');
-            } else {
-                skillsList.innerHTML = `
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">📭</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">У вас пока нет добавленных умейок</div>
-                        <button class="main-button" onclick="triggerHapticFeedback(); showSection('masterSection');" style="padding: 15px; margin-top: 10px;">
-                            ✨ Добавить первую умейку
-                        </button>
-                    </div>
-                `;
-            }
-            
-        } catch (error) {
-            console.error('❌ Неожиданная ошибка загрузки умейок:', error);
-            const skillsList = document.getElementById('mySkillsList');
-            if (skillsList) {
-                skillsList.innerHTML = `
-                    <div class="error-message">
-                        ❌ Неожиданная ошибка<br>
-                        <small>${error.message}</small>
-                    </div>
-                `;
-            }
-        }
-    }
-
-    async function loadProfileSkills() {
-        try {
-            if (!currentUserId) {
-                console.log('👤 Пользователь не определен');
-                return;
-            }
-
-            console.log('📡 Загрузка моих умейок для профиля...');
-            
-            const skillsList = document.getElementById('profileSkillsList');
-            let skills = [];
-            
-            try {
-                const response = await fetch(`${API_URL}/api/skills/user/${currentUserId}`);
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.success) {
-                        skills = result.skills;
-                        
-                        skills = skills.map(skill => {
-                            const globalSkill = getGlobalSkillById(skill._id);
-                            if (globalSkill) {
-                                if (globalSkill.updatedAt) {
-                                    if (!skill.updatedAt || new Date(globalSkill.updatedAt) > new Date(skill.updatedAt)) {
-                                        skill.status = globalSkill.status;
-                                    }
-                                }
-                                if (globalSkill.details) skill.details = globalSkill.details;
-                                if (globalSkill.qrCode) skill.qrCode = globalSkill.qrCode;
-                                if (globalSkill.qrCodeData) skill.qrCodeData = globalSkill.qrCodeData;
-                                if (globalSkill.category) skill.category = globalSkill.category;
-                            }
-                            if (!skill.qrCodeData) {
-                                skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
-                            }
-                            return skill;
-                        });
-                    }
-                }
-            } catch (serverError) {
-                console.log('⚠️ Сервер недоступен для загрузки умейок в профиль');
-            }
-            
-            const localUserSkills = loadSkillsFromLocalStorage(currentUserId);
-            skills = [...skills, ...localUserSkills.filter(s => s.local)];
-            
-            const globalSkills = getGlobalSkills();
-            const myGlobalSkills = globalSkills.filter(s => s.userId === currentUserId);
             
             const existingIds = new Set(skills.map(s => s._id));
             myGlobalSkills.forEach(skill => {
@@ -7343,196 +7375,6 @@
         `;
     }
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОИСКА ПО КАТЕГОРИИ
-    window.searchByCategory = async function(category) {
-        triggerHapticFeedback();
-        
-        const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
-        
-        const resultsContainer = document.getElementById('categorySearchResults');
-        const categoriesContainer = document.getElementById('categoriesList');
-        
-        if (categoriesContainer) categoriesContainer.style.display = 'none';
-        resultsContainer.innerHTML = '<div class="loading">🔍 Поиск мастеров по категории "' + cleanCategory + '"...</div>';
-        resultsContainer.style.display = 'block';
-        
-        try {
-            // Получаем все умейки из глобального хранилища
-            await preloadAllSkills();
-            const allGlobalSkills = getGlobalSkills();
-            console.log(`📊 Всего умейок в глобальном хранилище: ${allGlobalSkills.length}`);
-            
-            // Фильтруем по категории (полное совпадение, включая эмодзи)
-            let filteredSkills = allGlobalSkills.filter(skill => {
-                if (!skill.category) return false;
-                // Удаляем эмодзи для сравнения
-                const skillCategory = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
-                return skillCategory.toLowerCase() === cleanCategory.toLowerCase();
-            });
-            
-            console.log(`📊 Найдено умейок в категории "${cleanCategory}": ${filteredSkills.length}`);
-            
-            // Убираем дубликаты
-            const uniqueSkills = [];
-            const seenIds = new Set();
-            for (const skill of filteredSkills) {
-                if (!seenIds.has(skill._id)) {
-                    seenIds.add(skill._id);
-                    uniqueSkills.push(skill);
-                }
-            }
-            filteredSkills = uniqueSkills;
-            
-            // Сортируем по имени мастера
-            filteredSkills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
-            
-            // Показываем умейки всех пользователей (не скрываем текущего пользователя - в архиве должны быть все мастера, включая себя?)
-            // Для архива показываем всех мастеров, включая текущего пользователя - это нормально, пользователь тоже может найти свои умейки
-            // Убираем filter по userId, так как в архиве должны быть все мастера
-            
-            console.log(`📊 Найдено умейок в категории после фильтрации: ${filteredSkills.length}`);
-            
-            if (filteredSkills.length > 0) {
-                resultsContainer.innerHTML = `
-                    <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-                        <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
-                                style="padding: 12px 20px; font-size: 14px; width: auto; margin: 0;">
-                            ← Назад к категориям
-                        </button>
-                        <div style="color: white; font-size: 14px;">Найдено: ${filteredSkills.length}</div>
-                    </div>
-                    ${filteredSkills.map(skill => {
-                        const statusBadge = getStatusBadge(skill.status);
-                        const cityInfo = skill.city ? `<div class="city-info" style="margin: 8px 0; padding: 6px 10px; background: rgba(102,126,234,0.15); border-radius: 8px; font-size: 13px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
-                        const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
-                        const isCurrentUser = skill.userId === currentUserId;
-                        const userLabel = isCurrentUser ? '<span style="background: #48bb78; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Вы</span>' : '';
-                        
-                        return `
-                        <div class="skill-card">
-                            <div class="skill-header">
-                                <div class="skill-title">${escapeHtml(skill.skill)} ${isLocal} ${userLabel}</div>
-                                <div class="skill-rating">${'⭐'.repeat(5)}</div>
-                            </div>
-                            
-                            ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
-                            
-                            <div class="skill-price">${skill.price} ₽</div>
-                            
-                            ${statusBadge}
-                            
-                            ${cityInfo}
-                            
-                            <div class="skill-user-row">
-                                <div class="skill-user-name">
-                                    <span>👤</span> <span>${escapeHtml(skill.username)}</span>
-                                </div>
-                                <button class="details-button" onclick="event.stopPropagation(); openDetailsModal('${skill._id}');">
-                                    📝 Подробно
-                                </button>
-                            </div>
-                            
-                            <div class="skill-contact-info">
-                                <div class="contact-label">📞 Контакты:</div>
-                                <div class="contact-item">
-                                    <span class="contact-icon">📱</span>
-                                    <span class="contact-text">${escapeHtml(skill.experience || 'Не указано')}</span>
-                                </div>
-                            </div>
-                            
-                            ${skill.photo ? `
-                                <div class="skill-photo">
-                                    <img src="${skill.photo}" alt="Фото работы" onerror="this.parentElement.style.display='none'">
-                                </div>
-                            ` : ''}
-                            
-                            <button class="chat-button" onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username).replace(/'/g, "\\'")}', '${escapeHtml(skill.experience || '')}', '');">
-                                📞 Подробные контакты
-                            </button>
-                            
-                            ${!isCurrentUser ? `
-                                <button class="create-deal-button" onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username).replace(/'/g, "\\'")}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');">
-                                    📝 Составить сделку
-                                </button>
-                            ` : ''}
-                            
-                            ${skill.location && skill.location.lat && skill.location.lon ? `
-                                <button class="map-skill-button" onclick="triggerHapticFeedback(); showOnMap('${skill.location.lat}', '${skill.location.lon}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}');" 
-                                        style="margin-top: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; width: 100%;">
-                                    🗺️ Показать на карте
-                                </button>
-                            ` : ''}
-                        </div>
-                    `}).join('')}
-                `;
-            } else {
-                resultsContainer.innerHTML = `
-                    <div style="margin-bottom: 15px;">
-                        <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
-                                style="padding: 12px 20px; font-size: 14px; width: auto; margin: 0;">
-                            ← Назад к категориям
-                        </button>
-                    </div>
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
-                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено по категории "${cleanCategory}"</div>
-                        <div style="opacity: 0.7;">Попробуйте выбрать другую категорию</div>
-                    </div>
-                `;
-            }
-            
-        } catch (error) {
-            console.error('Ошибка поиска по категории:', error);
-            resultsContainer.innerHTML = `
-                <div style="margin-bottom: 15px;">
-                    <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
-                            style="padding: 12px 20px; font-size: 14px; width: auto; margin: 0;">
-                        ← Назад к категориям
-                    </button>
-                </div>
-                <div class="error-message">
-                    ❌ Ошибка поиска<br>
-                    <small>${error.message}</small>
-                </div>
-            `;
-        }
-    };
-    
-    window.backToCategories = function() {
-        triggerHapticFeedback();
-        
-        const resultsContainer = document.getElementById('categorySearchResults');
-        const categoriesContainer = document.getElementById('categoriesList');
-        
-        if (categoriesContainer) categoriesContainer.style.display = 'block';
-        if (resultsContainer) {
-            resultsContainer.innerHTML = '';
-            resultsContainer.style.display = 'none';
-        }
-    };
-    
-    window.showOnMap = function(lat, lon, title) {
-        triggerHapticFeedback();
-        
-        if (!map) {
-            initMap();
-        }
-        
-        const mapSection = document.querySelector('.map-section');
-        if (mapSection) {
-            mapSection.classList.add('map-active');
-        }
-        
-        map.setView([parseFloat(lat), parseFloat(lon)], 15);
-        
-        L.marker([parseFloat(lat), parseFloat(lon)])
-            .addTo(map)
-            .bindPopup(`<b>📍 ${title}</b><br>Местоположение мастера`)
-            .openPopup();
-        
-        showNotification(`🗺️ Показано на карте: ${title}`);
-    };
-
     window.searchSkills = async function() {
         triggerHapticFeedback();
         
@@ -8205,7 +8047,7 @@
             }
             
             if (!masterId || !masterName) {
-                alert('❌ Ошибка: данные мастера не найдены');
+                                alert('❌ Ошибка: данные мастера не найдены');
                 return;
             }
             
@@ -8719,6 +8561,7 @@
         }
     };
 
+    // ========== ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ==========
     document.addEventListener('DOMContentLoaded', async function() {
         console.log('🚀 Ymeyka app loaded successfully!');
         
@@ -8761,6 +8604,7 @@
         
         initAdminAccess();
     });
-    </script>
+</script>
 </body>
 </html>
+               
