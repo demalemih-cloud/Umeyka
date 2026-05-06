@@ -2539,7 +2539,6 @@
             box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
 
-        /* Визитка стили */
         .visitka-skill-item {
             display: flex;
             align-items: center;
@@ -2628,7 +2627,6 @@
             display: flex;
         }
 
-        /* Стили для подсветки ошибки выбора категории */
         select.input-field.error {
             border: 2px solid #e53e3e !important;
             animation: shake 0.5s ease-in-out;
@@ -2640,7 +2638,6 @@
             75% { transform: translateX(5px); }
         }
         
-        /* Стиль для выпадающего списка категорий */
         select.input-field {
             cursor: pointer;
             appearance: none;
@@ -2838,19 +2835,7 @@
                 <h2 style="margin-bottom: 20px; text-align: center;">📚 Архив мастеров</h2>
                 
                 <div id="categoriesList" style="margin-bottom: 20px;"></div>
-                
                 <div id="categorySearchResults" style="margin-top: 20px;"></div>
-                
-                <div style="display: none;">
-                    <input type="text" id="searchInput" class="input-field" placeholder="🔎 Что ищем?">
-                    <div class="city-autocomplete">
-                        <input type="text" id="searchCity" class="input-field" placeholder="🏙️ Город">
-                        <div id="searchCityAutocompleteList" class="autocomplete-list"></div>
-                    </div>
-                    <button class="submit-button" onclick="triggerHapticFeedback(); searchSkills();">Найти мастеров</button>
-                </div>
-                
-                <div id="searchResults" style="margin-top: 20px;"></div>
             </div>
         </div>
 
@@ -2902,23 +2887,6 @@
                         <span class="button-icon">🎁</span>
                         Реферальная программа
                     </button>
-                </div>
-                
-                <div style="display: none;">
-                    <div class="tab-buttons">
-                        <button class="tab-button active" onclick="triggerHapticFeedback(); showProfileTab('stats');" id="statsTab">
-                            📊 Статистика
-                        </button>
-                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('skills');" id="skillsTab">
-                            ✨ Мои умейки
-                        </button>
-                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('deals');" id="dealsTab">
-                            📝 Сделки
-                        </button>
-                        <button class="tab-button" onclick="triggerHapticFeedback(); showProfileTab('referral');" id="referralTab">
-                            🎁 Реферальная программа
-                        </button>
-                    </div>
                 </div>
                 
                 <div id="profileStats" class="profile-tab">
@@ -5866,7 +5834,7 @@
         return false;
     }
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ addSkill - теперь правильно сохраняет категорию
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ addSkill
     window.addSkill = async function() {
         triggerHapticFeedback();
         
@@ -7218,7 +7186,7 @@
         `;
     }
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОИСКА ПО КАТЕГОРИИ - теперь корректно отображает умейки других пользователей
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОИСКА ПО КАТЕГОРИИ
     window.searchByCategory = async function(category) {
         triggerHapticFeedback();
         
@@ -7232,28 +7200,20 @@
         resultsContainer.style.display = 'block';
         
         try {
-            let skills = [];
-            
-            // Получаем все умейки из глобального хранилища (это включает и серверные, и локальные умейки всех пользователей)
+            // Получаем все умейки из глобального хранилища
+            await preloadAllSkills();
             const allGlobalSkills = getGlobalSkills();
             console.log(`📊 Всего умейок в глобальном хранилище: ${allGlobalSkills.length}`);
             
-            // Фильтруем по категории (поиск по полному совпадению с эмодзи или без)
+            // Фильтруем по категории (полное совпадение, включая эмодзи)
             let filteredSkills = allGlobalSkills.filter(skill => {
                 if (!skill.category) return false;
+                // Удаляем эмодзи для сравнения
                 const skillCategory = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
                 return skillCategory.toLowerCase() === cleanCategory.toLowerCase();
             });
             
             console.log(`📊 Найдено умейок в категории "${cleanCategory}": ${filteredSkills.length}`);
-            
-            // Дополнительно: показываем также умейки, у которых skill.skill содержит название категории (на случай если категория не заполнена)
-            const fallbackSkills = allGlobalSkills.filter(skill => {
-                if (filteredSkills.find(s => s._id === skill._id)) return false;
-                return skill.skill && skill.skill.toLowerCase().includes(cleanCategory.toLowerCase());
-            });
-            
-            filteredSkills = [...filteredSkills, ...fallbackSkills];
             
             // Убираем дубликаты
             const uniqueSkills = [];
@@ -7266,42 +7226,35 @@
             }
             filteredSkills = uniqueSkills;
             
-            console.log(`📊 После объединения: ${filteredSkills.length} умейок`);
-            
-            // Фильтруем по городу, если указан
-            const searchCityInput = document.getElementById('searchCity');
-            const searchCity = searchCityInput ? searchCityInput.value.trim() : '';
-            
-            if (searchCity) {
-                filteredSkills = filteredSkills.filter(s => s.city && s.city.toLowerCase() === searchCity.toLowerCase());
-            }
-            
             // Сортируем по имени мастера
             filteredSkills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
             
-            // Скрываем умейки текущего пользователя (показываем только других мастеров)
-            const otherSkills = filteredSkills.filter(s => s.userId !== currentUserId);
+            // Показываем умейки всех пользователей (не скрываем текущего пользователя - в архиве должны быть все мастера, включая себя?)
+            // Для архива показываем всех мастеров, включая текущего пользователя - это нормально, пользователь тоже может найти свои умейки
+            // Убираем filter по userId, так как в архиве должны быть все мастера
             
-            console.log(`📊 Умейок других пользователей: ${otherSkills.length}`);
+            console.log(`📊 Найдено умейок в категории после фильтрации: ${filteredSkills.length}`);
             
-            if (otherSkills.length > 0) {
+            if (filteredSkills.length > 0) {
                 resultsContainer.innerHTML = `
                     <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
                         <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
                                 style="padding: 12px 20px; font-size: 14px; width: auto; margin: 0;">
                             ← Назад к категориям
                         </button>
-                        <div style="color: white; font-size: 14px;">Найдено: ${otherSkills.length}</div>
+                        <div style="color: white; font-size: 14px;">Найдено: ${filteredSkills.length}</div>
                     </div>
-                    ${otherSkills.map(skill => {
+                    ${filteredSkills.map(skill => {
                         const statusBadge = getStatusBadge(skill.status);
                         const cityInfo = skill.city ? `<div class="city-info" style="margin: 8px 0; padding: 6px 10px; background: rgba(102,126,234,0.15); border-radius: 8px; font-size: 13px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                         const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                        const isCurrentUser = skill.userId === currentUserId;
+                        const userLabel = isCurrentUser ? '<span style="background: #48bb78; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Вы</span>' : '';
                         
                         return `
                         <div class="skill-card">
                             <div class="skill-header">
-                                <div class="skill-title">${escapeHtml(skill.skill)} ${isLocal}</div>
+                                <div class="skill-title">${escapeHtml(skill.skill)} ${isLocal} ${userLabel}</div>
                                 <div class="skill-rating">${'⭐'.repeat(5)}</div>
                             </div>
                             
@@ -7340,9 +7293,11 @@
                                 📞 Подробные контакты
                             </button>
                             
-                            <button class="create-deal-button" onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username).replace(/'/g, "\\'")}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');">
-                                📝 Составить сделку
-                            </button>
+                            ${!isCurrentUser ? `
+                                <button class="create-deal-button" onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username).replace(/'/g, "\\'")}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');">
+                                    📝 Составить сделку
+                                </button>
+                            ` : ''}
                             
                             ${skill.location && skill.location.lat && skill.location.lon ? `
                                 <button class="map-skill-button" onclick="triggerHapticFeedback(); showOnMap('${skill.location.lat}', '${skill.location.lon}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}');" 
