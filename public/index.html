@@ -3591,15 +3591,6 @@
     let logoClickCount = 0;
     let logoClickTimer = null;
 
-    // ========== ФУНКЦИЯ НОРМАЛИЗАЦИИ КАТЕГОРИИ (УДАЛЯЕТ ЭМОДЗИ И ПРИВОДИТ К НИЖНЕМУ РЕГИСТРУ) ==========
-    function normalizeCategory(category) {
-        if (!category) return '';
-        // Удаляем эмодзи и специальные символы, оставляем только буквы, цифры и пробелы
-        let normalized = category.replace(/[^\w\sа-яА-Я]/g, '').trim().toLowerCase();
-        console.log(`🔧 [Нормализация] "${category}" -> "${normalized}"`);
-        return normalized;
-    }
-
     // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ВИЗИТКОЙ ==========
     
     function getVisitkaSelectedSkills() {
@@ -4059,13 +4050,7 @@
                 
                 console.log(`💾 [Загрузка] Глобальное хранилище содержит ${mergedSkills.length} умейок (сервер: ${result.skills.length}, локальные: ${mergedSkills.length - result.skills.length})`);
                 
-                // Выводим все категории для отладки
-                const categories = new Set();
-                mergedSkills.forEach(s => {
-                    if (s.category) categories.add(s.category);
-                });
-                console.log('📋 [Загрузка] Все категории в хранилище:', Array.from(categories));
-                console.log('📋 [Загрузка] ID всех умейок:', mergedSkills.map(s => ({id: s._id, category: s.category})));
+                console.log('📋 [Загрузка] ID всех умейок:', mergedSkills.map(s => s._id));
                 
                 return mergedSkills;
             } else {
@@ -5849,7 +5834,7 @@
         return false;
     }
 
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ addSkill ==========
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ addSkill
     window.addSkill = async function() {
         triggerHapticFeedback();
         
@@ -7201,49 +7186,60 @@
         `;
     }
 
+    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ НОРМАЛИЗАЦИИ КАТЕГОРИИ ==========
+    function normalizeCategory(category) {
+        if (!category) return '';
+        // Удаляем все эмодзи и специальные символы, оставляем только буквы, цифры и пробелы
+        let normalized = category.replace(/[^\w\s\u0400-\u04FF]/g, '').trim();
+        // Также удаляем возможные лишние пробелы внутри
+        normalized = normalized.replace(/\s+/g, ' ').trim();
+        console.log(`🔄 [Нормализация] "${category}" -> "${normalized}"`);
+        return normalized;
+    }
+
     // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОИСКА ПО КАТЕГОРИИ ==========
     window.searchByCategory = async function(category) {
         triggerHapticFeedback();
         
-        console.log(`🔍 [Поиск] Начинаю поиск по категории: "${category}"`);
+        console.log(`🔍 [Поиск по категории] Начинаю поиск категории: "${category}"`);
         
         const resultsContainer = document.getElementById('categorySearchResults');
         const categoriesContainer = document.getElementById('categoriesList');
         
         if (categoriesContainer) categoriesContainer.style.display = 'none';
-        resultsContainer.innerHTML = '<div class="loading">🔍 Поиск мастеров по категории "' + escapeHtml(category) + '"...</div>';
+        resultsContainer.innerHTML = '<div class="loading">🔍 Поиск мастеров по категории "' + category + '"...</div>';
         resultsContainer.style.display = 'block';
         
         try {
-            // Получаем все умейки из глобального хранилища (все пользователи)
+            // Принудительно загружаем все умейки перед поиском
             await preloadAllSkills();
-            const allGlobalSkills = getGlobalSkills();
+            
+            // Получаем все умейки из глобального хранилища
+            let allGlobalSkills = getGlobalSkills();
             console.log(`📊 [Поиск] Всего умейок в глобальном хранилище: ${allGlobalSkills.length}`);
             
-            // Нормализуем искомую категорию для корректного сравнения
-            const searchCategoryNormalized = normalizeCategory(category);
-            console.log(`🔧 [Поиск] Нормализованная категория для поиска: "${searchCategoryNormalized}"`);
+            // Нормализуем искомую категорию
+            const searchNormalized = normalizeCategory(category);
+            console.log(`📊 [Поиск] Нормализованная искомая категория: "${searchNormalized}"`);
             
-            // Фильтруем умейки по категории
+            // Фильтруем по категории (с учетом, что категория может быть с эмодзи или без)
             let filteredSkills = allGlobalSkills.filter(skill => {
                 if (!skill.category) {
-                    console.log(`   [Поиск] Умейка ${skill._id} - нет категории, пропускаем`);
+                    console.log(`   Умейка ${skill._id} не имеет категории`);
                     return false;
                 }
                 
-                const skillCategoryNormalized = normalizeCategory(skill.category);
-                const matches = skillCategoryNormalized === searchCategoryNormalized;
+                // Нормализуем категорию умейки для сравнения
+                const skillNormalized = normalizeCategory(skill.category);
+                const match = skillNormalized.toLowerCase() === searchNormalized.toLowerCase();
                 
-                if (matches) {
-                    console.log(`   [Поиск] ✅ Совпадение: ${skill.category} -> ${skillCategoryNormalized} == ${searchCategoryNormalized}`);
-                } else {
-                    console.log(`   [Поиск] ❌ Не совпадает: ${skill.category} -> ${skillCategoryNormalized} != ${searchCategoryNormalized}`);
+                if (match) {
+                    console.log(`   ✅ Совпадение: "${skill.category}" -> "${skillNormalized}" === "${searchNormalized}"`);
                 }
-                
-                return matches;
+                return match;
             });
             
-            console.log(`📊 [Поиск] Найдено умейок в категории "${category}": ${filteredSkills.length}`);
+            console.log(`📊 [Поиск] Найдено умейок в категории: ${filteredSkills.length}`);
             
             // Убираем дубликаты
             const uniqueSkills = [];
@@ -7256,18 +7252,10 @@
             }
             filteredSkills = uniqueSkills;
             
-            console.log(`📊 [Поиск] После удаления дубликатов: ${filteredSkills.length} умейок`);
-            
-            // Выводим список найденных умейок для отладки
-            if (filteredSkills.length > 0) {
-                console.log(`📋 [Поиск] Найденные умейки:`);
-                filteredSkills.forEach((skill, idx) => {
-                    console.log(`   ${idx + 1}. ID: ${skill._id}, Название: ${skill.skill}, Мастер: ${skill.username}, Категория: ${skill.category}`);
-                });
-            }
-            
             // Сортируем по имени мастера
             filteredSkills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
+            
+            console.log(`📊 [Поиск] Показываю ${filteredSkills.length} умейок (включая свои)`);
             
             if (filteredSkills.length > 0) {
                 resultsContainer.innerHTML = `
@@ -7343,7 +7331,6 @@
                     `}).join('')}
                 `;
             } else {
-                console.log(`⚠️ [Поиск] Не найдено умейок в категории "${category}"`);
                 resultsContainer.innerHTML = `
                     <div style="margin-bottom: 15px;">
                         <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
@@ -7353,14 +7340,14 @@
                     </div>
                     <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
                         <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено по категории "${escapeHtml(category)}"</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено по категории "${category}"</div>
                         <div style="opacity: 0.7;">Попробуйте выбрать другую категорию</div>
                     </div>
                 `;
             }
             
         } catch (error) {
-            console.error('❌ [Поиск] Ошибка поиска по категории:', error);
+            console.error('❌ Ошибка поиска по категории:', error);
             resultsContainer.innerHTML = `
                 <div style="margin-bottom: 15px;">
                     <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
