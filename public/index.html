@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
+        /* Стили ОСТАЮТСЯ ТАКИМИ ЖЕ, КАК В ОРИГИНАЛЕ */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -4015,51 +4016,55 @@
         document.getElementById('detailsModal').classList.remove('active');
     };
     
-    // ========== ИСПРАВЛЕННЫЙ QR-СКАНЕР ==========
+    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ПРЕДЗАГРУЗКИ ВСЕХ УМЕЕК ==========
     
     async function preloadAllSkills() {
-        console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейек...');
+        console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейек с сервера...');
         
         try {
-            const currentGlobalSkills = getGlobalSkills();
-            const localSkillsOnly = currentGlobalSkills.filter(s => s.local === true);
-            const localSkillsByUser = {};
-            currentUserId && (localSkillsByUser[currentUserId] = loadSkillsFromLocalStorage(currentUserId) || []);
-            
+            // Загружаем все умейки с сервера (эндпоинт /api/skills должен возвращать ВСЕ умейки)
             const response = await fetch(`${API_URL}/api/skills`);
             const result = await response.json();
             
-            if (result.success && result.skills) {
+            if (result.success && Array.isArray(result.skills)) {
                 console.log(`✅ [Загрузка] Загружено ${result.skills.length} умейок с сервера`);
+                console.log('📋 [Загрузка] Категории загруженных умейок:', [...new Set(result.skills.map(s => s.category))]);
                 
+                // Объединяем с локальными умейками текущего пользователя
                 let mergedSkills = [...result.skills];
                 const serverIds = new Set(result.skills.map(s => s._id));
                 
-                const currentUserLocalSkills = loadSkillsFromLocalStorage(currentUserId) || [];
-                currentUserLocalSkills.forEach(skill => {
-                    if (!serverIds.has(skill._id)) {
-                        mergedSkills.push(skill);
-                        serverIds.add(skill._id);
-                    }
-                });
+                // Добавляем локальные умейки текущего пользователя (если есть)
+                if (currentUserId) {
+                    const currentUserLocalSkills = loadSkillsFromLocalStorage(currentUserId) || [];
+                    currentUserLocalSkills.forEach(skill => {
+                        if (!serverIds.has(skill._id)) {
+                            mergedSkills.push(skill);
+                            serverIds.add(skill._id);
+                        }
+                    });
+                }
                 
+                // Обновляем глобальное хранилище
                 setGlobalSkills(mergedSkills);
-                
                 globalSkillsCache = mergedSkills;
                 isSkillsLoaded = true;
                 
                 console.log(`💾 [Загрузка] Глобальное хранилище содержит ${mergedSkills.length} умейок (сервер: ${result.skills.length}, локальные: ${mergedSkills.length - result.skills.length})`);
+                console.log('📋 [Загрузка] Все категории в глобальном хранилище:', [...new Set(mergedSkills.map(s => s.category))]);
                 
-                console.log('📋 [Загрузка] ID всех умейок:', mergedSkills.map(s => s._id));
+                // Выводим примеры умейок для отладки
+                const sampleSkills = mergedSkills.slice(0, 3);
+                console.log('📋 [Загрузка] Примеры загруженных умейок:', sampleSkills.map(s => ({ id: s._id, category: s.category, userId: s.userId })));
                 
                 return mergedSkills;
             } else {
-                console.warn('⚠️ [Загрузка] Сервер вернул ошибку:', result.error);
+                console.warn('⚠️ [Загрузка] Сервер вернул ошибку или пустой список:', result);
                 isSkillsLoaded = true;
                 return getGlobalSkills();
             }
         } catch (error) {
-            console.error('❌ [Загрузка] Ошибка загрузки умейок:', error);
+            console.error('❌ [Загрузка] Ошибка загрузки умейок с сервера:', error);
             isSkillsLoaded = true;
             return getGlobalSkills();
         }
@@ -7186,12 +7191,10 @@
         `;
     }
 
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ НОРМАЛИЗАЦИИ КАТЕГОРИИ ==========
+    // ========== НОРМАЛИЗАЦИЯ КАТЕГОРИИ ==========
     function normalizeCategory(category) {
         if (!category) return '';
-        // Удаляем все эмодзи и специальные символы, оставляем только буквы, цифры и пробелы
         let normalized = category.replace(/[^\w\s\u0400-\u04FF]/g, '').trim();
-        // Также удаляем возможные лишние пробелы внутри
         normalized = normalized.replace(/\s+/g, ' ').trim();
         console.log(`🔄 [Нормализация] "${category}" -> "${normalized}"`);
         return normalized;
@@ -7211,39 +7214,41 @@
         resultsContainer.style.display = 'block';
         
         try {
-            // Принудительно загружаем все умейки перед поиском
-            await preloadAllSkills();
+            // ПРИНУДИТЕЛЬНО ЗАГРУЖАЕМ ВСЕ УМЕЙКИ С СЕРВЕРА ПЕРЕД ПОИСКОМ
+            console.log('🔄 [Поиск] Принудительная перезагрузка умейек с сервера...');
+            const freshSkills = await preloadAllSkills();
+            console.log(`✅ [Поиск] Загружено ${freshSkills.length} умейок с сервера`);
             
-            // Получаем все умейки из глобального хранилища
+            // Получаем все умейки из глобального хранилища (уже обновлено)
             let allGlobalSkills = getGlobalSkills();
             console.log(`📊 [Поиск] Всего умейок в глобальном хранилище: ${allGlobalSkills.length}`);
+            console.log('📊 [Поиск] Все категории в хранилище:', [...new Set(allGlobalSkills.map(s => s.category))]);
             
             // Нормализуем искомую категорию
             const searchNormalized = normalizeCategory(category);
             console.log(`📊 [Поиск] Нормализованная искомая категория: "${searchNormalized}"`);
             
-            // Фильтруем по категории (с учетом, что категория может быть с эмодзи или без)
+            // Фильтруем по категории - ВКЛЮЧАЕМ ВСЕ УМЕЙКИ (и свои и чужие)
             let filteredSkills = allGlobalSkills.filter(skill => {
                 if (!skill.category) {
-                    console.log(`   Умейка ${skill._id} не имеет категории`);
+                    console.log(`   Умейка ${skill._id} (${skill.skill}) не имеет категории, userId: ${skill.userId}`);
                     return false;
                 }
                 
-                // Нормализуем категорию умейки для сравнения
                 const skillNormalized = normalizeCategory(skill.category);
                 const match = skillNormalized.toLowerCase() === searchNormalized.toLowerCase();
                 
                 if (match) {
-                    console.log(`   ✅ Совпадение: "${skill.category}" -> "${skillNormalized}" === "${searchNormalized}"`);
+                    console.log(`   ✅ СОВПАДЕНИЕ: "${skill.category}" -> "${skillNormalized}" === "${searchNormalized}", владелец: ${skill.userId === currentUserId ? 'ВЫ' : 'ДРУГОЙ'}`);
                 }
                 return match;
             });
             
-            console.log(`📊 [Поиск] Найдено умейок в категории: ${filteredSkills.length}`);
+            console.log(`📊 [Поиск] Найдено умейок в категории (до удаления дубликатов): ${filteredSkills.length}`);
             
             // Убираем дубликаты
-            const uniqueSkills = [];
             const seenIds = new Set();
+            const uniqueSkills = [];
             for (const skill of filteredSkills) {
                 if (!seenIds.has(skill._id)) {
                     seenIds.add(skill._id);
@@ -7252,10 +7257,20 @@
             }
             filteredSkills = uniqueSkills;
             
+            console.log(`📊 [Поиск] Результат (после удаления дубликатов): ${filteredSkills.length} умейок`);
+            console.log(`📊 [Поиск] Из них своих (userId === ${currentUserId}): ${filteredSkills.filter(s => s.userId === currentUserId).length}`);
+            console.log(`📊 [Поиск] Из них чужих: ${filteredSkills.filter(s => s.userId !== currentUserId).length}`);
+            
+            // Выводим примеры найденных умейок для отладки
+            if (filteredSkills.length > 0) {
+                console.log('📊 [Поиск] Примеры найденных умейок:');
+                filteredSkills.slice(0, 5).forEach(s => {
+                    console.log(`   - ${s.skill} (категория: ${s.category}, владелец: ${s.userId === currentUserId ? 'ВЫ' : 'ДРУГОЙ'})`);
+                });
+            }
+            
             // Сортируем по имени мастера
             filteredSkills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
-            
-            console.log(`📊 [Поиск] Показываю ${filteredSkills.length} умейок (включая свои)`);
             
             if (filteredSkills.length > 0) {
                 resultsContainer.innerHTML = `
