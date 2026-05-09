@@ -2646,6 +2646,27 @@
             background-position: right 15px center;
             background-size: 16px;
         }
+        
+        .category-filter-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            display: inline-block;
+            width: auto;
+        }
+        
+        .no-category-skills {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            padding: 40px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 20px;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -2751,7 +2772,7 @@
                         <option value="💆 Массажист">💆 Массажист</option>
                         <option value="📦 Другое">📦 Другое</option>
                     </select>
-                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
+                    <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">
                         ⚠️ Обязательно выберите категорию — это поможет клиентам найти вас
                     </div>
                 </div>
@@ -2782,7 +2803,7 @@
                             50 км
                         </div>
                     </div>
-                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
+                    <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">
                         Выберите радиус, в котором вы готовы работать
                     </div>
                 </div>
@@ -2797,7 +2818,7 @@
                             ⏰ Занят
                         </div>
                     </div>
-                    <div style="color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 5px;">
+                    <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">
                         Статус "Готов" - вы доступны для новых заказов<br>
                         Статус "Занят" - временно не принимаете заказы
                     </div>
@@ -3591,187 +3612,506 @@
     let logoClickCount = 0;
     let logoClickTimer = null;
 
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ВСЕХ УМЕЕК ==========
+    // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ВИЗИТКОЙ ==========
+    
+    function getVisitkaSelectedSkills() {
+        const key = `visa_selected_skills_${currentUserId}`;
+        const saved = getLocalStorage(key);
+        if (saved && Array.isArray(saved)) {
+            return saved;
+        }
+        const userSkills = getUserSkills();
+        return userSkills.map(s => s._id);
+    }
+    
+    function saveVisitkaSelectedSkills(skillIds) {
+        const key = `visa_selected_skills_${currentUserId}`;
+        setLocalStorage(key, skillIds);
+        visitkaSelectedSkills = skillIds;
+    }
+    
+    function getUserSkills() {
+        const globalSkills = getGlobalSkills();
+        const globalUserSkills = globalSkills.filter(s => s.userId === currentUserId);
+        
+        const localUserSkills = loadSkillsFromLocalStorage(currentUserId) || [];
+        
+        const allSkills = [...globalUserSkills];
+        const existingIds = new Set(allSkills.map(s => s._id));
+        
+        localUserSkills.forEach(skill => {
+            if (!existingIds.has(skill._id)) {
+                allSkills.push(skill);
+                existingIds.add(skill._id);
+            }
+        });
+        
+        return allSkills;
+    }
+    
+    async function openVisitkaModal() {
+        triggerHapticFeedback();
+        
+        const modal = document.getElementById('visitkaModal');
+        const content = document.getElementById('visitkaContent');
+        
+        modal.style.display = 'flex';
+        content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки...</div></div>';
+        
+        await preloadAllSkills();
+        
+        loadSkillsFromLocalStorage(currentUserId);
+        
+        renderVisitkaModal();
+    }
+    
+    function renderVisitkaModal() {
+        const userSkills = getUserSkills();
+        const userData = getOrCreateUserProfile(currentUserId);
+        const userName = userData.firstName || 'Пользователь';
+        const skillsCount = userSkills.length;
+        const rating = userData.rating || 0;
+        
+        console.log('📇 [Визитка] Рендер визитки. Умейок пользователя:', skillsCount, 'ID:', userSkills.map(s => s._id));
+        
+        visitkaSelectedSkills = getVisitkaSelectedSkills();
+        
+        const content = document.getElementById('visitkaContent');
+        
+        if (userSkills.length === 0) {
+            content.innerHTML = `
+                <div style="text-align: center; padding: 30px;">
+                    <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
+                    <div style="color: #2d3748; font-size: 16px; margin-bottom: 10px;">У вас пока нет умейок</div>
+                    <div style="color: #666; font-size: 14px;">Добавьте их через раздел "Я умейка"</div>
+                    <button class="main-button button-master" onclick="triggerHapticFeedback(); closeVisitkaModal(); showSection('masterSection');" style="margin-top: 20px; padding: 15px;">
+                        ✨ Добавить умейку
+                    </button>
+                </div>
+            `;
+            document.getElementById('visitkaEditBtn').style.display = 'none';
+            document.getElementById('visitkaShareBtn').style.display = 'none';
+            return;
+        }
+        
+        document.getElementById('visitkaEditBtn').style.display = 'flex';
+        document.getElementById('visitkaShareBtn').style.display = 'flex';
+        
+        const qrUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
+        
+        content.innerHTML = `
+            <div class="visitka-user-info">
+                <div class="visitka-user-name">${escapeHtml(userName)}</div>
+                <div class="visitka-user-stats">
+                    <span>✨ ${skillsCount} умейк(и)</span>
+                    <span>⭐ Рейтинг: ${rating.toFixed(1)}</span>
+                </div>
+            </div>
+            
+            <div class="visitka-qr">
+                <div id="visitkaQRCode" style="width: 250px; height: 250px; margin: 0 auto;"></div>
+                <div style="font-size: 12px; color: #666; margin-top: 8px;">QR-код вашей визитки</div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="color: #2d3748; margin-bottom: 10px;">✨ Мои умейки</h4>
+                <div id="visitkaSkillsList">
+                    ${renderVisitkaSkillsList(userSkills)}
+                </div>
+            </div>
+        `;
+        
+        setTimeout(() => {
+            const container = document.getElementById('visitkaQRCode');
+            if (container) {
+                container.innerHTML = '';
+                new QRCode(container, {
+                    text: qrUrl,
+                    width: 250,
+                    height: 250,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        }, 100);
+    }
+    
+    function renderVisitkaSkillsList(skills) {
+        if (visitkaEditMode) {
+            return skills.map(skill => {
+                const isChecked = visitkaSelectedSkills.includes(skill._id);
+                return `
+                    <div class="visitka-skill-item" data-skill-id="${skill._id}">
+                        <input type="checkbox" class="visitka-skill-checkbox" ${isChecked ? 'checked' : ''} onchange="toggleVisitkaSkill('${skill._id}', this.checked)">
+                        <div class="visitka-skill-info">
+                            <div class="visitka-skill-name">${escapeHtml(skill.skill)}</div>
+                            <div class="visitka-skill-details">💰 ${skill.price} ₽ | 📍 ${skill.city || 'Не указан'}</div>
+                        </div>
+                        <div class="visitka-skill-price">${skill.price} ₽</div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            const selectedSkills = skills.filter(s => visitkaSelectedSkills.includes(s._id));
+            if (selectedSkills.length === 0) {
+                return '<div style="color: #999; text-align: center; padding: 20px;">Нет выбранных умейок для визитки</div>';
+            }
+            return selectedSkills.map(skill => {
+                const statusBadge = getStatusBadge(skill.status);
+                return `
+                    <div class="visitka-skill-item" style="cursor: pointer;" onclick="showVisitkaSkillDetail('${skill._id}')">
+                        <div class="visitka-skill-info" style="flex: 1;">
+                            <div class="visitka-skill-name">${escapeHtml(skill.skill)}</div>
+                            <div class="visitka-skill-details">💰 ${skill.price} ₽ | 📍 ${skill.city || 'Не указан'}</div>
+                            ${statusBadge}
+                        </div>
+                        <div style="color: #667eea;">📝</div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+    
+    function toggleVisitkaEditMode() {
+        triggerHapticFeedback();
+        visitkaEditMode = !visitkaEditMode;
+        
+        const editBtn = document.getElementById('visitkaEditBtn');
+        editBtn.textContent = visitkaEditMode ? '💾 Сохранить' : '✏️ Редактировать';
+        
+        const userSkills = getUserSkills();
+        const skillsListContainer = document.getElementById('visitkaSkillsList');
+        
+        if (visitkaEditMode) {
+            skillsListContainer.innerHTML = renderVisitkaSkillsList(userSkills);
+        } else {
+            saveVisitkaSelectedSkills(visitkaSelectedSkills);
+            skillsListContainer.innerHTML = renderVisitkaSkillsList(userSkills);
+        }
+    }
+    
+    function toggleVisitkaSkill(skillId, isChecked) {
+        triggerHapticFeedback();
+        if (isChecked) {
+            if (!visitkaSelectedSkills.includes(skillId)) {
+                visitkaSelectedSkills.push(skillId);
+            }
+        } else {
+            visitkaSelectedSkills = visitkaSelectedSkills.filter(id => id !== skillId);
+        }
+    }
+    
+    function showVisitkaSkillDetail(skillId) {
+        triggerHapticFeedback();
+        
+        const skill = getGlobalSkillById(skillId);
+        if (!skill) return;
+        
+        currentVisitkaSkill = skill;
+        
+        const modal = document.getElementById('visitkaSkillDetailModal');
+        const title = document.getElementById('visitkaSkillDetailTitle');
+        const text = document.getElementById('visitkaSkillDetailText');
+        
+        title.textContent = `📝 ${escapeHtml(skill.skill)}`;
+        
+        let detailsHtml = `<strong>💰 Цена:</strong> ${skill.price} ₽<br><br>`;
+        detailsHtml += `<strong>📍 Город:</strong> ${skill.city || 'Не указан'}<br><br>`;
+        detailsHtml += `<strong>📏 Радиус:</strong> ${skill.radius || 10} км<br><br>`;
+        detailsHtml += `<strong>⭐ Статус:</strong> ${skill.status === 'ready' ? 'Готов к работе' : 'Занят'}<br><br>`;
+        
+        if (skill.details && skill.details.trim()) {
+            detailsHtml += `<strong>📝 Подробности:</strong><br>${escapeHtml(skill.details)}<br><br>`;
+        } else {
+            detailsHtml += `<em style="color: #999;">Мастер не добавил подробности</em><br><br>`;
+        }
+        
+        text.innerHTML = detailsHtml;
+        
+        modal.classList.add('active');
+    }
+    
+    function closeVisitkaSkillDetailModal() {
+        triggerHapticFeedback();
+        document.getElementById('visitkaSkillDetailModal').classList.remove('active');
+        currentVisitkaSkill = null;
+    }
+    
+    function contactMasterFromVisitka() {
+        if (!currentVisitkaSkill) return;
+        
+        triggerHapticFeedback();
+        openContactModal(
+            currentVisitkaSkill._id,
+            currentVisitkaSkill.skill,
+            currentVisitkaSkill.username,
+            currentVisitkaSkill.experience || '',
+            ''
+        );
+        closeVisitkaSkillDetailModal();
+    }
+    
+    function createDealFromVisitkaSkill() {
+        if (!currentVisitkaSkill) return;
+        
+        triggerHapticFeedback();
+        createDealFromSkill(
+            currentVisitkaSkill._id,
+            currentVisitkaSkill.skill,
+            currentVisitkaSkill.username,
+            currentVisitkaSkill.userId,
+            currentVisitkaSkill.experience || ''
+        );
+        closeVisitkaSkillDetailModal();
+        closeVisitkaModal();
+    }
+    
+    function shareVisitka() {
+        triggerHapticFeedback();
+        
+        const shareUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
+        const userData = getOrCreateUserProfile(currentUserId);
+        const userName = userData.firstName || 'Пользователь';
+        
+        const shareText = `📇 Визитка мастера ${userName} в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке, чтобы посмотреть мои умейки:\n${shareUrl}`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: `Визитка ${userName}`,
+                text: shareText,
+                url: shareUrl
+            }).catch(err => console.log('Share canceled'));
+        } else {
+            navigator.clipboard.writeText(shareText).then(() => {
+                showNotification('✅ Ссылка на визитку скопирована!');
+            }).catch(() => {
+                alert('Ссылка: ' + shareUrl);
+            });
+        }
+    }
+    
+    function closeVisitkaModal() {
+        triggerHapticFeedback();
+        document.getElementById('visitkaModal').style.display = 'none';
+        visitkaEditMode = false;
+        document.getElementById('visitkaEditBtn').textContent = '✏️ Редактировать';
+    }
+    
+    async function openMasterVisitka(userId) {
+        triggerHapticFeedback();
+        
+        const modal = document.getElementById('masterVisitkaModal');
+        const content = document.getElementById('masterVisitkaContent');
+        const title = document.getElementById('masterVisitkaTitle');
+        
+        modal.style.display = 'flex';
+        content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки мастера...</div></div>';
+        
+        await preloadAllSkills();
+        
+        const allSkills = getGlobalSkills();
+        const masterSkills = allSkills.filter(s => s.userId === userId);
+        const userData = getOrCreateUserProfile(userId);
+        const userName = userData.firstName || 'Мастер';
+        
+        title.textContent = `📇 Визитка мастера ${escapeHtml(userName)}`;
+        
+        const masterSelectedKey = `visa_selected_skills_${userId}`;
+        const masterSelected = getLocalStorage(masterSelectedKey);
+        let displaySkills = masterSkills;
+        
+        if (masterSelected && Array.isArray(masterSelected) && masterSelected.length > 0) {
+            displaySkills = masterSkills.filter(s => masterSelected.includes(s._id));
+        }
+        
+        if (displaySkills.length === 0) {
+            content.innerHTML = `
+                <div style="text-align: center; padding: 30px;">
+                    <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
+                    <div style="color: #2d3748; font-size: 16px;">У мастера пока нет умейок в визитке</div>
+                </div>
+            `;
+            return;
+        }
+        
+        currentMasterVisitkaData = {
+            userId: userId,
+            userName: userName,
+            skills: displaySkills
+        };
+        
+        content.innerHTML = `
+            <div class="visitka-user-info">
+                <div class="visitka-user-name">${escapeHtml(userName)}</div>
+                <div class="visitka-user-stats">
+                    <span>✨ ${displaySkills.length} умейк(и)</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h4 style="color: #2d3748; margin-bottom: 10px;">✨ Умейки мастера</h4>
+                <div id="masterVisitkaSkillsList">
+                    ${displaySkills.map(skill => {
+                        const statusBadge = getStatusBadge(skill.status);
+                        return `
+                            <div class="visitka-skill-item" style="cursor: pointer;" onclick="showMasterVisitkaSkillDetail('${skill._id}')">
+                                <div class="visitka-skill-info" style="flex: 1;">
+                                    <div class="visitka-skill-name">${escapeHtml(skill.skill)}</div>
+                                    <div class="visitka-skill-details">💰 ${skill.price} ₽ | 📍 ${skill.city || 'Не указан'}</div>
+                                    ${statusBadge}
+                                </div>
+                                <div style="color: #667eea;">📝</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    function showMasterVisitkaSkillDetail(skillId) {
+        triggerHapticFeedback();
+        
+        if (!currentMasterVisitkaData) return;
+        
+        const skill = currentMasterVisitkaData.skills.find(s => s._id === skillId);
+        if (!skill) return;
+        
+        currentVisitkaSkill = skill;
+        
+        const modal = document.getElementById('visitkaSkillDetailModal');
+        const title = document.getElementById('visitkaSkillDetailTitle');
+        const text = document.getElementById('visitkaSkillDetailText');
+        
+        title.textContent = `📝 ${escapeHtml(skill.skill)}`;
+        
+        let detailsHtml = `<strong>💰 Цена:</strong> ${skill.price} ₽<br><br>`;
+        detailsHtml += `<strong>📍 Город:</strong> ${skill.city || 'Не указан'}<br><br>`;
+        detailsHtml += `<strong>📏 Радиус:</strong> ${skill.radius || 10} км<br><br>`;
+        detailsHtml += `<strong>⭐ Статус:</strong> ${skill.status === 'ready' ? 'Готов к работе' : 'Занят'}<br><br>`;
+        
+        if (skill.details && skill.details.trim()) {
+            detailsHtml += `<strong>📝 Подробности:</strong><br>${escapeHtml(skill.details)}<br><br>`;
+        } else {
+            detailsHtml += `<em style="color: #999;">Мастер не добавил подробности</em><br><br>`;
+        }
+        
+        text.innerHTML = detailsHtml;
+        
+        modal.classList.add('active');
+    }
+    
+    function closeMasterVisitkaModal() {
+        triggerHapticFeedback();
+        document.getElementById('masterVisitkaModal').style.display = 'none';
+        currentMasterVisitkaData = null;
+    }
+
+    // ========== ФУНКЦИЯ ДЛЯ ОТКРЫТИЯ МОДАЛЬНОГО ОКНА ПОДРОБНОСТЕЙ ==========
+    window.openDetailsModal = function(skillId) {
+        triggerHapticFeedback();
+        
+        const skill = getGlobalSkillById(skillId);
+        if (!skill) {
+            alert('❌ Умейка не найдена');
+            return;
+        }
+        
+        const detailsText = skill.details && skill.details.trim() ? skill.details.trim() : null;
+        
+        document.getElementById('detailsModalTitle').textContent = `📝 ${skill.skill}`;
+        
+        if (detailsText) {
+            document.getElementById('detailsModalText').innerHTML = detailsText.replace(/\n/g, '<br>');
+        } else {
+            document.getElementById('detailsModalText').innerHTML = '<span style="color: #999;">Мастер не добавил подробности</span>';
+        }
+        
+        document.getElementById('detailsModal').classList.add('active');
+    };
+    
+    window.closeDetailsModal = function() {
+        triggerHapticFeedback();
+        document.getElementById('detailsModal').classList.remove('active');
+    };
+    
+    // ========== ИСПРАВЛЕННЫЙ QR-СКАНЕР ==========
+    
+    // ГЛОБАЛЬНЫЙ КЭШ ВСЕХ УМЕЕК С СЕРВЕРА (КЛЮЧ: категория)
+    let allSkillsFromServer = [];
+    
     async function preloadAllSkills() {
         console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейок...');
         
         try {
-            // Пробуем загрузить через основной эндпоинт
-            let allSkills = [];
+            const currentGlobalSkills = getGlobalSkills();
+            const localSkillsOnly = currentGlobalSkills.filter(s => s.local === true);
+            const localSkillsByUser = {};
+            currentUserId && (localSkillsByUser[currentUserId] = loadSkillsFromLocalStorage(currentUserId) || []);
             
-            try {
-                const response = await fetch(`${API_URL}/api/skills`);
-                const result = await response.json();
-                
-                if (result.success && result.skills) {
-                    console.log(`✅ [Загрузка] Сервер вернул ${result.skills.length} умейок`);
-                    
-                    // Детальное логирование первых 5 умейок
-                    console.log('📋 [Загрузка-DEBUG] Первые 5 умейок с сервера:');
-                    result.skills.slice(0, 5).forEach((skill, idx) => {
-                        console.log(`   ${idx + 1}. ID: ${skill._id}, Категория: ${skill.category || 'Нет'}, UserId: ${skill.userId}, Название: ${skill.skill}`);
-                    });
-                    
-                    allSkills = result.skills;
-                    
-                    // Если сервер вернул очень мало умейек (меньше 3), пробуем альтернативный эндпоинт
-                    if (allSkills.length < 3) {
-                        console.log('⚠️ [Загрузка] Сервер вернул мало умейек, пробую загрузить полный список через /api/skills/all...');
-                        try {
-                            const altResponse = await fetch(`${API_URL}/api/skills/all`);
-                            const altResult = await altResponse.json();
-                            if (altResult.success && altResult.skills && altResult.skills.length > allSkills.length) {
-                                console.log(`✅ [Загрузка] Альтернативный эндпоинт вернул ${altResult.skills.length} умейок`);
-                                allSkills = altResult.skills;
-                            }
-                        } catch (altError) {
-                            console.log('⚠️ [Загрузка] Альтернативный эндпоинт недоступен');
-                        }
-                    }
+            // ВАЖНО: Запрашиваем ВСЕ умейки с сервера, не фильтруем по пользователю
+            const response = await fetch(`${API_URL}/api/skills/all`);
+            
+            // Если эндпоинт /all не существует, пробуем альтернативный подход
+            let result;
+            if (response.ok) {
+                result = await response.json();
+            } else {
+                // Пробуем получить все умейки через обычный эндпоинт без параметров
+                const fallbackResponse = await fetch(`${API_URL}/api/skills`);
+                if (fallbackResponse.ok) {
+                    result = await fallbackResponse.json();
                 } else {
-                    console.warn('⚠️ [Загрузка] Сервер вернул ошибку:', result.error);
+                    throw new Error('Сервер не вернул умейки');
                 }
-            } catch (error) {
-                console.error('❌ [Загрузка] Ошибка запроса к серверу:', error);
             }
             
-            // Загружаем локальные умейки текущего пользователя
-            if (currentUserId) {
-                const currentUserLocalSkills = loadSkillsFromLocalStorage(currentUserId) || [];
-                console.log(`📦 [Загрузка] Локальные умейки текущего пользователя: ${currentUserLocalSkills.length}`);
+            if (result.success && result.skills) {
+                console.log(`✅ [Загрузка] Загружено ${result.skills.length} умейок с сервера`);
+                allSkillsFromServer = result.skills;
                 
-                const serverIds = new Set(allSkills.map(s => s._id));
+                let mergedSkills = [...result.skills];
+                const serverIds = new Set(result.skills.map(s => s._id));
+                
+                const currentUserLocalSkills = loadSkillsFromLocalStorage(currentUserId) || [];
                 currentUserLocalSkills.forEach(skill => {
                     if (!serverIds.has(skill._id)) {
-                        allSkills.push(skill);
+                        mergedSkills.push(skill);
                         serverIds.add(skill._id);
                     }
                 });
-            }
-            
-            // Загружаем демо-данные, если умейек слишком мало (менее 5)
-            if (allSkills.length < 5) {
-                console.log('⚠️ [Загрузка] Добавляю демо-данные, так как получено мало умейек');
-                const demoSkills = getDemoSkills();
-                const existingIds = new Set(allSkills.map(s => s._id));
-                demoSkills.forEach(skill => {
-                    if (!existingIds.has(skill._id)) {
-                        allSkills.push(skill);
-                        existingIds.add(skill._id);
+                
+                setGlobalSkills(mergedSkills);
+                
+                globalSkillsCache = mergedSkills;
+                isSkillsLoaded = true;
+                
+                console.log(`💾 [Загрузка] Глобальное хранилище содержит ${mergedSkills.length} умейок (сервер: ${result.skills.length}, локальные: ${mergedSkills.length - result.skills.length})`);
+                
+                // Вывод статистики по категориям для отладки
+                const categoryStats = {};
+                mergedSkills.forEach(skill => {
+                    if (skill.category) {
+                        const cleanCat = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
+                        categoryStats[cleanCat] = (categoryStats[cleanCat] || 0) + 1;
                     }
                 });
-                console.log(`📦 [Загрузка] Добавлено ${demoSkills.length} демо-умейек`);
+                console.log('📊 [Загрузка] Распределение по категориям:', categoryStats);
+                
+                console.log('📋 [Загрузка] ID всех умейок:', mergedSkills.map(s => s._id));
+                
+                return mergedSkills;
+            } else {
+                console.warn('⚠️ [Загрузка] Сервер вернул ошибку:', result?.error);
+                isSkillsLoaded = true;
+                return getGlobalSkills();
             }
-            
-            // Сохраняем в глобальное хранилище
-            setGlobalSkills(allSkills);
-            globalSkillsCache = allSkills;
-            isSkillsLoaded = true;
-            
-            console.log(`💾 [Загрузка] Итоговое количество умейок в глобальном хранилище: ${allSkills.length}`);
-            console.log('📋 [Загрузка-DEBUG] Все категории в глобальном хранилище:', [...new Set(allSkills.map(s => s.category))]);
-            console.log('📋 [Загрузка-DEBUG] Количество умейок по категориям:');
-            const categoryCount = {};
-            allSkills.forEach(s => {
-                if (s.category) {
-                    const cat = s.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
-                    categoryCount[cat] = (categoryCount[cat] || 0) + 1;
-                }
-            });
-            Object.entries(categoryCount).forEach(([cat, count]) => {
-                console.log(`   ${cat}: ${count} умейек`);
-            });
-            
-            return allSkills;
         } catch (error) {
-            console.error('❌ [Загрузка] Критическая ошибка:', error);
+            console.error('❌ [Загрузка] Ошибка загрузки умейок:', error);
             isSkillsLoaded = true;
             return getGlobalSkills();
         }
-    }
-    
-    // Функция для генерации демо-данных
-    function getDemoSkills() {
-        const demoUserId1 = 'demo_user_1';
-        const demoUserId2 = 'demo_user_2';
-        
-        return [
-            {
-                _id: 'demo_skill_1',
-                skill: 'Ремонт телефонов',
-                category: '📱 Ремонт телефонов',
-                details: 'Ремонтирую любые телефоны. Быстро, качественно, с гарантией.',
-                experience: '+7 (999) 123-45-67',
-                price: 1500,
-                city: 'Москва',
-                radius: 10,
-                userId: demoUserId1,
-                username: 'Иван Петров',
-                status: 'ready',
-                createdAt: new Date().toISOString(),
-                location: { lat: 55.7558, lon: 37.6173 }
-            },
-            {
-                _id: 'demo_skill_2',
-                skill: 'Электромонтажные работы',
-                category: '⚡ Электрик',
-                details: 'Установка розеток, выключателей, прокладка проводки.',
-                experience: '@electro_master',
-                price: 2000,
-                city: 'Санкт-Петербург',
-                radius: 15,
-                userId: demoUserId2,
-                username: 'Алексей Сидоров',
-                status: 'ready',
-                createdAt: new Date().toISOString(),
-                location: { lat: 59.9343, lon: 30.3351 }
-            },
-            {
-                _id: 'demo_skill_3',
-                skill: 'Сантехнические работы',
-                category: '🔨 Сантехник',
-                details: 'Установка, замена сантехники, устранение протечек.',
-                experience: '+7 (912) 345-67-89',
-                price: 1800,
-                city: 'Москва',
-                radius: 10,
-                userId: demoUserId1,
-                username: 'Иван Петров',
-                status: 'ready',
-                createdAt: new Date().toISOString(),
-                location: { lat: 55.7558, lon: 37.6173 }
-            },
-            {
-                _id: 'demo_skill_4',
-                skill: 'Маникюр и педикюр',
-                category: '✂️ Парикмахер',
-                details: 'Качественный маникюр, педикюр. Использую только проверенные материалы.',
-                experience: '@beauty_nails',
-                price: 1000,
-                city: 'Санкт-Петербург',
-                radius: 5,
-                userId: demoUserId2,
-                username: 'Алексей Сидоров',
-                status: 'busy',
-                createdAt: new Date().toISOString(),
-                location: { lat: 59.9343, lon: 30.3351 }
-            },
-            {
-                _id: 'demo_skill_5',
-                skill: 'Строительство домов',
-                category: '🏗️ Строитель',
-                details: 'Строительство домов под ключ. Работаем по всей области.',
-                experience: '+7 (916) 234-56-78',
-                price: 50000,
-                city: 'Москва',
-                radius: 50,
-                userId: demoUserId1,
-                username: 'Иван Петров',
-                status: 'ready',
-                createdAt: new Date().toISOString(),
-                location: { lat: 55.7558, lon: 37.6173 }
-            }
-        ];
     }
     
     async function getSkillById(skillId) {
@@ -3800,11 +4140,18 @@
                 const result = await response.json();
                 if (result.success && result.skill) {
                     console.log(`✅ [Поиск] Умейка загружена с сервера:`, result.skill);
+                    
                     addGlobalSkill(result.skill);
+                    
                     return result.skill;
+                } else {
+                    console.warn(`⚠️ [Поиск] Сервер вернул ошибку:`, result.error);
+                    return null;
                 }
+            } else {
+                console.warn(`⚠️ [Поиск] Сервер ответил с кодом ${response.status}`);
+                return null;
             }
-            return null;
         } catch (error) {
             console.error(`❌ [Поиск] Ошибка запроса к серверу:`, error);
             return null;
@@ -3896,7 +4243,7 @@
             const skill = await getSkillById(extracted.id);
             
             if (!skill) {
-                console.error(`❌ [Сканер] Умейка с ID ${extracted.id} не найдена`);
+                console.error(`❌ [Сканер] Умейка с ID ${extracted.id} не найдена ни в кэше, ни на сервере`);
                 showScannerError(`Умейка не найдена. Проверьте, что QR-код действителен.`);
                 return;
             }
@@ -3967,6 +4314,7 @@
                 <div style="text-align: center; margin-bottom: 20px;">
                     <div style="font-size: 48px; margin-bottom: 10px;">🔧</div>
                     <h3 style="color: #2d3748; margin-bottom: 10px; font-size: 22px;">${escapeHtml(skill.skill)}</h3>
+                    ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin: 8px auto; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
                     <p style="color: #48bb78; font-size: 28px; font-weight: bold; margin: 10px 0;">${skill.price} ₽</p>
                 </div>
                 
@@ -4097,7 +4445,7 @@
             } catch (error) {
                 console.error('❌ [Сканер] Ошибка инициализации:', error);
                 errorDiv.style.display = 'block';
-                errorDiv.textcontent = '❌ Ошибка: ' + error.message;
+                errorDiv.textContent = '❌ Ошибка: ' + error.message;
             }
         }, 100);
     };
@@ -4124,6 +4472,7 @@
     };
     
     // ========== ОБРАБОТЧИК ГЛУБОКИХ ССЫЛОК ==========
+    
     function handleDeepLink() {
         console.log('🔗 [Deeplink] Начинаю обработку глубокой ссылки...');
         
@@ -4184,7 +4533,7 @@
                 console.log('✅ [Deeplink] Реферальная ссылка от другого пользователя');
                 showMainScreen();
                 setTimeout(() => {
-                                        showNotification('🎉 Вы перешли по реферальной ссылке! Зарегистрируйтесь, чтобы получить бонус.');
+                    showNotification('🎉 Вы перешли по реферальной ссылке! Зарегистрируйтесь, чтобы получить бонус.');
                 }, 500);
             } else if (!currentUserId) {
                 console.log('✅ [Deeplink] Реферальная ссылка, пользователь ещё не инициализирован');
@@ -4199,6 +4548,7 @@
     }
     
     // ========== ОБРАБОТКА РЕФЕРАЛЬНЫХ ССЫЛОК ==========
+    
     function processReferralLink() {
         console.log('🎁 [Referral] Начинаю обработку реферальной ссылки...');
         
@@ -5394,7 +5744,7 @@
             }, 3000);
             
         } catch (error) {
-            console.error('❌ Ошибка сжатия фото:', error);
+                        console.error('❌ Ошибка сжатия фото:', error);
             statusElement.textContent = '❌ Ошибка сжатия фото';
             statusElement.style.color = '#e53e3e';
             
@@ -6464,7 +6814,7 @@
                 }
             });
             
-            console.log('✅ Умейки загружены на карту:', skills.length, 'маркеров');
+            console.log('✅ Умейки загружены на карту:', skills.filter(s => s.location).length, 'маркеров');
             
         } catch (error) {
             console.error('❌ Ошибка загрузки карты:', error);
@@ -6886,44 +7236,44 @@
         `;
     }
 
-    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОИСКА ПО КАТЕГОРИИ - ТЕПЕРЬ ПОКАЗЫВАЕТ ВСЕХ МАСТЕРОВ
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОИСКА ПО КАТЕГОРИИ
     window.searchByCategory = async function(category) {
         triggerHapticFeedback();
         
+        // Сохраняем оригинальную категорию с эмодзи для отображения
+        const originalCategory = category;
+        // Очищаем от эмодзи для сравнения
         const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
         
         const resultsContainer = document.getElementById('categorySearchResults');
         const categoriesContainer = document.getElementById('categoriesList');
         
         if (categoriesContainer) categoriesContainer.style.display = 'none';
-        resultsContainer.innerHTML = '<div class="loading">🔍 Поиск мастеров по категории "' + cleanCategory + '"...</div>';
+        resultsContainer.innerHTML = '<div class="loading">🔍 Поиск мастеров по категории "' + originalCategory + '"...</div>';
         resultsContainer.style.display = 'block';
         
         try {
-            // Загружаем все умейки из глобального хранилища
-            await preloadAllSkills();
-            const allGlobalSkills = getGlobalSkills();
-            console.log(`📊 Всего умейок в глобальном хранилище: ${allGlobalSkills.length}`);
-            console.log(`📋 [Поиск-DEBUG] Категория поиска: "${cleanCategory}"`);
-            console.log(`📋 [Поиск-DEBUG] Все категории в хранилище:`, [...new Set(allGlobalSkills.map(s => s.category?.replace(/[^\w\sа-яА-Я]/g, '').trim()))]);
+            // Получаем все умейки из глобального хранилища (уже загружены с сервера через preloadAllSkills)
+            let allGlobalSkills = getGlobalSkills();
             
-            // Фильтруем по категории - ВАЖНО: показываем ВСЕХ мастеров (без фильтрации по userId)
+            // Дополнительно загружаем свежие данные с сервера, если нужно
+            await preloadAllSkills();
+            allGlobalSkills = getGlobalSkills();
+            
+            console.log(`📊 Всего умейок в глобальном хранилище: ${allGlobalSkills.length}`);
+            
+            // Фильтруем по категории (полное совпадение, учитывая эмодзи)
             let filteredSkills = allGlobalSkills.filter(skill => {
                 if (!skill.category) return false;
-                // Удаляем эмодзи для сравнения
-                const skillCategory = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
-                return skillCategory.toLowerCase() === cleanCategory.toLowerCase();
+                // Для сравнения удаляем эмодзи из категории умейки
+                const skillCategoryClean = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
+                return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
             });
             
-            console.log(`📊 Найдено умейок в категории "${cleanCategory}" ДО удаления дубликатов: ${filteredSkills.length}`);
+            console.log(`📊 Найдено умейок в категории "${cleanCategory}": ${filteredSkills.length}`);
+            console.log('📊 Примеры найденных умейок:', filteredSkills.slice(0, 3).map(s => ({ id: s._id, cat: s.category, name: s.skill, user: s.username })));
             
-            // Детальное логирование найденных умейок
-            console.log(`📋 [Поиск-DEBUG] Найденные умейки (первые 10):`);
-            filteredSkills.slice(0, 10).forEach((skill, idx) => {
-                console.log(`   ${idx + 1}. ID: ${skill._id}, Название: ${skill.skill}, Пользователь: ${skill.username} (${skill.userId}), Категория: ${skill.category}`);
-            });
-            
-            // Убираем дубликаты по _id
+            // Убираем дубликаты
             const uniqueSkills = [];
             const seenIds = new Set();
             for (const skill of filteredSkills) {
@@ -6934,15 +7284,13 @@
             }
             filteredSkills = uniqueSkills;
             
-            console.log(`📊 Найдено умейок в категории ПОСЛЕ удаления дубликатов: ${filteredSkills.length}`);
-            
             // Сортируем по имени мастера
             filteredSkills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
             
-            // !!! ВАЖНО: Убираем фильтр по userId - в архиве должны быть ВСЕ мастера, включая текущего пользователя
-            // Теперь отображаются абсолютно все умейки выбранной категории
+            // В архиве показываем всех мастеров, включая текущего пользователя
+            // (это нормально, пользователь тоже может найти свои умейки)
             
-            console.log(`✅ [Поиск-DEBUG] Итоговое количество умейок для отображения: ${filteredSkills.length}`);
+            console.log(`📊 Итоговое количество умейок для отображения: ${filteredSkills.length}`);
             
             if (filteredSkills.length > 0) {
                 resultsContainer.innerHTML = `
@@ -7025,10 +7373,11 @@
                             ← Назад к категориям
                         </button>
                     </div>
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 40px;">
+                    <div class="no-category-skills">
                         <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
-                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено по категории "${cleanCategory}"</div>
+                        <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено по категории "${originalCategory}"</div>
                         <div style="opacity: 0.7;">Попробуйте выбрать другую категорию</div>
+                        <div style="font-size: 12px; margin-top: 15px;">Возможно, мастера этой категории ещё не добавили свои услуги</div>
                     </div>
                 `;
             }
@@ -7103,10 +7452,11 @@
             let skills = [];
             
             try {
-                let url = `${API_URL}/api/skills/search?q=${encodeURIComponent(searchQuery || '')}`;
-                if (searchCity) {
-                    url += `&city=${encodeURIComponent(searchCity)}`;
-                }
+                let url = `${API_URL}/api/skills/all?`;
+                const params = [];
+                if (searchQuery) params.push(`q=${encodeURIComponent(searchQuery)}`);
+                if (searchCity) params.push(`city=${encodeURIComponent(searchCity)}`);
+                url += params.join('&');
                 
                 const response = await fetch(url);
                 const result = await response.json();
@@ -8195,7 +8545,7 @@
             );
             
             listContainer.innerHTML = sortedReviews.map(review => {
-                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
                 const avatar = review.userAvatar 
                     ? `<img src="${review.userAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`
                     : review.userName.charAt(0).toUpperCase();
@@ -8270,404 +8620,8 @@
             }
         }
     };
-    
-    // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ВИЗИТКОЙ ==========
-    
-    function getVisitkaSelectedSkills() {
-        const key = `visa_selected_skills_${currentUserId}`;
-        const saved = getLocalStorage(key);
-        if (saved && Array.isArray(saved)) {
-            return saved;
-        }
-        const userSkills = getUserSkills();
-        return userSkills.map(s => s._id);
-    }
-    
-    function saveVisitkaSelectedSkills(skillIds) {
-        const key = `visa_selected_skills_${currentUserId}`;
-        setLocalStorage(key, skillIds);
-        visitkaSelectedSkills = skillIds;
-    }
-    
-    function getUserSkills() {
-        const globalSkills = getGlobalSkills();
-        const globalUserSkills = globalSkills.filter(s => s.userId === currentUserId);
-        
-        const localUserSkills = loadSkillsFromLocalStorage(currentUserId) || [];
-        
-        const allSkills = [...globalUserSkills];
-        const existingIds = new Set(allSkills.map(s => s._id));
-        
-        localUserSkills.forEach(skill => {
-            if (!existingIds.has(skill._id)) {
-                allSkills.push(skill);
-                existingIds.add(skill._id);
-            }
-        });
-        
-        return allSkills;
-    }
-    
-    async function openVisitkaModal() {
-        triggerHapticFeedback();
-        
-        const modal = document.getElementById('visitkaModal');
-        const content = document.getElementById('visitkaContent');
-        
-        modal.style.display = 'flex';
-        content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки...</div></div>';
-        
-        await preloadAllSkills();
-        
-        loadSkillsFromLocalStorage(currentUserId);
-        
-        renderVisitkaModal();
-    }
-    
-    function renderVisitkaModal() {
-        const userSkills = getUserSkills();
-        const userData = getOrCreateUserProfile(currentUserId);
-        const userName = userData.firstName || 'Пользователь';
-        const skillsCount = userSkills.length;
-        const rating = userData.rating || 0;
-        
-        console.log('📇 [Визитка] Рендер визитки. Умейок пользователя:', skillsCount, 'ID:', userSkills.map(s => s._id));
-        
-        visitkaSelectedSkills = getVisitkaSelectedSkills();
-        
-        const content = document.getElementById('visitkaContent');
-        
-        if (userSkills.length === 0) {
-            content.innerHTML = `
-                <div style="text-align: center; padding: 30px;">
-                    <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
-                    <div style="color: #2d3748; font-size: 16px; margin-bottom: 10px;">У вас пока нет умейок</div>
-                    <div style="color: #666; font-size: 14px;">Добавьте их через раздел "Я умейка"</div>
-                    <button class="main-button button-master" onclick="triggerHapticFeedback(); closeVisitkaModal(); showSection('masterSection');" style="margin-top: 20px; padding: 15px;">
-                        ✨ Добавить умейку
-                    </button>
-                </div>
-            `;
-            document.getElementById('visitkaEditBtn').style.display = 'none';
-            document.getElementById('visitkaShareBtn').style.display = 'none';
-            return;
-        }
-        
-        document.getElementById('visitkaEditBtn').style.display = 'flex';
-        document.getElementById('visitkaShareBtn').style.display = 'flex';
-        
-        const qrUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
-        
-        content.innerHTML = `
-            <div class="visitka-user-info">
-                <div class="visitka-user-name">${escapeHtml(userName)}</div>
-                <div class="visitka-user-stats">
-                    <span>✨ ${skillsCount} умейк(и)</span>
-                    <span>⭐ Рейтинг: ${rating.toFixed(1)}</span>
-                </div>
-            </div>
-            
-            <div class="visitka-qr">
-                <div id="visitkaQRCode" style="width: 250px; height: 250px; margin: 0 auto;"></div>
-                <div style="font-size: 12px; color: #666; margin-top: 8px;">QR-код вашей визитки</div>
-            </div>
-            
-            <div style="margin-top: 20px;">
-                <h4 style="color: #2d3748; margin-bottom: 10px;">✨ Мои умейки</h4>
-                <div id="visitkaSkillsList">
-                    ${renderVisitkaSkillsList(userSkills)}
-                </div>
-            </div>
-        `;
-        
-        setTimeout(() => {
-            const container = document.getElementById('visitkaQRCode');
-            if (container) {
-                container.innerHTML = '';
-                new QRCode(container, {
-                    text: qrUrl,
-                    width: 250,
-                    height: 250,
-                    colorDark: '#000000',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-            }
-        }, 100);
-    }
-    
-    function renderVisitkaSkillsList(skills) {
-        if (visitkaEditMode) {
-            return skills.map(skill => {
-                const isChecked = visitkaSelectedSkills.includes(skill._id);
-                return `
-                    <div class="visitka-skill-item" data-skill-id="${skill._id}">
-                        <input type="checkbox" class="visitka-skill-checkbox" ${isChecked ? 'checked' : ''} onchange="toggleVisitkaSkill('${skill._id}', this.checked)">
-                        <div class="visitka-skill-info">
-                            <div class="visitka-skill-name">${escapeHtml(skill.skill)}</div>
-                            <div class="visitka-skill-details">💰 ${skill.price} ₽ | 📍 ${skill.city || 'Не указан'}</div>
-                        </div>
-                        <div class="visitka-skill-price">${skill.price} ₽</div>
-                    </div>
-                `;
-            }).join('');
-        } else {
-            const selectedSkills = skills.filter(s => visitkaSelectedSkills.includes(s._id));
-            if (selectedSkills.length === 0) {
-                return '<div style="color: #999; text-align: center; padding: 20px;">Нет выбранных умейок для визитки</div>';
-            }
-            return selectedSkills.map(skill => {
-                const statusBadge = getStatusBadge(skill.status);
-                return `
-                    <div class="visitka-skill-item" style="cursor: pointer;" onclick="showVisitkaSkillDetail('${skill._id}')">
-                        <div class="visitka-skill-info" style="flex: 1;">
-                            <div class="visitka-skill-name">${escapeHtml(skill.skill)}</div>
-                            <div class="visitka-skill-details">💰 ${skill.price} ₽ | 📍 ${skill.city || 'Не указан'}</div>
-                            ${statusBadge}
-                        </div>
-                        <div style="color: #667eea;">📝</div>
-                    </div>
-                `;
-            }).join('');
-        }
-    }
-    
-    function toggleVisitkaEditMode() {
-        triggerHapticFeedback();
-        visitkaEditMode = !visitkaEditMode;
-        
-        const editBtn = document.getElementById('visitkaEditBtn');
-        editBtn.textContent = visitkaEditMode ? '💾 Сохранить' : '✏️ Редактировать';
-        
-        const userSkills = getUserSkills();
-        const skillsListContainer = document.getElementById('visitkaSkillsList');
-        
-        if (visitkaEditMode) {
-            skillsListContainer.innerHTML = renderVisitkaSkillsList(userSkills);
-        } else {
-            saveVisitkaSelectedSkills(visitkaSelectedSkills);
-            skillsListContainer.innerHTML = renderVisitkaSkillsList(userSkills);
-        }
-    }
-    
-    function toggleVisitkaSkill(skillId, isChecked) {
-        triggerHapticFeedback();
-        if (isChecked) {
-            if (!visitkaSelectedSkills.includes(skillId)) {
-                visitkaSelectedSkills.push(skillId);
-            }
-        } else {
-            visitkaSelectedSkills = visitkaSelectedSkills.filter(id => id !== skillId);
-        }
-    }
-    
-    function showVisitkaSkillDetail(skillId) {
-        triggerHapticFeedback();
-        
-        const skill = getGlobalSkillById(skillId);
-        if (!skill) return;
-        
-        currentVisitkaSkill = skill;
-        
-        const modal = document.getElementById('visitkaSkillDetailModal');
-        const title = document.getElementById('visitkaSkillDetailTitle');
-        const text = document.getElementById('visitkaSkillDetailText');
-        
-        title.textContent = `📝 ${escapeHtml(skill.skill)}`;
-        
-        let detailsHtml = `<strong>💰 Цена:</strong> ${skill.price} ₽<br><br>`;
-        detailsHtml += `<strong>📍 Город:</strong> ${skill.city || 'Не указан'}<br><br>`;
-        detailsHtml += `<strong>📏 Радиус:</strong> ${skill.radius || 10} км<br><br>`;
-        detailsHtml += `<strong>⭐ Статус:</strong> ${skill.status === 'ready' ? 'Готов к работе' : 'Занят'}<br><br>`;
-        
-        if (skill.details && skill.details.trim()) {
-            detailsHtml += `<strong>📝 Подробности:</strong><br>${escapeHtml(skill.details)}<br><br>`;
-        } else {
-            detailsHtml += `<em style="color: #999;">Мастер не добавил подробности</em><br><br>`;
-        }
-        
-        text.innerHTML = detailsHtml;
-        
-        modal.classList.add('active');
-    }
-    
-    function closeVisitkaSkillDetailModal() {
-        triggerHapticFeedback();
-        document.getElementById('visitkaSkillDetailModal').classList.remove('active');
-        currentVisitkaSkill = null;
-    }
-    
-    function contactMasterFromVisitka() {
-        if (!currentVisitkaSkill) return;
-        
-        triggerHapticFeedback();
-        openContactModal(
-            currentVisitkaSkill._id,
-            currentVisitkaSkill.skill,
-            currentVisitkaSkill.username,
-            currentVisitkaSkill.experience || '',
-            ''
-        );
-        closeVisitkaSkillDetailModal();
-    }
-    
-    function createDealFromVisitkaSkill() {
-        if (!currentVisitkaSkill) return;
-        
-        triggerHapticFeedback();
-        createDealFromSkill(
-            currentVisitkaSkill._id,
-            currentVisitkaSkill.skill,
-            currentVisitkaSkill.username,
-            currentVisitkaSkill.userId,
-            currentVisitkaSkill.experience || ''
-        );
-        closeVisitkaSkillDetailModal();
-        closeVisitkaModal();
-    }
-    
-    function shareVisitka() {
-        triggerHapticFeedback();
-        
-        const shareUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
-        const userData = getOrCreateUserProfile(currentUserId);
-        const userName = userData.firstName || 'Пользователь';
-        
-        const shareText = `📇 Визитка мастера ${userName} в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке, чтобы посмотреть мои умейки:\n${shareUrl}`;
-        
-        if (navigator.share) {
-            navigator.share({
-                title: `Визитка ${userName}`,
-                text: shareText,
-                url: shareUrl
-            }).catch(err => console.log('Share canceled'));
-        } else {
-            navigator.clipboard.writeText(shareText).then(() => {
-                showNotification('✅ Ссылка на визитку скопирована!');
-            }).catch(() => {
-                alert('Ссылка: ' + shareUrl);
-            });
-        }
-    }
-    
-    function closeVisitkaModal() {
-        triggerHapticFeedback();
-        document.getElementById('visitkaModal').style.display = 'none';
-        visitkaEditMode = false;
-        document.getElementById('visitkaEditBtn').textContent = '✏️ Редактировать';
-    }
-    
-    async function openMasterVisitka(userId) {
-        triggerHapticFeedback();
-        
-        const modal = document.getElementById('masterVisitkaModal');
-        const content = document.getElementById('masterVisitkaContent');
-        const title = document.getElementById('masterVisitkaTitle');
-        
-        modal.style.display = 'flex';
-        content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки мастера...</div></div>';
-        
-        await preloadAllSkills();
-        
-        const allSkills = getGlobalSkills();
-        const masterSkills = allSkills.filter(s => s.userId === userId);
-        const userData = getOrCreateUserProfile(userId);
-        const userName = userData.firstName || 'Мастер';
-        
-        title.textContent = `📇 Визитка мастера ${escapeHtml(userName)}`;
-        
-        const masterSelectedKey = `visa_selected_skills_${userId}`;
-        const masterSelected = getLocalStorage(masterSelectedKey);
-        let displaySkills = masterSkills;
-        
-        if (masterSelected && Array.isArray(masterSelected) && masterSelected.length > 0) {
-            displaySkills = masterSkills.filter(s => masterSelected.includes(s._id));
-        }
-        
-        if (displaySkills.length === 0) {
-            content.innerHTML = `
-                <div style="text-align: center; padding: 30px;">
-                    <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
-                    <div style="color: #2d3748; font-size: 16px;">У мастера пока нет умейок в визитке</div>
-                </div>
-            `;
-            return;
-        }
-        
-        currentMasterVisitkaData = {
-            userId: userId,
-            userName: userName,
-            skills: displaySkills
-        };
-        
-        content.innerHTML = `
-            <div class="visitka-user-info">
-                <div class="visitka-user-name">${escapeHtml(userName)}</div>
-                <div class="visitka-user-stats">
-                    <span>✨ ${displaySkills.length} умейк(и)</span>
-                </div>
-            </div>
-            
-            <div style="margin-top: 20px;">
-                <h4 style="color: #2d3748; margin-bottom: 10px;">✨ Умейки мастера</h4>
-                <div id="masterVisitkaSkillsList">
-                    ${displaySkills.map(skill => {
-                        const statusBadge = getStatusBadge(skill.status);
-                        return `
-                            <div class="visitka-skill-item" style="cursor: pointer;" onclick="showMasterVisitkaSkillDetail('${skill._id}')">
-                                <div class="visitka-skill-info" style="flex: 1;">
-                                    <div class="visitka-skill-name">${escapeHtml(skill.skill)}</div>
-                                    <div class="visitka-skill-details">💰 ${skill.price} ₽ | 📍 ${skill.city || 'Не указан'}</div>
-                                    ${statusBadge}
-                                </div>
-                                <div style="color: #667eea;">📝</div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            </div>
-        `;
-    }
-    
-    function showMasterVisitkaSkillDetail(skillId) {
-        triggerHapticFeedback();
-        
-        if (!currentMasterVisitkaData) return;
-        
-        const skill = currentMasterVisitkaData.skills.find(s => s._id === skillId);
-        if (!skill) return;
-        
-        currentVisitkaSkill = skill;
-        
-        const modal = document.getElementById('visitkaSkillDetailModal');
-        const title = document.getElementById('visitkaSkillDetailTitle');
-        const text = document.getElementById('visitkaSkillDetailText');
-        
-        title.textContent = `📝 ${escapeHtml(skill.skill)}`;
-        
-        let detailsHtml = `<strong>💰 Цена:</strong> ${skill.price} ₽<br><br>`;
-        detailsHtml += `<strong>📍 Город:</strong> ${skill.city || 'Не указан'}<br><br>`;
-        detailsHtml += `<strong>📏 Радиус:</strong> ${skill.radius || 10} км<br><br>`;
-        detailsHtml += `<strong>⭐ Статус:</strong> ${skill.status === 'ready' ? 'Готов к работе' : 'Занят'}<br><br>`;
-        
-        if (skill.details && skill.details.trim()) {
-            detailsHtml += `<strong>📝 Подробности:</strong><br>${escapeHtml(skill.details)}<br><br>`;
-        } else {
-            detailsHtml += `<em style="color: #999;">Мастер не добавил подробности</em><br><br>`;
-        }
-        
-        text.innerHTML = detailsHtml;
-        
-        modal.classList.add('active');
-    }
-    
-    function closeMasterVisitkaModal() {
-        triggerHapticFeedback();
-        document.getElementById('masterVisitkaModal').style.display = 'none';
-        currentMasterVisitkaData = null;
-    }
 
-    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    // ========== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ==========
     document.addEventListener('DOMContentLoaded', async function() {
         console.log('🚀 Ymeyka app loaded successfully!');
         
@@ -8709,33 +8663,6 @@
         }
         
         initAdminAccess();
-        
-        window.openDetailsModal = function(skillId) {
-            triggerHapticFeedback();
-            
-            const skill = getGlobalSkillById(skillId);
-            if (!skill) {
-                alert('❌ Умейка не найдена');
-                return;
-            }
-            
-            const detailsText = skill.details && skill.details.trim() ? skill.details.trim() : null;
-            
-            document.getElementById('detailsModalTitle').textContent = `📝 ${skill.skill}`;
-            
-            if (detailsText) {
-                document.getElementById('detailsModalText').innerHTML = detailsText.replace(/\n/g, '<br>');
-            } else {
-                document.getElementById('detailsModalText').innerHTML = '<span style="color: #999;">Мастер не добавил подробности</span>';
-            }
-            
-            document.getElementById('detailsModal').classList.add('active');
-        };
-        
-        window.closeDetailsModal = function() {
-            triggerHapticFeedback();
-            document.getElementById('detailsModal').classList.remove('active');
-        };
     });
     </script>
 </body>
