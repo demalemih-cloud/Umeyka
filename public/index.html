@@ -7615,19 +7615,34 @@
     };
 
     function loadUserProfile() {
-        const userData = getOrCreateUserProfile(currentUserId);
-        const referralData = getReferralData();
-        const coins = getCoinsData();
-        
-        document.getElementById('userName').textContent = userData.firstName || 'Пользователь';
-        document.getElementById('userBio').textContent = userData.bio || 'Расскажите о себе...';
-        
-        if (userData.avatar) {
-            document.getElementById('userAvatar').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-        }
-        
-        updateUserStats(userData, referralData, coins);
+    const userData = getOrCreateUserProfile(currentUserId);
+    const referralData = getReferralData();
+    const coins = getCoinsData();
+    
+    // Обновляем имя
+    const userNameElement = document.getElementById('userName');
+    if (userNameElement) {
+        userNameElement.textContent = userData.firstName || 'Пользователь';
     }
+    
+    // Обновляем описание
+    const userBioElement = document.getElementById('userBio');
+    if (userBioElement) {
+        userBioElement.textContent = userData.bio || 'Расскажите о себе...';
+    }
+    
+    // Обновляем аватар
+    const userAvatar = document.getElementById('userAvatar');
+    if (userAvatar) {
+        if (userData.avatar) {
+            userAvatar.innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        } else {
+            userAvatar.innerHTML = '👤';
+        }
+    }
+    
+    updateUserStats(userData, referralData, coins);
+}
 
     function updateUserStats(userData, referralData, coins) {
         const statsGrid = document.getElementById('userStats');
@@ -7661,51 +7676,98 @@
     }
 
     window.editProfile = function() {
-        triggerHapticFeedback();
-        const userData = getOrCreateUserProfile(currentUserId);
-        
-        document.getElementById('editFirstName').value = userData.firstName || '';
-        document.getElementById('editAge').value = userData.age || '';
-        document.getElementById('editExperience').value = userData.experience || '';
-        document.getElementById('editContact').value = userData.contact || '';
-        document.getElementById('editBio').value = userData.bio || '';
-        
-        if (userData.avatar) {
-            document.getElementById('avatarPreview').innerHTML = `<img src="${userData.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-        }
-        
-        showSection('editProfileSection');
-    };
+    triggerHapticFeedback();
+    const userData = getOrCreateUserProfile(currentUserId);
+    
+    document.getElementById('editFirstName').value = userData.firstName || '';
+    document.getElementById('editAge').value = userData.age || '';
+    document.getElementById('editExperience').value = userData.experience || '';
+    document.getElementById('editContact').value = userData.contact || '';
+    document.getElementById('editBio').value = userData.bio || '';
+    
+    // Обновляем предпросмотр аватара
+    if (userData.avatar) {
+        updateAvatarPreview(userData.avatar);
+    } else {
+        updateAvatarPreview(null);
+    }
+    
+    // Сбрасываем currentAvatar при открытии формы редактирования
+    currentAvatar = userData.avatar || null;
+    
+    showSection('editProfileSection');
+};
 
     window.saveProfile = function() {
-        triggerHapticFeedback();
-        
-        const firstName = document.getElementById('editFirstName').value.trim();
-        const bio = document.getElementById('editBio').value.trim();
-        
-        if (!firstName || !bio) {
-            alert('❌ Пожалуйста, заполните обязательные поля (Имя и О себе)');
-            return;
+    triggerHapticFeedback();
+    
+    const firstName = document.getElementById('editFirstName').value.trim();
+    const bio = document.getElementById('editBio').value.trim();
+    
+    if (!firstName || !bio) {
+        alert('❌ Пожалуйста, заполните обязательные поля (Имя и О себе)');
+        return;
+    }
+    
+    const userData = getOrCreateUserProfile(currentUserId);
+    
+    userData.firstName = firstName;
+    userData.age = document.getElementById('editAge').value;
+    userData.experience = document.getElementById('editExperience').value;
+    userData.contact = document.getElementById('editContact').value;
+    userData.bio = bio;
+    
+    // Сохраняем аватар
+    if (currentAvatar) {
+        userData.avatar = currentAvatar;
+    }
+    
+    // Обновляем все умейки пользователя с новым именем
+    const allSkills = getGlobalSkills();
+    const updatedSkills = allSkills.map(skill => {
+        if (skill.userId === currentUserId) {
+            return { ...skill, username: firstName };
         }
-        
-        const userData = getOrCreateUserProfile(currentUserId);
-        
-        userData.firstName = firstName;
-        userData.age = document.getElementById('editAge').value;
-        userData.experience = document.getElementById('editExperience').value;
-        userData.contact = document.getElementById('editContact').value;
-        userData.bio = bio;
-        
-        if (currentAvatar) {
-            userData.avatar = currentAvatar;
-        }
-        
-        setLocalStorage(`user_${currentUserId}`, userData);
-        
-        alert('✅ Профиль сохранен!');
-        showProfileSection();
-        loadUserProfile();
-    };
+        return skill;
+    });
+    setGlobalSkills(updatedSkills);
+    
+    // Сохраняем профиль
+    setLocalStorage(`user_${currentUserId}`, userData);
+    
+    // Обновляем локальное хранилище умейок
+    const localUserSkills = loadSkillsFromLocalStorage(currentUserId);
+    if (localUserSkills && localUserSkills.length > 0) {
+        const updatedLocalSkills = localUserSkills.map(skill => {
+            if (skill.userId === currentUserId) {
+                return { ...skill, username: firstName };
+            }
+            return skill;
+        });
+        setLocalStorage(`skills_${currentUserId}`, updatedLocalSkills);
+    }
+    
+    alert('✅ Профиль сохранен!');
+    
+    // Принудительно обновляем все вкладки
+    showProfileSection();
+    
+    // Обновляем все данные
+    loadUserProfile();
+    
+    // Обновляем умейки в профиле, если они открыты
+    if (currentProfileTab === 'skills') {
+        loadProfileSkills();
+    }
+    
+    // Обновляем карту, если открыта
+    if (map) {
+        loadSkillsOnMap();
+    }
+    
+    // Сбрасываем currentAvatar, чтобы при следующем редактировании не было конфликтов
+    currentAvatar = null;
+};
 
     window.changeAvatar = function() {
         triggerHapticFeedback();
@@ -7713,29 +7775,47 @@
     };
 
     window.handleAvatarUpload = function(event) {
-        triggerHapticFeedback();
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        if (!file.type.match('image.*')) {
-            alert('❌ Пожалуйста, выберите изображение');
-            return;
-        }
-        
-        if (file.size > 5 * 1024 * 1024) {
-            alert('❌ Файл слишком большой. Максимальный размер: 5MB');
-            return;
-        }
-        
+    triggerHapticFeedback();
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.match('image.*')) {
+        alert('❌ Пожалуйста, выберите изображение');
+        return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) {
+        alert('❌ Файл слишком большой. Максимальный размер: 5MB');
+        return;
+    }
+    
+    // Сжимаем аватар перед сохранением
+    compressImage(file, 200, 200, 0.8).then(compressed => {
+        currentAvatar = compressed.dataUrl;
+        updateAvatarPreview(currentAvatar);
+    }).catch(error => {
+        console.error('Ошибка сжатия аватара:', error);
+        // Если сжатие не удалось, используем оригинал
         const reader = new FileReader();
         reader.onload = function(e) {
             currentAvatar = e.target.result;
-            document.getElementById('avatarPreview').innerHTML = `
-                <img src="${currentAvatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
-            `;
+            updateAvatarPreview(currentAvatar);
         };
         reader.readAsDataURL(file);
-    };
+    });
+};
+
+    // Функция для обновления предпросмотра аватара
+function updateAvatarPreview(avatarUrl) {
+    const avatarPreview = document.getElementById('avatarPreview');
+    if (avatarPreview) {
+        if (avatarUrl) {
+            avatarPreview.innerHTML = `<img src="${avatarUrl}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        } else {
+            avatarPreview.innerHTML = '👤';
+        }
+    }
+}
 
     window.showProfileTab = function(tabName) {
         triggerHapticFeedback();
