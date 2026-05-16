@@ -189,6 +189,40 @@
             font-size: 45px;
             margin-bottom: 5px;
             pointer-events: none;
+            animation: logoSparkle 1.5s ease-in-out infinite;
+            display: inline-block;
+            position: relative;
+        }
+        
+        @keyframes logoSparkle {
+            0%, 100% {
+                transform: scale(1);
+                text-shadow: 0 0 0px rgba(255,255,255,0);
+            }
+            50% {
+                transform: scale(1.15);
+                text-shadow: 0 0 20px rgba(255,255,255,0.8);
+            }
+        }
+        
+        /* Добавляем эффект свечения для второго эмодзи */
+        .logo::after {
+            content: '✨';
+            position: absolute;
+            opacity: 0;
+            animation: sparkle 1.5s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% {
+                opacity: 0;
+                transform: translate(0, 0) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(10px, -10px) scale(1);
+            }
         }
         
         .app-title {
