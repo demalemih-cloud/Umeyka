@@ -7965,7 +7965,10 @@ function updateAvatarPreview(avatarUrl) {
                     ((isClient && !deal.clientSigned) || (isMaster && !deal.masterSigned));
                 
                 const showCompleteButton = deal.status === 'active' && isMaster;
-                const showPayButton = isClient && deal.status === 'pending' && (!deal.paymentStatus || deal.paymentStatus === 'pending');
+                
+                // ИСПРАВЛЕНО: кнопка оплаты показывается также при статусе active, если платеж еще не был произведен
+                const showPayButton = isClient && (deal.status === 'pending' || deal.status === 'active') && (!deal.paymentStatus || deal.paymentStatus === 'pending');
+                
                 const showEscrowInfo = deal.paymentStatus === 'paid' || deal.paymentStatus === 'released';
                 const showDeleteButton = deal.status === 'completed';
                 
