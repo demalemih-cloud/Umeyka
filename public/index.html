@@ -3595,7 +3595,7 @@
     <script>
     // ========== КОНФИГУРАЦИЯ ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
-    const TELEGRAM_BOT_URL = 'https://t.me/ymeyka_bot';
+    const TELEGRAM_BOT_URL = window.location.origin + window.location.pathname;
     let currentUserId = null;
     let currentAvatar = null;
     let currentSkillPhoto = null;
@@ -3717,7 +3717,7 @@
         document.getElementById('visitkaEditBtn').style.display = 'flex';
         document.getElementById('visitkaShareBtn').style.display = 'flex';
         
-        const qrUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
+        const qrUrl = `${window.location.origin}${window.location.pathname}?start=user_${currentUserId}`;
         
         content.innerHTML = `
             <div class="visitka-user-info">
@@ -3890,7 +3890,7 @@
     function shareVisitka() {
         triggerHapticFeedback();
         
-        const shareUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
+        const shareUrl = `${window.location.origin}${window.location.pathname}?start=user_${currentUserId}`;
         const userData = getOrCreateUserProfile(currentUserId);
         const userName = userData.firstName || 'Пользователь';
         
@@ -4108,6 +4108,24 @@
                 isSkillsLoaded = true;
                 
                 console.log(`💾 [Загрузка] Глобальное хранилище содержит ${mergedSkills.length} умейок (сервер: ${result.skills.length}, локальные: ${mergedSkills.length - result.skills.length})`);
+                
+                // Миграция старых QR-кодов на новый формат
+                mergedSkills = mergedSkills.map(skill => {
+                    if (skill.qrCodeData && skill.qrCodeData.includes('https://t.me/ymeyka_bot')) {
+                        const newQrData = skill.qrCodeData.replace('https://t.me/ymeyka_bot', `${window.location.origin}${window.location.pathname}`);
+                        console.log(`🔄 [Миграция] Обновлён QR-код для умейки ${skill._id}: ${newQrData}`);
+                        return { ...skill, qrCodeData: newQrData };
+                    }
+                    if (!skill.qrCodeData) {
+                        const newQrData = `${window.location.origin}${window.location.pathname}?start=skill_${skill._id}`;
+                        console.log(`🔄 [Миграция] Добавлен QR-код для умейки ${skill._id}`);
+                        return { ...skill, qrCodeData: newQrData };
+                    }
+                    return skill;
+                });
+                
+                // Сохраняем обновлённые умейки обратно в глобальное хранилище
+                setGlobalSkills(mergedSkills);
                 
                 // Вывод статистики по категориям для отладки
                 const categoryStats = {};
@@ -5076,7 +5094,7 @@
     // ========== QR-КОД ФУНКЦИИ ==========
     
     function generateQRCode(skillId, skillName) {
-        const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
+        const qrData = `${window.location.origin}${window.location.pathname}?start=skill_${skillId}`;
         
         const tempContainer = document.createElement('div');
         tempContainer.id = 'tempQR';
@@ -5123,7 +5141,7 @@
         if (!skill) return null;
         
         if (!skill.qrCode) {
-            const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
+            const qrData = `${window.location.origin}${window.location.pathname}?start=skill_${skillId}`;
             skill.qrCodeData = qrData;
             addGlobalSkill(skill);
         }
@@ -5174,7 +5192,7 @@
         const skill = getGlobalSkillById(currentQRSkillId);
         if (!skill) return;
         
-        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`}`;
+        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${skill.qrCodeData || `${window.location.origin}${window.location.pathname}?start=skill_${currentQRSkillId}`}`;
         
         if (navigator.share) {
             navigator.share({
@@ -5452,7 +5470,7 @@
     }
 
     function generateReferralLink() {
-        return `${TELEGRAM_BOT_URL}?start=${currentUserId}`;
+        return `${window.location.origin}${window.location.pathname}?start=user_${currentUserId}`;
     }
 
     function updateReferralFriendsList(friends) {
@@ -6055,7 +6073,7 @@
                 createdAt: new Date().toISOString(),
                 local: true,
                 category: skillCategory,
-                qrCodeData: `${TELEGRAM_BOT_URL}?start=skill_local_${Date.now()}`
+                qrCodeData: `${window.location.origin}${window.location.pathname}?start=skill_local_${Date.now()}`
             };
             
             saveSkillToLocalStorage(localSkill);
@@ -6197,7 +6215,7 @@
                         
                         ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
                         
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(skill.qrCodeData || `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`)}" 
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(skill.qrCodeData || `${window.location.origin}${window.location.pathname}?start=skill_${skill._id}`)}" 
                              class="skill-qr-code" 
                              alt="QR"
                              onclick="event.stopPropagation(); triggerHapticFeedback(); showQRModal('${skill._id}', '${skill.skill.replace(/'/g, "\\'")}');">
@@ -6300,7 +6318,7 @@
                                 if (globalSkill.category) skill.category = globalSkill.category;
                             }
                             if (!skill.qrCodeData) {
-                                skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                                skill.qrCodeData = `${window.location.origin}${window.location.pathname}?start=skill_${skill._id}`;
                             }
                             return skill;
                         });
@@ -7494,7 +7512,7 @@
                         }
                         if (globalSkill && globalSkill.details) skill.details = globalSkill.details;
                         if (!skill.qrCodeData) {
-                            skill.qrCodeData = `${TELEGRAM_BOT_URL}?start=skill_${skill._id}`;
+                            skill.qrCodeData = `${window.location.origin}${window.location.pathname}?start=skill_${skill._id}`;
                         }
                         return skill;
                     });
