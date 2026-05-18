@@ -3717,32 +3717,45 @@
         document.getElementById('visitkaEditBtn').style.display = 'flex';
         document.getElementById('visitkaShareBtn').style.display = 'flex';
         
-        const qrUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
+        // Используем прямую веб-ссылку для QR-кода визитки мастера
+        const qrUrl = `https://umeyka-oocn.onrender.com/?start=user_${userId}`;
         
         content.innerHTML = `
             <div class="visitka-user-info">
                 <div class="visitka-user-name">${escapeHtml(userName)}</div>
                 <div class="visitka-user-stats">
-                    <span>✨ ${skillsCount} умейк(и)</span>
-                    <span>⭐ Рейтинг: ${rating.toFixed(1)}</span>
+                    <span>✨ ${displaySkills.length} умейк(и)</span>
                 </div>
             </div>
             
             <div class="visitka-qr">
-                <div id="visitkaQRCode" style="width: 250px; height: 250px; margin: 0 auto;"></div>
-                <div style="font-size: 12px; color: #666; margin-top: 8px;">QR-код вашей визитки</div>
+                <div id="masterVisitkaQRCode" style="width: 250px; height: 250px; margin: 0 auto;"></div>
+                <div style="font-size: 12px; color: #666; margin-top: 8px;">QR-код визитки мастера</div>
+                <div style="font-size: 10px; color: #999; margin-top: 5px;">(Отсканируйте обычным сканером телефона)</div>
             </div>
             
             <div style="margin-top: 20px;">
-                <h4 style="color: #2d3748; margin-bottom: 10px;">✨ Мои умейки</h4>
-                <div id="visitkaSkillsList">
-                    ${renderVisitkaSkillsList(userSkills)}
+                <h4 style="color: #2d3748; margin-bottom: 10px;">✨ Умейки мастера</h4>
+                <div id="masterVisitkaSkillsList">
+                    ${displaySkills.map(skill => {
+                        const statusBadge = getStatusBadge(skill.status);
+                        return `
+                            <div class="visitka-skill-item" style="cursor: pointer;" onclick="showMasterVisitkaSkillDetail('${skill._id}')">
+                                <div class="visitka-skill-info" style="flex: 1;">
+                                    <div class="visitka-skill-name">${escapeHtml(skill.skill)}</div>
+                                    <div class="visitka-skill-details">💰 ${skill.price} ₽ | 📍 ${skill.city || 'Не указан'}</div>
+                                    ${statusBadge}
+                                </div>
+                                <div style="color: #667eea;">📝</div>
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
         
         setTimeout(() => {
-            const container = document.getElementById('visitkaQRCode');
+            const container = document.getElementById('masterVisitkaQRCode');
             if (container) {
                 container.innerHTML = '';
                 new QRCode(container, {
@@ -3890,7 +3903,8 @@
     function shareVisitka() {
         triggerHapticFeedback();
         
-        const shareUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
+        // Используем прямую веб-ссылку вместо ссылки на бота
+        const shareUrl = `https://umeyka-oocn.onrender.com/?start=user_${currentUserId}`;
         const userData = getOrCreateUserProfile(currentUserId);
         const userName = userData.firstName || 'Пользователь';
         
@@ -4497,10 +4511,17 @@
         console.log('🔗 [Deeplink] Начинаю обработку глубокой ссылки...');
         
         const urlParams = new URLSearchParams(window.location.search);
-        const startParam = urlParams.get('start');
+        let startParam = urlParams.get('start');
+        let refParam = urlParams.get('ref');
+        
+        // Приоритет у параметра start, затем ref
+        if (!startParam && refParam) {
+            startParam = refParam;
+            console.log(`🔗 [Deeplink] Использую параметр ref: "${refParam}"`);
+        }
         
         if (!startParam) {
-            console.log('🔗 [Deeplink] Параметр start не найден');
+            console.log('🔗 [Deeplink] Параметр start/ref не найден');
             return;
         }
         
@@ -5452,7 +5473,8 @@
     }
 
     function generateReferralLink() {
-        return `${TELEGRAM_BOT_URL}?start=${currentUserId}`;
+        // Используем прямую веб-ссылку для реферальной программы
+        return `https://umeyka-oocn.onrender.com/?ref=${currentUserId}`;
     }
 
     function updateReferralFriendsList(friends) {
