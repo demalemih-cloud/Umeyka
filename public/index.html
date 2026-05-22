@@ -8919,31 +8919,6 @@ function updateAvatarPreview(avatarUrl) {
         
         initAdminAccess();
     });
-        // Функция для принудительной синхронизации умейок пользователя
-    async function syncUserSkills(userId) {
-        console.log(`🔄 Синхронизация умейок для пользователя ${userId}...`);
-        
-        try {
-            const response = await fetch(`${API_URL}/api/skills/user/${userId}`);
-            if (response.ok) {
-                const result = await response.json();
-                if (result.success && result.skills) {
-                    result.skills.forEach(skill => {
-                        const existingSkill = getGlobalSkillById(skill._id);
-                        if (!existingSkill || new Date(skill.updatedAt) > new Date(existingSkill.updatedAt)) {
-                            addGlobalSkill(skill);
-                        }
-                    });
-                    console.log(`✅ Синхронизировано ${result.skills.length} умейок`);
-                    return result.skills;
-                }
-            }
-        } catch (error) {
-            console.error('❌ Ошибка синхронизации:', error);
-        }
-        
-        return getGlobalSkills().filter(s => s.userId === userId);
-    }
     </script>
 </body>
 </html>
