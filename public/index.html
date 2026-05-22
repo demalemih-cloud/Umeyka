@@ -4207,72 +4207,53 @@
     // ГЛОБАЛЬНЫЙ КЭШ ВСЕХ УМЕЕК С СЕРВЕРА (КЛЮЧ: категория)
     let allSkillsFromServer = [];
     
+    // УЛУЧШЕННАЯ ФУНКЦИЯ ПРЕДВАРИТЕЛЬНОЙ ЗАГРУЗКИ
     async function preloadAllSkills() {
         console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейок...');
         
         try {
-            const currentGlobalSkills = getGlobalSkills();
-            const localSkillsOnly = currentGlobalSkills.filter(s => s.local === true);
-            const localSkillsByUser = {};
-            currentUserId && (localSkillsByUser[currentUserId] = loadSkillsFromLocalStorage(currentUserId) || []);
+            // Пытаемся загрузить с сервера
+            let response = await fetch(`${API_URL}/api/skills/all`);
             
-            // ВАЖНО: Запрашиваем ВСЕ умейки с сервера, не фильтруем по пользователю
-            const response = await fetch(`${API_URL}/api/skills/all`);
+            if (!response.ok) {
+                response = await fetch(`${API_URL}/api/skills`);
+            }
             
-            // Если эндпоинт /all не существует, пробуем альтернативный подход
-            let result;
             if (response.ok) {
-                result = await response.json();
-            } else {
-                // Пробуем получить все умейки через обычный эндпоинт без параметров
-                const fallbackResponse = await fetch(`${API_URL}/api/skills`);
-                if (fallbackResponse.ok) {
-                    result = await fallbackResponse.json();
-                } else {
-                    throw new Error('Сервер не вернул умейки');
+                const result = await response.json();
+                if (result.success && result.skills) {
+                    console.log(`✅ [Загрузка] Загружено ${result.skills.length} умейок с сервера`);
+                    
+                    // Обновляем глобальное хранилище
+                    let mergedSkills = [...result.skills];
+                    const serverIds = new Set(result.skills.map(s => s._id));
+                    
+                    // Добавляем локальные умейки текущего пользователя
+                    if (currentUserId) {
+                        const currentUserLocalSkills = loadSkillsFromLocalStorage(currentUserId) || [];
+                        currentUserLocalSkills.forEach(skill => {
+                            if (!serverIds.has(skill._id)) {
+                                mergedSkills.push(skill);
+                                serverIds.add(skill._id);
+                            }
+                        });
+                    }
+                    
+                    setGlobalSkills(mergedSkills);
+                    globalSkillsCache = mergedSkills;
+                    isSkillsLoaded = true;
+                    
+                    console.log(`💾 [Загрузка] Глобальное хранилище содержит ${mergedSkills.length} умейок`);
+                    return mergedSkills;
                 }
             }
             
-            if (result.success && result.skills) {
-                console.log(`✅ [Загрузка] Загружено ${result.skills.length} умейок с сервера`);
-                allSkillsFromServer = result.skills;
-                
-                let mergedSkills = [...result.skills];
-                const serverIds = new Set(result.skills.map(s => s._id));
-                
-                const currentUserLocalSkills = loadSkillsFromLocalStorage(currentUserId) || [];
-                currentUserLocalSkills.forEach(skill => {
-                    if (!serverIds.has(skill._id)) {
-                        mergedSkills.push(skill);
-                        serverIds.add(skill._id);
-                    }
-                });
-                
-                setGlobalSkills(mergedSkills);
-                
-                globalSkillsCache = mergedSkills;
-                isSkillsLoaded = true;
-                
-                console.log(`💾 [Загрузка] Глобальное хранилище содержит ${mergedSkills.length} умейок (сервер: ${result.skills.length}, локальные: ${mergedSkills.length - result.skills.length})`);
-                
-                // Вывод статистики по категориям для отладки
-                const categoryStats = {};
-                mergedSkills.forEach(skill => {
-                    if (skill.category) {
-                        const cleanCat = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
-                        categoryStats[cleanCat] = (categoryStats[cleanCat] || 0) + 1;
-                    }
-                });
-                console.log('📊 [Загрузка] Распределение по категориям:', categoryStats);
-                
-                console.log('📋 [Загрузка] ID всех умейок:', mergedSkills.map(s => s._id));
-                
-                return mergedSkills;
-            } else {
-                console.warn('⚠️ [Загрузка] Сервер вернул ошибку:', result?.error);
-                isSkillsLoaded = true;
-                return getGlobalSkills();
-            }
+            // Если сервер недоступен, используем локальные данные
+            console.log('⚠️ [Загрузка] Сервер недоступен, использую локальные данные');
+            const localSkills = getGlobalSkills();
+            isSkillsLoaded = true;
+            return localSkills;
+            
         } catch (error) {
             console.error('❌ [Загрузка] Ошибка загрузки умейок:', error);
             isSkillsLoaded = true;
@@ -4281,48 +4262,6 @@
     }
     
     async function getSkillById(skillId) {
-        console.log(`🔍 [Поиск] Ищу умейку с ID: ${skillId}`);
-        
-        let skill = getGlobalSkillById(skillId);
-        
-        if (skill) {
-            console.log(`✅ [Поиск] Умейка найдена в глобальном хранилище:`, skill);
-            return skill;
-        }
-        
-        console.log(`🔄 [Поиск] Умейка не найдена в кэше, запрашиваю с сервера...`);
-        
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            
-            const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
-                signal: controller.signal
-            });
-            
-            clearTimeout(timeoutId);
-            
-            if (response.ok) {
-                const result = await response.json();
-                if (result.success && result.skill) {
-                    console.log(`✅ [Поиск] Умейка загружена с сервера:`, result.skill);
-                    
-                    addGlobalSkill(result.skill);
-                    
-                    return result.skill;
-                } else {
-                    console.warn(`⚠️ [Поиск] Сервер вернул ошибку:`, result.error);
-                    return null;
-                }
-            } else {
-                console.warn(`⚠️ [Поиск] Сервер ответил с кодом ${response.status}`);
-                return null;
-            }
-        } catch (error) {
-            console.error(`❌ [Поиск] Ошибка запроса к серверу:`, error);
-            return null;
-        }
-    }
     
     function extractIdFromQR(qrData) {
         console.log(`🔧 [Парсинг] Извлекаю ID из: ${qrData}`);
@@ -4334,6 +4273,33 @@
                 return { type: 'skill', id: match[1] };
             }
         }
+        // ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ ЗАКРЫТИЯ СКАНЕРА И ПОКАЗА КАРТОЧКИ
+    async function showSkillAndCloseScanner(skill) {
+        // Останавливаем сканер
+        if (html5QrCode && html5QrCode.isScanning) {
+            try {
+                await html5QrCode.stop();
+                console.log('✅ [Сканер] Сканер остановлен');
+            } catch (stopError) {
+                console.warn('⚠️ [Сканер] Ошибка при остановке:', stopError);
+            }
+        }
+        
+        // Закрываем модальное окно сканера
+        const modal = document.getElementById('scannerModal');
+        modal.classList.remove('active');
+        
+        // Очищаем контейнер
+        const readerContainer = document.getElementById('qr-reader');
+        if (readerContainer) {
+            readerContainer.innerHTML = '';
+        }
+        
+        // Небольшая задержка перед открытием карточки
+        setTimeout(() => {
+            openSkillModal(skill);
+        }, 300);
+    }
         
         if (qrData.includes('start=user_')) {
             const match = qrData.match(/start=user_([^&]+)/);
@@ -4367,6 +4333,7 @@
         return null;
     }
     
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ОБРАБОТКИ QR-КОДА
     async function handleScannedQRCode(qrData) {
         console.log('📱 [Сканер] Получен QR-код:', qrData);
         
@@ -4377,6 +4344,7 @@
         errorDiv.textContent = '🔍 Обработка QR-кода...';
         
         try {
+            // Извлекаем ID из QR-кода
             const extracted = extractIdFromQR(qrData);
             
             if (!extracted) {
@@ -4387,7 +4355,8 @@
             
             console.log(`🎯 [Сканер] Тип: ${extracted.type}, ID: ${extracted.id}`);
             
-           if (extracted.type === 'user') {
+            // Если это визитка пользователя
+            if (extracted.type === 'user') {
                 // Закрываем сканер
                 if (html5QrCode && html5QrCode.isScanning) {
                     try {
@@ -4403,7 +4372,9 @@
                     readerContainer.innerHTML = '';
                 }
                 
-                // Небольшая задержка перед открытием визитки
+                // Предварительно загружаем данные мастера
+                await preloadAllSkills();
+                
                 setTimeout(() => {
                     openMasterVisitka(extracted.id);
                 }, 300);
@@ -4411,24 +4382,41 @@
                 return;
             }
             
+            // Если это умейка - сначала убеждаемся, что все данные загружены
+            if (!isSkillsLoaded) {
+                errorDiv.textContent = '⏳ Загрузка базы умейек...';
+                await preloadAllSkills();
+            }
+            
+            // Ищем умейку (с принудительной загрузкой с сервера при необходимости)
             const skill = await getSkillById(extracted.id);
             
             if (!skill) {
-                console.error(`❌ [Сканер] Умейка с ID ${extracted.id} не найдена ни в кэше, ни на сервере`);
+                console.error(`❌ [Сканер] Умейка с ID ${extracted.id} не найдена`);
+                
+                // Последняя попытка - принудительная загрузка всех данных с сервера
+                errorDiv.textContent = '🔄 Повторная загрузка данных...';
+                await preloadAllSkills();
+                
+                const secondAttempt = getGlobalSkillById(extracted.id);
+                if (secondAttempt) {
+                    console.log(`✅ [Сканер] Умейка найдена после повторной загрузки`);
+                    await showSkillAndCloseScanner(secondAttempt);
+                    return;
+                }
+                
                 showScannerError(`Умейка не найдена. Проверьте, что QR-код действителен.`);
                 return;
             }
             
             console.log(`✅ [Сканер] Умейка найдена:`, skill);
+            await showSkillAndCloseScanner(skill);
             
-            if (html5QrCode && html5QrCode.isScanning) {
-                try {
-                    await html5QrCode.stop();
-                    console.log('✅ [Сканер] Сканер остановлен');
-                } catch (stopError) {
-                    console.warn('⚠️ [Сканер] Ошибка при остановке:', stopError);
-                }
-            }
+        } catch (error) {
+            console.error('❌ [Сканер] Критическая ошибка:', error);
+            showScannerError('Ошибка при обработке QR-кода: ' + error.message);
+        }
+    }
             
             const modal = document.getElementById('scannerModal');
             modal.classList.remove('active');
@@ -4551,15 +4539,17 @@
         });
     }
     
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ ОТКРЫТИЯ СКАНЕРА
     window.openQRScanner = async function() {
         triggerHapticFeedback();
         
+        // Обязательно загружаем все данные перед сканированием
         if (!isSkillsLoaded) {
             const errorDiv = document.getElementById('scannerError');
             errorDiv.style.display = 'block';
             errorDiv.style.background = 'rgba(102, 126, 234, 0.2)';
             errorDiv.style.color = '#667eea';
-            errorDiv.textContent = '⏳ Загрузка базы умейек...';
+            errorDiv.textContent = '⏳ Загрузка базы умейек... Пожалуйста, подождите';
             
             await preloadAllSkills();
             
@@ -4571,8 +4561,6 @@
         
         errorDiv.style.display = 'none';
         errorDiv.textContent = '';
-        errorDiv.style.background = '';
-        errorDiv.style.color = '';
         
         modal.classList.add('active');
         
@@ -4603,6 +4591,7 @@
                         handleScannedQRCode(decodedText);
                     },
                     (errorMessage) => {
+                        // Игнорируем сообщения об отсутствии QR-кодов
                         if (!errorMessage.includes('No MultiFormat Readers')) {
                             console.log('📷 [Сканер] Статус:', errorMessage);
                         }
@@ -8889,9 +8878,10 @@ function updateAvatarPreview(avatarUrl) {
         
         currentUserId = checkAndSetUserId();
         
+        // Принудительная загрузка всех данных при старте
         console.log('📦 Начинаю предварительную загрузку всех умейек...');
         await preloadAllSkills();
-        console.log('✅ Предварительная загрузка завершена');
+        console.log('✅ Предварительная загрузка завершена, загружено умейек:', getGlobalSkills().length);
         
         processReferralLink();
         
