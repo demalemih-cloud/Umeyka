@@ -4283,7 +4283,6 @@
     async function getSkillById(skillId) {
         console.log(`🔍 [Поиск] Ищу умейку с ID: ${skillId}`);
         
-        // Сначала проверяем в глобальном кэше
         let skill = getGlobalSkillById(skillId);
         
         if (skill) {
@@ -4328,7 +4327,6 @@
     function extractIdFromQR(qrData) {
         console.log(`🔧 [Парсинг] Извлекаю ID из: ${qrData}`);
         
-        // Формат: https://t.me/ymeyka_bot?start=skill_XXXX
         if (qrData.includes('start=skill_')) {
             const match = qrData.match(/start=skill_([^&]+)/);
             if (match && match[1]) {
@@ -4337,7 +4335,6 @@
             }
         }
         
-        // Формат: https://t.me/ymeyka_bot?start=user_XXXX
         if (qrData.includes('start=user_')) {
             const match = qrData.match(/start=user_([^&]+)/);
             if (match && match[1]) {
@@ -4346,7 +4343,6 @@
             }
         }
         
-        // Формат: .../skill/XXXX
         if (qrData.includes('/skill/')) {
             const match = qrData.match(/\/skill\/([^\/?]+)/);
             if (match && match[1]) {
@@ -4355,14 +4351,12 @@
             }
         }
         
-        // Простой ID (24 символа MongoDB ObjectId)
         const simpleIdMatch = qrData.match(/^[a-zA-Z0-9]{24}$/);
         if (simpleIdMatch) {
             console.log(`✅ [Парсинг] Извлечен ID как простой строки: ${simpleIdMatch[0]}`);
             return { type: 'skill', id: simpleIdMatch[0] };
         }
         
-        // ID из конца URL
         const lastSlashMatch = qrData.match(/\/([^\/]+)$/);
         if (lastSlashMatch && lastSlashMatch[1] && lastSlashMatch[1].length >= 20) {
             console.log(`✅ [Парсинг] Извлечен ID из конца URL: ${lastSlashMatch[1]}`);
@@ -4457,13 +4451,6 @@
     function openSkillModal(skill) {
         console.log('🪟 [Модалка] Открываю карточку умейки:', skill.skill);
         
-        // Проверяем, что skill существует и имеет необходимые поля
-        if (!skill || !skill._id) {
-            console.error('❌ [Модалка] Некорректные данные умейки:', skill);
-            showNotification('❌ Ошибка: данные умейки не найдены');
-            return;
-        }
-        
         const existingModal = document.querySelector('.skill-modal-overlay');
         if (existingModal) {
             existingModal.remove();
@@ -4524,7 +4511,7 @@
                 ` : ''}
                 
                 <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
-                    <button class="submit-button" onclick="triggerHapticFeedback(); this.closest('.modal-overlay').remove(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill).replace(/'/g, "\\'")}', '${escapeHtml(skill.username).replace(/'/g, "\\'")}', '${skill.userId}', '${escapeHtml(skill.experience || '').replace(/'/g, "\\'")}');" style="margin: 0;">
+                    <button class="submit-button" onclick="triggerHapticFeedback(); this.closest('.modal-overlay').remove(); createDealFromSkill('${skill._id}', '${escapeHtml(skill.skill)}', '${escapeHtml(skill.username)}', '${skill.userId}', '${escapeHtml(skill.experience || '')}');" style="margin: 0;">
                         📝 Создать сделку
                     </button>
                     <button class="modal-button modal-cancel" onclick="this.closest('.modal-overlay').remove();">
