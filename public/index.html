@@ -967,7 +967,7 @@
 
         .button-my-skills:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(159, 122, 234, 0.4);
+            box-shadow: 0 12px 30px rgba(159, 122, 234, 0.4);
         }
 
         .button-deals {
@@ -2794,47 +2794,11 @@
             border-radius: 20px;
             margin: 20px 0;
         }
-
-        .server-error-banner {
-            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 12px;
-            margin: 10px 0;
-            text-align: center;
-            font-size: 14px;
-            display: none;
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            color: white;
-            font-size: 16px;
-        }
-
-        .loading-overlay .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-            margin-bottom: 15px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
             <div class="header" id="logoHeader">
                 <button class="qr-scanner-button" onclick="triggerHapticFeedback(); openQRScanner();">📷 Сканер</button>
@@ -2870,6 +2834,7 @@
                 </button>
             </div>
 
+            
             <div class="map-section">
                 <button class="map-button" onclick="triggerHapticFeedback(); openMap();">
                     🗺️ Поиск по карте
@@ -2897,6 +2862,7 @@
                 
                 <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
                 
+                <!-- ВЫБОР КАТЕГОРИИ (ОБЯЗАТЕЛЬНО) -->
                 <div style="margin: 15px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📂 Выберите категорию умейки *</div>
                     <select id="skillCategory" class="input-field" required style="cursor: pointer; background: rgba(255,255,255,0.95);">
@@ -2955,19 +2921,33 @@
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
                     <div class="radius-selector">
-                        <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectRadius(5);">5 км</div>
-                        <div class="radius-option selected" data-radius="10" onclick="triggerHapticFeedback(); selectRadius(10);">10 км</div>
-                        <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectRadius(25);">25 км</div>
-                        <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectRadius(50);">50 км</div>
+                        <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectRadius(5);">
+                            5 км
+                        </div>
+                        <div class="radius-option selected" data-radius="10" onclick="triggerHapticFeedback(); selectRadius(10);">
+                            10 км
+                        </div>
+                        <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectRadius(25);">
+                            25 км
+                        </div>
+                        <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectRadius(50);">
+                            50 км
+                        </div>
                     </div>
-                    <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">Выберите радиус, в котором вы готовы работать</div>
+                    <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">
+                        Выберите радиус, в котором вы готовы работать
+                    </div>
                 </div>
                 
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                     <div class="status-selector">
-                        <div class="status-option ready-option selected" onclick="triggerHapticFeedback(); selectMasterStatus('ready');" id="statusReadyOption">✅ Готов</div>
-                        <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectMasterStatus('busy');" id="statusBusyOption">⏰ Занят</div>
+                        <div class="status-option ready-option selected" onclick="triggerHapticFeedback(); selectMasterStatus('ready');" id="statusReadyOption">
+                            ✅ Готов
+                        </div>
+                        <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectMasterStatus('busy');" id="statusBusyOption">
+                            ⏰ Занят
+                        </div>
                     </div>
                     <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">
                         Статус "Готов" - вы доступны для новых заказов<br>
@@ -3020,7 +3000,9 @@
                 
                 <div id="userProfile">
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">👤</div>
+                        <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">
+                            👤
+                        </div>
                         <h3 id="userName">Пользователь</h3>
                         <p id="userBio" style="opacity: 0.8; margin: 10px 0;">Расскажите о себе...</p>
                         <div id="userBadges" style="margin: 10px 0;"></div>
@@ -3137,7 +3119,9 @@
                         
                         <div class="referral-link-container">
                             <div style="font-weight: bold; color: #667eea; margin-bottom: 10px;">Ваша реферальная ссылка:</div>
-                            <div class="referral-link" id="referralLinkText">Загрузка...</div>
+                            <div class="referral-link" id="referralLinkText">
+                                Загрузка...
+                            </div>
                         </div>
                         
                         <div class="referral-buttons">
@@ -3198,7 +3182,9 @@
                 <h2 style="margin-bottom: 20px; text-align: center;">💰 Мои финансы</h2>
                 
                 <div class="wallet-section">
-                    <div class="wallet-title">💳 Мой кошелек</div>
+                    <div class="wallet-title">
+                        💳 Мой кошелек
+                    </div>
                     
                     <div id="walletStatus" class="wallet-disconnected">
                         <span>🔴</span>
@@ -3250,7 +3236,9 @@
                 <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
         
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <div id="avatarPreview" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; cursor: pointer;" onclick="triggerHapticFeedback(); changeAvatar();">👤</div>
+                    <div id="avatarPreview" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; cursor: pointer;" onclick="triggerHapticFeedback(); changeAvatar();">
+                        👤
+                    </div>
                     <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Нажмите на аватар для выбора</div>
                     <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
                 </div>
@@ -3286,18 +3274,30 @@
                 <div>
                     <label style="color: white; display: block; margin-bottom: 10px;">⭐ Уровень качества *</label>
                     <div class="quality-options">
-                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('premium');" id="qualityPremium">Премиум</div>
-                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('standard');" id="qualityStandard">Стандарт</div>
-                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('economy');" id="qualityEconomy">Эконом</div>
+                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('premium');" id="qualityPremium">
+                            Премиум
+                        </div>
+                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('standard');" id="qualityStandard">
+                            Стандарт
+                        </div>
+                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('economy');" id="qualityEconomy">
+                            Эконом
+                        </div>
                     </div>
                 </div>
                 
                 <div>
                     <label style="color: white; display: block; margin-bottom: 10px;">✅ Дополнительные условия (выберите 2)</label>
                     <div class="additional-options">
-                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('quality');" id="optionQuality">⭐ Качество</div>
-                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('price');" id="optionPrice">💰 Цена</div>
-                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('timeRange');" id="optionTimeRange">⏱️ Диапазон Времени</div>
+                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('quality');" id="optionQuality">
+                            ⭐ Качество
+                        </div>
+                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('price');" id="optionPrice">
+                            💰 Цена
+                        </div>
+                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('timeRange');" id="optionTimeRange">
+                            ⏱️ Диапазон Времени
+                        </div>
                     </div>
                 </div>
                 
@@ -3312,6 +3312,7 @@
             </div>
         </div>
 
+        <!-- РАЗДЕЛ "О ПРОЕКТЕ" -->
         <div id="aboutSection" class="section">
             <button class="back-button" onclick="triggerHapticFeedback(); showMainScreen();">← Назад</button>
             
@@ -3409,6 +3410,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ВИЗИТКИ -->
     <div id="visitkaModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 450px;">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeVisitkaModal();">×</button>
@@ -3434,6 +3436,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ВИЗИТКИ МАСТЕРА (при сканировании) -->
     <div id="masterVisitkaModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 450px;">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeMasterVisitkaModal();">×</button>
@@ -3451,6 +3454,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ УМЕЙКИ В ВИЗИТКЕ -->
     <div id="visitkaSkillDetailModal" class="visitka-skill-detail-modal">
         <div class="modal-content" style="max-width: 400px;">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeVisitkaSkillDetailModal();">×</button>
@@ -3470,6 +3474,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ УМЕЙКИ -->
     <div id="editSkillModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeEditSkillModal();">×</button>
@@ -3536,18 +3541,30 @@
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
                 <div class="radius-selector" style="background: #f7fafc;">
-                    <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectEditRadius(5);">5 км</div>
-                    <div class="radius-option" data-radius="10" onclick="triggerHapticFeedback(); selectEditRadius(10);">10 км</div>
-                    <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectEditRadius(25);">25 км</div>
-                    <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectEditRadius(50);">50 км</div>
+                    <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectEditRadius(5);">
+                        5 км
+                    </div>
+                    <div class="radius-option" data-radius="10" onclick="triggerHapticFeedback(); selectEditRadius(10);">
+                        10 км
+                    </div>
+                    <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectEditRadius(25);">
+                        25 км
+                    </div>
+                    <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectEditRadius(50);">
+                        50 км
+                    </div>
                 </div>
             </div>
             
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                 <div class="status-selector" style="background: #f7fafc;">
-                    <div class="status-option ready-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('ready');" id="editStatusReadyOption">✅ Готов</div>
-                    <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('busy');" id="editStatusBusyOption">⏰ Занят</div>
+                    <div class="status-option ready-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('ready');" id="editStatusReadyOption">
+                        ✅ Готов
+                    </div>
+                    <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('busy');" id="editStatusBusyOption">
+                        ⏰ Занят
+                    </div>
                 </div>
             </div>
             
@@ -3577,6 +3594,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ПОДРОБНОСТЕЙ -->
     <div id="detailsModal" class="details-modal-overlay">
         <div class="details-modal-content">
             <button class="details-modal-close" onclick="closeDetailsModal();">×</button>
@@ -3586,22 +3604,31 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО КОНТАКТОВ МАСТЕРА -->
     <div id="contactModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeContactModal();">×</button>
             <div class="modal-title">📞 Контакты мастера</div>
             
-            <div id="contactInfo" class="contact-info"></div>
-            
-            <div class="contact-buttons">
-                <a id="callButton" class="call-button" href="#" target="_blank" onclick="triggerHapticFeedback();">📞 Позвонить</a>
-                <a id="telegramButton" class="telegram-button" href="#" target="_blank" onclick="triggerHapticFeedback();">✈️ Написать в Telegram</a>
+            <div id="contactInfo" class="contact-info">
             </div>
             
-            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeContactModal();" style="margin-top: 15px;">Закрыть</button>
+            <div class="contact-buttons">
+                <a id="callButton" class="call-button" href="#" target="_blank" onclick="triggerHapticFeedback();">
+                    📞 Позвонить
+                </a>
+                <a id="telegramButton" class="telegram-button" href="#" target="_blank" onclick="triggerHapticFeedback();">
+                    ✈️ Написать в Telegram
+                </a>
+            </div>
+            
+            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeContactModal();" style="margin-top: 15px;">
+                Закрыть
+            </button>
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ОПЛАТЫ -->
     <div id="paymentConfirmModal" class="payment-confirm-modal" style="display: none;">
         <div class="payment-confirm-content">
             <div class="payment-confirm-title">💳 Подтверждение оплаты</div>
@@ -3630,12 +3657,17 @@
             </div>
             
             <div class="payment-confirm-buttons">
-                <button class="payment-confirm-button payment-confirm-yes" onclick="confirmPayment();">✅ Подтвердить</button>
-                <button class="payment-confirm-button payment-confirm-no" onclick="closePaymentConfirm();">❌ Отмена</button>
+                <button class="payment-confirm-button payment-confirm-yes" onclick="confirmPayment();">
+                    ✅ Подтвердить
+                </button>
+                <button class="payment-confirm-button payment-confirm-no" onclick="closePaymentConfirm();">
+                    ❌ Отмена
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ОТЗЫВОВ -->
     <div id="reviewsModal" class="reviews-modal">
         <div class="reviews-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeReviewsModal();">×</button>
@@ -3657,6 +3689,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО QR-КОДА -->
     <div id="qrModal" class="qr-modal-overlay">
         <div class="qr-modal-content">
             <h2 id="qrModalTitle" style="color: #2d3748; margin-bottom: 20px; font-size: 20px;"></h2>
@@ -3665,7 +3698,9 @@
                 <span>📤</span>
                 Поделиться
             </button>
-            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeQRModal();" style="margin-top: 15px;">Закрыть</button>
+            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeQRModal();" style="margin-top: 15px;">
+                Закрыть
+            </button>
         </div>
     </div>
 
@@ -3705,9 +3740,9 @@
     
     let logoClickCount = 0;
     let logoClickTimer = null;
-    let isLoading = false;
+    let isServerAvailable = true;
 
-    // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ХРАНИЛИЩЕМ (ТОЛЬКО ПЕРСОНАЛЬНЫЕ ДАННЫЕ) ==========
+    // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ХРАНИЛИЩЕМ (ТОЛЬКО ДЛЯ ПЕРСОНАЛЬНЫХ ДАННЫХ) ==========
     
     function getLocalStorage(key) {
         try {
@@ -3729,47 +3764,47 @@
         }
     }
 
-    // ========== ЗАГРУЗКА УМЕЕК С СЕРВЕРА (ЕДИНСТВЕННЫЙ ИСТОЧНИК) ==========
+    // ========== ГЛОБАЛЬНЫЙ СПИСОК УМЕЕК - ВСЕГДА С СЕРВЕРА ==========
     
-    async function loadAllSkillsFromServer() {
-        if (isLoading) {
-            console.log('⏳ Загрузка уже выполняется, ждём...');
-            return null;
+    // Глобальный кэш умейек в памяти (для быстрого доступа, но всегда обновляется с сервера)
+    let globalSkillsCache = [];
+    let isLoadingSkills = false;
+    let lastSkillsFetchTime = 0;
+    const SKILLS_CACHE_DURATION = 30000; // 30 секунд кэширования в памяти
+    
+    async function loadAllSkillsFromServer(forceRefresh = false) {
+        const now = Date.now();
+        
+        // Если данные в памяти свежие и не требуется принудительное обновление
+        if (!forceRefresh && globalSkillsCache.length > 0 && (now - lastSkillsFetchTime) < SKILLS_CACHE_DURATION) {
+            console.log(`📦 Использую кэш памяти: ${globalSkillsCache.length} умейок`);
+            return globalSkillsCache;
         }
         
-        isLoading = true;
-        showGlobalLoading();
+        // Предотвращаем множественные параллельные запросы
+        if (isLoadingSkills) {
+            console.log('⏳ Загрузка умейок уже выполняется, жду...');
+            // Ждём завершения текущей загрузки
+            return new Promise((resolve) => {
+                const checkInterval = setInterval(() => {
+                    if (!isLoadingSkills) {
+                        clearInterval(checkInterval);
+                        resolve(globalSkillsCache);
+                    }
+                }, 100);
+            });
+        }
+        
+        isLoadingSkills = true;
         
         try {
-            console.log('🚀 Загрузка всех умейек с сервера...');
-            const response = await fetch(`${API_URL}/api/skills/all`);
+            console.log('🚀 Загружаю умейки с сервера...');
             
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const result = await response.json();
-            
-            if (result.success && result.skills) {
-                console.log(`✅ Загружено ${result.skills.length} умейек с сервера`);
-                return result.skills;
-            } else {
-                throw new Error(result.error || 'Неизвестная ошибка сервера');
-            }
-        } catch (error) {
-            console.error('❌ Ошибка загрузки умейек с сервера:', error);
-            showServerErrorBanner('Не удалось загрузить данные с сервера. Проверьте подключение к интернету.');
-            return [];
-        } finally {
-            isLoading = false;
-            hideGlobalLoading();
-        }
-    }
-
-    async function loadUserSkillsFromServer(userId) {
-        showGlobalLoading();
-        try {
-            const response = await fetch(`${API_URL}/api/skills/user/${userId}`);
+            const response = await fetch(`${API_URL}/api/skills/all`, {
+                headers: {
+                    'Cache-Control': 'no-cache'
+                }
+            });
             
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
@@ -3778,106 +3813,76 @@
             const result = await response.json();
             
             if (result.success && result.skills) {
-                console.log(`✅ Загружено ${result.skills.length} умейек пользователя ${userId}`);
-                return result.skills;
+                globalSkillsCache = result.skills;
+                lastSkillsFetchTime = now;
+                isServerAvailable = true;
+                console.log(`✅ Загружено ${globalSkillsCache.length} умейок с сервера`);
+                return globalSkillsCache;
+            } else {
+                throw new Error(result.error || 'Ошибка сервера');
             }
-            return [];
         } catch (error) {
-            console.error('❌ Ошибка загрузки умейек пользователя:', error);
+            console.error('❌ Ошибка загрузки умейок с сервера:', error);
+            isServerAvailable = false;
+            
+            // Если сервер недоступен, показываем ошибку и возвращаем пустой массив
+            // НЕ используем localStorage для публичных данных
+            showNotification('⚠️ Сервер недоступен. Пожалуйста, попробуйте позже.', 3000);
+            
             return [];
         } finally {
-            hideGlobalLoading();
+            isLoadingSkills = false;
         }
     }
-
-    async function getSkillByIdFromServer(skillId) {
+    
+    // Главная функция получения всех умейок
+    async function getGlobalSkills(forceRefresh = false) {
+        return await loadAllSkillsFromServer(forceRefresh);
+    }
+    
+    // Поиск умейки по ID (сначала в кэше, потом на сервере)
+    async function getSkillById(skillId) {
+        console.log(`🔍 Поиск умейки с ID: ${skillId}`);
+        
+        // Сначала ищем в кэше
+        let skill = globalSkillsCache.find(s => s._id === skillId);
+        
+        if (skill) {
+            console.log(`✅ Умейка найдена в кэше:`, skill.skill);
+            return skill;
+        }
+        
+        // Если не нашли, пробуем загрузить конкретную умейку с сервера
         try {
+            console.log(`🔄 Загружаю умейку ${skillId} с сервера...`);
             const response = await fetch(`${API_URL}/api/skills/${skillId}`);
             
-            if (!response.ok) {
-                return null;
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success && result.skill) {
+                    // Обновляем кэш
+                    globalSkillsCache = globalSkillsCache.filter(s => s._id !== skillId);
+                    globalSkillsCache.push(result.skill);
+                    console.log(`✅ Умейка загружена с сервера:`, result.skill.skill);
+                    return result.skill;
+                }
             }
-            
-            const result = await response.json();
-            
-            if (result.success && result.skill) {
-                return result.skill;
-            }
-            return null;
         } catch (error) {
-            console.error('❌ Ошибка загрузки умейки:', error);
-            return null;
+            console.error(`❌ Ошибка загрузки умейки ${skillId}:`, error);
         }
+        
+        console.warn(`⚠️ Умейка с ID ${skillId} не найдена`);
+        return null;
     }
-
-    // ========== ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ С УМЕЙКАМИ ==========
     
-    let globalSkillsCache = null;
-    let lastLoadTime = 0;
-    const CACHE_DURATION = 30000; // 30 секунд кэширования для уменьшения запросов
-    
-    async function getGlobalSkills(forceRefresh = false) {
-        const now = Date.now();
-        
-        if (!forceRefresh && globalSkillsCache && (now - lastLoadTime) < CACHE_DURATION) {
-            console.log('📦 Использую кэшированные умейки (актуальны)');
-            return globalSkillsCache;
-        }
-        
-        const skills = await loadAllSkillsFromServer();
-        if (skills && skills.length > 0) {
-            globalSkillsCache = skills;
-            lastLoadTime = now;
-            return skills;
-        }
-        
-        return globalSkillsCache || [];
+    // Обновить кэш после добавления/изменения умейки
+    async function refreshSkillsCache() {
+        globalSkillsCache = [];
+        lastSkillsFetchTime = 0;
+        return await loadAllSkillsFromServer(true);
     }
 
-    async function refreshGlobalSkills() {
-        globalSkillsCache = null;
-        return await getGlobalSkills(true);
-    }
-
-    function showGlobalLoading() {
-        let overlay = document.getElementById('globalLoadingOverlay');
-        if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.id = 'globalLoadingOverlay';
-            overlay.className = 'loading-overlay';
-            overlay.innerHTML = '<div class="spinner"></div><div>Загрузка данных...</div>';
-            document.body.appendChild(overlay);
-        }
-        overlay.style.display = 'flex';
-    }
-
-    function hideGlobalLoading() {
-        const overlay = document.getElementById('globalLoadingOverlay');
-        if (overlay) {
-            overlay.style.display = 'none';
-        }
-    }
-
-    function showServerErrorBanner(message) {
-        let banner = document.getElementById('serverErrorBanner');
-        if (!banner) {
-            banner = document.createElement('div');
-            banner.id = 'serverErrorBanner';
-            banner.className = 'server-error-banner';
-            const container = document.querySelector('.container');
-            if (container) {
-                container.insertBefore(banner, container.firstChild);
-            }
-        }
-        banner.textContent = message;
-        banner.style.display = 'block';
-        
-        setTimeout(() => {
-            banner.style.display = 'none';
-        }, 5000);
-    }
-
-    // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ЛОКАЛЬНЫМИ ДАННЫМИ ПОЛЬЗОВАТЕЛЯ ==========
+    // ========== ФУНКЦИИ ДЛЯ ЛОКАЛЬНЫХ ДАННЫХ ПОЛЬЗОВАТЕЛЯ ==========
     
     function getOrCreateUserProfile(userId, userName = 'Пользователь') {
         let userData = getLocalStorage(`user_${userId}`);
@@ -3889,6 +3894,7 @@
                 contact: '',
                 bio: 'Расскажите о себе...',
                 avatar: null,
+                skills: [],
                 rating: 0,
                 completedDeals: 0,
                 dealsCount: 0,
@@ -3901,6 +3907,39 @@
     }
     
     // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+    
+    function showLoadingIndicator() {
+        const loadingDiv = document.getElementById('globalLoadingIndicator');
+        if (loadingDiv) return;
+        
+        const newLoadingDiv = document.createElement('div');
+        newLoadingDiv.id = 'globalLoadingIndicator';
+        newLoadingDiv.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            font-size: 18px;
+        `;
+        newLoadingDiv.innerHTML = `
+            <div class="loading-spinner" style="width: 40px; height: 40px; border-width: 4px;"></div>
+            <div style="margin-top: 15px;">Загрузка данных...</div>
+        `;
+        document.body.appendChild(newLoadingDiv);
+    }
+    
+    function hideLoadingIndicator() {
+        const indicator = document.getElementById('globalLoadingIndicator');
+        if (indicator) indicator.remove();
+    }
     
     function showNotification(message, duration = 2000) {
         const notification = document.createElement('div');
@@ -3986,7 +4025,7 @@
         return badges[status] || badges['pending'];
     }
     
-    // ========== ФУНКЦИИ ДЛЯ ВИЗИТКИ ==========
+    // ========== ФУНКЦИИ ДЛЯ ВИЗИТКИ (используют localStorage для персональных настроек) ==========
     
     function getVisitkaSelectedSkills() {
         const key = `visa_selected_skills_${currentUserId}`;
@@ -4004,7 +4043,8 @@
     }
     
     async function getUserSkills() {
-        return await loadUserSkillsFromServer(currentUserId);
+        const globalSkills = await getGlobalSkills();
+        return globalSkills.filter(s => s.userId === currentUserId);
     }
     
     async function openVisitkaModal() {
@@ -4016,7 +4056,7 @@
         modal.style.display = 'flex';
         content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки...</div></div>';
         
-        await refreshGlobalSkills();
+        await getGlobalSkills(true);
         
         renderVisitkaModal();
     }
@@ -4028,7 +4068,7 @@
         const skillsCount = userSkills.length;
         const rating = userData.rating || 0;
         
-        console.log('📇 [Визитка] Рендер визитки. Умейок пользователя:', skillsCount);
+        console.log('📇 Визитка. Умейок пользователя:', skillsCount);
         
         visitkaSelectedSkills = getVisitkaSelectedSkills();
         
@@ -4150,10 +4190,10 @@
         }
     }
     
-    async function showVisitkaSkillDetail(skillId) {
+    function showVisitkaSkillDetail(skillId) {
         triggerHapticFeedback();
         
-        const skill = await getSkillByIdFromServer(skillId);
+        const skill = globalSkillsCache.find(s => s._id === skillId);
         if (!skill) return;
         
         currentVisitkaSkill = skill;
@@ -4254,19 +4294,23 @@
         modal.style.display = 'flex';
         content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки мастера...</div></div>';
         
-        await refreshGlobalSkills();
+        // Загружаем свежие данные с сервера
+        const allSkills = await getGlobalSkills(true);
         
-        const allSkills = await getGlobalSkills();
+        // Фильтруем умейки по userId
         const masterSkills = allSkills.filter(s => s.userId === userId);
+        console.log(`📊 Найдено умейок для мастера ${userId}: ${masterSkills.length}`);
         
         const userData = getOrCreateUserProfile(userId);
         const userName = userData.firstName || 'Мастер';
         
         title.textContent = `📇 Визитка мастера ${escapeHtml(userName)}`;
         
+        // Получаем выбранные умейки для визитки
         const masterSelectedKey = `visa_selected_skills_${userId}`;
         let masterSelected = getLocalStorage(masterSelectedKey);
         
+        // Если нет сохранённых выбранных умейок, показываем все
         let displaySkills = masterSkills;
         if (masterSelected && Array.isArray(masterSelected) && masterSelected.length > 0) {
             const filteredSkills = masterSkills.filter(s => masterSelected.includes(s._id));
@@ -4274,6 +4318,8 @@
                 displaySkills = filteredSkills;
             }
         }
+        
+        console.log(`📊 Отображаем умейок в визитке: ${displaySkills.length}`);
         
         if (displaySkills.length === 0) {
             content.innerHTML = `
@@ -4304,7 +4350,9 @@
             
             <div class="visitka-qr" style="margin-bottom: 15px;">
                 <div id="masterVisitkaQRCode" style="width: 150px; height: 150px; margin: 0 auto;"></div>
-                <div style="font-size: 11px; color: #666; text-align: center; margin-top: 8px;">📱 QR-код мастера</div>
+                <div style="font-size: 11px; color: #666; text-align: center; margin-top: 8px;">
+                    📱 QR-код мастера
+                </div>
             </div>
             
             <div style="margin-top: 20px;">
@@ -4381,10 +4429,10 @@
     }
     
     // ========== ФУНКЦИЯ ДЛЯ ОТКРЫТИЯ МОДАЛЬНОГО ОКНА ПОДРОБНОСТЕЙ ==========
-    window.openDetailsModal = async function(skillId) {
+    window.openDetailsModal = function(skillId) {
         triggerHapticFeedback();
         
-        const skill = await getSkillByIdFromServer(skillId);
+        const skill = globalSkillsCache.find(s => s._id === skillId);
         if (!skill) {
             alert('❌ Умейка не найдена');
             return;
@@ -4410,14 +4458,13 @@
     
     // ========== QR-СКАНЕР ==========
     
-    async function getSkillById(skillId) {
-        return await getSkillByIdFromServer(skillId);
-    }
-    
-    function extractIdFromQR(qrData) {
+    async function extractIdFromQR(qrData) {
+        console.log(`🔧 Парсинг QR: ${qrData}`);
+        
         if (qrData.includes('start=skill_')) {
             const match = qrData.match(/start=skill_([^&]+)/);
             if (match && match[1]) {
+                console.log(`✅ Извлечен ID умейки: ${match[1]}`);
                 return { type: 'skill', id: match[1] };
             }
         }
@@ -4425,6 +4472,7 @@
         if (qrData.includes('start=user_')) {
             const match = qrData.match(/start=user_([^&]+)/);
             if (match && match[1]) {
+                console.log(`✅ Извлечен ID пользователя: ${match[1]}`);
                 return { type: 'user', id: match[1] };
             }
         }
@@ -4432,25 +4480,22 @@
         if (qrData.includes('/skill/')) {
             const match = qrData.match(/\/skill\/([^\/?]+)/);
             if (match && match[1]) {
+                console.log(`✅ Извлечен ID умейки из URL: ${match[1]}`);
                 return { type: 'skill', id: match[1] };
             }
         }
         
         const simpleIdMatch = qrData.match(/^[a-zA-Z0-9]{24}$/);
         if (simpleIdMatch) {
+            console.log(`✅ Извлечен ID как строка: ${simpleIdMatch[0]}`);
             return { type: 'skill', id: simpleIdMatch[0] };
-        }
-        
-        const lastSlashMatch = qrData.match(/\/([^\/]+)$/);
-        if (lastSlashMatch && lastSlashMatch[1] && lastSlashMatch[1].length >= 20) {
-            return { type: 'skill', id: lastSlashMatch[1] };
         }
         
         return null;
     }
     
     async function handleScannedQRCode(qrData) {
-        console.log('📱 [Сканер] Получен QR-код:', qrData);
+        console.log('📱 Получен QR-код:', qrData);
         
         const errorDiv = document.getElementById('scannerError');
         errorDiv.style.display = 'block';
@@ -4459,12 +4504,14 @@
         errorDiv.textContent = '🔍 Обработка QR-кода...';
         
         try {
-            const extracted = extractIdFromQR(qrData);
+            const extracted = await extractIdFromQR(qrData);
             
             if (!extracted) {
-                showScannerError('Не удалось распознать QR-код. Убедитесь, что QR-код корректен.');
+                showScannerError('Не удалось распознать QR-код.');
                 return;
             }
+            
+            console.log(`🎯 Тип: ${extracted.type}, ID: ${extracted.id}`);
             
             if (extracted.type === 'user') {
                 if (html5QrCode && html5QrCode.isScanning) {
@@ -4488,12 +4535,16 @@
                 return;
             }
             
+            // Загружаем свежие данные перед поиском умейки
+            await getGlobalSkills(true);
             const skill = await getSkillById(extracted.id);
             
             if (!skill) {
-                showScannerError(`Умейка не найдена. Проверьте, что QR-код действителен.`);
+                showScannerError(`Умейка не найдена.`);
                 return;
             }
+            
+            console.log(`✅ Умейка найдена:`, skill);
             
             if (html5QrCode && html5QrCode.isScanning) {
                 try {
@@ -4514,12 +4565,14 @@
             }, 300);
             
         } catch (error) {
-            console.error('❌ [Сканер] Критическая ошибка:', error);
-            showScannerError('Ошибка при обработке QR-кода: ' + error.message);
+            console.error('❌ Ошибка обработки QR:', error);
+            showScannerError('Ошибка при обработке QR-кода');
         }
     }
     
     function openSkillModal(skill) {
+        console.log('🪟 Открываю карточку умейки:', skill.skill);
+        
         const existingModal = document.querySelector('.skill-modal-overlay');
         if (existingModal) {
             existingModal.remove();
@@ -4609,12 +4662,15 @@
     window.openQRScanner = async function() {
         triggerHapticFeedback();
         
+        // Предзагружаем умейки перед сканированием
+        showLoadingIndicator();
+        await getGlobalSkills(true);
+        hideLoadingIndicator();
+        
         const modal = document.getElementById('scannerModal');
         const errorDiv = document.getElementById('scannerError');
         
         errorDiv.style.display = 'none';
-        errorDiv.textContent = '';
-        
         modal.classList.add('active');
         
         setTimeout(async () => {
@@ -4639,23 +4695,23 @@
                 await html5QrCode.start(
                     { facingMode: "environment" },
                     config,
-                    (decodedText, decodedResult) => {
-                        console.log('✅ [Сканер] QR-код распознан:', decodedText);
+                    (decodedText) => {
+                        console.log('✅ QR-код распознан:', decodedText);
                         handleScannedQRCode(decodedText);
                     },
                     (errorMessage) => {
                         if (!errorMessage.includes('No MultiFormat Readers')) {
-                            console.log('📷 [Сканер] Статус:', errorMessage);
+                            console.log('📷 Статус:', errorMessage);
                         }
                     }
                 ).catch(err => {
-                    console.error('❌ [Сканер] Ошибка запуска:', err);
+                    console.error('❌ Ошибка запуска камеры:', err);
                     errorDiv.style.display = 'block';
-                    errorDiv.textContent = '❌ Не удалось получить доступ к камере. Убедитесь, что вы разрешили доступ.';
+                    errorDiv.textContent = '❌ Не удалось получить доступ к камере.';
                 });
                 
             } catch (error) {
-                console.error('❌ [Сканер] Ошибка инициализации:', error);
+                console.error('❌ Ошибка инициализации:', error);
                 errorDiv.style.display = 'block';
                 errorDiv.textContent = '❌ Ошибка: ' + error.message;
             }
@@ -4680,26 +4736,29 @@
         
         const errorDiv = document.getElementById('scannerError');
         errorDiv.style.display = 'none';
-        errorDiv.textContent = '';
     };
     
     // ========== ОБРАБОТЧИК ГЛУБОКИХ ССЫЛОК ==========
     
     function handleDeepLink() {
+        console.log('🔗 Обработка глубокой ссылки...');
+        
         const urlParams = new URLSearchParams(window.location.search);
         const startParam = urlParams.get('start');
         
         if (!startParam) return;
         
+        console.log(`🔗 Параметр start: "${startParam}"`);
+        
         if (startParam.startsWith('skill_')) {
             const skillId = startParam.replace('skill_', '');
+            console.log('🔗 Ссылка на умейку:', skillId);
             
             const openSkill = async () => {
+                await getGlobalSkills(true);
                 const skill = await getSkillById(skillId);
                 if (skill) {
-                    setTimeout(() => {
-                        openSkillModal(skill);
-                    }, 1000);
+                    setTimeout(() => openSkillModal(skill), 1000);
                 } else {
                     showNotification('❌ Умейка не найдена');
                 }
@@ -4711,12 +4770,11 @@
         
         if (startParam.startsWith('user_')) {
             const userId = startParam.replace('user_', '');
+            console.log('🔗 Ссылка на визитку пользователя:', userId);
             
             const openVisitka = async () => {
-                await refreshGlobalSkills();
-                setTimeout(() => {
-                    openMasterVisitka(userId);
-                }, 500);
+                await getGlobalSkills(true);
+                setTimeout(() => openMasterVisitka(userId), 500);
             };
             
             openVisitka();
@@ -4725,17 +4783,17 @@
         
         if (/^\d+$/.test(startParam)) {
             const referrerId = startParam;
+            console.log('🔗 Реферальная ссылка от:', referrerId);
             
             if (currentUserId && referrerId !== currentUserId) {
                 setTimeout(() => {
                     showNotification('🎉 Вы перешли по реферальной ссылке! Зарегистрируйтесь, чтобы получить бонус.');
                 }, 500);
             }
-            return;
         }
     }
     
-    // ========== БАЗА ДАННЫХ ГОРОДОВ ==========
+    // ========== БАЗА ГОРОДОВ ==========
     const citiesDatabase = {
         'Евпатория': { lat: 45.1906, lon: 33.3666 },
         'Севастополь': { lat: 44.6167, lon: 33.5254 },
@@ -4832,6 +4890,7 @@
     }
     
     function selectRadius(radius) {
+        console.log('🔄 Выбор радиуса:', radius);
         currentRadius = radius;
         
         document.querySelectorAll('#masterSection .radius-option').forEach(option => {
@@ -4843,6 +4902,7 @@
     }
     
     function selectEditRadius(radius) {
+        console.log('🔄 Выбор радиуса (редактирование):', radius);
         currentEditRadius = radius;
         
         document.querySelectorAll('#editSkillModal .radius-option').forEach(option => {
@@ -4854,6 +4914,7 @@
     }
     
     function selectMasterStatus(status) {
+        console.log('🔄 Выбор статуса (создание):', status);
         currentMasterStatus = status;
         
         const readyOption = document.getElementById('statusReadyOption');
@@ -4870,6 +4931,7 @@
     }
     
     function selectEditMasterStatus(status) {
+        console.log('🔄 Выбор статуса (редактирование):', status);
         currentEditMasterStatus = status;
         
         const readyOption = document.getElementById('editStatusReadyOption');
@@ -4884,6 +4946,443 @@
             if (busyOption) busyOption.classList.add('selected');
         }
     }
+    
+    // ========== ФУНКЦИИ ДЛЯ ФИНАНСОВ И СДЕЛОК (локальное хранилище для персональных данных) ==========
+    
+    function getWalletData() {
+        const data = getLocalStorage(`wallet_${currentUserId}`);
+        return data || {
+            connected: false,
+            walletAddress: null,
+            availableBalance: 0,
+            frozenBalance: 0,
+            totalEarned: 0,
+            totalCommission: 0,
+            transactions: []
+        };
+    }
+    
+    function saveWalletData(data) {
+        setLocalStorage(`wallet_${currentUserId}`, data);
+        updateWalletUI();
+    }
+    
+    function addTransaction(type, amount, description, dealId = null) {
+        const wallet = getWalletData();
+        const transaction = {
+            id: 'tx_' + Date.now(),
+            type: type,
+            amount: amount,
+            description: description,
+            dealId: dealId,
+            timestamp: new Date().toISOString(),
+            status: 'completed'
+        };
+        
+        wallet.transactions.unshift(transaction);
+        saveWalletData(wallet);
+        
+        return transaction;
+    }
+    
+    function updateWalletUI() {
+        const wallet = getWalletData();
+        
+        document.getElementById('availableBalance').textContent = wallet.availableBalance + ' ⭐';
+        document.getElementById('frozenBalance').textContent = wallet.frozenBalance + ' ⭐';
+        document.getElementById('totalEarned').textContent = wallet.totalEarned + ' ⭐';
+        document.getElementById('totalCommission').textContent = wallet.totalCommission + ' ⭐';
+        
+        const walletStatus = document.getElementById('walletStatus');
+        if (wallet.connected) {
+            walletStatus.className = 'wallet-connected';
+            walletStatus.innerHTML = `<span>🟢</span><span>Wallet подключен: ${wallet.walletAddress?.slice(0, 6)}...${wallet.walletAddress?.slice(-4)}</span>`;
+            document.getElementById('withdrawButton').style.display = 'flex';
+        } else {
+            walletStatus.className = 'wallet-disconnected';
+            walletStatus.innerHTML = `<span>🔴</span><span>Telegram Wallet не подключен</span>`;
+            document.getElementById('withdrawButton').style.display = 'none';
+        }
+        
+        renderTransactionHistory(wallet.transactions);
+    }
+    
+    function renderTransactionHistory(transactions) {
+        const container = document.getElementById('transactionHistory');
+        
+        if (!transactions || transactions.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">История операций пуста</div>';
+            return;
+        }
+        
+        container.innerHTML = transactions.slice(0, 10).map(tx => {
+            const isIncome = tx.type === 'deposit' || tx.type === 'payout' || tx.type === 'refund';
+            const isCommission = tx.type === 'commission';
+            const amountClass = isIncome ? 'positive' : 'negative';
+            const icon = isIncome ? '💰' : (isCommission ? '💸' : '💳');
+            
+            return `
+                <div class="transaction-item ${isIncome ? 'income' : (isCommission ? 'commission' : 'expense')}">
+                    <div class="transaction-info">
+                        <div class="transaction-title">${icon} ${tx.description}</div>
+                        <div class="transaction-date">${new Date(tx.timestamp).toLocaleDateString('ru-RU')}</div>
+                    </div>
+                    <div class="transaction-amount ${amountClass}">
+                        ${isIncome ? '+' : '-'}${tx.amount} ⭐
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    async function connectWallet() {
+        triggerHapticFeedback();
+        
+        try {
+            const tg = window.Telegram?.WebApp;
+            
+            if (!tg) {
+                alert('❌ Telegram Web App не доступен');
+                return;
+            }
+            
+            if (tg.openInvoice) {
+                const wallet = getWalletData();
+                wallet.connected = true;
+                wallet.walletAddress = 'EQ' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                saveWalletData(wallet);
+                
+                showNotification('✅ Wallet успешно подключен!');
+                
+                setTimeout(() => {
+                    if (confirm('💰 Хотите пополнить баланс?')) {
+                        depositFunds();
+                    }
+                }, 500);
+            } else {
+                alert('❌ Telegram Wallet не поддерживается в вашей версии приложения');
+            }
+        } catch (error) {
+            console.error('❌ Ошибка подключения кошелька:', error);
+            alert('❌ Ошибка подключения кошелька');
+        }
+    }
+    
+    async function depositFunds() {
+        triggerHapticFeedback();
+        
+        const amount = prompt('💰 Введите сумму для пополнения (в Stars):', '100');
+        
+        if (!amount || isNaN(amount) || amount <= 0) {
+            alert('❌ Неверная сумма');
+            return;
+        }
+        
+        try {
+            const tg = window.Telegram?.WebApp;
+            
+            if (tg?.openInvoice) {
+                setTimeout(() => {
+                    const wallet = getWalletData();
+                    wallet.availableBalance += parseInt(amount);
+                    saveWalletData(wallet);
+                    
+                    addTransaction('deposit', parseInt(amount), 'Пополнение баланса');
+                    
+                    showNotification(`✅ Баланс пополнен на ${amount} Stars!`);
+                }, 1500);
+            } else {
+                const wallet = getWalletData();
+                wallet.availableBalance += parseInt(amount);
+                saveWalletData(wallet);
+                
+                addTransaction('deposit', parseInt(amount), 'Пополнение баланса (демо)');
+                
+                showNotification(`✅ Баланс пополнен на ${amount} Stars! (демо)`);
+            }
+        } catch (error) {
+            console.error('❌ Ошибка пополнения:', error);
+            alert('❌ Ошибка пополнения баланса');
+        }
+    }
+    
+    async function withdrawFunds() {
+        triggerHapticFeedback();
+        
+        const wallet = getWalletData();
+        
+        if (!wallet.connected) {
+            alert('❌ Сначала подключите Wallet');
+            return;
+        }
+        
+        if (wallet.availableBalance <= 0) {
+            alert('❌ Нет доступных средств для вывода');
+            return;
+        }
+        
+        const amount = prompt(`💸 Введите сумму для вывода (доступно: ${wallet.availableBalance} Stars):`, wallet.availableBalance);
+        
+        if (!amount || isNaN(amount) || amount <= 0 || amount > wallet.availableBalance) {
+            alert('❌ Неверная сумма');
+            return;
+        }
+        
+        if (!confirm(`⚠️ Подтвердите вывод ${amount} Stars на адрес ${wallet.walletAddress}?`)) {
+            return;
+        }
+        
+        try {
+            setTimeout(() => {
+                wallet.availableBalance -= parseInt(amount);
+                saveWalletData(wallet);
+                
+                addTransaction('withdrawal', parseInt(amount), 'Вывод средств');
+                
+                showNotification(`✅ Выведено ${amount} Stars!`);
+            }, 1500);
+        } catch (error) {
+            console.error('❌ Ошибка вывода:', error);
+            alert('❌ Ошибка вывода средств');
+        }
+    }
+    
+    function getGlobalDeals() {
+        return getLocalStorage('umeyka_global_deals') || [];
+    }
+    
+    function setGlobalDeals(deals) {
+        return setLocalStorage('umeyka_global_deals', deals);
+    }
+    
+    function getUserDeals(userId) {
+        const globalDeals = getGlobalDeals();
+        return globalDeals.filter(deal => deal.clientId === userId || deal.masterId === userId);
+    }
+    
+    function addGlobalDeal(deal) {
+        const globalDeals = getGlobalDeals();
+        globalDeals.push(deal);
+        setGlobalDeals(globalDeals);
+        return deal;
+    }
+    
+    function updateGlobalDeal(dealId, updates) {
+        const globalDeals = getGlobalDeals();
+        const dealIndex = globalDeals.findIndex(deal => deal.id === dealId);
+        
+        if (dealIndex !== -1) {
+            globalDeals[dealIndex] = { ...globalDeals[dealIndex], ...updates };
+            setGlobalDeals(globalDeals);
+            return globalDeals[dealIndex];
+        }
+        return null;
+    }
+    
+    function getDealById(dealId) {
+        const globalDeals = getGlobalDeals();
+        return globalDeals.find(deal => deal.id === dealId);
+    }
+    
+    function processPayment(dealId) {
+        const deal = getDealById(dealId);
+        if (!deal) return false;
+        
+        const wallet = getWalletData();
+        const totalAmount = deal.total;
+        
+        if (wallet.availableBalance < totalAmount) {
+            alert('❌ Недостаточно средств на балансе. Пополните кошелек.');
+            return false;
+        }
+        
+        wallet.availableBalance -= totalAmount;
+        wallet.frozenBalance += totalAmount;
+        saveWalletData(wallet);
+        
+        updateGlobalDeal(dealId, {
+            paymentStatus: 'paid',
+            escrowBalance: deal.amount,
+            commissionAmount: deal.commission,
+            paidAt: new Date().toISOString()
+        });
+        
+        addTransaction('payment', totalAmount, `Оплата сделки "${deal.title}"`, dealId);
+        addTransaction('commission', deal.commission, `Комиссия по сделке "${deal.title}"`, dealId);
+        
+        return true;
+    }
+    
+    function releasePayment(dealId) {
+        const deal = getDealById(dealId);
+        if (!deal || deal.paymentStatus !== 'paid') return false;
+        
+        const masterWallet = getOrCreateWallet(deal.masterId);
+        const systemWallet = getOrCreateWallet('system');
+        
+        const masterAmount = deal.amount * 0.95;
+        const commission = deal.amount * 0.05;
+        
+        const clientWallet = getWalletData();
+        clientWallet.frozenBalance -= deal.total;
+        saveWalletData(clientWallet);
+        
+        masterWallet.availableBalance += masterAmount;
+        masterWallet.totalEarned += masterAmount;
+        saveWalletData(masterWallet);
+        
+        systemWallet.availableBalance += commission;
+        systemWallet.totalCommission += commission;
+        saveWalletData(systemWallet);
+        
+        updateGlobalDeal(dealId, {
+            paymentStatus: 'released',
+            masterPayout: masterAmount,
+            releasedAt: new Date().toISOString()
+        });
+        
+        const masterTx = {
+            id: 'tx_' + Date.now(),
+            type: 'payout',
+            amount: masterAmount,
+            description: `Выплата по сделке "${deal.title}"`,
+            dealId: dealId,
+            timestamp: new Date().toISOString(),
+            status: 'completed'
+        };
+        
+        const masterData = getLocalStorage(`wallet_${deal.masterId}`) || {};
+        masterData.transactions = masterData.transactions || [];
+        masterData.transactions.unshift(masterTx);
+        setLocalStorage(`wallet_${deal.masterId}`, masterData);
+        
+        return true;
+    }
+    
+    function getOrCreateWallet(userId) {
+        let wallet = getLocalStorage(`wallet_${userId}`);
+        if (!wallet) {
+            wallet = {
+                connected: false,
+                walletAddress: null,
+                availableBalance: 0,
+                frozenBalance: 0,
+                totalEarned: 0,
+                totalCommission: 0,
+                transactions: []
+            };
+            setLocalStorage(`wallet_${userId}`, wallet);
+        }
+        return wallet;
+    }
+    
+    window.payForDeal = function(dealId) {
+        triggerHapticFeedback();
+        
+        const deal = getDealById(dealId);
+        if (!deal) {
+            alert('❌ Сделка не найдена');
+            return;
+        }
+        
+        if (deal.paymentStatus === 'paid') {
+            alert('❌ Сделка уже оплачена');
+            return;
+        }
+        
+        const wallet = getWalletData();
+        
+        if (!wallet.connected) {
+            alert('❌ Сначала подключите Telegram Wallet в личном кабинете');
+            return;
+        }
+        
+        pendingPaymentDealId = dealId;
+        document.getElementById('confirmDealTitle').textContent = deal.title;
+        document.getElementById('confirmDealAmount').textContent = deal.amount + ' ⭐';
+        document.getElementById('confirmDealCommission').textContent = deal.commission + ' ⭐';
+        document.getElementById('confirmDealTotal').textContent = deal.total + ' ⭐';
+        document.getElementById('paymentConfirmModal').style.display = 'flex';
+    };
+    
+    function confirmPayment() {
+        if (!pendingPaymentDealId) return;
+        
+        if (processPayment(pendingPaymentDealId)) {
+            showNotification('✅ Оплата прошла успешно! Деньги заморожены до завершения сделки.');
+            closePaymentConfirm();
+            loadDeals();
+            updateWalletUI();
+        }
+        
+        pendingPaymentDealId = null;
+    }
+    
+    function closePaymentConfirm() {
+        document.getElementById('paymentConfirmModal').style.display = 'none';
+        pendingPaymentDealId = null;
+    }
+    
+    // ========== ФУНКЦИИ ДЛЯ QR-КОДОВ ==========
+    
+    window.showQRModal = function(skillId, skillName) {
+        triggerHapticFeedback();
+        
+        currentQRSkillId = skillId;
+        currentQRSkillName = skillName;
+        
+        const skill = globalSkillsCache.find(s => s._id === skillId);
+        if (!skill) {
+            alert('❌ Умейка не найдена');
+            return;
+        }
+        
+        document.getElementById('qrModalTitle').textContent = skillName;
+        
+        const container = document.getElementById('qrCodeContainer');
+        container.innerHTML = '';
+        
+        const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
+        new QRCode(container, {
+            text: qrData,
+            width: 250,
+            height: 250,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        
+        document.getElementById('qrModal').classList.add('active');
+    };
+    
+    window.closeQRModal = function() {
+        triggerHapticFeedback();
+        document.getElementById('qrModal').classList.remove('active');
+        currentQRSkillId = null;
+        currentQRSkillName = null;
+    };
+    
+    window.shareQRCode = function() {
+        triggerHapticFeedback();
+        
+        if (!currentQRSkillId || !currentQRSkillName) return;
+        
+        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: currentQRSkillName,
+                text: shareText,
+                url: `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`
+            }).catch(err => console.log('Share canceled'));
+        } else {
+            navigator.clipboard.writeText(shareText).then(() => {
+                showNotification('✅ Ссылка скопирована в буфер обмена!');
+            }).catch(() => {
+                alert('Ссылка: ' + `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`);
+            });
+        }
+    };
     
     // ========== ФУНКЦИИ ДЛЯ СЖАТИЯ ИЗОБРАЖЕНИЙ ==========
     
@@ -5075,7 +5574,7 @@
         statusElement.style.display = 'none';
     };
     
-    // ========== ДОБАВЛЕНИЕ УМЕЙКИ ==========
+    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ УМЕЙКИ ==========
     
     window.addSkill = async function() {
         triggerHapticFeedback();
@@ -5137,74 +5636,92 @@
                 skillData.photoTimestamp = new Date().toISOString();
             }
             
-            showGlobalLoading();
+            showLoadingIndicator();
             
-            const response = await fetch(`${API_URL}/api/skills`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(skillData)
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                await refreshGlobalSkills();
+            try {
+                const response = await fetch(`${API_URL}/api/skills`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(skillData)
+                });
                 
-                alert('✅ Умейка успешно опубликована!');
-                
-                const currentSelected = getVisitkaSelectedSkills();
-                if (!currentSelected.includes(result.skill._id)) {
-                    currentSelected.push(result.skill._id);
-                    saveVisitkaSelectedSkills(currentSelected);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
-                document.getElementById('skillName').value = '';
-                document.getElementById('skillCategory').value = '';
-                document.getElementById('skillDetails').value = '';
-                document.getElementById('skillExperience').value = '';
-                document.getElementById('skillPrice').value = '';
-                document.getElementById('skillCity').value = '';
-                removeSkillPhoto();
-                currentSkillPhoto = null;
-                currentRadius = 10;
-                selectRadius(10);
-                currentMasterStatus = 'ready';
-                selectMasterStatus('ready');
+                const result = await response.json();
                 
-                await loadMySkills();
-                await loadProfileSkills();
-                
-                if (map) {
-                    setTimeout(() => loadSkillsOnMap(), 500);
+                if (result.success) {
+                    // Обновляем кэш с сервера
+                    await refreshSkillsCache();
+                    
+                    showNotification('✅ Умейка успешно опубликована!');
+                    
+                    // Обновляем выбранные умейки для визитки
+                    const currentSelected = getVisitkaSelectedSkills();
+                    if (result.skill && !currentSelected.includes(result.skill._id)) {
+                        currentSelected.push(result.skill._id);
+                        saveVisitkaSelectedSkills(currentSelected);
+                    }
+                    
+                    // Очищаем форму
+                    document.getElementById('skillName').value = '';
+                    document.getElementById('skillCategory').value = '';
+                    document.getElementById('skillDetails').value = '';
+                    document.getElementById('skillExperience').value = '';
+                    document.getElementById('skillPrice').value = '';
+                    document.getElementById('skillCity').value = '';
+                    removeSkillPhoto();
+                    currentSkillPhoto = null;
+                    currentRadius = 10;
+                    selectRadius(10);
+                    currentMasterStatus = 'ready';
+                    selectMasterStatus('ready');
+                    
+                    // Обновляем отображения
+                    await loadMySkills();
+                    await loadProfileSkills();
+                    
+                    if (map) {
+                        setTimeout(() => loadSkillsOnMap(), 1000);
+                    }
+                } else {
+                    throw new Error(result.error || 'Ошибка сервера');
                 }
-            } else {
-                throw new Error(result.error || 'Ошибка сервера');
+                
+            } catch (serverError) {
+                console.error('❌ Ошибка сервера:', serverError);
+                showNotification('❌ Сервер недоступен. Попробуйте позже.', 3000);
+                alert('❌ Не удалось опубликовать умейку. Проверьте подключение к интернету.');
+            } finally {
+                hideLoadingIndicator();
             }
             
         } catch (error) {
-            console.error('❌ Ошибка добавления умейки:', error);
-            alert(`❌ Ошибка добавления умейки: ${error.message}. Проверьте подключение к интернету.`);
-        } finally {
-            hideGlobalLoading();
+            hideLoadingIndicator();
+            console.error('Ошибка добавления умейки:', error);
+            alert('❌ Ошибка добавления умейки: ' + error.message);
         }
     };
     
-    // ========== ЗАГРУЗКА УМЕЕК ПОЛЬЗОВАТЕЛЯ ==========
+    // ========== ФУНКЦИИ ДЛЯ ЗАГРУЗКИ УМЕЕК ПОЛЬЗОВАТЕЛЯ ==========
     
     async function loadMySkills() {
         try {
+            console.log('📡 Загрузка моих умейок...');
+            
             const skillsList = document.getElementById('mySkillsList');
-            if (!skillsList) return;
+            if (!skillsList) {
+                console.error('❌ Элемент mySkillsList не найден');
+                return;
+            }
             
-            skillsList.innerHTML = '<div class="loading">⏳ Загрузка ваших умейок...</div>';
+            skillsList.innerHTML = '<div class="loading"><div class="loading-spinner"></div> ⏳ Загрузка ваших умейок...</div>';
             
-            const mySkills = await loadUserSkillsFromServer(currentUserId);
+            const allSkills = await getGlobalSkills(true);
+            const mySkills = allSkills.filter(s => s.userId === currentUserId);
             
             if (mySkills.length > 0) {
                 skillsList.innerHTML = mySkills.map(skill => {
@@ -5280,7 +5797,12 @@
             console.error('❌ Ошибка загрузки умейок:', error);
             const skillsList = document.getElementById('mySkillsList');
             if (skillsList) {
-                skillsList.innerHTML = `<div class="error-message">❌ Ошибка загрузки: ${error.message}</div>`;
+                skillsList.innerHTML = `
+                    <div class="error-message">
+                        ❌ Ошибка загрузки умейок<br>
+                        <small>${error.message}</small>
+                    </div>
+                `;
             }
         }
     }
@@ -5290,7 +5812,8 @@
             if (!currentUserId) return;
             
             const skillsList = document.getElementById('profileSkillsList');
-            const mySkills = await loadUserSkillsFromServer(currentUserId);
+            const allSkills = await getGlobalSkills(true);
+            const mySkills = allSkills.filter(s => s.userId === currentUserId);
             
             if (mySkills.length > 0) {
                 skillsList.innerHTML = mySkills.map(skill => {
@@ -5356,7 +5879,9 @@
         triggerHapticFeedback();
         
         try {
-            const skill = await getSkillByIdFromServer(skillId);
+            // Загружаем свежие данные
+            await getGlobalSkills(true);
+            let skill = globalSkillsCache.find(s => s._id === skillId);
             
             if (!skill) {
                 alert('❌ Умейка не найдена');
@@ -5472,7 +5997,7 @@
                 skillData.photoTimestamp = new Date().toISOString();
             }
             
-            showGlobalLoading();
+            showLoadingIndicator();
             
             const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                 method: 'PUT',
@@ -5482,73 +6007,69 @@
                 body: JSON.stringify(skillData)
             });
             
-            if (!response.ok) {
+            hideLoadingIndicator();
+            
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success) {
+                    // Обновляем кэш
+                    await refreshSkillsCache();
+                    showNotification('✅ Умейка успешно обновлена!');
+                    closeEditSkillModal();
+                    
+                    await loadMySkills();
+                    await loadProfileSkills();
+                    
+                    if (map) {
+                        await loadSkillsOnMap();
+                    }
+                } else {
+                    throw new Error(result.error || 'Ошибка сервера');
+                }
+            } else {
                 throw new Error(`HTTP ${response.status}`);
             }
             
-            const result = await response.json();
-            
-            if (result.success) {
-                await refreshGlobalSkills();
-                
-                alert('✅ Умейка успешно обновлена!');
-                closeEditSkillModal();
-                
-                await loadMySkills();
-                await loadProfileSkills();
-                
-                if (map) {
-                    await loadSkillsOnMap();
-                }
-            } else {
-                throw new Error(result.error || 'Ошибка сервера');
-            }
-            
         } catch (error) {
+            hideLoadingIndicator();
             console.error('❌ Ошибка сохранения умейки:', error);
-            alert(`❌ Ошибка сохранения умейки: ${error.message}`);
-        } finally {
-            hideGlobalLoading();
+            alert('❌ Ошибка сохранения умейки: ' + error.message);
         }
     };
     
     window.deleteSkill = async function(skillId) {
         triggerHapticFeedback();
         
-        if (!confirm('❌ Удалить эту умейку?')) return;
-        
-        try {
-            showGlobalLoading();
-            
-            const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
-                method: 'DELETE'
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                await refreshGlobalSkills();
-                await loadMySkills();
-                await loadProfileSkills();
+        if (confirm('❌ Удалить эту умейку?')) {
+            try {
+                showLoadingIndicator();
                 
-                if (map) {
-                    await loadSkillsOnMap();
+                const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
+                    method: 'DELETE'
+                });
+                
+                hideLoadingIndicator();
+                
+                if (response.ok) {
+                    // Обновляем кэш
+                    await refreshSkillsCache();
+                    
+                    showNotification('✅ Умейка удалена!');
+                    await loadMySkills();
+                    await loadProfileSkills();
+                    
+                    if (map) {
+                        await loadSkillsOnMap();
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
-                alert('✅ Умейка удалена!');
-            } else {
-                throw new Error(result.error || 'Ошибка сервера');
+            } catch (error) {
+                hideLoadingIndicator();
+                console.error('❌ Ошибка удаления умейки:', error);
+                alert('❌ Ошибка удаления умейки: ' + error.message);
             }
-            
-        } catch (error) {
-            console.error('❌ Ошибка удаления умейки:', error);
-            alert(`❌ Ошибка удаления умейки: ${error.message}`);
-        } finally {
-            hideGlobalLoading();
         }
     };
     
@@ -5645,7 +6166,9 @@
     
     async function loadSkillsOnMap() {
         try {
-            const skills = await getGlobalSkills();
+            console.log('🗺️ Загрузка умейок на карту');
+            
+            const skills = await getGlobalSkills(true);
             
             if (markers.length > 0) {
                 markers.forEach(marker => map.removeLayer(marker));
@@ -5790,7 +6313,7 @@
         }
     }
     
-    // ========== НАВИГАЦИЯ ==========
+    // ========== ФУНКЦИИ ДЛЯ НАВИГАЦИИ ==========
     
     window.showMainScreen = function() {
         triggerHapticFeedback();
@@ -5867,7 +6390,7 @@
         checkReviewEligibility();
     };
     
-    // ========== ПРОФИЛЬ ==========
+    // ========== ФУНКЦИИ ДЛЯ ПРОФИЛЯ ==========
     
     function loadUserProfile() {
         const userData = getOrCreateUserProfile(currentUserId);
@@ -5972,7 +6495,29 @@
         
         setLocalStorage(`user_${currentUserId}`, userData);
         
-        alert('✅ Профиль сохранен!');
+        // Обновляем username во всех умейках пользователя на сервере
+        const updateUsername = async () => {
+            const skills = await getGlobalSkills(true);
+            const userSkills = skills.filter(s => s.userId === currentUserId);
+            
+            for (const skill of userSkills) {
+                try {
+                    await fetch(`${API_URL}/api/skills/${skill._id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...skill, username: firstName })
+                    });
+                } catch (error) {
+                    console.error('Ошибка обновления имени в умейке:', error);
+                }
+            }
+            
+            await refreshSkillsCache();
+        };
+        
+        updateUsername();
+        
+        showNotification('✅ Профиль сохранен!');
         
         showProfileSection();
         loadUserProfile();
@@ -6058,47 +6603,10 @@
         }
     };
     
-    // ========== СДЕЛКИ ==========
+    // ========== ФУНКЦИИ ДЛЯ СДЕЛОК ==========
     
     function generateDealId() {
         return 'deal_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
-    
-    function getGlobalDeals() {
-        return getLocalStorage('umeyka_global_deals') || [];
-    }
-    
-    function setGlobalDeals(deals) {
-        return setLocalStorage('umeyka_global_deals', deals);
-    }
-    
-    function getUserDeals(userId) {
-        const globalDeals = getGlobalDeals();
-        return globalDeals.filter(deal => deal.clientId === userId || deal.masterId === userId);
-    }
-    
-    function addGlobalDeal(deal) {
-        const globalDeals = getGlobalDeals();
-        globalDeals.push(deal);
-        setGlobalDeals(globalDeals);
-        return deal;
-    }
-    
-    function updateGlobalDeal(dealId, updates) {
-        const globalDeals = getGlobalDeals();
-        const dealIndex = globalDeals.findIndex(deal => deal.id === dealId);
-        
-        if (dealIndex !== -1) {
-            globalDeals[dealIndex] = { ...globalDeals[dealIndex], ...updates };
-            setGlobalDeals(globalDeals);
-            return globalDeals[dealIndex];
-        }
-        return null;
-    }
-    
-    function getDealById(dealId) {
-        const globalDeals = getGlobalDeals();
-        return globalDeals.find(deal => deal.id === dealId);
     }
     
     function loadDeals() {
@@ -6354,231 +6862,6 @@
             alert('❌ Ошибка подписи сделки: ' + error.message);
         }
     };
-    
-    function getWalletData() {
-        const data = getLocalStorage(`wallet_${currentUserId}`);
-        return data || {
-            connected: false,
-            walletAddress: null,
-            availableBalance: 0,
-            frozenBalance: 0,
-            totalEarned: 0,
-            totalCommission: 0,
-            transactions: []
-        };
-    }
-    
-    function saveWalletData(data) {
-        setLocalStorage(`wallet_${currentUserId}`, data);
-        updateWalletUI();
-    }
-    
-    function addTransaction(type, amount, description, dealId = null) {
-        const wallet = getWalletData();
-        const transaction = {
-            id: 'tx_' + Date.now(),
-            type: type,
-            amount: amount,
-            description: description,
-            dealId: dealId,
-            timestamp: new Date().toISOString(),
-            status: 'completed'
-        };
-        
-        wallet.transactions.unshift(transaction);
-        saveWalletData(wallet);
-        
-        return transaction;
-    }
-    
-    function updateWalletUI() {
-        const wallet = getWalletData();
-        
-        document.getElementById('availableBalance').textContent = wallet.availableBalance + ' ⭐';
-        document.getElementById('frozenBalance').textContent = wallet.frozenBalance + ' ⭐';
-        document.getElementById('totalEarned').textContent = wallet.totalEarned + ' ⭐';
-        document.getElementById('totalCommission').textContent = wallet.totalCommission + ' ⭐';
-        
-        const walletStatus = document.getElementById('walletStatus');
-        if (wallet.connected) {
-            walletStatus.className = 'wallet-connected';
-            walletStatus.innerHTML = `<span>🟢</span><span>Wallet подключен: ${wallet.walletAddress?.slice(0, 6)}...${wallet.walletAddress?.slice(-4)}</span>`;
-            document.getElementById('withdrawButton').style.display = 'flex';
-        } else {
-            walletStatus.className = 'wallet-disconnected';
-            walletStatus.innerHTML = `<span>🔴</span><span>Telegram Wallet не подключен</span>`;
-            document.getElementById('withdrawButton').style.display = 'none';
-        }
-        
-        renderTransactionHistory(wallet.transactions);
-    }
-    
-    function renderTransactionHistory(transactions) {
-        const container = document.getElementById('transactionHistory');
-        
-        if (!transactions || transactions.length === 0) {
-            container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">История операций пуста</div>';
-            return;
-        }
-        
-        container.innerHTML = transactions.slice(0, 10).map(tx => {
-            const isIncome = tx.type === 'deposit' || tx.type === 'payout' || tx.type === 'refund';
-            const isCommission = tx.type === 'commission';
-            const amountClass = isIncome ? 'positive' : 'negative';
-            const icon = isIncome ? '💰' : (isCommission ? '💸' : '💳');
-            
-            return `
-                <div class="transaction-item ${isIncome ? 'income' : (isCommission ? 'commission' : 'expense')}">
-                    <div class="transaction-info">
-                        <div class="transaction-title">${icon} ${tx.description}</div>
-                        <div class="transaction-date">${new Date(tx.timestamp).toLocaleDateString('ru-RU')}</div>
-                    </div>
-                    <div class="transaction-amount ${amountClass}">
-                        ${isIncome ? '+' : '-'}${tx.amount} ⭐
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-    
-    function processPayment(dealId) {
-        const deal = getDealById(dealId);
-        if (!deal) return false;
-        
-        const wallet = getWalletData();
-        const totalAmount = deal.total;
-        
-        if (wallet.availableBalance < totalAmount) {
-            alert('❌ Недостаточно средств на балансе. Пополните кошелек.');
-            return false;
-        }
-        
-        wallet.availableBalance -= totalAmount;
-        wallet.frozenBalance += totalAmount;
-        saveWalletData(wallet);
-        
-        updateGlobalDeal(dealId, {
-            paymentStatus: 'paid',
-            escrowBalance: deal.amount,
-            commissionAmount: deal.commission,
-            paidAt: new Date().toISOString()
-        });
-        
-        addTransaction('payment', totalAmount, `Оплата сделки "${deal.title}"`, dealId);
-        addTransaction('commission', deal.commission, `Комиссия по сделке "${deal.title}"`, dealId);
-        
-        return true;
-    }
-    
-    function releasePayment(dealId) {
-        const deal = getDealById(dealId);
-        if (!deal || deal.paymentStatus !== 'paid') return false;
-        
-        const masterWallet = getOrCreateWallet(deal.masterId);
-        const systemWallet = getOrCreateWallet('system');
-        
-        const masterAmount = deal.amount * 0.95;
-        const commission = deal.amount * 0.05;
-        
-        const clientWallet = getWalletData();
-        clientWallet.frozenBalance -= deal.total;
-        saveWalletData(clientWallet);
-        
-        masterWallet.availableBalance += masterAmount;
-        masterWallet.totalEarned += masterAmount;
-        saveWalletData(masterWallet);
-        
-        systemWallet.availableBalance += commission;
-        systemWallet.totalCommission += commission;
-        saveWalletData(systemWallet);
-        
-        updateGlobalDeal(dealId, {
-            paymentStatus: 'released',
-            masterPayout: masterAmount,
-            releasedAt: new Date().toISOString()
-        });
-        
-        const masterTx = {
-            id: 'tx_' + Date.now(),
-            type: 'payout',
-            amount: masterAmount,
-            description: `Выплата по сделке "${deal.title}"`,
-            dealId: dealId,
-            timestamp: new Date().toISOString(),
-            status: 'completed'
-        };
-        
-        const masterData = getLocalStorage(`wallet_${deal.masterId}`) || {};
-        masterData.transactions = masterData.transactions || [];
-        masterData.transactions.unshift(masterTx);
-        setLocalStorage(`wallet_${deal.masterId}`, masterData);
-        
-        return true;
-    }
-    
-    function getOrCreateWallet(userId) {
-        let wallet = getLocalStorage(`wallet_${userId}`);
-        if (!wallet) {
-            wallet = {
-                connected: false,
-                walletAddress: null,
-                availableBalance: 0,
-                frozenBalance: 0,
-                totalEarned: 0,
-                totalCommission: 0,
-                transactions: []
-            };
-            setLocalStorage(`wallet_${userId}`, wallet);
-        }
-        return wallet;
-    }
-    
-    window.payForDeal = function(dealId) {
-        triggerHapticFeedback();
-        
-        const deal = getDealById(dealId);
-        if (!deal) {
-            alert('❌ Сделка не найдена');
-            return;
-        }
-        
-        if (deal.paymentStatus === 'paid') {
-            alert('❌ Сделка уже оплачена');
-            return;
-        }
-        
-        const wallet = getWalletData();
-        
-        if (!wallet.connected) {
-            alert('❌ Сначала подключите Telegram Wallet в личном кабинете');
-            return;
-        }
-        
-        pendingPaymentDealId = dealId;
-        document.getElementById('confirmDealTitle').textContent = deal.title;
-        document.getElementById('confirmDealAmount').textContent = deal.amount + ' ⭐';
-        document.getElementById('confirmDealCommission').textContent = deal.commission + ' ⭐';
-        document.getElementById('confirmDealTotal').textContent = deal.total + ' ⭐';
-        document.getElementById('paymentConfirmModal').style.display = 'flex';
-    };
-    
-    function confirmPayment() {
-        if (!pendingPaymentDealId) return;
-        
-        if (processPayment(pendingPaymentDealId)) {
-            showNotification('✅ Оплата прошла успешно! Деньги заморожены до завершения сделки.');
-            closePaymentConfirm();
-            loadDeals();
-            updateWalletUI();
-        }
-        
-        pendingPaymentDealId = null;
-    }
-    
-    function closePaymentConfirm() {
-        document.getElementById('paymentConfirmModal').style.display = 'none';
-        pendingPaymentDealId = null;
-    }
     
     window.completeDeal = function(dealId) {
         triggerHapticFeedback();
@@ -7100,173 +7383,6 @@
         setLocalStorage(`coins_${currentUserId}`, coins);
     }
     
-    async function connectWallet() {
-        triggerHapticFeedback();
-        
-        try {
-            const tg = window.Telegram?.WebApp;
-            
-            if (!tg) {
-                alert('❌ Telegram Web App не доступен');
-                return;
-            }
-            
-            if (tg.openInvoice) {
-                const wallet = getWalletData();
-                wallet.connected = true;
-                wallet.walletAddress = 'EQ' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                saveWalletData(wallet);
-                
-                showNotification('✅ Wallet успешно подключен!');
-                
-                setTimeout(() => {
-                    if (confirm('💰 Хотите пополнить баланс?')) {
-                        depositFunds();
-                    }
-                }, 500);
-            } else {
-                alert('❌ Telegram Wallet не поддерживается в вашей версии приложения');
-            }
-        } catch (error) {
-            console.error('❌ Ошибка подключения кошелька:', error);
-            alert('❌ Ошибка подключения кошелька');
-        }
-    }
-    
-    async function depositFunds() {
-        triggerHapticFeedback();
-        
-        const amount = prompt('💰 Введите сумму для пополнения (в Stars):', '100');
-        
-        if (!amount || isNaN(amount) || amount <= 0) {
-            alert('❌ Неверная сумма');
-            return;
-        }
-        
-        try {
-            const tg = window.Telegram?.WebApp;
-            
-            if (tg?.openInvoice) {
-                setTimeout(() => {
-                    const wallet = getWalletData();
-                    wallet.availableBalance += parseInt(amount);
-                    saveWalletData(wallet);
-                    
-                    addTransaction('deposit', parseInt(amount), 'Пополнение баланса');
-                    
-                    showNotification(`✅ Баланс пополнен на ${amount} Stars!`);
-                }, 1500);
-            } else {
-                const wallet = getWalletData();
-                wallet.availableBalance += parseInt(amount);
-                saveWalletData(wallet);
-                
-                addTransaction('deposit', parseInt(amount), 'Пополнение баланса (демо)');
-                
-                showNotification(`✅ Баланс пополнен на ${amount} Stars! (демо)`);
-            }
-        } catch (error) {
-            console.error('❌ Ошибка пополнения:', error);
-            alert('❌ Ошибка пополнения баланса');
-        }
-    }
-    
-    async function withdrawFunds() {
-        triggerHapticFeedback();
-        
-        const wallet = getWalletData();
-        
-        if (!wallet.connected) {
-            alert('❌ Сначала подключите Wallet');
-            return;
-        }
-        
-        if (wallet.availableBalance <= 0) {
-            alert('❌ Нет доступных средств для вывода');
-            return;
-        }
-        
-        const amount = prompt(`💸 Введите сумму для вывода (доступно: ${wallet.availableBalance} Stars):`, wallet.availableBalance);
-        
-        if (!amount || isNaN(amount) || amount <= 0 || amount > wallet.availableBalance) {
-            alert('❌ Неверная сумма');
-            return;
-        }
-        
-        if (!confirm(`⚠️ Подтвердите вывод ${amount} Stars на адрес ${wallet.walletAddress}?`)) {
-            return;
-        }
-        
-        try {
-            setTimeout(() => {
-                wallet.availableBalance -= parseInt(amount);
-                saveWalletData(wallet);
-                
-                addTransaction('withdrawal', parseInt(amount), 'Вывод средств');
-                
-                showNotification(`✅ Выведено ${amount} Stars!`);
-            }, 1500);
-        } catch (error) {
-            console.error('❌ Ошибка вывода:', error);
-            alert('❌ Ошибка вывода средств');
-        }
-    }
-    
-    // ========== QR-КОДЫ ==========
-    
-    window.showQRModal = function(skillId, skillName) {
-        triggerHapticFeedback();
-        
-        currentQRSkillId = skillId;
-        currentQRSkillName = skillName;
-        
-        document.getElementById('qrModalTitle').textContent = skillName;
-        
-        const container = document.getElementById('qrCodeContainer');
-        container.innerHTML = '';
-        
-        const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
-        new QRCode(container, {
-            text: qrData,
-            width: 250,
-            height: 250,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
-        });
-        
-        document.getElementById('qrModal').classList.add('active');
-    };
-    
-    window.closeQRModal = function() {
-        triggerHapticFeedback();
-        document.getElementById('qrModal').classList.remove('active');
-        currentQRSkillId = null;
-        currentQRSkillName = null;
-    };
-    
-    window.shareQRCode = function() {
-        triggerHapticFeedback();
-        
-        if (!currentQRSkillId || !currentQRSkillName) return;
-        
-        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`;
-        
-        if (navigator.share) {
-            navigator.share({
-                title: currentQRSkillName,
-                text: shareText,
-                url: `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`
-            }).catch(err => console.log('Share canceled'));
-        } else {
-            navigator.clipboard.writeText(shareText).then(() => {
-                showNotification('✅ Ссылка скопирована в буфер обмена!');
-            }).catch(() => {
-                alert('Ссылка: ' + `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`);
-            });
-        }
-    };
-    
     // ========== КАТЕГОРИИ ДЛЯ АРХИВА ==========
     
     const skillCategories = [
@@ -7342,13 +7458,18 @@
         resultsContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div> Поиск мастеров по категории "' + originalCategory + '"...</div>';
         resultsContainer.style.display = 'block';
         
+        // Загружаем свежие данные с сервера
         const allGlobalSkills = await getGlobalSkills(true);
+        
+        console.log(`📊 Всего умейок: ${allGlobalSkills.length}`);
         
         let filteredSkills = allGlobalSkills.filter(skill => {
             if (!skill.category) return false;
             const skillCategoryClean = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
             return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
         });
+        
+        console.log(`📊 Найдено умейок в категории "${cleanCategory}": ${filteredSkills.length}`);
         
         const uniqueSkills = [];
         const seenIds = new Set();
@@ -7487,7 +7608,7 @@
         showNotification(`🗺️ Показано на карте: ${title}`);
     };
     
-    // ========== КОНТАКТЫ ==========
+    // ========== ФУНКЦИИ ДЛЯ КОНТАКТОВ ==========
     
     window.openContactModal = function(skillId, skillName, username, phone, telegram) {
         triggerHapticFeedback();
@@ -7551,7 +7672,7 @@
         });
     };
     
-    // ========== ОТЗЫВЫ О ПРОЕКТЕ ==========
+    // ========== ФУНКЦИИ ДЛЯ ОТЗЫВОВ О ПРОЕКТЕ ==========
     
     function getProjectReviews() {
         return getLocalStorage('umeyka_project_reviews') || [];
@@ -7567,6 +7688,9 @@
     function calculateProjectStats() {
         const reviews = getProjectReviews();
         const globalDeals = getGlobalDeals();
+        const allSkills = globalSkillsCache;
+        
+        const uniqueMasters = new Set(allSkills.map(s => s.userId)).size;
         
         const dealsCount = globalDeals.length;
         
@@ -7583,7 +7707,7 @@
             : 0;
         
         return {
-            mastersCount: Math.floor(Math.random() * 500) + 500,
+            mastersCount: uniqueMasters || Math.floor(Math.random() * 500) + 500,
             dealsCount: dealsCount || Math.floor(Math.random() * 1000) + 1000,
             averageRating: averageRating || 4.9,
             satisfactionRate: satisfactionRate || 98,
@@ -7745,6 +7869,7 @@
         logoHeader.addEventListener('click', (e) => {
             e.stopPropagation();
             logoClickCount++;
+            console.log(`[Admin] Клик по логотипу: ${logoClickCount}/6`);
             
             if (logoClickTimer) clearTimeout(logoClickTimer);
             
@@ -7761,6 +7886,7 @@
     }
     
     function openAdminPanel() {
+        console.log('🔓 Открытие админ-панели (6 кликов)');
         const adminUrl = 'umeyka-admin.html';
         window.open(adminUrl, '_blank');
     }
@@ -7768,36 +7894,44 @@
     // ========== ОПРЕДЕЛЕНИЕ USER ID ==========
     
     function checkAndSetUserId() {
+        console.log('🔍 Проверка User ID...');
+        
         const tg = window.Telegram?.WebApp;
         if (tg && tg.initDataUnsafe?.user) {
             const user = tg.initDataUnsafe.user;
             currentUserId = user.id.toString();
+            console.log('✅ User ID из Telegram:', currentUserId);
         } else {
-            const savedId = getLocalStorage('umeyka_user_id');
-            if (savedId) {
-                currentUserId = savedId;
-            } else {
+            if (!currentUserId || currentUserId === 'null' || currentUserId === 'undefined') {
                 currentUserId = 'user_' + Math.random().toString(36).substr(2, 9);
+                console.log('🆔 Создан новый User ID:', currentUserId);
+            } else {
+                console.log('📌 Используем существующий User ID:', currentUserId);
             }
         }
         
         if (currentUserId) {
-            setLocalStorage('umeyka_user_id', currentUserId);
+            localStorage.setItem('umeyka_user_id', currentUserId);
         }
         
         return currentUserId;
     }
     
     function processReferralLink() {
+        console.log('🎁 Обработка реферальной ссылки...');
+        
         try {
             const urlParams = new URLSearchParams(window.location.search);
             let referrerId = urlParams.get('ref') || urlParams.get('start');
             
             if (referrerId && (referrerId.startsWith('skill_') || referrerId.startsWith('user_'))) {
+                console.log('🎁 Это ссылка на умейку или визитку, а не реферальная');
                 return;
             }
             
             if (referrerId && /^\d+$/.test(referrerId)) {
+                console.log(`🎁 Найден реферер с ID: ${referrerId}`);
+                
                 if (currentUserId && referrerId !== currentUserId) {
                     const referralData = getReferralData();
                     
@@ -7842,9 +7976,9 @@
         
         currentUserId = checkAndSetUserId();
         
-        showGlobalLoading();
-        await refreshGlobalSkills();
-        hideGlobalLoading();
+        showLoadingIndicator();
+        await getGlobalSkills(true);
+        hideLoadingIndicator();
         
         processReferralLink();
         handleDeepLink();
