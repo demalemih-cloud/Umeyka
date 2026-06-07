@@ -30,7 +30,39 @@
             height: 100%;
             overflow-y: auto;
             overflow-x: hidden;
-            background: linear-gradient(135deg, #1e3a5f 0%, #0f2b4d 100%;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f2b4d 100%);
+            position: relative;
+        }
+        
+        /* Свайп-индикатор (язычок) */
+        .swipe-handle {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px 0 0 3px;
+            transition: all 0.3s ease;
+            z-index: 2000;
+            pointer-events: none;
+            opacity: 0;
+        }
+        
+        .swipe-handle.visible {
+            opacity: 0.6;
+        }
+        
+        .swipe-handle.active {
+            background: rgba(255, 255, 255, 0.8);
+            width: 8px;
+            opacity: 0.9;
+        }
+        
+        /* Анимации для свайпа */
+        .swipe-transition {
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
         
         /* Стили для индикатора загрузки */
@@ -50,6 +82,28 @@
             to { transform: rotate(360deg); }
         }
         
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeOutDown {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+        }
+        
         .offline-badge {
             background: #f56565;
             color: white;
@@ -58,85 +112,6 @@
             font-size: 10px;
             font-weight: bold;
             margin-left: 8px;
-        }
-        
-        /* Стиль для индикатора свайпа */
-        .swipe-indicator {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            padding: 12px 24px;
-            border-radius: 40px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            z-index: 10000;
-            pointer-events: none;
-            animation: swipeFadeOut 3s ease forwards;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            white-space: nowrap;
-        }
-        
-        @keyframes swipeFadeOut {
-            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            70% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); visibility: hidden; }
-        }
-        
-        /* Стиль для анимации свайпа */
-        .swipe-animation {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 64px;
-            z-index: 10001;
-            pointer-events: none;
-            animation: swipeArrow 0.5s ease forwards;
-        }
-        
-        @keyframes swipeArrow {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-            20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); visibility: hidden; }
-        }
-        
-        /* Анимация ухода секции при свайпе */
-        .section-swipe-out {
-            animation: slideOutLeft 0.3s ease forwards !important;
-        }
-        
-        @keyframes slideOutLeft {
-            0% { transform: translateX(0); opacity: 1; }
-            100% { transform: translateX(-100%); opacity: 0; visibility: hidden; }
-        }
-        
-        /* Подсказка вверху секции */
-        .swipe-hint {
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-            padding: 10px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 15px;
-            animation: hintFadeOut 3s ease forwards;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        @keyframes hintFadeOut {
-            0% { opacity: 1; }
-            70% { opacity: 1; }
-            100% { opacity: 0; visibility: hidden; height: 0; padding: 0; margin: 0; }
         }
         
         .qr-scanner-button {
@@ -536,6 +511,36 @@
             transform: translateY(-2px);
             border-color: #84cc16;
             box-shadow: 0 4px 15px rgba(132, 204, 22, 0.3);
+        }
+        
+        .back-button {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border: none;
+            color: white;
+            padding: 18px 30px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+            transition: all 0.3s ease;
+            width: 90%;
+            max-width: 300px;
+            margin: 0 auto 20px auto;
+            display: block;
+            position: relative;
+            left: auto;
+            top: auto;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.5);
+        }
+        
+        .back-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
         }
         
         .form-section {
@@ -2921,7 +2926,10 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="appContainer">
+        <!-- Свайп-индикатор (язычок) -->
+        <div class="swipe-handle" id="swipeHandle"></div>
+        
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
             <div class="header" id="logoHeader">
@@ -2978,9 +2986,8 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ МАСТЕРА -->
+        <!-- СЕКЦИЯ МАСТЕРА (без кнопки Назад) -->
         <div id="masterSection" class="section">
-            <div class="swipe-hint" id="masterSwipeHint">← Свайпните влево, чтобы вернуться</div>
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
                 
@@ -3104,9 +3111,8 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ КЛИЕНТА / АРХИВ -->
+        <!-- СЕКЦИЯ КЛИЕНТА / АРХИВ (без кнопки Назад) -->
         <div id="clientSection" class="section">
-            <div class="swipe-hint" id="clientSwipeHint">← Свайпните влево, чтобы вернуться</div>
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📚 Архив мастеров</h2>
                 
@@ -3115,10 +3121,8 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА -->
+        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА (без кнопки Назад) -->
         <div id="profileSection" class="section">
-            <div class="swipe-hint" id="profileSwipeHint">← Свайпните влево, чтобы вернуться</div>
-            
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
                 
@@ -3298,10 +3302,8 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ ФИНАНСОВ -->
+        <!-- СЕКЦИЯ ФИНАНСОВ (без кнопки Назад) -->
         <div id="financeSection" class="section">
-            <div class="swipe-hint" id="financeSwipeHint">← Свайпните влево, чтобы вернуться</div>
-            
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">💰 Мои финансы</h2>
                 
@@ -3352,10 +3354,8 @@
             </div>
         </div>
 
-        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ (без кнопки Назад) -->
         <div id="editProfileSection" class="section">
-            <div class="swipe-hint" id="editProfileSwipeHint">← Свайпните влево, чтобы вернуться</div>
-    
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
         
@@ -3377,10 +3377,8 @@
             </div>
         </div>
 
-        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
+        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ (без кнопки Назад) -->
         <div id="createDealSection" class="section">
-            <div class="swipe-hint" id="createDealSwipeHint">← Свайпните влево, чтобы вернуться</div>
-            
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📄 Создание сделки</h2>
                 
@@ -3436,10 +3434,8 @@
             </div>
         </div>
 
-        <!-- РАЗДЕЛ "О ПРОЕКТЕ" -->
+        <!-- РАЗДЕЛ "О ПРОЕКТЕ" (без кнопки Назад) -->
         <div id="aboutSection" class="section">
-            <div class="swipe-hint" id="aboutSwipeHint">← Свайпните влево, чтобы вернуться</div>
-            
             <div class="form-section">
                 <div class="about-section">
                     <div class="about-title">🤝 О проекте Ymeyka</div>
@@ -3866,117 +3862,164 @@
     let logoClickCount = 0;
     let logoClickTimer = null;
     let offlineMode = false;
+
+    // ========== ФУНКЦИИ ДЛЯ СВАЙП-НАВИГАЦИИ ==========
     
-    // ========== ПЕРЕМЕННЫЕ ДЛЯ СВАЙПА ==========
     let touchStartX = 0;
     let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
+    let touchStartTime = 0;
     let isSwiping = false;
-    let currentSectionId = null;
-
-    // ========== ФУНКЦИИ ДЛЯ СВАЙПА ==========
+    let currentActiveSection = null;
+    let swipeHandle = null;
+    let handleTimeout = null;
     
-    function initSwipeListeners() {
-        const sections = [
-            'masterSection', 'clientSection', 'profileSection', 
-            'financeSection', 'editProfileSection', 'createDealSection', 'aboutSection'
-        ];
+    function initSwipeNavigation() {
+        const container = document.getElementById('appContainer');
+        swipeHandle = document.getElementById('swipeHandle');
         
-        sections.forEach(sectionId => {
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.addEventListener('touchstart', handleTouchStart, { passive: false });
-                section.addEventListener('touchmove', handleTouchMove, { passive: false });
-                section.addEventListener('touchend', handleTouchEnd);
-            }
-        });
+        // Показываем язычок на мобильных устройствах
+        if (window.innerWidth <= 768) {
+            showSwipeHandleTemporarily();
+            
+            // Показываем язычок при входе в любой раздел (кроме главного)
+            const sections = ['masterSection', 'clientSection', 'profileSection', 'financeSection', 'editProfileSection', 'createDealSection', 'aboutSection'];
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const observer = new MutationObserver((mutations) => {
+                        mutations.forEach((mutation) => {
+                            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                                if (section.style.display === 'block') {
+                                    showSwipeHandleTemporarily();
+                                }
+                            }
+                        });
+                    });
+                    observer.observe(section, { attributes: true });
+                }
+            });
+        }
+        
+        container.addEventListener('touchstart', handleTouchStart, { passive: false });
+        container.addEventListener('touchmove', handleTouchMove, { passive: false });
+        container.addEventListener('touchend', handleTouchEnd);
+        
+        // Также добавляем для десктопов подсказку
+        const desktopHint = document.createElement('div');
+        desktopHint.style.cssText = `
+            position: fixed;
+            right: 10px;
+            bottom: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            z-index: 2000;
+            pointer-events: none;
+            backdrop-filter: blur(5px);
+            opacity: 0.7;
+        `;
+        desktopHint.innerHTML = '⬅️ Свайп от края для возврата';
+        if (window.innerWidth > 768) {
+            document.body.appendChild(desktopHint);
+            setTimeout(() => {
+                desktopHint.style.opacity = '0';
+                setTimeout(() => desktopHint.remove(), 1000);
+            }, 3000);
+        }
+    }
+    
+    function showSwipeHandleTemporarily() {
+        if (!swipeHandle) return;
+        swipeHandle.classList.add('visible');
+        if (handleTimeout) clearTimeout(handleTimeout);
+        handleTimeout = setTimeout(() => {
+            swipeHandle.classList.remove('visible');
+        }, 2000);
+    }
+    
+    function showSwipeHandleActive() {
+        if (!swipeHandle) return;
+        swipeHandle.classList.add('active');
+        setTimeout(() => {
+            swipeHandle.classList.remove('active');
+        }, 200);
     }
     
     function handleTouchStart(e) {
-        const section = e.currentTarget;
-        if (section.style.display !== 'block') return;
-        
         const touch = e.touches[0];
         touchStartX = touch.clientX;
         touchStartY = touch.clientY;
-        isSwiping = true;
-        currentSectionId = section.id;
+        touchStartTime = Date.now();
+        
+        // Проверяем, находится ли пользователь в одном из разделов (не на главном)
+        const sections = ['masterSection', 'clientSection', 'profileSection', 'financeSection', 'editProfileSection', 'createDealSection', 'aboutSection'];
+        for (const sectionId of sections) {
+            const section = document.getElementById(sectionId);
+            if (section && section.style.display === 'block') {
+                currentActiveSection = section;
+                break;
+            }
+        }
+        
+        if (currentActiveSection) {
+            showSwipeHandleActive();
+        }
     }
     
     function handleTouchMove(e) {
-        if (!isSwiping) return;
-        
-        const section = document.getElementById(currentSectionId);
-        if (!section || section.style.display !== 'block') {
-            isSwiping = false;
-            return;
-        }
+        if (!currentActiveSection) return;
         
         const touch = e.touches[0];
-        const deltaX = touch.clientX - touchStartX;
-        const deltaY = touch.clientY - touchStartY;
+        const deltaX = touchStartX - touch.clientX;
+        const deltaY = Math.abs(touchStartY - touch.clientY);
         
-        // Если вертикальное перемещение больше горизонтального, отменяем свайп (это скролл)
-        if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 10) {
-            isSwiping = false;
-            return;
-        }
-        
-        // Только левый свайп (отрицательное deltaX)
-        if (deltaX < -30) {
-            // Показываем визуальную индикацию при свайпе
-            const swipeArrow = document.createElement('div');
-            swipeArrow.className = 'swipe-animation';
-            swipeArrow.innerHTML = '←';
-            swipeArrow.style.left = '30%';
-            document.body.appendChild(swipeArrow);
-            setTimeout(() => swipeArrow.remove(), 500);
+        // Проверяем, что свайп горизонтальный и от правого края
+        if (deltaX > 20 && deltaY < 50 && touchStartX > window.innerWidth - 80) {
+            e.preventDefault();
+            isSwiping = true;
+            
+            // Визуальная обратная связь - небольшое смещение
+            const currentTransform = currentActiveSection.style.transform;
+            if (!currentTransform || currentTransform === 'none') {
+                currentActiveSection.style.transition = 'none';
+                currentActiveSection.style.transform = `translateX(-${Math.min(deltaX * 0.5, 60)}px)`;
+            }
         }
     }
     
     function handleTouchEnd(e) {
-        if (!isSwiping) return;
-        
-        const section = document.getElementById(currentSectionId);
-        if (!section || section.style.display !== 'block') {
+        if (!currentActiveSection) {
+            currentActiveSection = null;
             isSwiping = false;
             return;
         }
         
-        touchEndX = e.changedTouches[0].clientX;
-        touchEndY = e.changedTouches[0].clientY;
+        const touch = e.changedTouches[0];
+        const deltaX = touchStartX - touch.clientX;
+        const deltaY = Math.abs(touchStartY - touch.clientY);
+        const timeDiff = Date.now() - touchStartTime;
         
-        const deltaX = touchEndX - touchStartX;
-        const deltaY = touchEndY - touchStartY;
+        // Возвращаем исходное положение
+        currentActiveSection.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+        currentActiveSection.style.transform = '';
         
-        // Проверяем, что это горизонтальный свайп влево с порогом 50px
-        if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX < -50) {
-            e.preventDefault();
+        // Условие для свайпа: от правого края, горизонтально, достаточное расстояние
+        const isFromRightEdge = touchStartX > window.innerWidth - 60;
+        const isHorizontalSwipe = deltaY < 100;
+        const isValidSwipe = deltaX > 50 && timeDiff < 500;
+        
+        if (isSwiping && isFromRightEdge && isHorizontalSwipe && isValidSwipe) {
             triggerHapticFeedback();
-            
-            // Добавляем анимацию ухода секции
-            section.classList.add('section-swipe-out');
-            
-            setTimeout(() => {
-                showMainScreen();
-                section.classList.remove('section-swipe-out');
-            }, 300);
+            console.log('👆 Свайп вправо распознан, возврат на главный экран');
+            showMainScreen();
         }
         
+        currentActiveSection = null;
         isSwiping = false;
-        currentSectionId = null;
     }
-    
-    function addSwipeHint(sectionId, hintId) {
-        const hint = document.getElementById(hintId);
-        if (hint) {
-            setTimeout(() => {
-                hint.style.display = 'flex';
-            }, 100);
-        }
-    }
-    
+
     // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ХРАНИЛИЩЕМ И КЭШЕМ ==========
     
     function getLocalStorage(key) {
@@ -4645,7 +4688,7 @@
         document.getElementById('detailsModal').classList.remove('active');
     };
     
-    // ========== QR-СКАНЕР ==========
+    // ========== ИСПРАВЛЕННЫЙ QR-СКАНЕР ==========
     
     async function getSkillById(skillId) {
         console.log(`🔍 [Поиск] Ищу умейку с ID: ${skillId}`);
@@ -5669,7 +5712,7 @@
         statusElement.style.display = 'none';
     };
     
-    // ========== ФУНКЦИЯ ДОБАВЛЕНИЯ УМЕЙКИ ==========
+    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ УМЕЙКИ ==========
     
     window.addSkill = async function() {
         triggerHapticFeedback();
@@ -6367,6 +6410,11 @@
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
         document.querySelector('.map-section').classList.remove('map-active');
+        
+        // Показываем язычок на главном экране
+        if (window.innerWidth <= 768) {
+            showSwipeHandleTemporarily();
+        }
     };
     
     window.showSection = function(sectionId) {
@@ -6383,27 +6431,6 @@
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
         document.getElementById(sectionId).style.display = 'block';
-        
-        // Добавляем подсказку о свайпе для каждой секции
-        const hintMap = {
-            'masterSection': 'masterSwipeHint',
-            'clientSection': 'clientSwipeHint',
-            'profileSection': 'profileSwipeHint',
-            'financeSection': 'financeSwipeHint',
-            'editProfileSection': 'editProfileSwipeHint',
-            'createDealSection': 'createDealSwipeHint',
-            'aboutSection': 'aboutSwipeHint'
-        };
-        
-        if (hintMap[sectionId]) {
-            const hint = document.getElementById(hintMap[sectionId]);
-            if (hint) {
-                hint.style.animation = 'none';
-                hint.offsetHeight;
-                hint.style.animation = 'hintFadeOut 3s ease forwards';
-            }
-        }
-        
         if (sectionId === 'masterSection') {
             currentMasterStatus = 'ready';
             selectMasterStatus('ready');
@@ -6419,6 +6446,10 @@
                 resultsContainer.style.display = 'none';
             }
             if (categoriesContainer) categoriesContainer.style.display = 'block';
+        }
+        // Показываем язычок при переходе в раздел
+        if (window.innerWidth <= 768) {
+            showSwipeHandleTemporarily();
         }
     };
     
@@ -7898,10 +7929,6 @@
         hideLoadingIndicator();
         processReferralLink();
         handleDeepLink();
-        
-        // Инициализация обработчиков свайпа
-        initSwipeListeners();
-        
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -7913,6 +7940,7 @@
             dealAmount.addEventListener('input', updateDealCommission);
         }
         initAdminAccess();
+        initSwipeNavigation();
     });
     </script>
 </body>
