@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Ymeyka - Мастера рядом</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -15,6 +15,7 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
+            user-select: none; /* улучшение для свайпов */
         }
         
         body {
@@ -50,6 +51,45 @@
             to { transform: rotate(360deg); }
         }
         
+        /* Визуальная индикация свайпа */
+        .swipe-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+            z-index: 9998;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            border-top-right-radius: 30px;
+            border-bottom-right-radius: 30px;
+        }
+        
+        .swipe-indicator.active {
+            opacity: 1;
+        }
+        
+        .swipe-arrow {
+            position: fixed;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%) scale(0.8);
+            font-size: 48px;
+            color: rgba(255,255,255,0.7);
+            text-shadow: 0 0 10px rgba(0,0,0,0.3);
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.15s ease;
+        }
+        
+        .swipe-arrow.active {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+        
         .offline-badge {
             background: #f56565;
             color: white;
@@ -60,54 +100,9 @@
             margin-left: 8px;
         }
         
-        /* Стили для индикации свайпа */
-        .swipe-indicator {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 60px;
-            height: 100%;
-            background: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
-            z-index: 1001;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            border-radius: 0 20px 20px 0;
-        }
+        /* Удалены все стили для back-button, так как они больше не нужны */
         
-        .swipe-indicator.active {
-            opacity: 1;
-        }
-        
-        .swipe-indicator::before {
-            content: "←";
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 40px;
-            font-weight: bold;
-            color: rgba(255,255,255,0.7);
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
-            opacity: 0.8;
-        }
-        
-        /* Анимация для свайпа */
-        @keyframes swipeFadeOut {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-        }
-        
-        .swipe-animation {
-            animation: swipeFadeOut 0.3s ease forwards;
-        }
-        
+        /* ... остальные стили остаются без изменений ... */
         .qr-scanner-button {
             position: absolute;
             top: 15px;
@@ -507,6 +502,8 @@
             box-shadow: 0 4px 15px rgba(132, 204, 22, 0.3);
         }
         
+        /* Кнопка назад удалена, все ее стили убраны */
+        
         .form-section {
             background: rgba(255,255,255,0.1);
             padding: 25px 20px;
@@ -661,6 +658,7 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
         
+        /* ... остальные стили остаются полностью без изменений, так как они не затрагивают навигацию ... */
         .city-info {
             background: rgba(255,255,255,0.15);
             padding: 10px 15px;
@@ -2890,10 +2888,11 @@
     </style>
 </head>
 <body>
-    <div class="container" id="appContainer">
-        <!-- ИНДИКАТОР СВАЙПА -->
-        <div id="swipeIndicator" class="swipe-indicator"></div>
+    <!-- Элементы для визуальной индикации свайпа -->
+    <div class="swipe-indicator" id="swipeIndicator"></div>
+    <div class="swipe-arrow" id="swipeArrow">←</div>
 
+    <div class="container">
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div id="mainScreen">
             <div class="header" id="logoHeader">
@@ -2950,7 +2949,7 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ МАСТЕРА -->
+        <!-- СЕКЦИЯ МАСТЕРА (Кнопка "Назад" УДАЛЕНА) -->
         <div id="masterSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
@@ -3075,7 +3074,7 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ КЛИЕНТА / АРХИВ -->
+        <!-- СЕКЦИЯ КЛИЕНТА / АРХИВ (Кнопка "Назад" УДАЛЕНА) -->
         <div id="clientSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📚 Архив мастеров</h2>
@@ -3085,9 +3084,8 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА -->
+        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА (Кнопка "Назад" УДАЛЕНА) -->
         <div id="profileSection" class="section">
-            
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
                 
@@ -3267,7 +3265,7 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ ФИНАНСОВ -->
+        <!-- СЕКЦИЯ ФИНАНСОВ (Кнопка "Назад" УДАЛЕНА) -->
         <div id="financeSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">💰 Мои финансы</h2>
@@ -3319,9 +3317,8 @@
             </div>
         </div>
 
-        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ (Кнопка "Назад" УДАЛЕНА) -->
         <div id="editProfileSection" class="section">
-    
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
         
@@ -3343,9 +3340,8 @@
             </div>
         </div>
 
-        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
+        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ (Кнопка "Назад" УДАЛЕНА) -->
         <div id="createDealSection" class="section">
-            
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📄 Создание сделки</h2>
                 
@@ -3401,9 +3397,8 @@
             </div>
         </div>
 
-        <!-- РАЗДЕЛ "О ПРОЕКТЕ" -->
+        <!-- РАЗДЕЛ "О ПРОЕКТЕ" (Кнопка "Назад" УДАЛЕНА) -->
         <div id="aboutSection" class="section">
-            
             <div class="form-section">
                 <div class="about-section">
                     <div class="about-title">🤝 О проекте Ymeyka</div>
@@ -3831,141 +3826,118 @@
     let logoClickTimer = null;
     let offlineMode = false;
 
-    // ========== ФУНКЦИИ ДЛЯ РАБОТЫ СО СВАЙПАМИ ==========
-    
+    // ========== НОВАЯ ЛОГИКА СВАЙПА ==========
     let swipeStartX = 0;
-    let swipeStartY = 0;
-    let swipeActive = false;
-    let currentSectionElement = null;
-    let swipeIndicator = null;
+    let swipeStartTime = 0;
+    const SWIPE_THRESHOLD = 50;
+    const SWIPE_MAX_TIME = 300;
     
     function initSwipeNavigation() {
-        console.log('🔄 [Свайп] Инициализация обработчиков свайпов');
-        swipeIndicator = document.getElementById('swipeIndicator');
+        const sections = document.querySelectorAll('.section');
         
-        document.body.addEventListener('touchstart', handleSwipeStart, { passive: false });
-        document.body.addEventListener('touchmove', handleSwipeMove, { passive: false });
-        document.body.addEventListener('touchend', handleSwipeEnd);
+        sections.forEach(section => {
+            section.addEventListener('touchstart', handleTouchStart, { passive: false });
+            section.addEventListener('touchmove', handleTouchMove, { passive: false });
+            section.addEventListener('touchend', handleTouchEnd, { passive: false });
+        });
     }
     
-    function getCurrentActiveSection() {
-        const sections = ['masterSection', 'clientSection', 'profileSection', 'financeSection', 'editProfileSection', 'createDealSection', 'aboutSection'];
-        for (const sectionId of sections) {
-            const section = document.getElementById(sectionId);
-            if (section && section.style.display === 'block') {
-                return section;
-            }
-        }
-        return null;
-    }
-    
-    function getTargetScreen(currentSectionId) {
-        switch(currentSectionId) {
-            case 'masterSection':
-            case 'clientSection':
-            case 'profileSection':
-            case 'aboutSection':
-                return 'mainScreen';
-            case 'financeSection':
-            case 'editProfileSection':
-            case 'createDealSection':
-                return 'profileSection';
-            default:
-                return 'mainScreen';
-        }
-    }
-    
-    function handleSwipeStart(e) {
-        const activeSection = getCurrentActiveSection();
-        if (!activeSection) return;
-        
-        currentSectionElement = activeSection;
+    function handleTouchStart(e) {
         const touch = e.touches[0];
         swipeStartX = touch.clientX;
-        swipeStartY = touch.clientY;
-        swipeActive = true;
+        swipeStartTime = Date.now();
         
-        // Показываем индикатор
-        if (swipeIndicator) {
-            swipeIndicator.classList.add('active');
-        }
+        const indicator = document.getElementById('swipeIndicator');
+        const arrow = document.getElementById('swipeArrow');
+        indicator.classList.remove('active');
+        arrow.classList.remove('active');
     }
     
-    function handleSwipeMove(e) {
-        if (!swipeActive || !currentSectionElement) return;
+    function handleTouchMove(e) {
+        if (swipeStartX === 0) return;
         
         const touch = e.touches[0];
-        const deltaX = touch.clientX - swipeStartX;
-        const deltaY = touch.clientY - swipeStartY;
+        const currentX = touch.clientX;
+        const diffX = currentX - swipeStartX;
         
-        // Проверяем, что свайп больше вправо, чем вниз/вверх
-        if (deltaX > 30 && Math.abs(deltaY) < 100) {
-            e.preventDefault();
+        if (diffX > 10) {
+            const indicator = document.getElementById('swipeIndicator');
+            const arrow = document.getElementById('swipeArrow');
+            indicator.classList.add('active');
+            arrow.classList.add('active');
             
-            // Визуальный эффект при свайпе - добавляем затемнение/стрелку
-            if (swipeIndicator) {
-                const opacity = Math.min(0.8, deltaX / 200);
-                swipeIndicator.style.opacity = opacity;
-            }
-        } else if (deltaX < 0) {
-            // Свайп влево - скрываем индикатор
-            if (swipeIndicator) {
-                swipeIndicator.style.opacity = '0';
-            }
+            const opacity = Math.min(0.5, diffX / 200);
+            indicator.style.opacity = opacity;
+            
+            const scale = Math.min(1.2, 0.8 + diffX / 150);
+            arrow.style.transform = `translateY(-50%) scale(${scale})`;
+            arrow.style.opacity = Math.min(0.9, diffX / 100);
+        } else {
+            const indicator = document.getElementById('swipeIndicator');
+            const arrow = document.getElementById('swipeArrow');
+            indicator.classList.remove('active');
+            arrow.classList.remove('active');
+        }
+        
+        if (diffX > 30) {
+            e.preventDefault();
         }
     }
     
-    function handleSwipeEnd(e) {
-        if (!swipeActive || !currentSectionElement) {
-            if (swipeIndicator) {
-                swipeIndicator.classList.remove('active');
-                swipeIndicator.style.opacity = '0';
-            }
-            swipeActive = false;
-            return;
-        }
+    function handleTouchEnd(e) {
+        if (swipeStartX === 0) return;
         
-        const touch = e.changedTouches[0];
-        const deltaX = touch.clientX - swipeStartX;
-        const deltaY = touch.clientY - swipeStartY;
+        const touchEnd = e.changedTouches[0];
+        const endX = touchEnd.clientX;
+        const diffX = endX - swipeStartX;
+        const diffTime = Date.now() - swipeStartTime;
         
-        // Убираем индикатор
-        if (swipeIndicator) {
-            swipeIndicator.classList.remove('active');
-            swipeIndicator.style.opacity = '0';
-        }
+        const indicator = document.getElementById('swipeIndicator');
+        const arrow = document.getElementById('swipeArrow');
+        indicator.classList.remove('active');
+        arrow.classList.remove('active');
+        indicator.style.opacity = '';
+        arrow.style.transform = '';
+        arrow.style.opacity = '';
         
-        // Проверяем, что это свайп вправо (больше 50px и не слишком наклонный)
-        if (deltaX > 50 && Math.abs(deltaY) < 100) {
-            const currentSectionId = currentSectionElement.id;
-            const targetScreen = getTargetScreen(currentSectionId);
-            
-            // Добавляем анимацию текущей секции
-            currentSectionElement.classList.add('swipe-animation');
-            
-            // Тактильный отклик
+        if (diffX > SWIPE_THRESHOLD && diffTime < SWIPE_MAX_TIME) {
             triggerHapticFeedback();
             
-            setTimeout(() => {
-                currentSectionElement.classList.remove('swipe-animation');
-                currentSectionElement.style.display = 'none';
-                
-                // Переход на нужный экран
-                if (targetScreen === 'mainScreen') {
-                    showMainScreen();
-                } else if (targetScreen === 'profileSection') {
-                    showProfileSection();
+            let activeSection = null;
+            const sections = ['masterSection', 'clientSection', 'profileSection', 'financeSection', 'editProfileSection', 'createDealSection', 'aboutSection'];
+            for (const sectionId of sections) {
+                const section = document.getElementById(sectionId);
+                if (section && section.style.display === 'block') {
+                    activeSection = sectionId;
+                    break;
                 }
-                
-                swipeActive = false;
-                currentSectionElement = null;
-            }, 200);
+            }
+            
+            if (activeSection) {
+                switch (activeSection) {
+                    case 'masterSection':
+                    case 'clientSection':
+                    case 'profileSection':
+                    case 'aboutSection':
+                        showMainScreen();
+                        break;
+                    case 'financeSection':
+                    case 'editProfileSection':
+                    case 'createDealSection':
+                        showProfileSection();
+                        break;
+                    default:
+                        showMainScreen();
+                }
+            } else {
+                showMainScreen();
+            }
         }
         
-        swipeActive = false;
-        currentSectionElement = null;
+        swipeStartX = 0;
+        swipeStartTime = 0;
     }
-    
+
     // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ХРАНИЛИЩЕМ И КЭШЕМ ==========
     
     function getLocalStorage(key) {
@@ -7855,6 +7827,10 @@
     
     document.addEventListener('DOMContentLoaded', async function() {
         console.log('🚀 Ymeyka app loaded successfully!');
+        
+        // Инициализация свайп-навигации
+        initSwipeNavigation();
+        
         currentMasterStatus = 'ready';
         currentEditMasterStatus = 'ready';
         currentRadius = 10;
@@ -7866,7 +7842,6 @@
         hideLoadingIndicator();
         processReferralLink();
         handleDeepLink();
-        initSwipeNavigation(); // Инициализируем обработчики свайпов
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
