@@ -15,7 +15,7 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
-            user-select: none; /* улучшение для свайпов */
+            user-select: none;
         }
         
         body {
@@ -34,7 +34,6 @@
             background: linear-gradient(135deg, #1e3a5f 0%, #0f2b4d 100%);
         }
         
-        /* Стили для индикатора загрузки */
         .loading-spinner {
             display: inline-block;
             width: 20px;
@@ -51,7 +50,6 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Визуальная индикация свайпа */
         .swipe-indicator {
             position: fixed;
             top: 0;
@@ -100,9 +98,6 @@
             margin-left: 8px;
         }
         
-        /* Удалены все стили для back-button, так как они больше не нужны */
-        
-        /* ... остальные стили остаются без изменений ... */
         .qr-scanner-button {
             position: absolute;
             top: 15px;
@@ -388,17 +383,14 @@
             overflow-y: auto;
         }
         
-        /* Специальный фон для архива мастеров (оранжевый) */
         #clientSection {
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
         }
 
-        /* Специальный фон для раздела "Я умейка" (светло-салатовый) */
         #masterSection {
             background: linear-gradient(135deg, #84cc16 0%, #3f6212 100%);
         }
         
-        /* Стили для карточек в разделе мастера */
         #masterSection .skill-card {
             background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%);
             border-left: 5px solid #84cc16;
@@ -436,7 +428,6 @@
             background: rgba(255,255,255,0.3);
         }
         
-        /* Стили для карточек в архиве */
         #clientSection .skill-card {
             background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%);
             border-left: 5px solid #f97316;
@@ -468,7 +459,6 @@
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
         }
 
-        /* Стили для подразделов в архиве (фисташковый цвет) */
         .subcategory-buttons {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -501,8 +491,6 @@
             border-color: #84cc16;
             box-shadow: 0 4px 15px rgba(132, 204, 22, 0.3);
         }
-        
-        /* Кнопка назад удалена, все ее стили убраны */
         
         .form-section {
             background: rgba(255,255,255,0.1);
@@ -658,7 +646,6 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
         
-        /* ... остальные стили остаются полностью без изменений, так как они не затрагивают навигацию ... */
         .city-info {
             background: rgba(255,255,255,0.15);
             padding: 10px 15px;
@@ -7224,7 +7211,7 @@
         setLocalStorage(`coins_${currentUserId}`, coins);
     }
     
-    // ========== КАТЕГОРИИ ДЛЯ АРХИВА И ПОДРАЗДЕЛЫ ==========
+    // ========== КАТЕГОРИИ ДЛЯ АРХИВА И ПОДРАЗДЕЛЫ (Функция возврата на главный экран удалена) ==========
     
     const skillCategories = [
         "🚕 Такси",
@@ -7337,10 +7324,6 @@
         
         resultsContainer.innerHTML = `
             <div style="margin-bottom: 20px;">
-                <button class="back-button" onclick="triggerHapticFeedback(); backToCategories();" 
-                        style="padding: 12px 20px; font-size: 14px; width: auto; margin: 0;">
-                    ← Назад к категориям
-                </button>
                 <div style="text-align: center; margin: 15px 0;">
                     <div class="category-filter-badge" style="background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);">
                         📂 ${category}
@@ -7486,16 +7469,7 @@
         showSubcategories(category);
     };
     
-    window.backToCategories = function() {
-        triggerHapticFeedback();
-        const resultsContainer = document.getElementById('categorySearchResults');
-        const categoriesContainer = document.getElementById('categoriesList');
-        if (categoriesContainer) categoriesContainer.style.display = 'block';
-        if (resultsContainer) {
-            resultsContainer.innerHTML = '';
-            resultsContainer.style.display = 'none';
-        }
-    };
+    // Функция backToCategories УДАЛЕНА полностью
     
     window.showOnMap = function(lat, lon, title) {
         triggerHapticFeedback();
