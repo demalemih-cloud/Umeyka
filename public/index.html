@@ -50,6 +50,57 @@
             to { transform: rotate(360deg); }
         }
         
+        .workformat-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+        
+        .workformat-option {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px 10px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+            background: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .workformat-option.selected {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border-color: white;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+        }
+        
+        .workformat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            margin: 8px 0;
+            width: fit-content;
+        }
+        
+        .workformat-badge.one { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); }
+        .workformat-badge.two { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
+        .workformat-badge.team { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); }
+        .workformat-badge.looking { background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); }
+        
         .swipe-indicator {
             position: fixed;
             top: 0;
@@ -2936,7 +2987,7 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ МАСТЕРА (Кнопка "Назад" УДАЛЕНА) -->
+        <!-- СЕКЦИЯ МАСТЕРА -->
         <div id="masterSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
@@ -3020,6 +3071,28 @@
                     </div>
                 </div>
                 
+                <!-- НОВОЕ ПОЛЕ: ФОРМАТ РАБОТЫ -->
+                <div style="margin: 20px 0;">
+                    <div style="color: white; margin-bottom: 10px; font-weight: 600;">👥 Формат работы *</div>
+                    <div class="workformat-selector" id="workFormatSelector">
+                        <div class="workformat-option" data-workformat="Один" onclick="triggerHapticFeedback(); selectWorkFormat('Один');">
+                            👤 Один
+                        </div>
+                        <div class="workformat-option" data-workformat="Вдвоём" onclick="triggerHapticFeedback(); selectWorkFormat('Вдвоём');">
+                            👥 Вдвоём
+                        </div>
+                        <div class="workformat-option" data-workformat="Бригада" onclick="triggerHapticFeedback(); selectWorkFormat('Бригада');">
+                            🏢 Бригада
+                        </div>
+                        <div class="workformat-option" data-workformat="Ищу бригаду" onclick="triggerHapticFeedback(); selectWorkFormat('Ищу бригаду');">
+                            🔍 Ищу бригаду
+                        </div>
+                    </div>
+                    <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">
+                        Выберите формат работы — это поможет клиентам понять, с кем они будут иметь дело
+                    </div>
+                </div>
+                
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                     <div class="status-selector">
@@ -3061,7 +3134,7 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ КЛИЕНТА / АРХИВ (Кнопка "Назад" УДАЛЕНА) -->
+        <!-- СЕКЦИЯ КЛИЕНТА / АРХИВ -->
         <div id="clientSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📚 Архив мастеров</h2>
@@ -3071,7 +3144,7 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА (Кнопка "Назад" УДАЛЕНА) -->
+        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА -->
         <div id="profileSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
@@ -3252,7 +3325,7 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ ФИНАНСОВ (Кнопка "Назад" УДАЛЕНА) -->
+        <!-- СЕКЦИЯ ФИНАНСОВ -->
         <div id="financeSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">💰 Мои финансы</h2>
@@ -3304,7 +3377,7 @@
             </div>
         </div>
 
-        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ (Кнопка "Назад" УДАЛЕНА) -->
+        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
         <div id="editProfileSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
@@ -3327,7 +3400,7 @@
             </div>
         </div>
 
-        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ (Кнопка "Назад" УДАЛЕНА) -->
+        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
         <div id="createDealSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📄 Создание сделки</h2>
@@ -3384,7 +3457,7 @@
             </div>
         </div>
 
-        <!-- РАЗДЕЛ "О ПРОЕКТЕ" (Кнопка "Назад" УДАЛЕНА) -->
+        <!-- РАЗДЕЛ "О ПРОЕКТЕ" -->
         <div id="aboutSection" class="section">
             <div class="form-section">
                 <div class="about-section">
@@ -3625,6 +3698,28 @@
                 </div>
             </div>
             
+            <!-- НОВОЕ ПОЛЕ: ФОРМАТ РАБОТЫ (РЕДАКТИРОВАНИЕ) -->
+            <div style="margin: 20px 0;">
+                <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">👥 Формат работы *</div>
+                <div class="workformat-selector" id="editWorkFormatSelector" style="background: #f7fafc;">
+                    <div class="workformat-option" data-workformat="Один" onclick="triggerHapticFeedback(); selectEditWorkFormat('Один');">
+                        👤 Один
+                    </div>
+                    <div class="workformat-option" data-workformat="Вдвоём" onclick="triggerHapticFeedback(); selectEditWorkFormat('Вдвоём');">
+                        👥 Вдвоём
+                    </div>
+                    <div class="workformat-option" data-workformat="Бригада" onclick="triggerHapticFeedback(); selectEditWorkFormat('Бригада');">
+                        🏢 Бригада
+                    </div>
+                    <div class="workformat-option" data-workformat="Ищу бригаду" onclick="triggerHapticFeedback(); selectEditWorkFormat('Ищу бригаду');">
+                        🔍 Ищу бригаду
+                    </div>
+                </div>
+                <div style="color: #666; font-size: 12px; margin-top: 5px;">
+                    Выберите формат работы — это поможет клиентам понять, с кем они будут иметь дело
+                </div>
+            </div>
+            
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                 <div class="status-selector" style="background: #f7fafc;">
@@ -3798,6 +3893,8 @@
     let currentEditMasterStatus = 'ready';
     let currentRadius = 10;
     let currentEditRadius = 10;
+    let currentWorkFormat = 'Один';
+    let currentEditWorkFormat = 'Один';
     let pendingPaymentDealId = null;
     let currentQRSkillId = null;
     let currentQRSkillName = null;
@@ -3812,6 +3909,44 @@
     let logoClickCount = 0;
     let logoClickTimer = null;
     let offlineMode = false;
+
+    // ========== ФУНКЦИИ ДЛЯ ФОРМАТА РАБОТЫ ==========
+    
+    function getWorkFormatBadge(workFormat) {
+        if (!workFormat) return '';
+        let icon = '';
+        let classMod = '';
+        switch(workFormat) {
+            case 'Один': icon = '👤'; classMod = 'one'; break;
+            case 'Вдвоём': icon = '👥'; classMod = 'two'; break;
+            case 'Бригада': icon = '🏢'; classMod = 'team'; break;
+            case 'Ищу бригаду': icon = '🔍'; classMod = 'looking'; break;
+            default: icon = '👤'; classMod = 'one';
+        }
+        return `<div class="workformat-badge ${classMod}">${icon} ${workFormat}</div>`;
+    }
+    
+    function selectWorkFormat(format) {
+        console.log('🔄 Выбор формата работы (создание):', format);
+        currentWorkFormat = format;
+        document.querySelectorAll('#masterSection .workformat-option').forEach(option => {
+            option.classList.remove('selected');
+            if (option.dataset.workformat === format) {
+                option.classList.add('selected');
+            }
+        });
+    }
+    
+    function selectEditWorkFormat(format) {
+        console.log('🔄 Выбор формата работы (редактирование):', format);
+        currentEditWorkFormat = format;
+        document.querySelectorAll('#editWorkFormatSelector .workformat-option').forEach(option => {
+            option.classList.remove('selected');
+            if (option.dataset.workformat === format) {
+                option.classList.add('selected');
+            }
+        });
+    }
 
     // ========== НОВАЯ ЛОГИКА СВАЙПА ==========
     let swipeStartX = 0;
@@ -4325,12 +4460,14 @@
             }
             return selectedSkills.map(skill => {
                 const statusBadge = getStatusBadge(skill.status);
+                const workFormatBadge = getWorkFormatBadge(skill.workFormat);
                 return `
                     <div class="visitka-skill-item" style="cursor: pointer;" onclick="showVisitkaSkillDetail('${skill._id}')">
                         <div class="visitka-skill-info" style="flex: 1;">
                             <div class="visitka-skill-name">${escapeHtml(skill.skill)}</div>
                             <div class="visitka-skill-details">💰 ${skill.price} ₽ | 📍 ${skill.city || 'Не указан'}</div>
                             ${statusBadge}
+                            ${workFormatBadge}
                         </div>
                         <div style="color: #667eea;">📝</div>
                     </div>
@@ -4370,6 +4507,7 @@
         let detailsHtml = `<strong>💰 Цена:</strong> ${skill.price} ₽<br><br>`;
         detailsHtml += `<strong>📍 Город:</strong> ${skill.city || 'Не указан'}<br><br>`;
         detailsHtml += `<strong>📏 Радиус:</strong> ${skill.radius || 10} км<br><br>`;
+        detailsHtml += `<strong>👥 Формат работы:</strong> ${skill.workFormat || 'Один'}<br><br>`;
         detailsHtml += `<strong>⭐ Статус:</strong> ${skill.status === 'ready' ? 'Готов к работе' : 'Занят'}<br><br>`;
         if (skill.details && skill.details.trim()) {
             detailsHtml += `<strong>📝 Подробности:</strong><br>${escapeHtml(skill.details)}<br><br>`;
@@ -4512,12 +4650,14 @@
                 <div id="masterVisitkaSkillsList">
                     ${displaySkills.map(skill => {
                         const statusBadge = getStatusBadge(skill.status);
+                        const workFormatBadge = getWorkFormatBadge(skill.workFormat);
                         return `
                             <div class="visitka-skill-item" style="cursor: pointer;" onclick="showMasterVisitkaSkillDetail('${skill._id}')">
                                 <div class="visitka-skill-info" style="flex: 1;">
                                     <div class="visitka-skill-name">${escapeHtml(skill.skill)}</div>
                                     <div class="visitka-skill-details">💰 ${skill.price} ₽ | 📍 ${skill.city || 'Не указан'}</div>
                                     ${statusBadge}
+                                    ${workFormatBadge}
                                 </div>
                                 <div style="color: #667eea;">📝</div>
                             </div>
@@ -4554,6 +4694,7 @@
         let detailsHtml = `<strong>💰 Цена:</strong> ${skill.price} ₽<br><br>`;
         detailsHtml += `<strong>📍 Город:</strong> ${skill.city || 'Не указан'}<br><br>`;
         detailsHtml += `<strong>📏 Радиус:</strong> ${skill.radius || 10} км<br><br>`;
+        detailsHtml += `<strong>👥 Формат работы:</strong> ${skill.workFormat || 'Один'}<br><br>`;
         detailsHtml += `<strong>⭐ Статус:</strong> ${skill.status === 'ready' ? 'Готов к работе' : 'Занят'}<br><br>`;
         if (skill.details && skill.details.trim()) {
             detailsHtml += `<strong>📝 Подробности:</strong><br>${escapeHtml(skill.details)}<br><br>`;
@@ -4735,6 +4876,7 @@
         modal.style.zIndex = '5000';
         modal.style.display = 'flex';
         const statusBadge = getStatusBadge(skill.status);
+        const workFormatBadge = getWorkFormatBadge(skill.workFormat);
         const cityInfo = skill.city 
             ? `<div style="margin: 10px 0; padding: 8px 12px; background: #e6f3ff; border-radius: 8px; font-size: 14px; color: #2d3748;">
                    📍 ${escapeHtml(skill.city)} | 📍 ${skill.radius || 10}км
@@ -4758,6 +4900,7 @@
                     <p style="color: #48bb78; font-size: 28px; font-weight: bold; margin: 10px 0;">${skill.price} ₽</p>
                 </div>
                 ${statusBadge}
+                ${workFormatBadge}
                 ${cityInfo}
                 <div style="background: #f7fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
                     <div class="skill-user-row">
@@ -5628,6 +5771,7 @@
             const skillExperience = document.getElementById('skillExperience').value;
             const skillPrice = document.getElementById('skillPrice').value;
             const skillCity = document.getElementById('skillCity').value;
+            
             if (!skillCategory) {
                 alert('❌ Пожалуйста, выберите категорию умейки!');
                 const categorySelect = document.getElementById('skillCategory');
@@ -5660,6 +5804,7 @@
                 price: parseInt(skillPrice),
                 city: skillCity.trim(),
                 radius: currentRadius,
+                workFormat: currentWorkFormat,
                 location: location,
                 userId: currentUserId,
                 username: userData.firstName || 'Аноним',
@@ -5702,6 +5847,8 @@
                         selectRadius(10);
                         currentMasterStatus = 'ready';
                         selectMasterStatus('ready');
+                        currentWorkFormat = 'Один';
+                        selectWorkFormat('Один');
                         await preloadAllSkills();
                         loadMySkills();
                         loadProfileSkills();
@@ -5739,6 +5886,8 @@
                 selectRadius(10);
                 currentMasterStatus = 'ready';
                 selectMasterStatus('ready');
+                currentWorkFormat = 'Один';
+                selectWorkFormat('Один');
                 await preloadAllSkills();
                 loadMySkills();
                 loadProfileSkills();
@@ -5769,6 +5918,7 @@
             if (mySkills.length > 0) {
                 skillsList.innerHTML = mySkills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
+                    const workFormatBadge = getWorkFormatBadge(skill.workFormat);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
                     const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                     return `
@@ -5784,6 +5934,7 @@
                              onclick="event.stopPropagation(); triggerHapticFeedback(); showQRModal('${skill._id}', '${skill.skill.replace(/'/g, "\\'")}');">
                         <div class="skill-price">${skill.price} ₽</div>
                         ${statusBadge}
+                        ${workFormatBadge}
                         ${cityInfo}
                         <div class="skill-user-row">
                             <div class="skill-user-name">
@@ -5849,6 +6000,7 @@
             if (mySkills.length > 0) {
                 skillsList.innerHTML = mySkills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
+                    const workFormatBadge = getWorkFormatBadge(skill.workFormat);
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
                     const cityInfo = skill.city ? `<div class="city-info" style="background: rgba(102,126,234,0.08); margin: 10px 0; padding: 8px 12px; border-radius: 8px; font-size: 14px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                     return `
@@ -5859,6 +6011,7 @@
                         </div>
                         ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin: 8px 0; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
                         ${statusBadge}
+                        ${workFormatBadge}
                         ${cityInfo}
                         <div class="skill-user-row">
                             <div class="skill-user-name">
@@ -5921,6 +6074,8 @@
             document.getElementById('editSkillCity').value = skill.city || '';
             currentEditRadius = skill.radius || 10;
             selectEditRadius(currentEditRadius);
+            currentEditWorkFormat = skill.workFormat || 'Один';
+            selectEditWorkFormat(currentEditWorkFormat);
             const skillStatus = skill.status || 'ready';
             selectEditMasterStatus(skillStatus);
             editSkillPhoto = null;
@@ -5988,6 +6143,7 @@
                 price: parseInt(skillPrice),
                 city: skillCity.trim(),
                 radius: currentEditRadius,
+                workFormat: currentEditWorkFormat,
                 status: currentEditMasterStatus,
                 updatedAt: new Date().toISOString()
             };
@@ -6225,6 +6381,7 @@
     
     function createMapSkillPopup(skill, isUserSkill) {
         const statusBadge = getStatusBadge(skill.status);
+        const workFormatBadge = getWorkFormatBadge(skill.workFormat);
         const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
         const photoThumbnail = skill.photo ? `
             <div class="popup-skill-photo">
@@ -6246,6 +6403,7 @@
                 <div style="margin: 10px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
                     <p style="margin: 8px 0; font-weight: bold; color: #48bb78;">${skill.price} руб.</p>
                     ${statusBadge}
+                    ${workFormatBadge}
                     ${cityInfo}
                     ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin: 8px 0; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
                     <div class="skill-user-row" style="margin: 10px 0;">
@@ -6336,6 +6494,8 @@
             selectMasterStatus('ready');
             currentRadius = 10;
             selectRadius(10);
+            currentWorkFormat = 'Один';
+            selectWorkFormat('Один');
             loadMySkills();
         } else if (sectionId === 'clientSection') {
             renderCategories();
@@ -7211,7 +7371,7 @@
         setLocalStorage(`coins_${currentUserId}`, coins);
     }
     
-    // ========== КАТЕГОРИИ ДЛЯ АРХИВА И ПОДРАЗДЕЛЫ (Функция возврата на главный экран удалена) ==========
+    // ========== КАТЕГОРИИ ДЛЯ АРХИВА И ПОДРАЗДЕЛЫ ==========
     
     const skillCategories = [
         "🚕 Такси",
@@ -7399,6 +7559,7 @@
                 </div>
                 ${filteredSkills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
+                    const workFormatBadge = getWorkFormatBadge(skill.workFormat);
                     const cityInfo = skill.city ? `<div class="city-info" style="margin: 8px 0; padding: 6px 10px; background: rgba(102,126,234,0.15); border-radius: 8px; font-size: 13px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                     const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
                     const isCurrentUser = skill.userId === currentUserId;
@@ -7412,6 +7573,7 @@
                         ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin-bottom: 10px; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
                         <div class="skill-price">${skill.price} ₽</div>
                         ${statusBadge}
+                        ${workFormatBadge}
                         ${cityInfo}
                         <div class="skill-user-row">
                             <div class="skill-user-name">
@@ -7464,12 +7626,9 @@
         }
     };
     
-    // Алиас для обратной совместимости
     window.searchByCategory = function(category) {
         showSubcategories(category);
     };
-    
-    // Функция backToCategories УДАЛЕНА полностью
     
     window.showOnMap = function(lat, lon, title) {
         triggerHapticFeedback();
@@ -7809,6 +7968,8 @@
         currentEditMasterStatus = 'ready';
         currentRadius = 10;
         currentEditRadius = 10;
+        currentWorkFormat = 'Один';
+        currentEditWorkFormat = 'Один';
         showMainScreen();
         currentUserId = checkAndSetUserId();
         showLoadingIndicator();
@@ -7827,6 +7988,10 @@
             dealAmount.addEventListener('input', updateDealCommission);
         }
         initAdminAccess();
+        
+        // Инициализация селекторов формата работы
+        selectWorkFormat('Один');
+        selectEditWorkFormat('Один');
     });
     </script>
 </body>
