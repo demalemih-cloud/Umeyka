@@ -404,21 +404,32 @@
             margin-right: 12px;
         }
         
-        .map-section {
-            padding: 15px 20px 20px;
+        .qr-code-section {
+            display: flex;
+            justify-content: center;
+            padding: 15px 20px 25px;
         }
         
-        .map-button {
-            width: 100%;
+        .qr-code-card {
+            background: white;
+            border-radius: 20px;
             padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 15px;
-            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            display: inline-block;
             cursor: pointer;
-            margin-bottom: 10px;
+            transition: transform 0.2s ease;
+        }
+        
+        .qr-code-card:active {
+            transform: scale(0.98);
+        }
+        
+        .qr-code-card p {
+            color: #2d3748;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 8px;
         }
         
         .section {
@@ -2923,6 +2934,22 @@
             font-weight: bold;
             color: white;
         }
+        
+        .map-header-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .map-close-button {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -2967,12 +2994,12 @@
                 </button>
             </div>
 
-            
-            <div class="map-section">
-                <button class="map-button" onclick="triggerHapticFeedback(); openMap();">
-                    🗺️ Поиск по карте
-                </button>
-                <div id="map"></div>
+            <!-- Блок QR-кода визитки -->
+            <div class="qr-code-section">
+                <div class="qr-code-card" id="mainScreenQrCard" onclick="triggerHapticFeedback(); openMainScreenQRModal();">
+                    <div id="mainScreenQrCode" style="width: 100px; height: 100px;"></div>
+                    <p>Моя визитка</p>
+                </div>
             </div>
         </div>
 
@@ -3085,8 +3112,7 @@
                             🏢 Бригада
                         </div>
                         <div class="workformat-option" data-workformat="Ищу бригаду" onclick="triggerHapticFeedback(); selectWorkFormat('Ищу бригаду');">
-                            🔍 Ищу бригаду
-                        </div>
+                            🔍 Ищу бригаду                        </div>
                     </div>
                     <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">
                         Выберите формат работы — это поможет клиентам понять, с кем они будут иметь дело
@@ -3867,6 +3893,18 @@
             </button>
         </div>
     </div>
+    
+    <!-- МОДАЛЬНОЕ ОКНО КАРТЫ (ВСПЛЫВАЮЩЕЕ) -->
+    <div id="mapModal" class="modal-overlay" style="display: none; z-index: 10001;">
+        <div class="modal-content" style="max-width: 90%; width: 800px; padding: 20px;">
+            <button class="modal-close" onclick="triggerHapticFeedback(); closeMapModal();">×</button>
+            <div class="modal-title">🗺️ Мастера на карте</div>
+            <div id="modalMap" style="height: 500px; width: 100%; border-radius: 15px; margin-bottom: 10px;"></div>
+            <div class="map-header-actions">
+                <button class="map-close-button" onclick="triggerHapticFeedback(); closeMapModal();">Закрыть карту</button>
+            </div>
+        </div>
+    </div>
 
     <script>
     // ========== КОНФИГУРАЦИЯ ==========
@@ -3884,6 +3922,7 @@
     let currentDealTab = 'pending';
     let projectRating = 0;
     let map = null;
+    let modalMap = null;
     let markers = [];
     let userLocation = null;
     let mapRefreshInterval = null;
@@ -3909,6 +3948,16 @@
     let logoClickCount = 0;
     let logoClickTimer = null;
     let offlineMode = false;
+    
+    let currentMapFilter = {
+        category: null,
+        subcategory: null
+    };
+    
+    let currentModalMapFilter = {
+        category: null,
+        subcategory: null
+    };
 
     // ========== ФУНКЦИИ ДЛЯ ФОРМАТА РАБОТЫ ==========
     
@@ -5226,346 +5275,230 @@
         }
     }
     
-    // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ФИНАНСАМИ И СДЕЛКАМИ ==========
+    // ========== ФУНКЦИИ ДЛЯ КАРТЫ (В МОДАЛЬНОМ ОКНЕ) ==========
     
-    function getWalletData() {
-        const data = getLocalStorage(`wallet_${currentUserId}`);
-        return data || {
-            connected: false,
-            walletAddress: null,
-            availableBalance: 0,
-            frozenBalance: 0,
-            totalEarned: 0,
-            totalCommission: 0,
-            transactions: []
-        };
-    }
-    
-    function saveWalletData(data) {
-        setLocalStorage(`wallet_${currentUserId}`, data);
-        updateWalletUI();
-    }
-    
-    function addTransaction(type, amount, description, dealId = null) {
-        const wallet = getWalletData();
-        const transaction = {
-            id: 'tx_' + Date.now(),
-            type: type,
-            amount: amount,
-            description: description,
-            dealId: dealId,
-            timestamp: new Date().toISOString(),
-            status: 'completed'
-        };
-        wallet.transactions.unshift(transaction);
-        saveWalletData(wallet);
-        return transaction;
-    }
-    
-    function updateWalletUI() {
-        const wallet = getWalletData();
-        document.getElementById('availableBalance').textContent = wallet.availableBalance + ' ⭐';
-        document.getElementById('frozenBalance').textContent = wallet.frozenBalance + ' ⭐';
-        document.getElementById('totalEarned').textContent = wallet.totalEarned + ' ⭐';
-        document.getElementById('totalCommission').textContent = wallet.totalCommission + ' ⭐';
-        const walletStatus = document.getElementById('walletStatus');
-        if (wallet.connected) {
-            walletStatus.className = 'wallet-connected';
-            walletStatus.innerHTML = `<span>🟢</span><span>Wallet подключен: ${wallet.walletAddress?.slice(0, 6)}...${wallet.walletAddress?.slice(-4)}</span>`;
-            document.getElementById('withdrawButton').style.display = 'flex';
-        } else {
-            walletStatus.className = 'wallet-disconnected';
-            walletStatus.innerHTML = `<span>🔴</span><span>Telegram Wallet не подключен</span>`;
-            document.getElementById('withdrawButton').style.display = 'none';
-        }
-        renderTransactionHistory(wallet.transactions);
-    }
-    
-    function renderTransactionHistory(transactions) {
-        const container = document.getElementById('transactionHistory');
-        if (!transactions || transactions.length === 0) {
-            container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">История операций пуста</div>';
-            return;
-        }
-        container.innerHTML = transactions.slice(0, 10).map(tx => {
-            const isIncome = tx.type === 'deposit' || tx.type === 'payout' || tx.type === 'refund';
-            const isCommission = tx.type === 'commission';
-            const amountClass = isIncome ? 'positive' : 'negative';
-            const icon = isIncome ? '💰' : (isCommission ? '💸' : '💳');
-            return `
-                <div class="transaction-item ${isIncome ? 'income' : (isCommission ? 'commission' : 'expense')}">
-                    <div class="transaction-info">
-                        <div class="transaction-title">${icon} ${tx.description}</div>
-                        <div class="transaction-date">${new Date(tx.timestamp).toLocaleDateString('ru-RU')}</div>
-                    </div>
-                    <div class="transaction-amount ${amountClass}">
-                        ${isIncome ? '+' : '-'}${tx.amount} ⭐
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-    
-    async function connectWallet() {
+    async function openMapModal(category, subcategory) {
         triggerHapticFeedback();
+        console.log(`🗺️ Открытие карты для категории: ${category}, подраздел: ${subcategory}`);
+        
+        currentModalMapFilter.category = category;
+        currentModalMapFilter.subcategory = subcategory;
+        
+        const modal = document.getElementById('mapModal');
+        const modalMapDiv = document.getElementById('modalMap');
+        
+        modal.style.display = 'flex';
+        
+        setTimeout(() => {
+            if (modalMap) {
+                modalMap.remove();
+                modalMap = null;
+            }
+            
+            modalMap = L.map('modalMap').setView([55.7558, 37.6173], 10);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(modalMap);
+            
+            loadFilteredSkillsOnMap(modalMap, category, subcategory);
+        }, 100);
+    }
+    
+    async function loadFilteredSkillsOnMap(mapInstance, category, subcategory) {
         try {
-            const tg = window.Telegram?.WebApp;
-            if (!tg) {
-                alert('❌ Telegram Web App не доступен');
+            console.log(`🗺️ Загрузка отфильтрованных умейок на карту. Категория: ${category}, Подраздел: ${subcategory}`);
+            
+            if (window.mapMarkers && window.mapMarkers.length > 0) {
+                window.mapMarkers.forEach(marker => mapInstance.removeLayer(marker));
+            }
+            window.mapMarkers = [];
+            
+            const allSkills = await getGlobalSkills();
+            const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
+            
+            let filteredSkills = allSkills.filter(skill => {
+                if (!skill.category) return false;
+                const skillCategoryClean = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
+                return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
+            });
+            
+            const uniqueSkills = [];
+            const seenIds = new Set();
+            for (const skill of filteredSkills) {
+                if (!seenIds.has(skill._id)) {
+                    seenIds.add(skill._id);
+                    uniqueSkills.push(skill);
+                }
+            }
+            filteredSkills = uniqueSkills;
+            
+            if (filteredSkills.length === 0) {
+                showNotification(`❌ Нет мастеров в категории "${category}" для отображения на карте.`, 3000);
                 return;
             }
-            if (tg.openInvoice) {
-                const wallet = getWalletData();
-                wallet.connected = true;
-                wallet.walletAddress = 'EQ' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                saveWalletData(wallet);
-                showNotification('✅ Wallet успешно подключен!');
-                setTimeout(() => {
-                    if (confirm('💰 Хотите пополнить баланс?')) {
-                        depositFunds();
+            
+            const bounds = [];
+            
+            filteredSkills.forEach(skill => {
+                if (skill.location && skill.location.lat && skill.location.lon) {
+                    const isUserSkill = skill.userId === currentUserId;
+                    const status = skill.status || 'ready';
+                    const statusClass = status === 'ready' ? 'status-ready' : 'status-busy';
+                    const fallbackIcon = isUserSkill ? '👤' : '🔧';
+                    
+                    let markerHtml = '';
+                    if (skill.photo) {
+                        markerHtml = `
+                            <div class="umeyka-marker-container ${statusClass}">
+                                <img src="${skill.photo}" class="umeyka-marker-photo" alt="${skill.skill}">
+                            </div>
+                        `;
+                    } else {
+                        markerHtml = `
+                            <div class="umeyka-marker-container ${statusClass}">
+                                <div class="umeyka-marker-fallback">${fallbackIcon}</div>
+                            </div>
+                        `;
                     }
-                }, 500);
-            } else {
-                alert('❌ Telegram Wallet не поддерживается в вашей версии приложения');
+                    
+                    const marker = L.marker([skill.location.lat, skill.location.lon], {
+                        icon: L.divIcon({
+                            className: 'umeyka-marker',
+                            html: markerHtml,
+                            iconSize: [50, 50],
+                            iconAnchor: [25, 25]
+                        })
+                    }).addTo(mapInstance);
+                    
+                    marker.bindPopup(createMapSkillPopup(skill, isUserSkill));
+                    
+                    if (!window.mapMarkers) window.mapMarkers = [];
+                    window.mapMarkers.push(marker);
+                    
+                    bounds.push([skill.location.lat, skill.location.lon]);
+                }
+            });
+            
+            if (bounds.length > 0) {
+                mapInstance.fitBounds(bounds);
             }
+            
         } catch (error) {
-            console.error('❌ Ошибка подключения кошелька:', error);
-            alert('❌ Ошибка подключения кошелька');
+            console.error('❌ Ошибка загрузки карты:', error);
+            showNotification('❌ Ошибка загрузки карты', 2000);
         }
     }
     
-    async function depositFunds() {
+    function createMapSkillPopup(skill, isUserSkill) {
+        const statusBadge = getStatusBadge(skill.status);
+        const workFormatBadge = getWorkFormatBadge(skill.workFormat);
+        const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
+        const photoThumbnail = skill.photo ? `
+            <div class="popup-skill-photo">
+                <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
+            </div>
+        ` : '';
+        return `
+            <div class="map-popup-content">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; overflow: hidden; border: 3px solid ${skill.status === 'busy' ? '#f56565' : '#48bb78'};">
+                        ${skill.photo ? `<img src="${skill.photo}" style="width: 100%; height: 100%; object-fit: cover;">` : (isUserSkill ? '👤' : '🔧')}
+                    </div>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0; color: #2d3748; font-size: 16px;">${skill.skill}</h3>
+                        <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
+                    </div>
+                    ${photoThumbnail}
+                </div>
+                <div style="margin: 10px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
+                    <p style="margin: 8px 0; font-weight: bold; color: #48bb78;">${skill.price} руб.</p>
+                    ${statusBadge}
+                    ${workFormatBadge}
+                    ${cityInfo}
+                    ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin: 8px 0; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
+                    <div class="skill-user-row" style="margin: 10px 0;">
+                        <div class="skill-user-name">
+                            <span>👤</span> <span>${skill.username}</span>
+                        </div>
+                        <button class="details-button" onclick="event.stopPropagation(); window.openDetailsModal('${skill._id}');">
+                            📝 Подробно
+                        </button>
+                    </div>
+                    <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px;">
+                        <div style="font-weight: 600; color: #667eea; margin-bottom: 5px;">📞 Контакты:</div>
+                        <div style="display:flex; align-items:center; gap:10px; padding: 8px; background: white; border-radius: 6px;">
+                            <span style="font-size:18px;">📱</span>
+                            <span style="font-size: 14px;">${skill.experience || 'Не указано'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="map-skill-actions">
+                    <button onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');"
+                            class="map-skill-button map-contact-button">
+                        📞 Контакты
+                    </button>
+                    ${isUserSkill ? `
+                        <button onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');"
+                                class="map-skill-button map-edit-button">
+                            ✏️ Редактировать
+                        </button>
+                    ` : `
+                        <button onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.userId}', '${skill.experience || ''}');"
+                                class="map-skill-button" style="background: #ed8936; color: white;">
+                            📝 Сделку
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    }
+    
+    function closeMapModal() {
         triggerHapticFeedback();
-        const amount = prompt('💰 Введите сумму для пополнения (в Stars):', '100');
-        if (!amount || isNaN(amount) || amount <= 0) {
-            alert('❌ Неверная сумма');
-            return;
+        const modal = document.getElementById('mapModal');
+        modal.style.display = 'none';
+        if (modalMap) {
+            modalMap.remove();
+            modalMap = null;
         }
-        try {
-            const tg = window.Telegram?.WebApp;
-            if (tg?.openInvoice) {
-                setTimeout(() => {
-                    const wallet = getWalletData();
-                    wallet.availableBalance += parseInt(amount);
-                    saveWalletData(wallet);
-                    addTransaction('deposit', parseInt(amount), 'Пополнение баланса');
-                    showNotification(`✅ Баланс пополнен на ${amount} Stars!`);
-                }, 1500);
-            } else {
-                const wallet = getWalletData();
-                wallet.availableBalance += parseInt(amount);
-                saveWalletData(wallet);
-                addTransaction('deposit', parseInt(amount), 'Пополнение баланса (демо)');
-                showNotification(`✅ Баланс пополнен на ${amount} Stars! (демо)`);
-            }
-        } catch (error) {
-            console.error('❌ Ошибка пополнения:', error);
-            alert('❌ Ошибка пополнения баланса');
+        if (window.mapMarkers) {
+            window.mapMarkers = [];
+        }
+        currentModalMapFilter.category = null;
+        currentModalMapFilter.subcategory = null;
+    }
+    
+    // ========== ФУНКЦИИ ДЛЯ QR-КОДА НА ГЛАВНОМ ЭКРАНЕ ==========
+    
+    function generateMainScreenQR() {
+        if (!currentUserId) return;
+        const qrUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
+        const container = document.getElementById('mainScreenQrCode');
+        if (container) {
+            container.innerHTML = '';
+            new QRCode(container, {
+                text: qrUrl,
+                width: 100,
+                height: 100,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
         }
     }
     
-    async function withdrawFunds() {
+    function openMainScreenQRModal() {
         triggerHapticFeedback();
-        const wallet = getWalletData();
-        if (!wallet.connected) {
-            alert('❌ Сначала подключите Wallet');
-            return;
-        }
-        if (wallet.availableBalance <= 0) {
-            alert('❌ Нет доступных средств для вывода');
-            return;
-        }
-        const amount = prompt(`💸 Введите сумму для вывода (доступно: ${wallet.availableBalance} Stars):`, wallet.availableBalance);
-        if (!amount || isNaN(amount) || amount <= 0 || amount > wallet.availableBalance) {
-            alert('❌ Неверная сумма');
-            return;
-        }
-        if (!confirm(`⚠️ Подтвердите вывод ${amount} Stars на адрес ${wallet.walletAddress}?`)) {
-            return;
-        }
-        try {
-            setTimeout(() => {
-                wallet.availableBalance -= parseInt(amount);
-                saveWalletData(wallet);
-                addTransaction('withdrawal', parseInt(amount), 'Вывод средств');
-                showNotification(`✅ Выведено ${amount} Stars!`);
-            }, 1500);
-        } catch (error) {
-            console.error('❌ Ошибка вывода:', error);
-            alert('❌ Ошибка вывода средств');
-        }
-    }
-    
-    function getGlobalDeals() {
-        return getLocalStorage('umeyka_global_deals') || [];
-    }
-    
-    function setGlobalDeals(deals) {
-        return setLocalStorage('umeyka_global_deals', deals);
-    }
-    
-    function getUserDeals(userId) {
-        const globalDeals = getGlobalDeals();
-        return globalDeals.filter(deal => deal.clientId === userId || deal.masterId === userId);
-    }
-    
-    function addGlobalDeal(deal) {
-        const globalDeals = getGlobalDeals();
-        globalDeals.push(deal);
-        setGlobalDeals(globalDeals);
-        return deal;
-    }
-    
-    function updateGlobalDeal(dealId, updates) {
-        const globalDeals = getGlobalDeals();
-        const dealIndex = globalDeals.findIndex(deal => deal.id === dealId);
-        if (dealIndex !== -1) {
-            globalDeals[dealIndex] = { ...globalDeals[dealIndex], ...updates };
-            setGlobalDeals(globalDeals);
-            return globalDeals[dealIndex];
-        }
-        return null;
-    }
-    
-    function getDealById(dealId) {
-        const globalDeals = getGlobalDeals();
-        return globalDeals.find(deal => deal.id === dealId);
-    }
-    
-    function processPayment(dealId) {
-        const deal = getDealById(dealId);
-        if (!deal) return false;
-        const wallet = getWalletData();
-        const totalAmount = deal.total;
-        if (wallet.availableBalance < totalAmount) {
-            alert('❌ Недостаточно средств на балансе. Пополните кошелек.');
-            return false;
-        }
-        wallet.availableBalance -= totalAmount;
-        wallet.frozenBalance += totalAmount;
-        saveWalletData(wallet);
-        updateGlobalDeal(dealId, {
-            paymentStatus: 'paid',
-            escrowBalance: deal.amount,
-            commissionAmount: deal.commission,
-            paidAt: new Date().toISOString()
-        });
-        addTransaction('payment', totalAmount, `Оплата сделки "${deal.title}"`, dealId);
-        addTransaction('commission', deal.commission, `Комиссия по сделке "${deal.title}"`, dealId);
-        return true;
-    }
-    
-    function releasePayment(dealId) {
-        const deal = getDealById(dealId);
-        if (!deal || deal.paymentStatus !== 'paid') return false;
-        const masterWallet = getOrCreateWallet(deal.masterId);
-        const systemWallet = getOrCreateWallet('system');
-        const masterAmount = deal.amount * 0.95;
-        const commission = deal.amount * 0.05;
-        const clientWallet = getWalletData();
-        clientWallet.frozenBalance -= deal.total;
-        saveWalletData(clientWallet);
-        masterWallet.availableBalance += masterAmount;
-        masterWallet.totalEarned += masterAmount;
-        saveWalletData(masterWallet);
-        systemWallet.availableBalance += commission;
-        systemWallet.totalCommission += commission;
-        saveWalletData(systemWallet);
-        updateGlobalDeal(dealId, {
-            paymentStatus: 'released',
-            masterPayout: masterAmount,
-            releasedAt: new Date().toISOString()
-        });
-        const masterTx = {
-            id: 'tx_' + Date.now(),
-            type: 'payout',
-            amount: masterAmount,
-            description: `Выплата по сделке "${deal.title}"`,
-            dealId: dealId,
-            timestamp: new Date().toISOString(),
-            status: 'completed'
-        };
-        const masterData = getLocalStorage(`wallet_${deal.masterId}`) || {};
-        masterData.transactions = masterData.transactions || [];
-        masterData.transactions.unshift(masterTx);
-        setLocalStorage(`wallet_${deal.masterId}`, masterData);
-        return true;
-    }
-    
-    function getOrCreateWallet(userId) {
-        let wallet = getLocalStorage(`wallet_${userId}`);
-        if (!wallet) {
-            wallet = {
-                connected: false,
-                walletAddress: null,
-                availableBalance: 0,
-                frozenBalance: 0,
-                totalEarned: 0,
-                totalCommission: 0,
-                transactions: []
-            };
-            setLocalStorage(`wallet_${userId}`, wallet);
-        }
-        return wallet;
-    }
-    
-    window.payForDeal = function(dealId) {
-        triggerHapticFeedback();
-        const deal = getDealById(dealId);
-        if (!deal) {
-            alert('❌ Сделка не найдена');
-            return;
-        }
-        if (deal.paymentStatus === 'paid') {
-            alert('❌ Сделка уже оплачена');
-            return;
-        }
-        const wallet = getWalletData();
-        if (!wallet.connected) {
-            alert('❌ Сначала подключите Telegram Wallet в личном кабинете');
-            return;
-        }
-        pendingPaymentDealId = dealId;
-        document.getElementById('confirmDealTitle').textContent = deal.title;
-        document.getElementById('confirmDealAmount').textContent = deal.amount + ' ⭐';
-        document.getElementById('confirmDealCommission').textContent = deal.commission + ' ⭐';
-        document.getElementById('confirmDealTotal').textContent = deal.total + ' ⭐';
-        document.getElementById('paymentConfirmModal').style.display = 'flex';
-    };
-    
-    function confirmPayment() {
-        if (!pendingPaymentDealId) return;
-        if (processPayment(pendingPaymentDealId)) {
-            showNotification('✅ Оплата прошла успешно! Деньги заморожены до завершения сделки.');
-            closePaymentConfirm();
-            loadDeals();
-            updateWalletUI();
-        }
-        pendingPaymentDealId = null;
-    }
-    
-    function closePaymentConfirm() {
-        document.getElementById('paymentConfirmModal').style.display = 'none';
-        pendingPaymentDealId = null;
-    }
-    
-    // ========== ФУНКЦИИ ДЛЯ QR-КОДОВ ==========
-    
-    window.showQRModal = function(skillId, skillName) {
-        triggerHapticFeedback();
-        currentQRSkillId = skillId;
-        currentQRSkillName = skillName;
-        const skill = getGlobalSkillById(skillId);
-        if (!skill) {
-            alert('❌ Умейка не найдена');
-            return;
-        }
-        document.getElementById('qrModalTitle').textContent = skillName;
+        const qrUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
+        const userData = getOrCreateUserProfile(currentUserId);
+        const userName = userData.firstName || 'Пользователь';
+        
+        document.getElementById('qrModalTitle').textContent = `📇 Визитка ${userName}`;
         const container = document.getElementById('qrCodeContainer');
         container.innerHTML = '';
-        const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
         new QRCode(container, {
-            text: qrData,
+            text: qrUrl,
             width: 250,
             height: 250,
             colorDark: '#000000',
@@ -5573,30 +5506,25 @@
             correctLevel: QRCode.CorrectLevel.H
         });
         document.getElementById('qrModal').classList.add('active');
-    };
-    
-    window.closeQRModal = function() {
-        triggerHapticFeedback();
-        document.getElementById('qrModal').classList.remove('active');
-        currentQRSkillId = null;
-        currentQRSkillName = null;
-    };
+    }
     
     window.shareQRCode = function() {
         triggerHapticFeedback();
-        if (!currentQRSkillId || !currentQRSkillName) return;
-        const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`;
+        const shareUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
+        const userData = getOrCreateUserProfile(currentUserId);
+        const userName = userData.firstName || 'Пользователь';
+        const shareText = `📇 Визитка мастера ${userName} в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке, чтобы посмотреть мои умейки:\n${shareUrl}`;
         if (navigator.share) {
             navigator.share({
-                title: currentQRSkillName,
+                title: `Визитка ${userName}`,
                 text: shareText,
-                url: `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`
+                url: shareUrl
             }).catch(err => console.log('Share canceled'));
         } else {
             navigator.clipboard.writeText(shareText).then(() => {
-                showNotification('✅ Ссылка скопирована в буфер обмена!');
+                showNotification('✅ Ссылка на визитку скопирована!');
             }).catch(() => {
-                alert('Ссылка: ' + `${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`);
+                alert('Ссылка: ' + shareUrl);
             });
         }
     };
@@ -5852,9 +5780,6 @@
                         await preloadAllSkills();
                         loadMySkills();
                         loadProfileSkills();
-                        if (map) {
-                            setTimeout(() => loadSkillsOnMap(), 1000);
-                        }
                         return;
                     }
                 }
@@ -5891,9 +5816,6 @@
                 await preloadAllSkills();
                 loadMySkills();
                 loadProfileSkills();
-                if (map) {
-                    setTimeout(() => loadSkillsOnMap(), 1000);
-                }
             }
         } catch (error) {
             hideLoadingIndicator();
@@ -6194,9 +6116,6 @@
             await preloadAllSkills();
             await loadMySkills();
             await loadProfileSkills();
-            if (map) {
-                await loadSkillsOnMap();
-            }
         } catch (error) {
             hideLoadingIndicator();
             console.error('❌ Ошибка сохранения умейки:', error);
@@ -6232,9 +6151,6 @@
                 await preloadAllSkills();
                 await loadMySkills();
                 await loadProfileSkills();
-                if (map) {
-                    await loadSkillsOnMap();
-                }
                 alert('✅ Умейка удалена!');
             } catch (error) {
                 hideLoadingIndicator();
@@ -6244,226 +6160,14 @@
         }
     };
     
-    // ========== ФУНКЦИИ ДЛЯ КАРТЫ ==========
-    
-    window.openMap = function() {
-        triggerHapticFeedback();
-        const mapSection = document.querySelector('.map-section');
-        mapSection.classList.add('map-active');
-        if (!map) {
-            initMap();
-        } else {
-            loadSkillsOnMap();
-        }
-        startMapAutoRefresh();
-    };
-    
-    function initMap() {
-        if (map) return;
-        map = L.map('map', {
-            attributionControl: false
-        }).setView([55.7558, 37.6173], 10);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            subdomains: 'abcd',
-            maxZoom: 20
-        }).addTo(map);
-        map.setMaxBounds([
-            [30, 19],
-            [70, 180]
-        ]);
-        initializeUserLocation();
-    }
-    
-    function initializeUserLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    const { latitude, longitude } = position.coords;
-                    userLocation = { lat: latitude, lon: longitude };
-                    map.setView([latitude, longitude], 13);
-                    const userMarker = L.marker([latitude, longitude], {
-                        icon: L.divIcon({
-                            className: 'user-marker',
-                            html: '<div class="user-marker-container"></div>',
-                            iconSize: [16, 16],
-                            iconAnchor: [8, 8]
-                        })
-                    })
-                    .addTo(map)
-                    .bindPopup('📍 <b>Ваше местоположение</b>')
-                    .openPopup();
-                    markers.push(userMarker);
-                    loadSkillsOnMap();
-                },
-                error => {
-                    console.log('📍 Геолокация недоступна:', error);
-                    userLocation = { lat: 55.7558, lon: 37.6173 };
-                    loadSkillsOnMap();
-                }
-            );
-        } else {
-            userLocation = { lat: 55.7558, lon: 37.6173 };
-            loadSkillsOnMap();
-        }
-    }
-    
-    function createSkillMarkerHtml(skill, isUserSkill) {
-        const status = skill.status || 'ready';
-        const statusClass = status === 'ready' ? 'status-ready' : 'status-busy';
-        const fallbackIcon = isUserSkill ? '👤' : '🔧';
-        if (skill.photo) {
-            return `
-                <div class="umeyka-marker-container ${statusClass}">
-                    <img src="${skill.photo}" class="umeyka-marker-photo" alt="${skill.skill}">
-                </div>
-            `;
-        } else {
-            return `
-                <div class="umeyka-marker-container ${statusClass}">
-                    <div class="umeyka-marker-fallback">${fallbackIcon}</div>
-                </div>
-            `;
-        }
-    }
-    
-    async function loadSkillsOnMap() {
-        try {
-            console.log('🗺️ Загрузка умейок на карту');
-            const skills = await getGlobalSkills();
-            if (markers.length > 0) {
-                markers.forEach(marker => map.removeLayer(marker));
-                markers = [];
-            }
-            if (userLocation) {
-                const userMarker = L.marker([userLocation.lat, userLocation.lon], {
-                    icon: L.divIcon({
-                        className: 'user-marker',
-                        html: '<div class="user-marker-container"></div>',
-                        iconSize: [16, 16],
-                        iconAnchor: [8, 8]
-                    })
-                })
-                .addTo(map)
-                .bindPopup('📍 <b>Ваше местоположение</b>');
-                markers.push(userMarker);
-            }
-            skills.forEach(skill => {
-                if (skill.location && skill.location.lat && skill.location.lon) {
-                    const isUserSkill = skill.userId === currentUserId;
-                    const status = skill.status || 'ready';
-                    const radius = skill.radius || 10;
-                    const circleColor = (!status || status === 'ready') ? '#48bb78' : '#f56565';
-                    const circle = L.circle([skill.location.lat, skill.location.lon], {
-                        color: circleColor,
-                        fillColor: circleColor,
-                        fillOpacity: 0.2,
-                        radius: radius * 1000
-                    }).addTo(map);
-                    markers.push(circle);
-                    const markerHtml = createSkillMarkerHtml(skill, isUserSkill);
-                    const marker = L.marker([skill.location.lat, skill.location.lon], {
-                        icon: L.divIcon({
-                            className: 'umeyka-marker',
-                            html: markerHtml,
-                            iconSize: [50, 50],
-                            iconAnchor: [25, 25]
-                        })
-                    })
-                    .addTo(map)
-                    .bindPopup(createMapSkillPopup(skill, isUserSkill));
-                    markers.push(marker);
-                }
-            });
-        } catch (error) {
-            console.error('❌ Ошибка загрузки карты:', error);
-        }
-    }
-    
-    function createMapSkillPopup(skill, isUserSkill) {
-        const statusBadge = getStatusBadge(skill.status);
-        const workFormatBadge = getWorkFormatBadge(skill.workFormat);
-        const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
-        const photoThumbnail = skill.photo ? `
-            <div class="popup-skill-photo">
-                <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
-            </div>
-        ` : '';
-        return `
-            <div class="map-popup-content">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                    <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; overflow: hidden; border: 3px solid ${skill.status === 'busy' ? '#f56565' : '#48bb78'};">
-                        ${skill.photo ? `<img src="${skill.photo}" style="width: 100%; height: 100%; object-fit: cover;">` : (isUserSkill ? '👤' : '🔧')}
-                    </div>
-                    <div style="flex: 1;">
-                        <h3 style="margin: 0; color: #2d3748; font-size: 16px;">${skill.skill}</h3>
-                        <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
-                    </div>
-                    ${photoThumbnail}
-                </div>
-                <div style="margin: 10px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
-                    <p style="margin: 8px 0; font-weight: bold; color: #48bb78;">${skill.price} руб.</p>
-                    ${statusBadge}
-                    ${workFormatBadge}
-                    ${cityInfo}
-                    ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin: 8px 0; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
-                    <div class="skill-user-row" style="margin: 10px 0;">
-                        <div class="skill-user-name">
-                            <span>👤</span> <span>${skill.username}</span>
-                        </div>
-                        <button class="details-button" onclick="event.stopPropagation(); window.openDetailsModal('${skill._id}');">
-                            📝 Подробно
-                        </button>
-                    </div>
-                    <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px;">
-                        <div style="font-weight: 600; color: #667eea; margin-bottom: 5px;">📞 Контакты:</div>
-                        <div style="display:flex; align-items:center; gap:10px; padding: 8px; background: white; border-radius: 6px;">
-                            <span style="font-size:18px;">📱</span>
-                            <span style="font-size: 14px;">${skill.experience || 'Не указано'}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="map-skill-actions">
-                    <button onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');"
-                            class="map-skill-button map-contact-button">
-                        📞 Контакты
-                    </button>
-                    ${isUserSkill ? `
-                        <button onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');"
-                                class="map-skill-button map-edit-button">
-                            ✏️ Редактировать
-                        </button>
-                    ` : `
-                        <button onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.userId}', '${skill.experience || ''}');"
-                                class="map-skill-button" style="background: #ed8936; color: white;">
-                            📝 Сделку
-                        </button>
-                    `}
-                </div>
-            </div>
-        `;
-    }
-    
-    function startMapAutoRefresh() {
-        stopMapAutoRefresh();
-        mapRefreshInterval = setInterval(() => {
-            if (document.querySelector('.map-active') && map) {
-                loadSkillsOnMap();
-            }
-        }, 30000);
-    }
-    
-    function stopMapAutoRefresh() {
-        if (mapRefreshInterval) {
-            clearInterval(mapRefreshInterval);
-            mapRefreshInterval = null;
-        }
-    }
-    
     // ========== ФУНКЦИИ ДЛЯ НАВИГАЦИИ ==========
     
     window.showMainScreen = function() {
         triggerHapticFeedback();
         stopMapAutoRefresh();
+        if (modalMap) {
+            closeMapModal();
+        }
         document.getElementById('mainScreen').style.display = 'block';
         document.getElementById('masterSection').style.display = 'none';
         document.getElementById('clientSection').style.display = 'none';
@@ -6472,13 +6176,16 @@
         document.getElementById('editProfileSection').style.display = 'none';
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
-        document.querySelector('.map-section').classList.remove('map-active');
+        generateMainScreenQR();
     };
     
     window.showSection = function(sectionId) {
         triggerHapticFeedback();
         if (!document.querySelector('.map-active') && mapRefreshInterval) {
             stopMapAutoRefresh();
+        }
+        if (modalMap) {
+            closeMapModal();
         }
         document.getElementById('mainScreen').style.display = 'none';
         document.getElementById('masterSection').style.display = 'none';
@@ -6636,10 +6343,8 @@
         if (currentProfileTab === 'skills') {
             loadProfileSkills();
         }
-        if (map) {
-            loadSkillsOnMap();
-        }
         currentAvatar = null;
+        generateMainScreenQR();
     };
     
     window.changeAvatar = function() {
@@ -7499,6 +7204,9 @@
                 <div class="become-master-button" onclick="triggerHapticFeedback(); openMasterFormWithCategory('${category.replace(/'/g, "\\'")}');">
                     ✨ Стать мастером в этой категории
                 </div>
+                <div class="become-master-button" onclick="triggerHapticFeedback(); openMapModal('${category.replace(/'/g, "\\'")}', '');" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-top: 10px;">
+                    🗺️ Посмотреть на карте
+                </div>
             </div>
             <div id="subcategorySkills"></div>
         `;
@@ -7556,6 +7264,9 @@
                     <div class="section-title">🔍 Результаты по подразделу "${subcategory}"</div>
                     ${offlineMode ? '<span class="offline-badge">📶 Офлайн-режим</span>' : ''}
                     <div style="color: white; font-size: 14px;">Найдено: ${filteredSkills.length}</div>
+                    <button class="become-master-button" onclick="triggerHapticFeedback(); openMapModal('${category.replace(/'/g, "\\'")}', '${subcategory.replace(/'/g, "\\'")}');" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-left: 10px;">
+                        🗺️ Посмотреть на карте
+                    </button>
                 </div>
                 ${filteredSkills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
@@ -7621,6 +7332,9 @@
                     <button class="become-master-button" onclick="triggerHapticFeedback(); openMasterFormWithCategory('${category.replace(/'/g, "\\'")}');" style="margin-top: 15px;">
                         ✨ Стать мастером в этой категории
                     </button>
+                    <button class="become-master-button" onclick="triggerHapticFeedback(); openMapModal('${category.replace(/'/g, "\\'")}', '${subcategory.replace(/'/g, "\\'")}');" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-top: 10px;">
+                        🗺️ Посмотреть на карте
+                    </button>
                 </div>
             `;
         }
@@ -7632,19 +7346,17 @@
     
     window.showOnMap = function(lat, lon, title) {
         triggerHapticFeedback();
-        if (!map) {
-            initMap();
-        }
-        const mapSection = document.querySelector('.map-section');
-        if (mapSection) {
-            mapSection.classList.add('map-active');
-        }
-        map.setView([parseFloat(lat), parseFloat(lon)], 15);
-        L.marker([parseFloat(lat), parseFloat(lon)])
-            .addTo(map)
-            .bindPopup(`<b>📍 ${title}</b><br>Местоположение мастера`)
-            .openPopup();
-        showNotification(`🗺️ Показано на карте: ${title}`);
+        openMapModal(currentMapFilter.category || "🧱 Плиточник", currentMapFilter.subcategory || "Один");
+        setTimeout(() => {
+            if (modalMap) {
+                modalMap.setView([parseFloat(lat), parseFloat(lon)], 15);
+                L.marker([parseFloat(lat), parseFloat(lon)])
+                    .addTo(modalMap)
+                    .bindPopup(`<b>📍 ${title}</b><br>Местоположение мастера`)
+                    .openPopup();
+                showNotification(`🗺️ Показано на карте: ${title}`);
+            }
+        }, 500);
     };
     
     // ========== ФУНКЦИИ ДЛЯ КОНТАКТОВ ==========
@@ -7956,6 +7668,362 @@
         }
     }
     
+    // ========== ФУНКЦИИ ДЛЯ ФИНАНСОВ И СДЕЛОК ==========
+    
+    function getWalletData() {
+        const data = getLocalStorage(`wallet_${currentUserId}`);
+        return data || {
+            connected: false,
+            walletAddress: null,
+            availableBalance: 0,
+            frozenBalance: 0,
+            totalEarned: 0,
+            totalCommission: 0,
+            transactions: []
+        };
+    }
+    
+    function saveWalletData(data) {
+        setLocalStorage(`wallet_${currentUserId}`, data);
+        updateWalletUI();
+    }
+    
+    function addTransaction(type, amount, description, dealId = null) {
+        const wallet = getWalletData();
+        const transaction = {
+            id: 'tx_' + Date.now(),
+            type: type,
+            amount: amount,
+            description: description,
+            dealId: dealId,
+            timestamp: new Date().toISOString(),
+            status: 'completed'
+        };
+        wallet.transactions.unshift(transaction);
+        saveWalletData(wallet);
+        return transaction;
+    }
+    
+    function updateWalletUI() {
+        const wallet = getWalletData();
+        document.getElementById('availableBalance').textContent = wallet.availableBalance + ' ⭐';
+        document.getElementById('frozenBalance').textContent = wallet.frozenBalance + ' ⭐';
+        document.getElementById('totalEarned').textContent = wallet.totalEarned + ' ⭐';
+        document.getElementById('totalCommission').textContent = wallet.totalCommission + ' ⭐';
+        const walletStatus = document.getElementById('walletStatus');
+        if (wallet.connected) {
+            walletStatus.className = 'wallet-connected';
+            walletStatus.innerHTML = `<span>🟢</span><span>Wallet подключен: ${wallet.walletAddress?.slice(0, 6)}...${wallet.walletAddress?.slice(-4)}</span>`;
+            document.getElementById('withdrawButton').style.display = 'flex';
+        } else {
+            walletStatus.className = 'wallet-disconnected';
+            walletStatus.innerHTML = `<span>🔴</span><span>Telegram Wallet не подключен</span>`;
+            document.getElementById('withdrawButton').style.display = 'none';
+        }
+        renderTransactionHistory(wallet.transactions);
+    }
+    
+    function renderTransactionHistory(transactions) {
+        const container = document.getElementById('transactionHistory');
+        if (!transactions || transactions.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">История операций пуста</div>';
+            return;
+        }
+        container.innerHTML = transactions.slice(0, 10).map(tx => {
+            const isIncome = tx.type === 'deposit' || tx.type === 'payout' || tx.type === 'refund';
+            const isCommission = tx.type === 'commission';
+            const amountClass = isIncome ? 'positive' : 'negative';
+            const icon = isIncome ? '💰' : (isCommission ? '💸' : '💳');
+            return `
+                <div class="transaction-item ${isIncome ? 'income' : (isCommission ? 'commission' : 'expense')}">
+                    <div class="transaction-info">
+                        <div class="transaction-title">${icon} ${tx.description}</div>
+                        <div class="transaction-date">${new Date(tx.timestamp).toLocaleDateString('ru-RU')}</div>
+                    </div>
+                    <div class="transaction-amount ${amountClass}">
+                        ${isIncome ? '+' : '-'}${tx.amount} ⭐
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    async function connectWallet() {
+        triggerHapticFeedback();
+        try {
+            const tg = window.Telegram?.WebApp;
+            if (!tg) {
+                alert('❌ Telegram Web App не доступен');
+                return;
+            }
+            if (tg.openInvoice) {
+                const wallet = getWalletData();
+                wallet.connected = true;
+                wallet.walletAddress = 'EQ' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                saveWalletData(wallet);
+                showNotification('✅ Wallet успешно подключен!');
+                setTimeout(() => {
+                    if (confirm('💰 Хотите пополнить баланс?')) {
+                        depositFunds();
+                    }
+                }, 500);
+            } else {
+                alert('❌ Telegram Wallet не поддерживается в вашей версии приложения');
+            }
+        } catch (error) {
+            console.error('❌ Ошибка подключения кошелька:', error);
+            alert('❌ Ошибка подключения кошелька');
+        }
+    }
+    
+    async function depositFunds() {
+        triggerHapticFeedback();
+        const amount = prompt('💰 Введите сумму для пополнения (в Stars):', '100');
+        if (!amount || isNaN(amount) || amount <= 0) {
+            alert('❌ Неверная сумма');
+            return;
+        }
+        try {
+            const tg = window.Telegram?.WebApp;
+            if (tg?.openInvoice) {
+                setTimeout(() => {
+                    const wallet = getWalletData();
+                    wallet.availableBalance += parseInt(amount);
+                    saveWalletData(wallet);
+                    addTransaction('deposit', parseInt(amount), 'Пополнение баланса');
+                    showNotification(`✅ Баланс пополнен на ${amount} Stars!`);
+                }, 1500);
+            } else {
+                const wallet = getWalletData();
+                wallet.availableBalance += parseInt(amount);
+                saveWalletData(wallet);
+                addTransaction('deposit', parseInt(amount), 'Пополнение баланса (демо)');
+                showNotification(`✅ Баланс пополнен на ${amount} Stars! (демо)`);
+            }
+        } catch (error) {
+            console.error('❌ Ошибка пополнения:', error);
+            alert('❌ Ошибка пополнения баланса');
+        }
+    }
+    
+    async function withdrawFunds() {
+        triggerHapticFeedback();
+        const wallet = getWalletData();
+        if (!wallet.connected) {
+            alert('❌ Сначала подключите Wallet');
+            return;
+        }
+        if (wallet.availableBalance <= 0) {
+            alert('❌ Нет доступных средств для вывода');
+            return;
+        }
+        const amount = prompt(`💸 Введите сумму для вывода (доступно: ${wallet.availableBalance} Stars):`, wallet.availableBalance);
+        if (!amount || isNaN(amount) || amount <= 0 || amount > wallet.availableBalance) {
+            alert('❌ Неверная сумма');
+            return;
+        }
+        if (!confirm(`⚠️ Подтвердите вывод ${amount} Stars на адрес ${wallet.walletAddress}?`)) {
+            return;
+        }
+        try {
+            setTimeout(() => {
+                wallet.availableBalance -= parseInt(amount);
+                saveWalletData(wallet);
+                addTransaction('withdrawal', parseInt(amount), 'Вывод средств');
+                showNotification(`✅ Выведено ${amount} Stars!`);
+            }, 1500);
+        } catch (error) {
+            console.error('❌ Ошибка вывода:', error);
+            alert('❌ Ошибка вывода средств');
+        }
+    }
+    
+    function getGlobalDeals() {
+        return getLocalStorage('umeyka_global_deals') || [];
+    }
+    
+    function setGlobalDeals(deals) {
+        return setLocalStorage('umeyka_global_deals', deals);
+    }
+    
+    function getUserDeals(userId) {
+        const globalDeals = getGlobalDeals();
+        return globalDeals.filter(deal => deal.clientId === userId || deal.masterId === userId);
+    }
+    
+    function addGlobalDeal(deal) {
+        const globalDeals = getGlobalDeals();
+        globalDeals.push(deal);
+        setGlobalDeals(globalDeals);
+        return deal;
+    }
+    
+    function updateGlobalDeal(dealId, updates) {
+        const globalDeals = getGlobalDeals();
+        const dealIndex = globalDeals.findIndex(deal => deal.id === dealId);
+        if (dealIndex !== -1) {
+            globalDeals[dealIndex] = { ...globalDeals[dealIndex], ...updates };
+            setGlobalDeals(globalDeals);
+            return globalDeals[dealIndex];
+        }
+        return null;
+    }
+    
+    function getDealById(dealId) {
+        const globalDeals = getGlobalDeals();
+        return globalDeals.find(deal => deal.id === dealId);
+    }
+    
+    function processPayment(dealId) {
+        const deal = getDealById(dealId);
+        if (!deal) return false;
+        const wallet = getWalletData();
+        const totalAmount = deal.total;
+        if (wallet.availableBalance < totalAmount) {
+            alert('❌ Недостаточно средств на балансе. Пополните кошелек.');
+            return false;
+        }
+        wallet.availableBalance -= totalAmount;
+        wallet.frozenBalance += totalAmount;
+        saveWalletData(wallet);
+        updateGlobalDeal(dealId, {
+            paymentStatus: 'paid',
+            escrowBalance: deal.amount,
+            commissionAmount: deal.commission,
+            paidAt: new Date().toISOString()
+        });
+        addTransaction('payment', totalAmount, `Оплата сделки "${deal.title}"`, dealId);
+        addTransaction('commission', deal.commission, `Комиссия по сделке "${deal.title}"`, dealId);
+        return true;
+    }
+    
+    function releasePayment(dealId) {
+        const deal = getDealById(dealId);
+        if (!deal || deal.paymentStatus !== 'paid') return false;
+        const masterWallet = getOrCreateWallet(deal.masterId);
+        const systemWallet = getOrCreateWallet('system');
+        const masterAmount = deal.amount * 0.95;
+        const commission = deal.amount * 0.05;
+        const clientWallet = getWalletData();
+        clientWallet.frozenBalance -= deal.total;
+        saveWalletData(clientWallet);
+        masterWallet.availableBalance += masterAmount;
+        masterWallet.totalEarned += masterAmount;
+        saveWalletData(masterWallet);
+        systemWallet.availableBalance += commission;
+        systemWallet.totalCommission += commission;
+        saveWalletData(systemWallet);
+        updateGlobalDeal(dealId, {
+            paymentStatus: 'released',
+            masterPayout: masterAmount,
+            releasedAt: new Date().toISOString()
+        });
+        const masterTx = {
+            id: 'tx_' + Date.now(),
+            type: 'payout',
+            amount: masterAmount,
+            description: `Выплата по сделке "${deal.title}"`,
+            dealId: dealId,
+            timestamp: new Date().toISOString(),
+            status: 'completed'
+        };
+        const masterData = getLocalStorage(`wallet_${deal.masterId}`) || {};
+        masterData.transactions = masterData.transactions || [];
+        masterData.transactions.unshift(masterTx);
+        setLocalStorage(`wallet_${deal.masterId}`, masterData);
+        return true;
+    }
+    
+    function getOrCreateWallet(userId) {
+        let wallet = getLocalStorage(`wallet_${userId}`);
+        if (!wallet) {
+            wallet = {
+                connected: false,
+                walletAddress: null,
+                availableBalance: 0,
+                frozenBalance: 0,
+                totalEarned: 0,
+                totalCommission: 0,
+                transactions: []
+            };
+            setLocalStorage(`wallet_${userId}`, wallet);
+        }
+        return wallet;
+    }
+    
+    window.payForDeal = function(dealId) {
+        triggerHapticFeedback();
+        const deal = getDealById(dealId);
+        if (!deal) {
+            alert('❌ Сделка не найдена');
+            return;
+        }
+        if (deal.paymentStatus === 'paid') {
+            alert('❌ Сделка уже оплачена');
+            return;
+        }
+        const wallet = getWalletData();
+        if (!wallet.connected) {
+            alert('❌ Сначала подключите Telegram Wallet в личном кабинете');
+            return;
+        }
+        pendingPaymentDealId = dealId;
+        document.getElementById('confirmDealTitle').textContent = deal.title;
+        document.getElementById('confirmDealAmount').textContent = deal.amount + ' ⭐';
+        document.getElementById('confirmDealCommission').textContent = deal.commission + ' ⭐';
+        document.getElementById('confirmDealTotal').textContent = deal.total + ' ⭐';
+        document.getElementById('paymentConfirmModal').style.display = 'flex';
+    };
+    
+    function confirmPayment() {
+        if (!pendingPaymentDealId) return;
+        if (processPayment(pendingPaymentDealId)) {
+            showNotification('✅ Оплата прошла успешно! Деньги заморожены до завершения сделки.');
+            closePaymentConfirm();
+            loadDeals();
+            updateWalletUI();
+        }
+        pendingPaymentDealId = null;
+    }
+    
+    function closePaymentConfirm() {
+        document.getElementById('paymentConfirmModal').style.display = 'none';
+        pendingPaymentDealId = null;
+    }
+    
+    // ========== ФУНКЦИИ ДЛЯ QR-КОДОВ ==========
+    
+    window.showQRModal = function(skillId, skillName) {
+        triggerHapticFeedback();
+        currentQRSkillId = skillId;
+        currentQRSkillName = skillName;
+        const skill = getGlobalSkillById(skillId);
+        if (!skill) {
+            alert('❌ Умейка не найдена');
+            return;
+        }
+        document.getElementById('qrModalTitle').textContent = skillName;
+        const container = document.getElementById('qrCodeContainer');
+        container.innerHTML = '';
+        const qrData = `${TELEGRAM_BOT_URL}?start=skill_${skillId}`;
+        new QRCode(container, {
+            text: qrData,
+            width: 250,
+            height: 250,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        document.getElementById('qrModal').classList.add('active');
+    };
+    
+    window.closeQRModal = function() {
+        triggerHapticFeedback();
+        document.getElementById('qrModal').classList.remove('active');
+        currentQRSkillId = null;
+        currentQRSkillName = null;
+    };
+    
     // ========== ИНИЦИАЛИЗАЦИЯ ==========
     
     document.addEventListener('DOMContentLoaded', async function() {
@@ -7992,6 +8060,28 @@
         // Инициализация селекторов формата работы
         selectWorkFormat('Один');
         selectEditWorkFormat('Один');
+        
+        // Генерация QR-кода на главном экране
+        generateMainScreenQR();
+        
+        // Загрузка геолокации для карты (если понадобится)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    userLocation = { lat: position.coords.latitude, lon: position.coords.longitude };
+                },
+                error => {
+                    console.log('📍 Геолокация недоступна:', error);
+                    userLocation = { lat: 55.7558, lon: 37.6173 };
+                }
+            );
+        } else {
+            userLocation = { lat: 55.7558, lon: 37.6173 };
+        }
+        
+        // Удаление старого map-section, если он существует (на всякий случай)
+        const mapSection = document.querySelector('.map-section');
+        if (mapSection) mapSection.remove();
     });
     </script>
 </body>
