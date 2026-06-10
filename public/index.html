@@ -404,6 +404,45 @@
             margin-right: 12px;
         }
         
+        /* QR-код визитки на главном экране */
+        .visitka-qr-section {
+            padding: 15px 20px 25px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .visitka-qr-card {
+            background: white;
+            border-radius: 20px;
+            padding: 15px 20px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            width: fit-content;
+            margin: 0 auto;
+        }
+        
+        .visitka-qr-card:active {
+            transform: scale(0.98);
+        }
+        
+        .visitka-qr-card .qr-code-small {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+            background: white;
+            padding: 5px;
+            border-radius: 12px;
+        }
+        
+        .visitka-qr-card .qr-label {
+            font-size: 13px;
+            color: #667eea;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+        
         .section {
             display: none;
             position: fixed;
@@ -524,6 +563,50 @@
             transform: translateY(-2px);
             border-color: #84cc16;
             box-shadow: 0 4px 15px rgba(132, 204, 22, 0.3);
+        }
+        
+        .action-buttons-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .action-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .action-button:active {
+            transform: scale(0.97);
+        }
+        
+        .action-button.become {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+        
+        .action-button.map {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .action-button.become:hover, .action-button.map:hover {
+            transform: translateY(-2px);
         }
         
         .form-section {
@@ -933,17 +1016,67 @@
             background: #f7fafc;
         }
         
-        #map {
-            height: 400px;
-            border-radius: 15px;
-            margin-top: 15px;
-            border: 2px solid rgba(255,255,255,0.3);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        /* Карта - скрыта по умолчанию на главном экране */
+        .map-section {
             display: none;
         }
         
-        .map-active #map {
-            display: block;
+        /* Карта-оверлей для модального открытия */
+        .map-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 11000;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        .map-modal-overlay.active {
+            display: flex;
+        }
+        
+        .map-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .map-modal-title {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .map-modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .map-container {
+            flex: 1;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        #mapModal {
+            height: 100%;
+            width: 100%;
+            border-radius: 15px;
         }
         
         .loading {
@@ -2906,45 +3039,6 @@
             font-weight: bold;
             color: white;
         }
-
-        /* Стили для QR-кода визитки на главном экране */
-        .home-qr-section {
-            padding: 15px 20px 25px;
-            display: flex;
-            justify-content: center;
-        }
-        
-        .home-qr-card {
-            background: white;
-            border-radius: 20px;
-            padding: 12px 20px 15px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
-            width: fit-content;
-            margin: 0 auto;
-            cursor: pointer;
-        }
-        
-        .home-qr-card:active {
-            transform: scale(0.98);
-        }
-        
-        .home-qr-code {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .home-qr-label {
-            font-size: 12px;
-            color: #4a5568;
-            margin-top: 8px;
-            font-weight: 500;
-        }
     </style>
 </head>
 <body>
@@ -2953,7 +3047,7 @@
     <div class="swipe-arrow" id="swipeArrow">←</div>
 
     <div class="container">
-        <!-- ГЛАВНЫЙ ЭКРАН -->
+        <!-- ГЛАВНЫЙ ЭКРАН (без карты) -->
         <div id="mainScreen">
             <div class="header" id="logoHeader">
                 <button class="qr-scanner-button" onclick="triggerHapticFeedback(); openQRScanner();">📷 Сканер</button>
@@ -2989,12 +3083,23 @@
                 </button>
             </div>
 
-            <!-- Блок с QR-кодом визитки на главном экране (внизу, после всех кнопок) -->
-            <div class="home-qr-section" id="homeQRContainer">
-                <div class="home-qr-card" onclick="openHomeQRModal()">
-                    <div id="homeQRCode" class="home-qr-code"></div>
-                    <div class="home-qr-label">📇 Моя визитка</div>
+            <!-- QR-код визитки на главном экране -->
+            <div class="visitka-qr-section">
+                <div class="visitka-qr-card" onclick="triggerHapticFeedback(); openVisitkaModal();">
+                    <div id="mainScreenQRCode" class="qr-code-small"></div>
+                    <div class="qr-label">Моя визитка</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- МОДАЛЬНОЕ ОКНО КАРТЫ -->
+        <div id="mapModalOverlay" class="map-modal-overlay">
+            <div class="map-modal-header">
+                <div class="map-modal-title">🗺️ Мастера на карте</div>
+                <button class="map-modal-close" onclick="closeMapModal();">Закрыть</button>
+            </div>
+            <div class="map-container">
+                <div id="mapModal"></div>
             </div>
         </div>
 
@@ -3016,7 +3121,6 @@
                 
                 <input type="text" id="skillName" class="input-field" placeholder="Моё умение (например: Ремонт телефонов)*" required>
                 
-                <!-- ВЫБОР КАТЕГОРИИ (ОБЯЗАТЕЛЬНО) -->
                 <div style="margin: 15px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">📂 Выберите категорию умейки *</div>
                     <select id="skillCategory" class="input-field" required style="cursor: pointer; background: rgba(255,255,255,0.95);">
@@ -3093,7 +3197,6 @@
                     </div>
                 </div>
                 
-                <!-- НОВОЕ ПОЛЕ: ФОРМАТ РАБОТЫ -->
                 <div style="margin: 20px 0;">
                     <div style="color: white; margin-bottom: 10px; font-weight: 600;">👥 Формат работы *</div>
                     <div class="workformat-selector" id="workFormatSelector">
@@ -3720,7 +3823,6 @@
                 </div>
             </div>
             
-            <!-- НОВОЕ ПОЛЕ: ФОРМАТ РАБОТЫ (РЕДАКТИРОВАНИЕ) -->
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">👥 Формат работы *</div>
                 <div class="workformat-selector" id="editWorkFormatSelector" style="background: #f7fafc;">
@@ -3890,21 +3992,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО УВЕЛИЧЕННОГО QR-КОДА С ГЛАВНОГО ЭКРАНА -->
-    <div id="homeQRModal" class="qr-modal-overlay">
-        <div class="qr-modal-content">
-            <h2 style="color: #2d3748; margin-bottom: 20px; font-size: 20px;">📇 Моя визитка</h2>
-            <div id="homeQRCodeLarge" class="qr-code-large"></div>
-            <button class="qr-share-button" onclick="triggerHapticFeedback(); shareHomeQRCode();">
-                <span>📤</span>
-                Поделиться в Telegram
-            </button>
-            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeHomeQRModal();" style="margin-top: 15px;">
-                Закрыть
-            </button>
-        </div>
-    </div>
-
     <script>
     // ========== КОНФИГУРАЦИЯ ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
@@ -3921,6 +4008,7 @@
     let currentDealTab = 'pending';
     let projectRating = 0;
     let map = null;
+    let mapModal = null;
     let markers = [];
     let userLocation = null;
     let mapRefreshInterval = null;
@@ -3946,294 +4034,10 @@
     let logoClickCount = 0;
     let logoClickTimer = null;
     let offlineMode = false;
-
-    // Переменные для фильтрации карты из архива
-    let activeMapCategory = null;
-    let activeMapSubcategory = null;
-
-    // ========== ФУНКЦИИ ДЛЯ QR-КОДА НА ГЛАВНОМ ЭКРАНЕ ==========
     
-    function generateHomeQRCode() {
-        if (!currentUserId) return;
-        const qrUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
-        const container = document.getElementById('homeQRCode');
-        if (container) {
-            container.innerHTML = '';
-            new QRCode(container, {
-                text: qrUrl,
-                width: 100,
-                height: 100,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        }
-    }
-    
-    function openHomeQRModal() {
-        triggerHapticFeedback();
-        if (!currentUserId) return;
-        const qrUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
-        const container = document.getElementById('homeQRCodeLarge');
-        if (container) {
-            container.innerHTML = '';
-            new QRCode(container, {
-                text: qrUrl,
-                width: 250,
-                height: 250,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        }
-        document.getElementById('homeQRModal').classList.add('active');
-    }
-    
-    function closeHomeQRModal() {
-        triggerHapticFeedback();
-        document.getElementById('homeQRModal').classList.remove('active');
-    }
-    
-    function shareHomeQRCode() {
-        triggerHapticFeedback();
-        const userData = getOrCreateUserProfile(currentUserId);
-        const userName = userData.firstName || 'Пользователь';
-        const shareUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
-        const shareText = `📇 Визитка мастера ${userName} в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке, чтобы посмотреть мои умейки:\n${shareUrl}`;
-        const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-        if (window.Telegram?.WebApp) {
-            window.Telegram.WebApp.openTelegramLink(tgShareUrl);
-        } else {
-            window.open(tgShareUrl, '_blank');
-        }
-    }
-
-    // ========== НОВАЯ ФУНКЦИЯ: ПОСМОТРЕТЬ НА КАРТЕ ==========
-    
-    function openMapWithFilters(category, subcategory) {
-        triggerHapticFeedback();
-        
-        if (!map) {
-            initMap();
-        }
-        
-        // Сохраняем активные фильтры
-        activeMapCategory = category;
-        activeMapSubcategory = subcategory;
-        
-        // Показываем карту
-        const mapDiv = document.getElementById('map');
-        if (mapDiv) {
-            mapDiv.style.display = 'block';
-            mapDiv.parentElement.classList.add('map-active');
-        }
-        
-        // Загружаем отфильтрованных мастеров на карту
-        loadFilteredSkillsOnMap(category, subcategory);
-        
-        // Показываем кнопку для возврата к списку категорий
-        showMapBackButton();
-    }
-    
-    function showMapBackButton() {
-        // Создаём кнопку "Назад к списку категорий" если её ещё нет
-        let backButton = document.getElementById('mapBackButton');
-        if (!backButton) {
-            backButton = document.createElement('button');
-            backButton.id = 'mapBackButton';
-            backButton.className = 'map-button';
-            backButton.style.position = 'fixed';
-            backButton.style.bottom = '20px';
-            backButton.style.left = '20px';
-            backButton.style.right = '20px';
-            backButton.style.zIndex = '1001';
-            backButton.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-            backButton.style.border = 'none';
-            backButton.style.borderRadius = '15px';
-            backButton.style.padding = '15px';
-            backButton.style.color = 'white';
-            backButton.style.fontSize = '16px';
-            backButton.style.fontWeight = '600';
-            backButton.style.cursor = 'pointer';
-            backButton.innerHTML = '← Назад к списку категорий';
-            backButton.onclick = () => {
-                triggerHapticFeedback();
-                closeMapAndShowCategories();
-            };
-            document.body.appendChild(backButton);
-        } else {
-            backButton.style.display = 'block';
-        }
-    }
-    
-    function hideMapBackButton() {
-        const backButton = document.getElementById('mapBackButton');
-        if (backButton) {
-            backButton.style.display = 'none';
-        }
-    }
-    
-    function closeMapAndShowCategories() {
-        // Скрываем карту
-        const mapDiv = document.getElementById('map');
-        if (mapDiv) {
-            mapDiv.style.display = 'none';
-            mapDiv.parentElement.classList.remove('map-active');
-        }
-        
-        // Скрываем кнопку назад
-        hideMapBackButton();
-        
-        // Показываем список категорий
-        const categoriesContainer = document.getElementById('categoriesList');
-        const resultsContainer = document.getElementById('categorySearchResults');
-        
-        if (categoriesContainer) {
-            categoriesContainer.style.display = 'block';
-        }
-        if (resultsContainer) {
-            resultsContainer.innerHTML = '';
-            resultsContainer.style.display = 'none';
-        }
-        
-        // Сбрасываем активные фильтры
-        activeMapCategory = null;
-        activeMapSubcategory = null;
-        
-        // Перезагружаем все умейки на карту (без фильтра)
-        loadSkillsOnMap();
-    }
-    
-    async function loadFilteredSkillsOnMap(category, subcategory) {
-        try {
-            console.log(`🗺️ Загрузка мастеров на карту с фильтрами: категория=${category}, подраздел=${subcategory}`);
-            
-            const allSkills = await getGlobalSkills();
-            
-            // Очищаем координаты от символов эмодзи в категории
-            const cleanCategory = category ? category.replace(/[^\w\sа-яА-Я]/g, '').trim() : '';
-            
-            // Фильтруем умейки по категории
-            let filteredSkills = allSkills.filter(skill => {
-                if (!skill.category) return false;
-                const skillCategoryClean = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
-                return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
-            });
-            
-            // Фильтруем по подразделу (формату работы)
-            if (subcategory && subcategory !== 'Все') {
-                filteredSkills = filteredSkills.filter(skill => {
-                    const skillWorkFormat = skill.workFormat || '';
-                    return skillWorkFormat === subcategory;
-                });
-            }
-            
-            // Убираем дубликаты
-            const uniqueSkills = [];
-            const seenIds = new Set();
-            for (const skill of filteredSkills) {
-                if (!seenIds.has(skill._id)) {
-                    seenIds.add(skill._id);
-                    uniqueSkills.push(skill);
-                }
-            }
-            filteredSkills = uniqueSkills;
-            
-            console.log(`🗺️ Найдено мастеров для отображения: ${filteredSkills.length}`);
-            
-            // Очищаем старые маркеры
-            if (markers.length > 0) {
-                markers.forEach(marker => {
-                    if (map && marker) {
-                        try {
-                            map.removeLayer(marker);
-                        } catch(e) {}
-                    }
-                });
-                markers = [];
-            }
-            
-            // Добавляем маркер пользователя, если есть
-            if (userLocation) {
-                const userMarker = L.marker([userLocation.lat, userLocation.lon], {
-                    icon: L.divIcon({
-                        className: 'user-marker',
-                        html: '<div class="user-marker-container"></div>',
-                        iconSize: [16, 16],
-                        iconAnchor: [8, 8]
-                    })
-                })
-                .addTo(map)
-                .bindPopup('📍 <b>Ваше местоположение</b>');
-                markers.push(userMarker);
-            }
-            
-            // Добавляем маркеры мастеров
-            filteredSkills.forEach(skill => {
-                if (skill.location && skill.location.lat && skill.location.lon) {
-                    const isUserSkill = skill.userId === currentUserId;
-                    const radius = skill.radius || 10;
-                    const circleColor = (!skill.status || skill.status === 'ready') ? '#48bb78' : '#f56565';
-                    
-                    // Добавляем круг радиуса
-                    const circle = L.circle([skill.location.lat, skill.location.lon], {
-                        color: circleColor,
-                        fillColor: circleColor,
-                        fillOpacity: 0.2,
-                        radius: radius * 1000
-                    }).addTo(map);
-                    markers.push(circle);
-                    
-                    // Создаём маркер с иконкой
-                    const statusClass = (!skill.status || skill.status === 'ready') ? 'status-ready' : 'status-busy';
-                    const fallbackIcon = isUserSkill ? '👤' : '🔧';
-                    
-                    let markerHtml;
-                    if (skill.photo) {
-                        markerHtml = `
-                            <div class="umeyka-marker-container ${statusClass}">
-                                <img src="${skill.photo}" class="umeyka-marker-photo" alt="${skill.skill}">
-                            </div>
-                        `;
-                    } else {
-                        markerHtml = `
-                            <div class="umeyka-marker-container ${statusClass}">
-                                <div class="umeyka-marker-fallback">${fallbackIcon}</div>
-                            </div>
-                        `;
-                    }
-                    
-                    const marker = L.marker([skill.location.lat, skill.location.lon], {
-                        icon: L.divIcon({
-                            className: 'umeyka-marker',
-                            html: markerHtml,
-                            iconSize: [50, 50],
-                            iconAnchor: [25, 25]
-                        })
-                    })
-                    .addTo(map)
-                    .bindPopup(createMapSkillPopup(skill, isUserSkill));
-                    markers.push(marker);
-                }
-            });
-            
-            // Центрируем карту на первом мастере или на пользователе
-            if (filteredSkills.length > 0 && filteredSkills[0].location) {
-                map.setView([filteredSkills[0].location.lat, filteredSkills[0].location.lon], 12);
-            } else if (userLocation) {
-                map.setView([userLocation.lat, userLocation.lon], 12);
-            } else {
-                map.setView([55.7558, 37.6173], 10);
-            }
-            
-            if (filteredSkills.length === 0) {
-                showNotification('❌ В этой категории нет мастеров для отображения на карте', 3000);
-            }
-            
-        } catch (error) {
-            console.error('❌ Ошибка загрузки карты с фильтрами:', error);
-        }
-    }
+    // Переменные для фильтрации карты
+    let currentMapFilterCategory = null;
+    let currentMapFilterSubcategory = null;
 
     // ========== ФУНКЦИИ ДЛЯ ФОРМАТА РАБОТЫ ==========
     
@@ -4407,7 +4211,6 @@
         }
     }
 
-    // Функция для проверки кэша
     function getCachedSkills() {
         const cache = getLocalStorage('umeyka_skills_cache');
         if (cache && cache.timestamp && (Date.now() - cache.timestamp < CACHE_TTL)) {
@@ -4427,7 +4230,7 @@
         console.log('💾 [Кэш] Данные сохранены в кэш');
     }
 
-    // ========== ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ С УМЕЙКАМИ (ЕДИНЫЙ ИСТОЧНИК) ==========
+    // ========== ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ С УМЕЙКАМИ ==========
     
     async function preloadAllSkills() {
         console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейок...');
@@ -4657,6 +4460,184 @@
             'refunded': '<div class="payment-status-badge payment-refunded">↩️ Возвращено клиенту</div>'
         };
         return badges[status] || badges['pending'];
+    }
+    
+    // ========== ФУНКЦИИ ДЛЯ КАРТЫ (модальное окно) ==========
+    
+    function initMapModal() {
+        if (mapModal) return;
+        mapModal = L.map('mapModal', {
+            attributionControl: false
+        }).setView([55.7558, 37.6173], 10);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(mapModal);
+        mapModal.setMaxBounds([
+            [30, 19],
+            [70, 180]
+        ]);
+    }
+    
+    async function loadSkillsOnMapModal(category, subcategory) {
+        if (!mapModal) {
+            initMapModal();
+        }
+        if (mapModal && markers.length > 0) {
+            markers.forEach(marker => mapModal.removeLayer(marker));
+            markers = [];
+        }
+        
+        let allSkills = await getGlobalSkills();
+        
+        // Фильтрация по категории
+        let filteredSkills = allSkills;
+        if (category) {
+            const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
+            filteredSkills = filteredSkills.filter(skill => {
+                if (!skill.category) return false;
+                const skillCategoryClean = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
+                return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
+            });
+        }
+        
+        // Фильтрация по подразделу (формату работы)
+        if (subcategory) {
+            filteredSkills = filteredSkills.filter(skill => {
+                return skill.workFormat === subcategory;
+            });
+        }
+        
+        // Убираем дубликаты
+        const uniqueSkills = [];
+        const seenIds = new Set();
+        for (const skill of filteredSkills) {
+            if (!seenIds.has(skill._id)) {
+                seenIds.add(skill._id);
+                uniqueSkills.push(skill);
+            }
+        }
+        filteredSkills = uniqueSkills;
+        
+        console.log(`🗺️ Загрузка ${filteredSkills.length} умейок на карту для категории ${category}, подраздела ${subcategory}`);
+        
+        // Добавляем маркеры для отфильтрованных умейок
+        filteredSkills.forEach(skill => {
+            if (skill.location && skill.location.lat && skill.location.lon) {
+                const isUserSkill = skill.userId === currentUserId;
+                const status = skill.status || 'ready';
+                const radius = skill.radius || 10;
+                const circleColor = (!status || status === 'ready') ? '#48bb78' : '#f56565';
+                const circle = L.circle([skill.location.lat, skill.location.lon], {
+                    color: circleColor,
+                    fillColor: circleColor,
+                    fillOpacity: 0.2,
+                    radius: radius * 1000
+                }).addTo(mapModal);
+                markers.push(circle);
+                
+                const markerHtml = `<div class="umeyka-marker-container ${status === 'ready' ? 'status-ready' : 'status-busy'}">
+                                        <div class="umeyka-marker-fallback">${isUserSkill ? '👤' : '🔧'}</div>
+                                    </div>`;
+                const marker = L.marker([skill.location.lat, skill.location.lon], {
+                    icon: L.divIcon({
+                        className: 'umeyka-marker',
+                        html: markerHtml,
+                        iconSize: [50, 50],
+                        iconAnchor: [25, 25]
+                    })
+                })
+                .addTo(mapModal)
+                .bindPopup(createMapSkillPopup(skill, isUserSkill));
+                markers.push(marker);
+            }
+        });
+        
+        // Центрируем карту на первом маркере или на местоположении пользователя
+        if (filteredSkills.length > 0 && filteredSkills[0].location) {
+            mapModal.setView([filteredSkills[0].location.lat, filteredSkills[0].location.lon], 12);
+        } else if (userLocation) {
+            mapModal.setView([userLocation.lat, userLocation.lon], 12);
+        }
+    }
+    
+    function createMapSkillPopup(skill, isUserSkill) {
+        const statusBadge = getStatusBadge(skill.status);
+        const workFormatBadge = getWorkFormatBadge(skill.workFormat);
+        const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
+        
+        return `
+            <div class="map-popup-content">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; overflow: hidden; border: 3px solid ${skill.status === 'busy' ? '#f56565' : '#48bb78'};">
+                        ${skill.photo ? `<img src="${skill.photo}" style="width: 100%; height: 100%; object-fit: cover;">` : (isUserSkill ? '👤' : '🔧')}
+                    </div>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0; color: #2d3748; font-size: 16px;">${skill.skill}</h3>
+                        <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
+                    </div>
+                </div>
+                <div style="margin: 10px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
+                    <p style="margin: 8px 0; font-weight: bold; color: #48bb78;">${skill.price} руб.</p>
+                    ${statusBadge}
+                    ${workFormatBadge}
+                    ${cityInfo}
+                    ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin: 8px 0; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
+                    <div class="skill-user-row" style="margin: 10px 0;">
+                        <div class="skill-user-name">
+                            <span>👤</span> <span>${skill.username}</span>
+                        </div>
+                        <button class="details-button" onclick="event.stopPropagation(); window.openDetailsModal('${skill._id}');">
+                            📝 Подробно
+                        </button>
+                    </div>
+                    <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px;">
+                        <div style="font-weight: 600; color: #667eea; margin-bottom: 5px;">📞 Контакты:</div>
+                        <div style="display:flex; align-items:center; gap:10px; padding: 8px; background: white; border-radius: 6px;">
+                            <span style="font-size:18px;">📱</span>
+                            <span style="font-size: 14px;">${skill.experience || 'Не указано'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="map-skill-actions">
+                    <button onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');"
+                            class="map-skill-button map-contact-button">
+                        📞 Контакты
+                    </button>
+                    ${isUserSkill ? `
+                        <button onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');"
+                                class="map-skill-button map-edit-button">
+                            ✏️ Редактировать
+                        </button>
+                    ` : `
+                        <button onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.userId}', '${skill.experience || ''}');"
+                                class="map-skill-button" style="background: #ed8936; color: white;">
+                            📝 Сделку
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    }
+    
+    function openMapModal(category, subcategory) {
+        currentMapFilterCategory = category;
+        currentMapFilterSubcategory = subcategory;
+        
+        const modal = document.getElementById('mapModalOverlay');
+        modal.classList.add('active');
+        
+        setTimeout(() => {
+            initMapModal();
+            loadSkillsOnMapModal(category, subcategory);
+        }, 100);
+    }
+    
+    function closeMapModal() {
+        const modal = document.getElementById('mapModalOverlay');
+        modal.classList.remove('active');
+        currentMapFilterCategory = null;
+        currentMapFilterSubcategory = null;
     }
     
     // ========== ФУНКЦИИ ДЛЯ ВИЗИТКИ ==========
@@ -6177,9 +6158,8 @@
                         await preloadAllSkills();
                         loadMySkills();
                         loadProfileSkills();
-                        if (map) {
-                            setTimeout(() => loadSkillsOnMap(), 1000);
-                        }
+                        // Обновляем QR-код на главном экране
+                        generateMainScreenQR();
                         return;
                     }
                 }
@@ -6216,9 +6196,7 @@
                 await preloadAllSkills();
                 loadMySkills();
                 loadProfileSkills();
-                if (map) {
-                    setTimeout(() => loadSkillsOnMap(), 1000);
-                }
+                generateMainScreenQR();
             }
         } catch (error) {
             hideLoadingIndicator();
@@ -6519,9 +6497,7 @@
             await preloadAllSkills();
             await loadMySkills();
             await loadProfileSkills();
-            if (map) {
-                await loadSkillsOnMap();
-            }
+            generateMainScreenQR();
         } catch (error) {
             hideLoadingIndicator();
             console.error('❌ Ошибка сохранения умейки:', error);
@@ -6557,9 +6533,7 @@
                 await preloadAllSkills();
                 await loadMySkills();
                 await loadProfileSkills();
-                if (map) {
-                    await loadSkillsOnMap();
-                }
+                generateMainScreenQR();
                 alert('✅ Умейка удалена!');
             } catch (error) {
                 hideLoadingIndicator();
@@ -6569,210 +6543,60 @@
         }
     };
     
-    // ========== ФУНКЦИИ ДЛЯ КАРТЫ ==========
+    // ========== QR-КОД ВИЗИТКИ НА ГЛАВНОМ ЭКРАНЕ ==========
     
-    function initMap() {
-        if (map) return;
-        map = L.map('map', {
-            attributionControl: false
-        }).setView([55.7558, 37.6173], 10);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            subdomains: 'abcd',
-            maxZoom: 20
-        }).addTo(map);
-        map.setMaxBounds([
-            [30, 19],
-            [70, 180]
-        ]);
-        initializeUserLocation();
-    }
-    
-    function initializeUserLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    const { latitude, longitude } = position.coords;
-                    userLocation = { lat: latitude, lon: longitude };
-                    map.setView([latitude, longitude], 13);
-                    const userMarker = L.marker([latitude, longitude], {
-                        icon: L.divIcon({
-                            className: 'user-marker',
-                            html: '<div class="user-marker-container"></div>',
-                            iconSize: [16, 16],
-                            iconAnchor: [8, 8]
-                        })
-                    })
-                    .addTo(map)
-                    .bindPopup('📍 <b>Ваше местоположение</b>')
-                    .openPopup();
-                    markers.push(userMarker);
-                    loadSkillsOnMap();
-                },
-                error => {
-                    console.log('📍 Геолокация недоступна:', error);
-                    userLocation = { lat: 55.7558, lon: 37.6173 };
-                    loadSkillsOnMap();
+    function generateMainScreenQR() {
+        const container = document.getElementById('mainScreenQRCode');
+        if (!container) return;
+        container.innerHTML = '';
+        const qrUrl = `${TELEGRAM_BOT_URL}?start=user_${currentUserId}`;
+        new QRCode(container, {
+            text: qrUrl,
+            width: 100,
+            height: 100,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        const card = document.querySelector('.visitka-qr-card');
+        if (card) {
+            card.onclick = () => {
+                triggerHapticFeedback();
+                const modal = document.getElementById('qrModal');
+                document.getElementById('qrModalTitle').textContent = 'Моя визитка';
+                const container = document.getElementById('qrCodeContainer');
+                container.innerHTML = '';
+                new QRCode(container, {
+                    text: qrUrl,
+                    width: 250,
+                    height: 250,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                const shareBtn = document.querySelector('#qrModal .qr-share-button');
+                if (shareBtn) {
+                    const oldClick = shareBtn.onclick;
+                    shareBtn.onclick = () => {
+                        triggerHapticFeedback();
+                        const shareText = `📇 Моя визитка в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке, чтобы посмотреть мои умейки:\n${qrUrl}`;
+                        if (navigator.share) {
+                            navigator.share({
+                                title: 'Моя визитка Ymeyka',
+                                text: shareText,
+                                url: qrUrl
+                            }).catch(err => console.log('Share canceled'));
+                        } else {
+                            navigator.clipboard.writeText(shareText).then(() => {
+                                showNotification('✅ Ссылка на визитку скопирована!');
+                            }).catch(() => {
+                                alert('Ссылка: ' + qrUrl);
+                            });
+                        }
+                    };
                 }
-            );
-        } else {
-            userLocation = { lat: 55.7558, lon: 37.6173 };
-            loadSkillsOnMap();
-        }
-    }
-    
-    function createSkillMarkerHtml(skill, isUserSkill) {
-        const status = skill.status || 'ready';
-        const statusClass = status === 'ready' ? 'status-ready' : 'status-busy';
-        const fallbackIcon = isUserSkill ? '👤' : '🔧';
-        if (skill.photo) {
-            return `
-                <div class="umeyka-marker-container ${statusClass}">
-                    <img src="${skill.photo}" class="umeyka-marker-photo" alt="${skill.skill}">
-                </div>
-            `;
-        } else {
-            return `
-                <div class="umeyka-marker-container ${statusClass}">
-                    <div class="umeyka-marker-fallback">${fallbackIcon}</div>
-                </div>
-            `;
-        }
-    }
-    
-    async function loadSkillsOnMap() {
-        try {
-            console.log('🗺️ Загрузка умейок на карту');
-            const skills = await getGlobalSkills();
-            if (markers.length > 0) {
-                markers.forEach(marker => map.removeLayer(marker));
-                markers = [];
-            }
-            if (userLocation) {
-                const userMarker = L.marker([userLocation.lat, userLocation.lon], {
-                    icon: L.divIcon({
-                        className: 'user-marker',
-                        html: '<div class="user-marker-container"></div>',
-                        iconSize: [16, 16],
-                        iconAnchor: [8, 8]
-                    })
-                })
-                .addTo(map)
-                .bindPopup('📍 <b>Ваше местоположение</b>');
-                markers.push(userMarker);
-            }
-            skills.forEach(skill => {
-                if (skill.location && skill.location.lat && skill.location.lon) {
-                    const isUserSkill = skill.userId === currentUserId;
-                    const status = skill.status || 'ready';
-                    const radius = skill.radius || 10;
-                    const circleColor = (!status || status === 'ready') ? '#48bb78' : '#f56565';
-                    const circle = L.circle([skill.location.lat, skill.location.lon], {
-                        color: circleColor,
-                        fillColor: circleColor,
-                        fillOpacity: 0.2,
-                        radius: radius * 1000
-                    }).addTo(map);
-                    markers.push(circle);
-                    const markerHtml = createSkillMarkerHtml(skill, isUserSkill);
-                    const marker = L.marker([skill.location.lat, skill.location.lon], {
-                        icon: L.divIcon({
-                            className: 'umeyka-marker',
-                            html: markerHtml,
-                            iconSize: [50, 50],
-                            iconAnchor: [25, 25]
-                        })
-                    })
-                    .addTo(map)
-                    .bindPopup(createMapSkillPopup(skill, isUserSkill));
-                    markers.push(marker);
-                }
-            });
-        } catch (error) {
-            console.error('❌ Ошибка загрузки карты:', error);
-        }
-    }
-    
-    function createMapSkillPopup(skill, isUserSkill) {
-        const statusBadge = getStatusBadge(skill.status);
-        const workFormatBadge = getWorkFormatBadge(skill.workFormat);
-        const cityInfo = skill.city ? `<div style="margin: 10px 0; padding: 8px; background: #e6f3ff; border-radius: 6px; font-size: 14px; color: #2d3748;">📍 Город: ${skill.city} | Радиус: ${skill.radius || 10}км</div>` : '';
-        const photoThumbnail = skill.photo ? `
-            <div class="popup-skill-photo">
-                <img src="${skill.photo}" alt="Фото работы" onerror="this.style.display='none'">
-            </div>
-        ` : '';
-        return `
-            <div class="map-popup-content">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                    <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; overflow: hidden; border: 3px solid ${skill.status === 'busy' ? '#f56565' : '#48bb78'};">
-                        ${skill.photo ? `<img src="${skill.photo}" style="width: 100%; height: 100%; object-fit: cover;">` : (isUserSkill ? '👤' : '🔧')}
-                    </div>
-                    <div style="flex: 1;">
-                        <h3 style="margin: 0; color: #2d3748; font-size: 16px;">${skill.skill}</h3>
-                        <p style="margin: 4px 0 0; color: #666; font-size: 12px;">${skill.username} ${isUserSkill ? '(Вы)' : ''}</p>
-                    </div>
-                    ${photoThumbnail}
-                </div>
-                <div style="margin: 10px 0; padding: 12px; background: #f7fafc; border-radius: 8px;">
-                    <p style="margin: 8px 0; font-weight: bold; color: #48bb78;">${skill.price} руб.</p>
-                    ${statusBadge}
-                    ${workFormatBadge}
-                    ${cityInfo}
-                    ${skill.category ? `<div style="background: rgba(102,126,234,0.15); padding: 4px 8px; border-radius: 8px; font-size: 12px; margin: 8px 0; display: inline-block; color: #667eea; font-weight: 600;">📂 ${escapeHtml(skill.category)}</div>` : ''}
-                    <div class="skill-user-row" style="margin: 10px 0;">
-                        <div class="skill-user-name">
-                            <span>👤</span> <span>${skill.username}</span>
-                        </div>
-                        <button class="details-button" onclick="event.stopPropagation(); window.openDetailsModal('${skill._id}');">
-                            📝 Подробно
-                        </button>
-                    </div>
-                    <div style="margin: 10px 0; padding: 10px; background: rgba(102,126,234,0.08); border-radius: 8px;">
-                        <div style="font-weight: 600; color: #667eea; margin-bottom: 5px;">📞 Контакты:</div>
-                        <div style="display:flex; align-items:center; gap:10px; padding: 8px; background: white; border-radius: 6px;">
-                            <span style="font-size:18px;">📱</span>
-                            <span style="font-size: 14px;">${skill.experience || 'Не указано'}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="map-skill-actions">
-                    <button onclick="triggerHapticFeedback(); openContactModal('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.experience || ''}', '');"
-                            class="map-skill-button map-contact-button">
-                        📞 Контакты
-                    </button>
-                    ${isUserSkill ? `
-                        <button onclick="triggerHapticFeedback(); openEditSkillModal('${skill._id}');"
-                                class="map-skill-button map-edit-button">
-                            ✏️ Редактировать
-                        </button>
-                    ` : `
-                        <button onclick="triggerHapticFeedback(); createDealFromSkill('${skill._id}', '${skill.skill.replace(/'/g,"\\'")}', '${skill.username.replace(/'/g,"\\'")}', '${skill.userId}', '${skill.experience || ''}');"
-                                class="map-skill-button" style="background: #ed8936; color: white;">
-                            📝 Сделку
-                        </button>
-                    `}
-                </div>
-            </div>
-        `;
-    }
-    
-    function startMapAutoRefresh() {
-        stopMapAutoRefresh();
-        mapRefreshInterval = setInterval(() => {
-            if (document.querySelector('.map-active') && map) {
-                if (activeMapCategory && activeMapSubcategory) {
-                    loadFilteredSkillsOnMap(activeMapCategory, activeMapSubcategory);
-                } else {
-                    loadSkillsOnMap();
-                }
-            }
-        }, 30000);
-    }
-    
-    function stopMapAutoRefresh() {
-        if (mapRefreshInterval) {
-            clearInterval(mapRefreshInterval);
-            mapRefreshInterval = null;
+                document.getElementById('qrModal').classList.add('active');
+            };
         }
     }
     
@@ -6780,17 +6604,6 @@
     
     window.showMainScreen = function() {
         triggerHapticFeedback();
-        stopMapAutoRefresh();
-        // Скрываем карту и кнопку назад
-        const mapDiv = document.getElementById('map');
-        if (mapDiv) {
-            mapDiv.style.display = 'none';
-            if (mapDiv.parentElement) mapDiv.parentElement.classList.remove('map-active');
-        }
-        hideMapBackButton();
-        activeMapCategory = null;
-        activeMapSubcategory = null;
-        
         document.getElementById('mainScreen').style.display = 'block';
         document.getElementById('masterSection').style.display = 'none';
         document.getElementById('clientSection').style.display = 'none';
@@ -6803,19 +6616,6 @@
     
     window.showSection = function(sectionId) {
         triggerHapticFeedback();
-        // Скрываем карту и кнопку назад
-        const mapDiv = document.getElementById('map');
-        if (mapDiv) {
-            mapDiv.style.display = 'none';
-            if (mapDiv.parentElement) mapDiv.parentElement.classList.remove('map-active');
-        }
-        hideMapBackButton();
-        activeMapCategory = null;
-        activeMapSubcategory = null;
-        
-        if (mapRefreshInterval) {
-            stopMapAutoRefresh();
-        }
         document.getElementById('mainScreen').style.display = 'none';
         document.getElementById('masterSection').style.display = 'none';
         document.getElementById('clientSection').style.display = 'none';
@@ -6853,6 +6653,7 @@
         document.getElementById('profileSkills').style.display = 'none';
         document.getElementById('profileDeals').style.display = 'none';
         document.getElementById('profileReferral').style.display = 'none';
+        showProfileTab('stats');
     };
     
     window.showFinanceSection = function() {
@@ -6972,11 +6773,7 @@
         if (currentProfileTab === 'skills') {
             loadProfileSkills();
         }
-        if (map) {
-            loadSkillsOnMap();
-        }
-        // Обновляем QR-код на главном экране
-        generateHomeQRCode();
+        generateMainScreenQR();
         currentAvatar = null;
     };
     
@@ -7749,7 +7546,6 @@
         "📦 Другое"
     ];
     
-    // Подразделы для каждой категории
     const subcategories = {
         "🚕 Такси": ["Один", "Вдвоём", "Команда", "Ищу команду"],
         "🧱 Плиточник": ["Один", "Вдвоём", "Команда", "Ищу команду"],
@@ -7834,13 +7630,13 @@
                         </button>
                     `).join('')}
                 </div>
-                <div style="display: flex; gap: 12px; margin-top: 15px; flex-wrap: wrap; justify-content: center;">
-                    <div class="become-master-button" onclick="triggerHapticFeedback(); openMasterFormWithCategory('${category.replace(/'/g, "\\'")}');">
+                <div class="action-buttons-group">
+                    <button class="action-button become" onclick="triggerHapticFeedback(); openMasterFormWithCategory('${category.replace(/'/g, "\\'")}');">
                         ✨ Стать мастером в этой категории
-                    </div>
-                    <div class="become-master-button" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="triggerHapticFeedback(); openMapWithFilters('${category.replace(/'/g, "\\'")}', '');">
+                    </button>
+                    <button class="action-button map" onclick="triggerHapticFeedback(); openMapModal('${category.replace(/'/g, "\\'")}', '');">
                         🗺️ Посмотреть на карте
-                    </div>
+                    </button>
                 </div>
             </div>
             <div id="subcategorySkills"></div>
@@ -7882,12 +7678,9 @@
             return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
         });
         
-        // Фильтруем по подразделу (формату работы)
+        // Дополнительная фильтрация по подразделу (формату работы)
         if (subcategory) {
-            filteredSkills = filteredSkills.filter(skill => {
-                const skillWorkFormat = skill.workFormat || '';
-                return skillWorkFormat === subcategory;
-            });
+            filteredSkills = filteredSkills.filter(skill => skill.workFormat === subcategory);
         }
         
         const uniqueSkills = [];
@@ -7969,11 +7762,11 @@
                     <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
                     <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено в категории "${category}"</div>
                     <div style="opacity: 0.7;">Попробуйте выбрать другую категорию</div>
-                    <div style="display: flex; gap: 12px; justify-content: center; margin-top: 15px;">
-                        <button class="become-master-button" onclick="triggerHapticFeedback(); openMasterFormWithCategory('${category.replace(/'/g, "\\'")}');">
+                    <div class="action-buttons-group" style="margin-top: 15px;">
+                        <button class="action-button become" onclick="triggerHapticFeedback(); openMasterFormWithCategory('${category.replace(/'/g, "\\'")}');">
                             ✨ Стать мастером в этой категории
                         </button>
-                        <button class="become-master-button" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="triggerHapticFeedback(); openMapWithFilters('${category.replace(/'/g, "\\'")}', '${subcategory}');">
+                        <button class="action-button map" onclick="triggerHapticFeedback(); openMapModal('${category.replace(/'/g, "\\'")}', '');">
                             🗺️ Посмотреть на карте
                         </button>
                     </div>
@@ -7988,22 +7781,17 @@
     
     window.showOnMap = function(lat, lon, title) {
         triggerHapticFeedback();
-        if (!map) {
-            initMap();
-        }
-        const mapDiv = document.getElementById('map');
-        if (mapDiv) {
-            mapDiv.style.display = 'block';
-            mapDiv.parentElement.classList.add('map-active');
-        }
-        map.setView([parseFloat(lat), parseFloat(lon)], 15);
-        L.marker([parseFloat(lat), parseFloat(lon)])
-            .addTo(map)
-            .bindPopup(`<b>📍 ${title}</b><br>Местоположение мастера`)
-            .openPopup();
+        openMapModal(null, null);
+        setTimeout(() => {
+            if (mapModal) {
+                mapModal.setView([parseFloat(lat), parseFloat(lon)], 15);
+                L.marker([parseFloat(lat), parseFloat(lon)])
+                    .addTo(mapModal)
+                    .bindPopup(`<b>📍 ${title}</b><br>Местоположение мастера`)
+                    .openPopup();
+            }
+        }, 500);
         showNotification(`🗺️ Показано на карте: ${title}`);
-        // Показываем кнопку возврата
-        showMapBackButton();
     };
     
     // ========== ФУНКЦИИ ДЛЯ КОНТАКТОВ ==========
@@ -8333,13 +8121,10 @@
         currentUserId = checkAndSetUserId();
         showLoadingIndicator();
         await preloadAllSkills();
+        generateMainScreenQR();
         hideLoadingIndicator();
         processReferralLink();
         handleDeepLink();
-        
-        // Генерируем QR-код на главном экране
-        generateHomeQRCode();
-        
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
