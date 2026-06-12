@@ -34,6 +34,413 @@
             background: linear-gradient(135deg, #1e3a5f 0%, #0f2b4d 100%);
         }
         
+        /* Стили для кнопки игр */
+        .games-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
+            border: none;
+            color: #1a3a1a;
+            padding: 12px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(132, 204, 22, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .games-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Модальное окно игр */
+        .games-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .games-modal-overlay.active {
+            display: flex;
+        }
+        
+        .games-modal-content {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f2b4d 100%);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .games-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .games-modal-title {
+            font-size: 22px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .games-modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .games-modal-close:active {
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* Стили карточек игр */
+        .games-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .game-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        
+        .game-card:active {
+            transform: scale(0.98);
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .game-card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .game-icon {
+            font-size: 40px;
+        }
+        
+        .game-info {
+            flex: 1;
+        }
+        
+        .game-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .game-description {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .game-reward {
+            font-size: 12px;
+            background: rgba(255,215,0,0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        
+        /* Стили для каждой игры */
+        .game-container {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            display: none;
+        }
+        
+        .game-container.active {
+            display: block;
+        }
+        
+        /* Колесо удачи */
+        .wheel-container {
+            text-align: center;
+        }
+        
+        .wheel-canvas {
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .wheel-spin-btn {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 0;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .wheel-spins-left {
+            font-size: 14px;
+            margin-top: 10px;
+            color: #fbbf24;
+        }
+        
+        .wheel-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .wheel-progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Лови заказ */
+        .catch-game-area {
+            text-align: center;
+        }
+        
+        .catch-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+        
+        .catch-canvas {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            border-radius: 16px;
+            margin: 0 auto;
+            cursor: pointer;
+            display: block;
+        }
+        
+        .catch-start-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 0;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .catch-records {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        /* Карточная память */
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .memory-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .memory-card.flipped {
+            background: white;
+            transform: rotateY(180deg);
+        }
+        
+        .memory-card.matched {
+            opacity: 0.5;
+            cursor: default;
+            background: #48bb78;
+        }
+        
+        .memory-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+        
+        .memory-new-btn {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        /* Тапай-зарабатывай */
+        .tap-game-area {
+            text-align: center;
+        }
+        
+        .tap-button {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            cursor: pointer;
+            margin: 20px auto;
+            transition: all 0.1s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .tap-button:active {
+            transform: scale(0.95);
+        }
+        
+        .tap-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+        
+        .tap-start-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 0;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        /* Ежедневный квиз */
+        .quiz-container {
+            padding: 10px;
+        }
+        
+        .quiz-question {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .quiz-option {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .quiz-option:active {
+            transform: scale(0.98);
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .quiz-option.correct {
+            background: #48bb78;
+        }
+        
+        .quiz-option.wrong {
+            background: #f56565;
+        }
+        
+        .quiz-status {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .quiz-result {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
         .loading-spinner {
             display: inline-block;
             width: 20px;
@@ -404,7 +811,6 @@
             margin-right: 12px;
         }
         
-        /* QR-код визитки на главном экране */
         .visitka-qr-section {
             padding: 15px 20px 25px;
             display: flex;
@@ -1016,12 +1422,10 @@
             background: #f7fafc;
         }
         
-        /* Карта - скрыта по умолчанию на главном экране */
         .map-section {
             display: none;
         }
         
-        /* Карта-оверлей для модального открытия */
         .map-modal-overlay {
             position: fixed;
             top: 0;
@@ -3039,12 +3443,194 @@
             font-weight: bold;
             color: white;
         }
+
+        /* Анимация для наград */
+        @keyframes coinRain {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(200px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .coin-animation {
+            position: fixed;
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 10001;
+            animation: coinRain 1s ease-out forwards;
+        }
+
+        @keyframes starPulse {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        .star-animation {
+            position: fixed;
+            font-size: 30px;
+            pointer-events: none;
+            z-index: 10001;
+            animation: starPulse 0.8s ease-out forwards;
+        }
     </style>
 </head>
 <body>
     <!-- Элементы для визуальной индикации свайпа -->
     <div class="swipe-indicator" id="swipeIndicator"></div>
     <div class="swipe-arrow" id="swipeArrow">←</div>
+
+    <!-- Кнопка вызова игр -->
+    <button class="games-button" id="gamesButton" onclick="triggerHapticFeedback(); openGamesModal();">
+        <span>🎮</span>
+        <span>Игры</span>
+    </button>
+
+    <!-- Модальное окно с играми -->
+    <div id="gamesModal" class="games-modal-overlay">
+        <div class="games-modal-content">
+            <div class="games-modal-header">
+                <div class="games-modal-title">
+                    <span>🎮</span>
+                    <span>Мини-игры Ymeyka</span>
+                </div>
+                <button class="games-modal-close" onclick="triggerHapticFeedback(); closeGamesModal();">×</button>
+            </div>
+            
+            <div class="games-grid">
+                <!-- Игра 1: Колесо удачи -->
+                <div class="game-card" onclick="triggerHapticFeedback(); showGame('wheelGame');">
+                    <div class="game-card-header">
+                        <div class="game-icon">🎡</div>
+                        <div class="game-info">
+                            <div class="game-name">Колесо удачи</div>
+                            <div class="game-description">Крути колесо и получай награды!</div>
+                            <div class="game-reward">🎁 +1⭐, +3🪙, +5🪙, Бонус</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="wheelGame" class="game-container">
+                    <div class="wheel-container">
+                        <canvas id="wheelCanvas" width="300" height="300" class="wheel-canvas"></canvas>
+                        <button class="wheel-spin-btn" id="wheelSpinBtn">🎡 Крутить</button>
+                        <div class="wheel-spins-left" id="wheelSpinsLeft">Осталось вращений: 3</div>
+                        <div class="wheel-progress-bar">
+                            <div class="wheel-progress-fill" id="wheelProgressFill" style="width: 100%"></div>
+                        </div>
+                        <div id="wheelResult" style="margin-top: 10px; font-size: 14px;"></div>
+                    </div>
+                </div>
+
+                <!-- Игра 2: Лови заказ -->
+                <div class="game-card" onclick="triggerHapticFeedback(); showGame('catchGame');">
+                    <div class="game-card-header">
+                        <div class="game-icon">📦</div>
+                        <div class="game-info">
+                            <div class="game-name">Лови заказ</div>
+                            <div class="game-description">Лови падающие заказы!</div>
+                            <div class="game-reward">💰 +1🪙 за заказ</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="catchGame" class="game-container">
+                    <div class="catch-game-area">
+                        <div class="catch-stats">
+                            <span>🎯 Счёт: <span id="catchScore">0</span></span>
+                            <span>⏱️ Время: <span id="catchTimer">15</span>с</span>
+                            <span>🪙 Монеты: <span id="catchCoins">0</span></span>
+                        </div>
+                        <canvas id="catchCanvas" width="300" height="400" class="catch-canvas"></canvas>
+                        <button class="catch-start-btn" id="catchStartBtn">🎮 Начать игру</button>
+                        <div class="catch-records">
+                            <div>🏆 Рекорд сессии: <span id="catchSessionRecord">0</span></div>
+                            <div>🥇 Лучший результат: <span id="catchTop1">0</span></div>
+                            <div>🥈 Второй результат: <span id="catchTop2">0</span></div>
+                            <div>🥉 Третий результат: <span id="catchTop3">0</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Игра 3: Карточная память -->
+                <div class="game-card" onclick="triggerHapticFeedback(); showGame('memoryGame');">
+                    <div class="game-card-header">
+                        <div class="game-icon">🧠</div>
+                        <div class="game-info">
+                            <div class="game-name">Карточная память</div>
+                            <div class="game-description">Найди все пары профессий!</div>
+                            <div class="game-reward">⭐ +10 монет за победу</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="memoryGame" class="game-container">
+                    <div class="memory-stats">
+                        <span>Ходы: <span id="memoryMoves">0</span></span>
+                        <span>Время: <span id="memoryTime">0</span>с</span>
+                        <span>Пары: <span id="memoryPairs">0</span>/8</span>
+                    </div>
+                    <div class="memory-board" id="memoryBoard"></div>
+                    <button class="memory-new-btn" id="memoryNewBtn">🔄 Новая игра</button>
+                    <div id="memoryResult" style="text-align: center; margin-top: 10px;"></div>
+                </div>
+
+                <!-- Игра 4: Тапай-зарабатывай -->
+                <div class="game-card" onclick="triggerHapticFeedback(); showGame('tapGame');">
+                    <div class="game-card-header">
+                        <div class="game-icon">👆</div>
+                        <div class="game-info">
+                            <div class="game-name">Тапай-зарабатывай</div>
+                            <div class="game-description">Тапай по убегающей кнопке!</div>
+                            <div class="game-reward">💰 +1🪙 за тап, +5⭐ за 100 тапов</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tapGame" class="game-container">
+                    <div class="tap-game-area">
+                        <div class="tap-stats">
+                            <span>👆 Тапов: <span id="tapCount">0</span></span>
+                            <span>⏱️ Время: <span id="tapTimer">10</span>с</span>
+                            <span>🪙 Монеты: <span id="tapCoins">0</span></span>
+                        </div>
+                        <div id="tapButton" class="tap-button" style="position: relative; margin: 20px auto;">👆</div>
+                        <button class="tap-start-btn" id="tapStartBtn">🎮 Начать</button>
+                        <div id="tapBonusMessage" style="text-align: center; margin-top: 10px; font-size: 12px;"></div>
+                    </div>
+                </div>
+
+                <!-- Игра 5: Ежедневный квиз -->
+                <div class="game-card" onclick="triggerHapticFeedback(); showGame('quizGame');">
+                    <div class="game-card-header">
+                        <div class="game-icon">❓</div>
+                        <div class="game-info">
+                            <div class="game-name">Ежедневный квиз</div>
+                            <div class="game-description">Ответь на вопрос и получи награду!</div>
+                            <div class="game-reward">⭐ +3 монеты за правильный ответ</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="quizGame" class="game-container">
+                    <div class="quiz-container">
+                        <div class="quiz-status" id="quizStatus">Загрузка вопроса...</div>
+                        <div class="quiz-question" id="quizQuestion"></div>
+                        <div class="quiz-options" id="quizOptions"></div>
+                        <div class="quiz-result" id="quizResult"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <!-- ГЛАВНЫЙ ЭКРАН (без карты) -->
@@ -4039,6 +4625,822 @@
     let currentMapFilterCategory = null;
     let currentMapFilterSubcategory = null;
 
+    // Переменные для игр
+    let currentGame = null;
+    let wheelSpins = 3;
+    let wheelLastResetDate = null;
+    let wheelIsSpinning = false;
+    let wheelRotation = 0;
+    let wheelSegments = [
+        { name: "+1 ⭐", value: "star", amount: 1 },
+        { name: "+3 🪙", value: "coin", amount: 3 },
+        { name: "+5 🪙", value: "coin", amount: 5 },
+        { name: "Бонус", value: "bonus", amount: 0 },
+        { name: "Попробуй ещё", value: "retry", amount: 0 },
+        { name: "Супер-приз!", value: "super", amount: 10 }
+    ];
+    
+    let catchGameActive = false;
+    let catchScore = 0;
+    let catchCoinsEarned = 0;
+    let catchTimer = 15;
+    let catchInterval = null;
+    let catchAnimationId = null;
+    let catchItems = [];
+    let catchSessionRecord = 0;
+    let catchTopScores = [0, 0, 0];
+    
+    let memoryCards = [];
+    let memoryFlippedCards = [];
+    let memoryMatchedPairs = 0;
+    let memoryMoves = 0;
+    let memoryTime = 0;
+    let memoryTimerInterval = null;
+    let memoryGameActive = false;
+    let memoryLockBoard = false;
+    
+    let tapGameActive = false;
+    let tapCount = 0;
+    let tapTimer = 10;
+    let tapCoinsEarned = 0;
+    let tapInterval = null;
+    let tapButtonPositions = [{ x: 0, y: 0 }];
+    let tapBonusGiven = false;
+    
+    let quizQuestions = [
+        { question: "Какой инструмент используется для забивания гвоздей?", options: ["Отвёртка", "Молоток", "Пила", "Дрель"], correct: 1 },
+        { question: "Что такое шпаклёвка?", options: ["Инструмент для резки", "Строительная смесь", "Вид краски", "Защитное покрытие"], correct: 1 },
+        { question: "Как называется профессиональный инструмент для измерения углов?", options: ["Рулетка", "Уровень", "Транспортир", "Угломер"], correct: 3 },
+        { question: "Что такое перфоратор?", options: ["Электродрель с ударом", "Шлифовальная машина", "Сварочный аппарат", "Бетономешалка"], correct: 0 },
+        { question: "Какой материал используется для гидроизоляции?", options: ["Гипсокартон", "Рубероид", "Пенопласт", "Фанера"], correct: 1 },
+        { question: "Что такое уровень?", options: ["Прибор для измерения горизонтали", "Измерительная лента", "Инструмент для резки", "Защитные очки"], correct: 0 },
+        { question: "Какой инструмент используется для сварки?", options: ["Болгарка", "Сварочный аппарат", "Паяльник", "Клещи"], correct: 1 },
+        { question: "Что такое грунтовка?", options: ["Вид краски", "Подготовительный состав", "Инструмент", "Защитная плёнка"], correct: 1 },
+        { question: "Как называется профессия по укладке плитки?", options: ["Маляр", "Штукатур", "Плиточник", "Плотник"], correct: 2 },
+        { question: "Что такое стяжка пола?", options: ["Выравнивающий слой", "Финишное покрытие", "Утеплитель", "Звукоизоляция"], correct: 0 },
+        { question: "Какой материал используется для кровли?", options: ["Пеноблок", "Металлочерепица", "Сайдинг", "Гипсокартон"], correct: 1 },
+        { question: "Что такое лазерный уровень?", options: ["Современный измерительный прибор", "Декоративная подсветка", "Охранная система", "Медицинское оборудование"], correct: 0 },
+        { question: "Как расшифровывается ПВХ?", options: ["Поливинилхлорид", "Пено-виниловая смесь", "Пластик высокого качества", "Полимер вспененный"], correct: 0 },
+        { question: "Что такое фальш-стена?", options: ["Несущая стена", "Декоративная перегородка", "Уличная стена", "Толстая стена"], correct: 1 },
+        { question: "Какой инструмент используется для шлифовки?", options: ["Болгарка", "Шлифмашина", "Дрель", "Перфоратор"], correct: 1 },
+        { question: "Что такое монтажная пена?", options: ["Клей", "Герметик", "Утеплитель и заполнитель", "Краска"], correct: 2 },
+        { question: "Как называется профессия по установке сантехники?", options: ["Электрик", "Сантехник", "Плиточник", "Маляр"], correct: 1 },
+        { question: "Что такое дюбель?", options: ["Крепёжное изделие", "Инструмент", "Строительный материал", "Защитное устройство"], correct: 0 },
+        { question: "Какой инструмент используется для резки металла?", options: ["Лобзик", "Болгарка", "Пила по дереву", "Ножницы"], correct: 1 },
+        { question: "Что такое вентилируемый фасад?", options: ["Система облицовки с зазором", "Окна", "Система отопления", "Кондиционер"], correct: 0 }
+    ];
+    let currentQuizQuestion = null;
+    let quizAnsweredToday = false;
+    let quizLastAnswerDate = null;
+    
+    // ========== ФУНКЦИИ ДЛЯ МОНЕТ И ЗВЁЗД ==========
+    
+    function addCoins(amount) {
+        let currentCoins = getCoins();
+        currentCoins += amount;
+        saveCoins(currentCoins);
+        showCoinAnimation(amount);
+        showNotification(`+${amount} 🪙 монет!`, 1500);
+        return currentCoins;
+    }
+    
+    function getCoins() {
+        const data = getLocalStorage(`user_coins_${currentUserId}`);
+        return data || 0;
+    }
+    
+    function saveCoins(coins) {
+        setLocalStorage(`user_coins_${currentUserId}`, coins);
+        updateUserStatsDisplay();
+    }
+    
+    function addStars(amount) {
+        let currentStars = getStars();
+        currentStars += amount;
+        saveStars(currentStars);
+        showStarAnimation(amount);
+        showNotification(`+${amount} ⭐ звезд!`, 1500);
+        return currentStars;
+    }
+    
+    function getStars() {
+        const data = getLocalStorage(`user_stars_${currentUserId}`);
+        return data || 0;
+    }
+    
+    function saveStars(stars) {
+        setLocalStorage(`user_stars_${currentUserId}`, stars);
+        updateUserStatsDisplay();
+    }
+    
+    function updateUserStatsDisplay() {
+        const coinsElement = document.getElementById('userCoins');
+        const starsElement = document.getElementById('userStars');
+        if (coinsElement) coinsElement.textContent = getCoins();
+        if (starsElement) starsElement.textContent = getStars();
+    }
+    
+    function showCoinAnimation(amount) {
+        const coin = document.createElement('div');
+        coin.className = 'coin-animation';
+        coin.textContent = `+${amount}🪙`;
+        coin.style.left = Math.random() * window.innerWidth + 'px';
+        coin.style.top = '50%';
+        document.body.appendChild(coin);
+        setTimeout(() => coin.remove(), 1000);
+    }
+    
+    function showStarAnimation(amount) {
+        const star = document.createElement('div');
+        star.className = 'star-animation';
+        star.textContent = `+${amount}⭐`;
+        star.style.left = Math.random() * window.innerWidth + 'px';
+        star.style.top = '50%';
+        document.body.appendChild(star);
+        setTimeout(() => star.remove(), 800);
+    }
+    
+    // ========== ИГРА 1: КОЛЕСО УДАЧИ ==========
+    
+    function initWheelGame() {
+        const canvas = document.getElementById('wheelCanvas');
+        if (!canvas) return;
+        
+        loadWheelData();
+        drawWheel();
+        
+        document.getElementById('wheelSpinBtn').onclick = () => {
+            if (wheelIsSpinning) return;
+            if (wheelSpins <= 0) {
+                showNotification('❌ У вас закончились бесплатные вращения! Завтра будет новый лимит.', 2000);
+                return;
+            }
+            spinWheel();
+        };
+    }
+    
+    function loadWheelData() {
+        const data = getLocalStorage(`wheel_${currentUserId}`);
+        if (data) {
+            wheelSpins = data.spins !== undefined ? data.spins : 3;
+            wheelLastResetDate = data.lastResetDate;
+        }
+        checkWheelReset();
+    }
+    
+    function saveWheelData() {
+        setLocalStorage(`wheel_${currentUserId}`, {
+            spins: wheelSpins,
+            lastResetDate: wheelLastResetDate
+        });
+        updateWheelUI();
+    }
+    
+    function checkWheelReset() {
+        const today = new Date().toDateString();
+        if (wheelLastResetDate !== today) {
+            wheelSpins = 3;
+            wheelLastResetDate = today;
+            saveWheelData();
+        }
+    }
+    
+    function updateWheelUI() {
+        document.getElementById('wheelSpinsLeft').textContent = `Осталось вращений: ${wheelSpins}`;
+        const progressPercent = (wheelSpins / 3) * 100;
+        document.getElementById('wheelProgressFill').style.width = `${progressPercent}%`;
+    }
+    
+    function drawWheel() {
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = width / 2 - 5;
+        const angleStep = (Math.PI * 2) / wheelSegments.length;
+        
+        ctx.clearRect(0, 0, width, height);
+        
+        for (let i = 0; i < wheelSegments.length; i++) {
+            const startAngle = i * angleStep + wheelRotation;
+            const endAngle = startAngle + angleStep;
+            
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7B05E'];
+            ctx.beginPath();
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.fill();
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(startAngle + angleStep / 2);
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillStyle = '#2d3748';
+            ctx.fillText(wheelSegments[i].name, radius * 0.7, 0);
+            ctx.restore();
+        }
+        
+        ctx.beginPath();
+        ctx.fillStyle = '#fbbf24';
+        ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#d97706';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🎡', centerX, centerY);
+    }
+    
+    function spinWheel() {
+        if (wheelIsSpinning) return;
+        
+        wheelIsSpinning = true;
+        const spins = 5 + Math.random() * 5;
+        const spinAngle = spins * Math.PI * 2 + Math.random() * Math.PI * 2;
+        const targetRotation = wheelRotation + spinAngle;
+        const startTime = performance.now();
+        const duration = 2000;
+        
+        function animateSpin(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(1, elapsed / duration);
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+            
+            wheelRotation = targetRotation * easeOut;
+            drawWheel();
+            
+            if (progress < 1) {
+                requestAnimationFrame(animateSpin);
+            } else {
+                wheelIsSpinning = false;
+                determinePrize();
+            }
+        }
+        
+        requestAnimationFrame(animateSpin);
+    }
+    
+    function determinePrize() {
+        const angleStep = (Math.PI * 2) / wheelSegments.length;
+        let normalizedRotation = wheelRotation % (Math.PI * 2);
+        let pointerAngle = (Math.PI * 2 - normalizedRotation) % (Math.PI * 2);
+        const segmentIndex = Math.floor(pointerAngle / angleStep) % wheelSegments.length;
+        const prize = wheelSegments[segmentIndex];
+        
+        wheelSpins--;
+        saveWheelData();
+        
+        let rewardMessage = '';
+        switch(prize.value) {
+            case 'star':
+                addStars(prize.amount);
+                rewardMessage = `🎉 Вы выиграли +${prize.amount} ⭐ звезд!`;
+                break;
+            case 'coin':
+                addCoins(prize.amount);
+                rewardMessage = `🎉 Вы выиграли +${prize.amount} 🪙 монет!`;
+                break;
+            case 'bonus':
+                addCoins(5);
+                addStars(1);
+                rewardMessage = `🎉 Бонус! +5 монет и +1 звезда!`;
+                break;
+            case 'retry':
+                wheelSpins++;
+                saveWheelData();
+                rewardMessage = `🔄 Попробуйте ещё раз! +1 бесплатное вращение!`;
+                break;
+            case 'super':
+                addCoins(10);
+                addStars(2);
+                rewardMessage = `🎉✨ СУПЕР-ПРИЗ! +10 монет и +2 звезды! ✨🎉`;
+                break;
+        }
+        
+        document.getElementById('wheelResult').innerHTML = `<div style="background: rgba(72,187,120,0.3); padding: 10px; border-radius: 10px;">${rewardMessage}</div>`;
+        showNotification(rewardMessage, 2500);
+        setTimeout(() => {
+            document.getElementById('wheelResult').innerHTML = '';
+        }, 3000);
+        
+        updateWheelUI();
+    }
+    
+    // ========== ИГРА 2: ЛОВИ ЗАКАЗ ==========
+    
+    function initCatchGame() {
+        const canvas = document.getElementById('catchCanvas');
+        if (!canvas) return;
+        
+        loadCatchRecords();
+        
+        document.getElementById('catchStartBtn').onclick = () => {
+            if (catchGameActive) return;
+            startCatchGame();
+        };
+    }
+    
+    function loadCatchRecords() {
+        const data = getLocalStorage(`catch_records_${currentUserId}`);
+        if (data) {
+            catchTopScores = data.topScores || [0, 0, 0];
+        }
+        updateCatchLeaderboard();
+    }
+    
+    function saveCatchRecords() {
+        setLocalStorage(`catch_records_${currentUserId}`, {
+            topScores: catchTopScores
+        });
+    }
+    
+    function updateCatchLeaderboard() {
+        document.getElementById('catchTop1').textContent = catchTopScores[0];
+        document.getElementById('catchTop2').textContent = catchTopScores[1];
+        document.getElementById('catchTop3').textContent = catchTopScores[2];
+    }
+    
+    function updateCatchScoreboard() {
+        document.getElementById('catchScore').textContent = catchScore;
+        document.getElementById('catchCoins').textContent = catchCoinsEarned;
+        document.getElementById('catchTimer').textContent = catchTimer;
+    }
+    
+    function startCatchGame() {
+        catchGameActive = true;
+        catchScore = 0;
+        catchCoinsEarned = 0;
+        catchTimer = 15;
+        catchItems = [];
+        updateCatchScoreboard();
+        
+        const canvas = document.getElementById('catchCanvas');
+        canvas.width = 300;
+        canvas.height = 400;
+        
+        if (catchInterval) clearInterval(catchInterval);
+        catchInterval = setInterval(() => {
+            if (!catchGameActive) return;
+            catchTimer--;
+            updateCatchScoreboard();
+            if (catchTimer <= 0) {
+                endCatchGame();
+            }
+            if (Math.random() < 0.3) {
+                spawnCatchItem();
+            }
+        }, 1000);
+        
+        function gameLoop() {
+            if (!catchGameActive) return;
+            drawCatchCanvas();
+            updateCatchItems();
+            catchAnimationId = requestAnimationFrame(gameLoop);
+        }
+        gameLoop();
+        
+        canvas.onclick = (e) => {
+            if (!catchGameActive) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const mouseX = (e.clientX - rect.left) * scaleX;
+            const mouseY = (e.clientY - rect.top) * scaleY;
+            
+            for (let i = catchItems.length - 1; i >= 0; i--) {
+                const item = catchItems[i];
+                if (mouseX >= item.x && mouseX <= item.x + 30 &&
+                    mouseY >= item.y && mouseY <= item.y + 30) {
+                    catchItems.splice(i, 1);
+                    catchScore += 10;
+                    catchCoinsEarned++;
+                    updateCatchScoreboard();
+                    break;
+                }
+            }
+        };
+    }
+    
+    function spawnCatchItem() {
+        const icons = ['🔧', '🔨', '🛠️', '📱', '🧱'];
+        catchItems.push({
+            x: Math.random() * 270,
+            y: 0,
+            icon: icons[Math.floor(Math.random() * icons.length)]
+        });
+    }
+    
+    function updateCatchItems() {
+        for (let i = 0; i < catchItems.length; i++) {
+            catchItems[i].y += 3;
+            if (catchItems[i].y > 370) {
+                catchItems.splice(i, 1);
+                i--;
+            }
+        }
+    }
+    
+    function drawCatchCanvas() {
+        const canvas = document.getElementById('catchCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#2d3748';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        for (const item of catchItems) {
+            ctx.font = '30px Arial';
+            ctx.fillStyle = '#FFD700';
+            ctx.fillText(item.icon, item.x, item.y);
+        }
+    }
+    
+    function endCatchGame() {
+        catchGameActive = false;
+        if (catchInterval) clearInterval(catchInterval);
+        if (catchAnimationId) cancelAnimationFrame(catchAnimationId);
+        
+        addCoins(catchCoinsEarned);
+        
+        if (catchScore > catchSessionRecord) {
+            catchSessionRecord = catchScore;
+            document.getElementById('catchSessionRecord').textContent = catchSessionRecord;
+        }
+        
+        let newTopScores = [...catchTopScores, catchScore].sort((a,b) => b - a).slice(0, 3);
+        catchTopScores = newTopScores;
+        saveCatchRecords();
+        updateCatchLeaderboard();
+        
+        showNotification(`🎮 Игра окончена! +${catchCoinsEarned} монет. Счёт: ${catchScore}`, 3000);
+        document.getElementById('catchStartBtn').textContent = '🎮 Играть снова';
+    }
+    
+    // ========== ИГРА 3: КАРТОЧНАЯ ПАМЯТЬ ==========
+    
+    function initMemoryGame() {
+        document.getElementById('memoryNewBtn').onclick = () => {
+            startMemoryGame();
+        };
+        startMemoryGame();
+    }
+    
+    function startMemoryGame() {
+        if (memoryTimerInterval) clearInterval(memoryTimerInterval);
+        
+        const professions = ['👨‍🔧', '👩‍🍳', '👨‍🎨', '🧑‍🔬', '👨‍💻', '👩‍🔧', '👨‍🏫', '👩‍⚕️'];
+        let cards = [];
+        for (let i = 0; i < professions.length; i++) {
+            cards.push({ id: i * 2, value: professions[i], matched: false, flipped: false });
+            cards.push({ id: i * 2 + 1, value: professions[i], matched: false, flipped: false });
+        }
+        for (let i = cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cards[i], cards[j]] = [cards[j], cards[i]];
+        }
+        memoryCards = cards;
+        memoryFlippedCards = [];
+        memoryMatchedPairs = 0;
+        memoryMoves = 0;
+        memoryTime = 0;
+        memoryGameActive = true;
+        memoryLockBoard = false;
+        
+        updateMemoryStats();
+        renderMemoryBoard();
+        
+        memoryTimerInterval = setInterval(() => {
+            if (memoryGameActive && memoryMatchedPairs < 8) {
+                memoryTime++;
+                updateMemoryStats();
+            }
+        }, 1000);
+    }
+    
+    function updateMemoryStats() {
+        document.getElementById('memoryMoves').textContent = memoryMoves;
+        document.getElementById('memoryTime').textContent = memoryTime;
+        document.getElementById('memoryPairs').textContent = `${memoryMatchedPairs}/8`;
+    }
+    
+    function renderMemoryBoard() {
+        const board = document.getElementById('memoryBoard');
+        board.innerHTML = '';
+        
+        for (let i = 0; i < memoryCards.length; i++) {
+            const card = memoryCards[i];
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'memory-card';
+            if (card.flipped || card.matched) cardDiv.classList.add('flipped');
+            if (card.matched) cardDiv.classList.add('matched');
+            cardDiv.textContent = (card.flipped || card.matched) ? card.value : '?';
+            cardDiv.onclick = () => {
+                if (!memoryGameActive || memoryLockBoard || card.matched || card.flipped) return;
+                flipMemoryCard(i);
+            };
+            board.appendChild(cardDiv);
+        }
+    }
+    
+    function flipMemoryCard(index) {
+        const card = memoryCards[index];
+        if (card.flipped || card.matched) return;
+        
+        card.flipped = true;
+        memoryFlippedCards.push({ index, value: card.value });
+        renderMemoryBoard();
+        
+        if (memoryFlippedCards.length === 2) {
+            memoryMoves++;
+            updateMemoryStats();
+            memoryLockBoard = true;
+            
+            if (memoryFlippedCards[0].value === memoryFlippedCards[1].value) {
+                memoryCards[memoryFlippedCards[0].index].matched = true;
+                memoryCards[memoryFlippedCards[1].index].matched = true;
+                memoryMatchedPairs++;
+                updateMemoryStats();
+                memoryFlippedCards = [];
+                memoryLockBoard = false;
+                renderMemoryBoard();
+                
+                if (memoryMatchedPairs === 8) {
+                    endMemoryGame();
+                }
+            } else {
+                setTimeout(() => {
+                    memoryCards[memoryFlippedCards[0].index].flipped = false;
+                    memoryCards[memoryFlippedCards[1].index].flipped = false;
+                    memoryFlippedCards = [];
+                    memoryLockBoard = false;
+                    renderMemoryBoard();
+                }, 1000);
+            }
+        }
+    }
+    
+    function endMemoryGame() {
+        memoryGameActive = false;
+        if (memoryTimerInterval) clearInterval(memoryTimerInterval);
+        
+        addCoins(10);
+        document.getElementById('memoryResult').innerHTML = `<div style="background: rgba(72,187,120,0.3); padding: 10px; border-radius: 10px;">🎉 Поздравляем! Вы нашли все пары! +10 монет! Ходов: ${memoryMoves}, Время: ${memoryTime}с 🎉</div>`;
+        setTimeout(() => {
+            document.getElementById('memoryResult').innerHTML = '';
+        }, 5000);
+    }
+    
+    // ========== ИГРА 4: ТАПАЙ-ЗАРАБАТЫВАЙ ==========
+    
+    function initTapGame() {
+        const tapButton = document.getElementById('tapButton');
+        tapButton.onclick = () => {
+            if (!tapGameActive) return;
+            tapCount++;
+            tapCoinsEarned++;
+            updateTapStats();
+            
+            if (tapCount >= 100 && !tapBonusGiven) {
+                tapBonusGiven = true;
+                addStars(5);
+                document.getElementById('tapBonusMessage').innerHTML = '<div style="color: #FFD700;">✨ БОНУС! +5 звёзд за 100 тапов! ✨</div>';
+                setTimeout(() => {
+                    document.getElementById('tapBonusMessage').innerHTML = '';
+                }, 3000);
+            }
+            
+            if (Math.random() < 0.3) {
+                const container = tapButton.parentElement;
+                const maxX = container.clientWidth - tapButton.clientWidth;
+                const maxY = container.clientHeight - tapButton.clientHeight;
+                const newX = Math.random() * maxX;
+                const newY = Math.random() * maxY;
+                tapButton.style.position = 'relative';
+                tapButton.style.left = newX + 'px';
+                tapButton.style.top = newY + 'px';
+            }
+        };
+        
+        document.getElementById('tapStartBtn').onclick = () => {
+            if (tapGameActive) return;
+            startTapGame();
+        };
+    }
+    
+    function startTapGame() {
+        tapGameActive = true;
+        tapCount = 0;
+        tapCoinsEarned = 0;
+        tapTimer = 10;
+        tapBonusGiven = false;
+        updateTapStats();
+        
+        const tapButton = document.getElementById('tapButton');
+        tapButton.style.left = '0px';
+        tapButton.style.top = '0px';
+        
+        if (tapInterval) clearInterval(tapInterval);
+        tapInterval = setInterval(() => {
+            if (!tapGameActive) return;
+            tapTimer--;
+            updateTapStats();
+            if (tapTimer <= 0) {
+                endTapGame();
+            }
+        }, 1000);
+    }
+    
+    function updateTapStats() {
+        document.getElementById('tapCount').textContent = tapCount;
+        document.getElementById('tapCoins').textContent = tapCoinsEarned;
+        document.getElementById('tapTimer').textContent = tapTimer;
+    }
+    
+    function endTapGame() {
+        tapGameActive = false;
+        if (tapInterval) clearInterval(tapInterval);
+        
+        addCoins(tapCoinsEarned);
+        showNotification(`👆 Игра окончена! +${tapCoinsEarned} монет. Тапов: ${tapCount}`, 3000);
+        document.getElementById('tapStartBtn').textContent = '🎮 Играть снова';
+    }
+    
+    // ========== ИГРА 5: ЕЖЕДНЕВНЫЙ КВИЗ ==========
+    
+    function initQuizGame() {
+        loadQuizData();
+        updateQuizUI();
+    }
+    
+    function loadQuizData() {
+        const data = getLocalStorage(`quiz_${currentUserId}`);
+        if (data) {
+            quizAnsweredToday = data.answered || false;
+            quizLastAnswerDate = data.lastAnswerDate;
+        }
+        checkQuizReset();
+        selectRandomQuizQuestion();
+    }
+    
+    function saveQuizData() {
+        setLocalStorage(`quiz_${currentUserId}`, {
+            answered: quizAnsweredToday,
+            lastAnswerDate: quizLastAnswerDate
+        });
+    }
+    
+    function checkQuizReset() {
+        const today = new Date().toDateString();
+        if (quizLastAnswerDate !== today) {
+            quizAnsweredToday = false;
+            quizLastAnswerDate = today;
+            saveQuizData();
+        }
+    }
+    
+    function selectRandomQuizQuestion() {
+        const randomIndex = Math.floor(Math.random() * quizQuestions.length);
+        currentQuizQuestion = { ...quizQuestions[randomIndex] };
+    }
+    
+    function updateQuizUI() {
+        const statusDiv = document.getElementById('quizStatus');
+        const questionDiv = document.getElementById('quizQuestion');
+        const optionsDiv = document.getElementById('quizOptions');
+        const resultDiv = document.getElementById('quizResult');
+        
+        if (quizAnsweredToday) {
+            statusDiv.innerHTML = '<div style="background: #ed8936; padding: 8px; border-radius: 8px;">📅 Сегодня вы уже ответили на вопрос! Приходите завтра за новой наградой.</div>';
+            questionDiv.innerHTML = '';
+            optionsDiv.innerHTML = '';
+            return;
+        }
+        
+        statusDiv.innerHTML = '<div style="background: #48bb78; padding: 8px; border-radius: 8px;">✨ Новый вопрос! Ответьте правильно и получите +3 монеты ✨</div>';
+        questionDiv.innerHTML = currentQuizQuestion.question;
+        
+        optionsDiv.innerHTML = '';
+        for (let i = 0; i < currentQuizQuestion.options.length; i++) {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'quiz-option';
+            optionDiv.textContent = currentQuizQuestion.options[i];
+            optionDiv.onclick = () => {
+                if (quizAnsweredToday) return;
+                checkQuizAnswer(i);
+            };
+            optionsDiv.appendChild(optionDiv);
+        }
+        
+        resultDiv.innerHTML = '';
+    }
+    
+    function checkQuizAnswer(selectedIndex) {
+        const isCorrect = (selectedIndex === currentQuizQuestion.correct);
+        const optionsDiv = document.getElementById('quizOptions');
+        const children = optionsDiv.children;
+        
+        for (let i = 0; i < children.length; i++) {
+            children[i].style.pointerEvents = 'none';
+            if (i === currentQuizQuestion.correct) {
+                children[i].classList.add('correct');
+            }
+            if (i === selectedIndex && !isCorrect) {
+                children[i].classList.add('wrong');
+            }
+        }
+        
+        const resultDiv = document.getElementById('quizResult');
+        if (isCorrect) {
+            addCoins(3);
+            resultDiv.innerHTML = '<div style="background: #48bb78; padding: 10px; border-radius: 10px;">✅ Правильно! +3 монеты! 🎉</div>';
+        } else {
+            resultDiv.innerHTML = `<div style="background: #f56565; padding: 10px; border-radius: 10px;">❌ Неправильно! Правильный ответ: ${currentQuizQuestion.options[currentQuizQuestion.correct]}. Приходите завтра за новым вопросом!</div>`;
+        }
+        
+        quizAnsweredToday = true;
+        saveQuizData();
+        
+        setTimeout(() => {
+            updateQuizUI();
+        }, 3000);
+    }
+    
+    // ========== УПРАВЛЕНИЕ МОДАЛЬНЫМ ОКНОМ ИГР ==========
+    
+    function openGamesModal() {
+        triggerHapticFeedback();
+        const modal = document.getElementById('gamesModal');
+        modal.classList.add('active');
+        
+        // Инициализация игр при открытии модального окна
+        setTimeout(() => {
+            initWheelGame();
+            initCatchGame();
+            initMemoryGame();
+            initTapGame();
+            initQuizGame();
+        }, 100);
+    }
+    
+    function closeGamesModal() {
+        triggerHapticFeedback();
+        const modal = document.getElementById('gamesModal');
+        modal.classList.remove('active');
+        
+        // Сброс игр при закрытии
+        if (catchInterval) clearInterval(catchInterval);
+        if (catchAnimationId) cancelAnimationFrame(catchAnimationId);
+        if (memoryTimerInterval) clearInterval(memoryTimerInterval);
+        if (tapInterval) clearInterval(tapInterval);
+        
+        catchGameActive = false;
+        memoryGameActive = false;
+        tapGameActive = false;
+        
+        // Скрыть все игровые контейнеры
+        const gameContainers = document.querySelectorAll('.game-container');
+        gameContainers.forEach(container => {
+            container.classList.remove('active');
+        });
+        
+        currentGame = null;
+    }
+    
+    function showGame(gameId) {
+        const gameContainers = document.querySelectorAll('.game-container');
+        gameContainers.forEach(container => {
+            container.classList.remove('active');
+        });
+        
+        const selectedGame = document.getElementById(gameId);
+        if (selectedGame) {
+            selectedGame.classList.add('active');
+        }
+        
+        currentGame = gameId;
+        
+        // Обновить UI в зависимости от игры
+        if (gameId === 'wheelGame') {
+            updateWheelUI();
+        } else if (gameId === 'catchGame') {
+            document.getElementById('catchStartBtn').textContent = '🎮 Начать игру';
+            loadCatchRecords();
+        } else if (gameId === 'memoryGame') {
+            startMemoryGame();
+        } else if (gameId === 'tapGame') {
+            document.getElementById('tapStartBtn').textContent = '🎮 Начать';
+        } else if (gameId === 'quizGame') {
+            updateQuizUI();
+        }
+    }
+    
     // ========== ФУНКЦИИ ДЛЯ ФОРМАТА РАБОТЫ ==========
     
     function getWorkFormatBadge(workFormat) {
@@ -6158,7 +7560,6 @@
                         await preloadAllSkills();
                         loadMySkills();
                         loadProfileSkills();
-                        // Обновляем QR-код на главном экране
                         generateMainScreenQR();
                         return;
                     }
@@ -6674,7 +8075,8 @@
     function loadUserProfile() {
         const userData = getOrCreateUserProfile(currentUserId);
         const referralData = getReferralData();
-        const coins = getCoinsData();
+        const coins = getCoins();
+        const stars = getStars();
         const userNameElement = document.getElementById('userName');
         if (userNameElement) {
             userNameElement.textContent = userData.firstName || 'Пользователь';
@@ -6691,21 +8093,19 @@
                 userAvatar.innerHTML = '👤';
             }
         }
-        updateUserStats(userData, referralData, coins);
+        updateUserStats(userData, referralData, coins, stars);
     }
     
-    function updateUserStats(userData, referralData, coins) {
+    function updateUserStats(userData, referralData, coins, stars) {
         const statsGrid = document.getElementById('userStats');
         if (!statsGrid) return;
-        const stars = referralData?.starsEarned || 0;
-        const goldCoins = coins || 0;
         statsGrid.innerHTML = `
             <div class="stat-card">
                 <div class="stat-value">${stars}</div>
                 <div class="stat-label">⭐ Звёзды</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value">${goldCoins}</div>
+                <div class="stat-value">${coins}</div>
                 <div class="stat-label">🪙 Монеты</div>
             </div>
             <div class="stat-card">
@@ -7094,7 +8494,7 @@
                         status: 'completed',
                         completedAt: new Date().toISOString()
                     });
-                    addCoin();
+                    addCoins(1);
                     const userData = getOrCreateUserProfile(currentUserId);
                     userData.completedDeals = (userData.completedDeals || 0) + 1;
                     userData.rating = (userData.rating || 0) + 0.5;
@@ -7485,27 +8885,6 @@
         });
     };
     
-    function addCoin() {
-        const currentCoins = getCoinsData();
-        const newCoins = currentCoins + 1;
-        saveCoinsData(newCoins);
-        console.log(`🪙 +1 монета. Всего: ${newCoins}`);
-        const userData = getOrCreateUserProfile(currentUserId);
-        userData.completedDeals = (userData.completedDeals || 0) + 1;
-        setLocalStorage(`user_${currentUserId}`, userData);
-        loadUserProfile();
-        return newCoins;
-    }
-    
-    function getCoinsData() {
-        const data = getLocalStorage(`coins_${currentUserId}`);
-        return data || 0;
-    }
-    
-    function saveCoinsData(coins) {
-        setLocalStorage(`coins_${currentUserId}`, coins);
-    }
-    
     // ========== КАТЕГОРИИ ДЛЯ АРХИВА И ПОДРАЗДЕЛЫ ==========
     
     const skillCategories = [
@@ -7678,7 +9057,6 @@
             return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
         });
         
-        // Дополнительная фильтрация по подразделу (формату работы)
         if (subcategory) {
             filteredSkills = filteredSkills.filter(skill => skill.workFormat === subcategory);
         }
@@ -8089,6 +9467,7 @@
                         referralData.referralCount += 1;
                         referralData.starsEarned += 1;
                         saveReferralData(referralData);
+                        addStars(1);
                         const userProfile = getOrCreateUserProfile(currentUserId);
                         userProfile.stars = (userProfile.stars || 0) + 1;
                         setLocalStorage(`user_${currentUserId}`, userProfile);
@@ -8108,7 +9487,6 @@
     document.addEventListener('DOMContentLoaded', async function() {
         console.log('🚀 Ymeyka app loaded successfully!');
         
-        // Инициализация свайп-навигации
         initSwipeNavigation();
         
         currentMasterStatus = 'ready';
@@ -8137,9 +9515,15 @@
         }
         initAdminAccess();
         
-        // Инициализация селекторов формата работы
         selectWorkFormat('Один');
         selectEditWorkFormat('Один');
+        
+        // Инициализация игр
+        initWheelGame();
+        initCatchGame();
+        initMemoryGame();
+        initTapGame();
+        initQuizGame();
     });
     </script>
 </body>
