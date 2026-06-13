@@ -198,14 +198,39 @@
             display: block;
         }
         
-        /* Колесо удачи */
+        /* Колесо удачи (исправленное) */
         .wheel-container {
             text-align: center;
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .wheel-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto;
         }
         
         .wheel-canvas {
-            margin: 0 auto;
             display: block;
+            margin: 0 auto;
+            width: 200px;
+            height: 200px;
+        }
+        
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ff5722;
+            z-index: 10;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
         
         .wheel-spin-btn {
@@ -241,49 +266,6 @@
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
             border-radius: 4px;
             transition: width 0.3s ease;
-        }
-        
-        /* Лови заказ */
-        .catch-game-area {
-            text-align: center;
-        }
-        
-        .catch-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-        }
-        
-        .catch-canvas {
-            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-            border-radius: 16px;
-            margin: 0 auto;
-            cursor: pointer;
-            display: block;
-        }
-        
-        .catch-start-btn {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: none;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: bold;
-            margin: 15px 0;
-            cursor: pointer;
-            width: 100%;
-        }
-        
-        .catch-records {
-            margin-top: 15px;
-            padding: 10px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            font-size: 12px;
         }
         
         /* Карточная память */
@@ -339,53 +321,6 @@
             margin-top: 15px;
         }
         
-        /* Тапай-зарабатывай */
-        .tap-game-area {
-            text-align: center;
-        }
-        
-        .tap-button {
-            width: 150px;
-            height: 150px;
-            background: linear-gradient(135deg, #f6e05e 0%, #d69e2e 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
-            cursor: pointer;
-            margin: 20px auto;
-            transition: all 0.1s ease;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            position: relative;
-        }
-        
-        .tap-button:active {
-            transform: scale(0.95);
-        }
-        
-        .tap-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 12px;
-        }
-        
-        .tap-start-btn {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border: none;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: bold;
-            margin: 15px 0;
-            cursor: pointer;
-            width: 100%;
-        }
-        
         /* Ежедневный квиз */
         .quiz-container {
             padding: 10px;
@@ -439,6 +374,160 @@
             text-align: center;
             margin-top: 15px;
             font-size: 14px;
+        }
+        
+        /* Игра "Угадай профессию" */
+        .quiz-game-container {
+            padding: 10px;
+        }
+        
+        .quiz-question-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .quiz-options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .quiz-option-btn {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .quiz-option-btn:active {
+            transform: scale(0.98);
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .quiz-option-btn.correct {
+            background: #48bb78;
+        }
+        
+        .quiz-option-btn.wrong {
+            background: #f56565;
+        }
+        
+        .quiz-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+        
+        .quiz-hint-btn {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .quiz-hint-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .quiz-result-screen {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .quiz-new-game-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        /* Игра "Найди мастера" */
+        .find-master-game-area {
+            text-align: center;
+        }
+        
+        .find-master-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+        }
+        
+        .find-master-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin: 15px 0;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 16px;
+        }
+        
+        .find-master-cell {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .find-master-cell:active {
+            transform: scale(0.95);
+        }
+        
+        .find-master-cell.found {
+            opacity: 0.4;
+            cursor: default;
+            background: #48bb78;
+        }
+        
+        .find-master-start-btn {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 0;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .find-master-new-btn {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
         }
         
         .loading-spinner {
@@ -3524,7 +3613,10 @@
                 </div>
                 <div id="wheelGame" class="game-container">
                     <div class="wheel-container">
-                        <canvas id="wheelCanvas" width="300" height="300" class="wheel-canvas"></canvas>
+                        <div class="wheel-wrapper">
+                            <canvas id="wheelCanvas" width="200" height="200" class="wheel-canvas"></canvas>
+                            <div class="wheel-pointer"></div>
+                        </div>
                         <button class="wheel-spin-btn" id="wheelSpinBtn">🎡 Крутить</button>
                         <div class="wheel-spins-left" id="wheelSpinsLeft">Осталось вращений: 3</div>
                         <div class="wheel-progress-bar">
@@ -3534,36 +3626,7 @@
                     </div>
                 </div>
 
-                <!-- Игра 2: Лови заказ -->
-                <div class="game-card" onclick="triggerHapticFeedback(); showGame('catchGame');">
-                    <div class="game-card-header">
-                        <div class="game-icon">📦</div>
-                        <div class="game-info">
-                            <div class="game-name">Лови заказ</div>
-                            <div class="game-description">Лови падающие заказы!</div>
-                            <div class="game-reward">💰 +1🪙 за заказ</div>
-                        </div>
-                    </div>
-                </div>
-                <div id="catchGame" class="game-container">
-                    <div class="catch-game-area">
-                        <div class="catch-stats">
-                            <span>🎯 Счёт: <span id="catchScore">0</span></span>
-                            <span>⏱️ Время: <span id="catchTimer">15</span>с</span>
-                            <span>🪙 Монеты: <span id="catchCoins">0</span></span>
-                        </div>
-                        <canvas id="catchCanvas" width="300" height="400" class="catch-canvas"></canvas>
-                        <button class="catch-start-btn" id="catchStartBtn">🎮 Начать игру</button>
-                        <div class="catch-records">
-                            <div>🏆 Рекорд сессии: <span id="catchSessionRecord">0</span></div>
-                            <div>🥇 Лучший результат: <span id="catchTop1">0</span></div>
-                            <div>🥈 Второй результат: <span id="catchTop2">0</span></div>
-                            <div>🥉 Третий результат: <span id="catchTop3">0</span></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Игра 3: Карточная память -->
+                <!-- Игра 2: Карточная память (Мемори) -->
                 <div class="game-card" onclick="triggerHapticFeedback(); showGame('memoryGame');">
                     <div class="game-card-header">
                         <div class="game-icon">🧠</div>
@@ -3585,32 +3648,8 @@
                     <div id="memoryResult" style="text-align: center; margin-top: 10px;"></div>
                 </div>
 
-                <!-- Игра 4: Тапай-зарабатывай -->
-                <div class="game-card" onclick="triggerHapticFeedback(); showGame('tapGame');">
-                    <div class="game-card-header">
-                        <div class="game-icon">👆</div>
-                        <div class="game-info">
-                            <div class="game-name">Тапай-зарабатывай</div>
-                            <div class="game-description">Тапай по убегающей кнопке!</div>
-                            <div class="game-reward">💰 +1🪙 за тап, +5⭐ за 100 тапов</div>
-                        </div>
-                    </div>
-                </div>
-                <div id="tapGame" class="game-container">
-                    <div class="tap-game-area">
-                        <div class="tap-stats">
-                            <span>👆 Тапов: <span id="tapCount">0</span></span>
-                            <span>⏱️ Время: <span id="tapTimer">10</span>с</span>
-                            <span>🪙 Монеты: <span id="tapCoins">0</span></span>
-                        </div>
-                        <div id="tapButton" class="tap-button" style="position: relative; margin: 20px auto;">👆</div>
-                        <button class="tap-start-btn" id="tapStartBtn">🎮 Начать</button>
-                        <div id="tapBonusMessage" style="text-align: center; margin-top: 10px; font-size: 12px;"></div>
-                    </div>
-                </div>
-
-                <!-- Игра 5: Ежедневный квиз -->
-                <div class="game-card" onclick="triggerHapticFeedback(); showGame('quizGame');">
+                <!-- Игра 3: Ежедневный квиз -->
+                <div class="game-card" onclick="triggerHapticFeedback(); showGame('dailyQuizGame');">
                     <div class="game-card-header">
                         <div class="game-icon">❓</div>
                         <div class="game-info">
@@ -3620,12 +3659,69 @@
                         </div>
                     </div>
                 </div>
-                <div id="quizGame" class="game-container">
+                <div id="dailyQuizGame" class="game-container">
                     <div class="quiz-container">
-                        <div class="quiz-status" id="quizStatus">Загрузка вопроса...</div>
-                        <div class="quiz-question" id="quizQuestion"></div>
-                        <div class="quiz-options" id="quizOptions"></div>
-                        <div class="quiz-result" id="quizResult"></div>
+                        <div class="quiz-status" id="dailyQuizStatus">Загрузка вопроса...</div>
+                        <div class="quiz-question" id="dailyQuizQuestion"></div>
+                        <div class="quiz-options" id="dailyQuizOptions"></div>
+                        <div class="quiz-result" id="dailyQuizResult"></div>
+                    </div>
+                </div>
+
+                <!-- Игра 4: Угадай профессию (новая) -->
+                <div class="game-card" onclick="triggerHapticFeedback(); showGame('professionQuizGame');">
+                    <div class="game-card-header">
+                        <div class="game-icon">🔧</div>
+                        <div class="game-info">
+                            <div class="game-name">Угадай профессию</div>
+                            <div class="game-description">Отгадай профессию по описанию!</div>
+                            <div class="game-reward">💰 +2 монеты за правильный ответ</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="professionQuizGame" class="game-container">
+                    <div class="quiz-game-container">
+                        <div class="quiz-stats">
+                            <span>📊 Вопрос: <span id="professionCurrentQuestion">1</span>/<span id="professionTotalQuestions">5</span></span>
+                            <span>💰 Монет: <span id="professionCoinsEarned">0</span></span>
+                            <span>✅ Правильно: <span id="professionCorrectCount">0</span></span>
+                        </div>
+                        <div id="professionQuizQuestionArea">
+                            <div class="quiz-question-text" id="professionQuestionText"></div>
+                            <div class="quiz-options-list" id="professionOptions"></div>
+                            <button class="quiz-hint-btn" id="professionHintBtn">💡 Подсказка (убрать 2 варианта) - 1 монета</button>
+                        </div>
+                        <div id="professionQuizResultArea" style="display: none;">
+                            <div class="quiz-result-screen">
+                                <div id="professionResultText"></div>
+                                <button class="quiz-new-game-btn" id="professionNewGameBtn">🎮 Новая игра</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Игра 5: Найди мастера (новая) -->
+                <div class="game-card" onclick="triggerHapticFeedback(); showGame('findMasterGame');">
+                    <div class="game-card-header">
+                        <div class="game-icon">🔍</div>
+                        <div class="game-info">
+                            <div class="game-name">Найди мастера</div>
+                            <div class="game-description">Найди всех мастеров на картинке!</div>
+                            <div class="game-reward">💰 +1 монета за мастера, +5 бонус за всех</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="findMasterGame" class="game-container">
+                    <div class="find-master-game-area">
+                        <div class="find-master-stats">
+                            <span>🔍 Найдено: <span id="findMasterFound">0</span>/<span id="findMasterTotal">5</span></span>
+                            <span>⏱️ Время: <span id="findMasterTimer">30</span>с</span>
+                            <span>💰 Монет: <span id="findMasterCoins">0</span></span>
+                        </div>
+                        <div class="find-master-grid" id="findMasterGrid"></div>
+                        <button class="find-master-start-btn" id="findMasterStartBtn">🎮 Начать игру</button>
+                        <button class="find-master-new-btn" id="findMasterNewBtn" style="display: none;">🔄 Новая игра</button>
+                        <div id="findMasterMessage" style="margin-top: 10px; font-size: 14px;"></div>
                     </div>
                 </div>
             </div>
@@ -4627,6 +4723,8 @@
 
     // Переменные для игр
     let currentGame = null;
+    
+    // Колесо удачи
     let wheelSpins = 3;
     let wheelLastResetDate = null;
     let wheelIsSpinning = false;
@@ -4640,16 +4738,7 @@
         { name: "Супер-приз!", value: "super", amount: 10 }
     ];
     
-    let catchGameActive = false;
-    let catchScore = 0;
-    let catchCoinsEarned = 0;
-    let catchTimer = 15;
-    let catchInterval = null;
-    let catchAnimationId = null;
-    let catchItems = [];
-    let catchSessionRecord = 0;
-    let catchTopScores = [0, 0, 0];
-    
+    // Карточная память
     let memoryCards = [];
     let memoryFlippedCards = [];
     let memoryMatchedPairs = 0;
@@ -4659,39 +4748,53 @@
     let memoryGameActive = false;
     let memoryLockBoard = false;
     
-    let tapGameActive = false;
-    let tapCount = 0;
-    let tapTimer = 10;
-    let tapCoinsEarned = 0;
-    let tapInterval = null;
-    let tapButtonPositions = [{ x: 0, y: 0 }];
-    let tapBonusGiven = false;
-    
+    // Ежедневный квиз
     let quizQuestions = [
         { question: "Какой инструмент используется для забивания гвоздей?", options: ["Отвёртка", "Молоток", "Пила", "Дрель"], correct: 1 },
         { question: "Что такое шпаклёвка?", options: ["Инструмент для резки", "Строительная смесь", "Вид краски", "Защитное покрытие"], correct: 1 },
         { question: "Как называется профессиональный инструмент для измерения углов?", options: ["Рулетка", "Уровень", "Транспортир", "Угломер"], correct: 3 },
         { question: "Что такое перфоратор?", options: ["Электродрель с ударом", "Шлифовальная машина", "Сварочный аппарат", "Бетономешалка"], correct: 0 },
-        { question: "Какой материал используется для гидроизоляции?", options: ["Гипсокартон", "Рубероид", "Пенопласт", "Фанера"], correct: 1 },
-        { question: "Что такое уровень?", options: ["Прибор для измерения горизонтали", "Измерительная лента", "Инструмент для резки", "Защитные очки"], correct: 0 },
-        { question: "Какой инструмент используется для сварки?", options: ["Болгарка", "Сварочный аппарат", "Паяльник", "Клещи"], correct: 1 },
-        { question: "Что такое грунтовка?", options: ["Вид краски", "Подготовительный состав", "Инструмент", "Защитная плёнка"], correct: 1 },
-        { question: "Как называется профессия по укладке плитки?", options: ["Маляр", "Штукатур", "Плиточник", "Плотник"], correct: 2 },
-        { question: "Что такое стяжка пола?", options: ["Выравнивающий слой", "Финишное покрытие", "Утеплитель", "Звукоизоляция"], correct: 0 },
-        { question: "Какой материал используется для кровли?", options: ["Пеноблок", "Металлочерепица", "Сайдинг", "Гипсокартон"], correct: 1 },
-        { question: "Что такое лазерный уровень?", options: ["Современный измерительный прибор", "Декоративная подсветка", "Охранная система", "Медицинское оборудование"], correct: 0 },
-        { question: "Как расшифровывается ПВХ?", options: ["Поливинилхлорид", "Пено-виниловая смесь", "Пластик высокого качества", "Полимер вспененный"], correct: 0 },
-        { question: "Что такое фальш-стена?", options: ["Несущая стена", "Декоративная перегородка", "Уличная стена", "Толстая стена"], correct: 1 },
-        { question: "Какой инструмент используется для шлифовки?", options: ["Болгарка", "Шлифмашина", "Дрель", "Перфоратор"], correct: 1 },
-        { question: "Что такое монтажная пена?", options: ["Клей", "Герметик", "Утеплитель и заполнитель", "Краска"], correct: 2 },
-        { question: "Как называется профессия по установке сантехники?", options: ["Электрик", "Сантехник", "Плиточник", "Маляр"], correct: 1 },
-        { question: "Что такое дюбель?", options: ["Крепёжное изделие", "Инструмент", "Строительный материал", "Защитное устройство"], correct: 0 },
-        { question: "Какой инструмент используется для резки металла?", options: ["Лобзик", "Болгарка", "Пила по дереву", "Ножницы"], correct: 1 },
-        { question: "Что такое вентилируемый фасад?", options: ["Система облицовки с зазором", "Окна", "Система отопления", "Кондиционер"], correct: 0 }
+        { question: "Какой материал используется для гидроизоляции?", options: ["Гипсокартон", "Рубероид", "Пенопласт", "Фанера"], correct: 1 }
     ];
     let currentQuizQuestion = null;
     let quizAnsweredToday = false;
     let quizLastAnswerDate = null;
+    
+    // Угадай профессию
+    let professionQuestions = [
+        { text: "Этот мастер делает дома уютными, работает с красками и обоями", options: ["Плиточник", "Электрик", "Маляр", "Сантехник"], correct: 2 },
+        { text: "Без него не загорится свет", options: ["Сантехник", "Электрик", "Плиточник", "Маляр"], correct: 1 },
+        { text: "Какой инструмент используется для забивания гвоздей?", options: ["Отвёртка", "Молоток", "Пила", "Дрель"], correct: 1 },
+        { text: "Кто кладёт плитку?", options: ["Маляр", "Электрик", "Плиточник", "Сантехник"], correct: 2 },
+        { text: "Этот мастер занимается установкой и ремонтом сантехники", options: ["Электрик", "Плиточник", "Маляр", "Сантехник"], correct: 3 },
+        { text: "Кто ремонтирует бытовую технику?", options: ["Сантехник", "Электрик", "Мастер по ремонту техники", "Плиточник"], correct: 2 },
+        { text: "Какой мастер работает с деревом?", options: ["Столяр", "Маляр", "Электрик", "Сантехник"], correct: 0 },
+        { text: "Кто занимается укладкой ламината?", options: ["Маляр", "Плиточник", "Паркетчик", "Электрик"], correct: 2 },
+        { text: "Какой мастер устанавливает кондиционеры?", options: ["Сантехник", "Электрик", "Монтажник", "Плиточник"], correct: 2 },
+        { text: "Кто штукатурит стены?", options: ["Маляр", "Штукатур", "Плиточник", "Столяр"], correct: 1 }
+    ];
+    let currentProfessionQuestions = [];
+    let professionCurrentIndex = 0;
+    let professionCorrectCount = 0;
+    let professionCoinsEarned = 0;
+    let professionGameActive = false;
+    let professionHintUsed = false;
+    let professionOriginalOptions = [];
+    
+    // Найди мастера
+    let findMasterLocations = [
+        { name: "кухня", bg: "🍳🧼🍽️🚰🗑️", masters: [0, 7, 12, 18, 22] },
+        { name: "ванная", bg: "🚿🛁🧴🚽🪞", masters: [2, 9, 14, 19, 23] },
+        { name: "гостиная", bg: "🛋️📺🪑🖼️🚪", masters: [4, 11, 16, 20, 24] }
+    ];
+    let currentLocationIndex = 0;
+    let findMasterGameActive = false;
+    let findMasterGrid = [];
+    let findMasterFound = 0;
+    let findMasterTimer = 30;
+    let findMasterCoinsEarned = 0;
+    let findMasterInterval = null;
+    let findMasterMasterIcons = ['👨‍🔧', '⚡', '🧱', '🎨', '🔨'];
     
     // ========== ФУНКЦИИ ДЛЯ МОНЕТ И ЗВЁЗД ==========
     
@@ -4733,6 +4836,17 @@
         updateUserStatsDisplay();
     }
     
+    function spendCoins(amount) {
+        let currentCoins = getCoins();
+        if (currentCoins >= amount) {
+            saveCoins(currentCoins - amount);
+            showNotification(`-${amount} 🪙 монет`, 1500);
+            return true;
+        }
+        showNotification(`❌ Недостаточно монет! Нужно ${amount} 🪙`, 2000);
+        return false;
+    }
+    
     function updateUserStatsDisplay() {
         const coinsElement = document.getElementById('userCoins');
         const starsElement = document.getElementById('userStars');
@@ -4760,7 +4874,7 @@
         setTimeout(() => star.remove(), 800);
     }
     
-    // ========== ИГРА 1: КОЛЕСО УДАЧИ ==========
+    // ========== ИГРА 1: КОЛЕСО УДАЧИ (ИСПРАВЛЕННОЕ) ==========
     
     function initWheelGame() {
         const canvas = document.getElementById('wheelCanvas');
@@ -4842,18 +4956,18 @@
             ctx.rotate(startAngle + angleStep / 2);
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.font = 'bold 12px Arial';
+            ctx.font = 'bold 10px Arial';
             ctx.fillStyle = '#2d3748';
-            ctx.fillText(wheelSegments[i].name, radius * 0.7, 0);
+            ctx.fillText(wheelSegments[i].name, radius * 0.65, 0);
             ctx.restore();
         }
         
         ctx.beginPath();
         ctx.fillStyle = '#fbbf24';
-        ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, 15, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = '#d97706';
-        ctx.font = 'bold 20px Arial';
+        ctx.font = 'bold 14px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('🎡', centerX, centerY);
@@ -4934,156 +5048,7 @@
         updateWheelUI();
     }
     
-    // ========== ИГРА 2: ЛОВИ ЗАКАЗ ==========
-    
-    function initCatchGame() {
-        const canvas = document.getElementById('catchCanvas');
-        if (!canvas) return;
-        
-        loadCatchRecords();
-        
-        document.getElementById('catchStartBtn').onclick = () => {
-            if (catchGameActive) return;
-            startCatchGame();
-        };
-    }
-    
-    function loadCatchRecords() {
-        const data = getLocalStorage(`catch_records_${currentUserId}`);
-        if (data) {
-            catchTopScores = data.topScores || [0, 0, 0];
-        }
-        updateCatchLeaderboard();
-    }
-    
-    function saveCatchRecords() {
-        setLocalStorage(`catch_records_${currentUserId}`, {
-            topScores: catchTopScores
-        });
-    }
-    
-    function updateCatchLeaderboard() {
-        document.getElementById('catchTop1').textContent = catchTopScores[0];
-        document.getElementById('catchTop2').textContent = catchTopScores[1];
-        document.getElementById('catchTop3').textContent = catchTopScores[2];
-    }
-    
-    function updateCatchScoreboard() {
-        document.getElementById('catchScore').textContent = catchScore;
-        document.getElementById('catchCoins').textContent = catchCoinsEarned;
-        document.getElementById('catchTimer').textContent = catchTimer;
-    }
-    
-    function startCatchGame() {
-        catchGameActive = true;
-        catchScore = 0;
-        catchCoinsEarned = 0;
-        catchTimer = 15;
-        catchItems = [];
-        updateCatchScoreboard();
-        
-        const canvas = document.getElementById('catchCanvas');
-        canvas.width = 300;
-        canvas.height = 400;
-        
-        if (catchInterval) clearInterval(catchInterval);
-        catchInterval = setInterval(() => {
-            if (!catchGameActive) return;
-            catchTimer--;
-            updateCatchScoreboard();
-            if (catchTimer <= 0) {
-                endCatchGame();
-            }
-            if (Math.random() < 0.3) {
-                spawnCatchItem();
-            }
-        }, 1000);
-        
-        function gameLoop() {
-            if (!catchGameActive) return;
-            drawCatchCanvas();
-            updateCatchItems();
-            catchAnimationId = requestAnimationFrame(gameLoop);
-        }
-        gameLoop();
-        
-        canvas.onclick = (e) => {
-            if (!catchGameActive) return;
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-            const mouseX = (e.clientX - rect.left) * scaleX;
-            const mouseY = (e.clientY - rect.top) * scaleY;
-            
-            for (let i = catchItems.length - 1; i >= 0; i--) {
-                const item = catchItems[i];
-                if (mouseX >= item.x && mouseX <= item.x + 30 &&
-                    mouseY >= item.y && mouseY <= item.y + 30) {
-                    catchItems.splice(i, 1);
-                    catchScore += 10;
-                    catchCoinsEarned++;
-                    updateCatchScoreboard();
-                    break;
-                }
-            }
-        };
-    }
-    
-    function spawnCatchItem() {
-        const icons = ['🔧', '🔨', '🛠️', '📱', '🧱'];
-        catchItems.push({
-            x: Math.random() * 270,
-            y: 0,
-            icon: icons[Math.floor(Math.random() * icons.length)]
-        });
-    }
-    
-    function updateCatchItems() {
-        for (let i = 0; i < catchItems.length; i++) {
-            catchItems[i].y += 3;
-            if (catchItems[i].y > 370) {
-                catchItems.splice(i, 1);
-                i--;
-            }
-        }
-    }
-    
-    function drawCatchCanvas() {
-        const canvas = document.getElementById('catchCanvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#2d3748';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        for (const item of catchItems) {
-            ctx.font = '30px Arial';
-            ctx.fillStyle = '#FFD700';
-            ctx.fillText(item.icon, item.x, item.y);
-        }
-    }
-    
-    function endCatchGame() {
-        catchGameActive = false;
-        if (catchInterval) clearInterval(catchInterval);
-        if (catchAnimationId) cancelAnimationFrame(catchAnimationId);
-        
-        addCoins(catchCoinsEarned);
-        
-        if (catchScore > catchSessionRecord) {
-            catchSessionRecord = catchScore;
-            document.getElementById('catchSessionRecord').textContent = catchSessionRecord;
-        }
-        
-        let newTopScores = [...catchTopScores, catchScore].sort((a,b) => b - a).slice(0, 3);
-        catchTopScores = newTopScores;
-        saveCatchRecords();
-        updateCatchLeaderboard();
-        
-        showNotification(`🎮 Игра окончена! +${catchCoinsEarned} монет. Счёт: ${catchScore}`, 3000);
-        document.getElementById('catchStartBtn').textContent = '🎮 Играть снова';
-    }
-    
-    // ========== ИГРА 3: КАРТОЧНАЯ ПАМЯТЬ ==========
+    // ========== ИГРА 2: КАРТОЧНАЯ ПАМЯТЬ ==========
     
     function initMemoryGame() {
         document.getElementById('memoryNewBtn').onclick = () => {
@@ -5197,111 +5162,36 @@
         }, 5000);
     }
     
-    // ========== ИГРА 4: ТАПАЙ-ЗАРАБАТЫВАЙ ==========
+    // ========== ИГРА 3: ЕЖЕДНЕВНЫЙ КВИЗ ==========
     
-    function initTapGame() {
-        const tapButton = document.getElementById('tapButton');
-        tapButton.onclick = () => {
-            if (!tapGameActive) return;
-            tapCount++;
-            tapCoinsEarned++;
-            updateTapStats();
-            
-            if (tapCount >= 100 && !tapBonusGiven) {
-                tapBonusGiven = true;
-                addStars(5);
-                document.getElementById('tapBonusMessage').innerHTML = '<div style="color: #FFD700;">✨ БОНУС! +5 звёзд за 100 тапов! ✨</div>';
-                setTimeout(() => {
-                    document.getElementById('tapBonusMessage').innerHTML = '';
-                }, 3000);
-            }
-            
-            if (Math.random() < 0.3) {
-                const container = tapButton.parentElement;
-                const maxX = container.clientWidth - tapButton.clientWidth;
-                const maxY = container.clientHeight - tapButton.clientHeight;
-                const newX = Math.random() * maxX;
-                const newY = Math.random() * maxY;
-                tapButton.style.position = 'relative';
-                tapButton.style.left = newX + 'px';
-                tapButton.style.top = newY + 'px';
-            }
-        };
-        
-        document.getElementById('tapStartBtn').onclick = () => {
-            if (tapGameActive) return;
-            startTapGame();
-        };
+    function initDailyQuizGame() {
+        loadDailyQuizData();
+        updateDailyQuizUI();
     }
     
-    function startTapGame() {
-        tapGameActive = true;
-        tapCount = 0;
-        tapCoinsEarned = 0;
-        tapTimer = 10;
-        tapBonusGiven = false;
-        updateTapStats();
-        
-        const tapButton = document.getElementById('tapButton');
-        tapButton.style.left = '0px';
-        tapButton.style.top = '0px';
-        
-        if (tapInterval) clearInterval(tapInterval);
-        tapInterval = setInterval(() => {
-            if (!tapGameActive) return;
-            tapTimer--;
-            updateTapStats();
-            if (tapTimer <= 0) {
-                endTapGame();
-            }
-        }, 1000);
-    }
-    
-    function updateTapStats() {
-        document.getElementById('tapCount').textContent = tapCount;
-        document.getElementById('tapCoins').textContent = tapCoinsEarned;
-        document.getElementById('tapTimer').textContent = tapTimer;
-    }
-    
-    function endTapGame() {
-        tapGameActive = false;
-        if (tapInterval) clearInterval(tapInterval);
-        
-        addCoins(tapCoinsEarned);
-        showNotification(`👆 Игра окончена! +${tapCoinsEarned} монет. Тапов: ${tapCount}`, 3000);
-        document.getElementById('tapStartBtn').textContent = '🎮 Играть снова';
-    }
-    
-    // ========== ИГРА 5: ЕЖЕДНЕВНЫЙ КВИЗ ==========
-    
-    function initQuizGame() {
-        loadQuizData();
-        updateQuizUI();
-    }
-    
-    function loadQuizData() {
-        const data = getLocalStorage(`quiz_${currentUserId}`);
+    function loadDailyQuizData() {
+        const data = getLocalStorage(`daily_quiz_${currentUserId}`);
         if (data) {
             quizAnsweredToday = data.answered || false;
             quizLastAnswerDate = data.lastAnswerDate;
         }
-        checkQuizReset();
+        checkDailyQuizReset();
         selectRandomQuizQuestion();
     }
     
-    function saveQuizData() {
-        setLocalStorage(`quiz_${currentUserId}`, {
+    function saveDailyQuizData() {
+        setLocalStorage(`daily_quiz_${currentUserId}`, {
             answered: quizAnsweredToday,
             lastAnswerDate: quizLastAnswerDate
         });
     }
     
-    function checkQuizReset() {
+    function checkDailyQuizReset() {
         const today = new Date().toDateString();
         if (quizLastAnswerDate !== today) {
             quizAnsweredToday = false;
             quizLastAnswerDate = today;
-            saveQuizData();
+            saveDailyQuizData();
         }
     }
     
@@ -5310,11 +5200,11 @@
         currentQuizQuestion = { ...quizQuestions[randomIndex] };
     }
     
-    function updateQuizUI() {
-        const statusDiv = document.getElementById('quizStatus');
-        const questionDiv = document.getElementById('quizQuestion');
-        const optionsDiv = document.getElementById('quizOptions');
-        const resultDiv = document.getElementById('quizResult');
+    function updateDailyQuizUI() {
+        const statusDiv = document.getElementById('dailyQuizStatus');
+        const questionDiv = document.getElementById('dailyQuizQuestion');
+        const optionsDiv = document.getElementById('dailyQuizOptions');
+        const resultDiv = document.getElementById('dailyQuizResult');
         
         if (quizAnsweredToday) {
             statusDiv.innerHTML = '<div style="background: #ed8936; padding: 8px; border-radius: 8px;">📅 Сегодня вы уже ответили на вопрос! Приходите завтра за новой наградой.</div>';
@@ -5333,7 +5223,7 @@
             optionDiv.textContent = currentQuizQuestion.options[i];
             optionDiv.onclick = () => {
                 if (quizAnsweredToday) return;
-                checkQuizAnswer(i);
+                checkDailyQuizAnswer(i);
             };
             optionsDiv.appendChild(optionDiv);
         }
@@ -5341,9 +5231,9 @@
         resultDiv.innerHTML = '';
     }
     
-    function checkQuizAnswer(selectedIndex) {
+    function checkDailyQuizAnswer(selectedIndex) {
         const isCorrect = (selectedIndex === currentQuizQuestion.correct);
-        const optionsDiv = document.getElementById('quizOptions');
+        const optionsDiv = document.getElementById('dailyQuizOptions');
         const children = optionsDiv.children;
         
         for (let i = 0; i < children.length; i++) {
@@ -5356,7 +5246,7 @@
             }
         }
         
-        const resultDiv = document.getElementById('quizResult');
+        const resultDiv = document.getElementById('dailyQuizResult');
         if (isCorrect) {
             addCoins(3);
             resultDiv.innerHTML = '<div style="background: #48bb78; padding: 10px; border-radius: 10px;">✅ Правильно! +3 монеты! 🎉</div>';
@@ -5365,11 +5255,289 @@
         }
         
         quizAnsweredToday = true;
-        saveQuizData();
+        saveDailyQuizData();
         
         setTimeout(() => {
-            updateQuizUI();
+            updateDailyQuizUI();
         }, 3000);
+    }
+    
+    // ========== ИГРА 4: УГАДАЙ ПРОФЕССИЮ (НОВАЯ) ==========
+    
+    function initProfessionQuizGame() {
+        document.getElementById('professionNewGameBtn').onclick = () => {
+            startProfessionQuizGame();
+        };
+        document.getElementById('professionHintBtn').onclick = () => {
+            useProfessionHint();
+        };
+        startProfessionQuizGame();
+    }
+    
+    function startProfessionQuizGame() {
+        currentProfessionQuestions = [...professionQuestions];
+        for (let i = currentProfessionQuestions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [currentProfessionQuestions[i], currentProfessionQuestions[j]] = [currentProfessionQuestions[j], currentProfessionQuestions[i]];
+        }
+        currentProfessionQuestions = currentProfessionQuestions.slice(0, 5);
+        
+        professionCurrentIndex = 0;
+        professionCorrectCount = 0;
+        professionCoinsEarned = 0;
+        professionGameActive = true;
+        professionHintUsed = false;
+        
+        document.getElementById('professionTotalQuestions').textContent = currentProfessionQuestions.length;
+        document.getElementById('professionCoinsEarned').textContent = professionCoinsEarned;
+        document.getElementById('professionCorrectCount').textContent = professionCorrectCount;
+        document.getElementById('professionQuizQuestionArea').style.display = 'block';
+        document.getElementById('professionQuizResultArea').style.display = 'none';
+        
+        displayProfessionQuestion();
+    }
+    
+    function displayProfessionQuestion() {
+        if (professionCurrentIndex >= currentProfessionQuestions.length) {
+            endProfessionQuizGame();
+            return;
+        }
+        
+        const question = currentProfessionQuestions[professionCurrentIndex];
+        document.getElementById('professionQuestionText').innerHTML = question.text;
+        document.getElementById('professionCurrentQuestion').textContent = professionCurrentIndex + 1;
+        
+        const optionsContainer = document.getElementById('professionOptions');
+        optionsContainer.innerHTML = '';
+        professionOriginalOptions = [...question.options];
+        
+        for (let i = 0; i < question.options.length; i++) {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'quiz-option-btn';
+            optionDiv.textContent = question.options[i];
+            optionDiv.onclick = () => checkProfessionAnswer(i);
+            optionsContainer.appendChild(optionDiv);
+        }
+        
+        const hintBtn = document.getElementById('professionHintBtn');
+        hintBtn.classList.remove('disabled');
+        hintBtn.disabled = false;
+        professionHintUsed = false;
+    }
+    
+    function checkProfessionAnswer(selectedIndex) {
+        if (!professionGameActive) return;
+        
+        const question = currentProfessionQuestions[professionCurrentIndex];
+        const isCorrect = (selectedIndex === question.correct);
+        const optionsContainer = document.getElementById('professionOptions');
+        const children = optionsContainer.children;
+        
+        for (let i = 0; i < children.length; i++) {
+            children[i].style.pointerEvents = 'none';
+            if (i === question.correct) {
+                children[i].classList.add('correct');
+            }
+            if (i === selectedIndex && !isCorrect) {
+                children[i].classList.add('wrong');
+            }
+        }
+        
+        if (isCorrect) {
+            professionCorrectCount++;
+            professionCoinsEarned += 2;
+            addCoins(2);
+            showNotification('✅ Правильно! +2 монеты!', 1500);
+        } else {
+            showNotification(`❌ Неправильно! Правильный ответ: ${question.options[question.correct]}`, 2000);
+        }
+        
+        document.getElementById('professionCoinsEarned').textContent = professionCoinsEarned;
+        document.getElementById('professionCorrectCount').textContent = professionCorrectCount;
+        
+        professionCurrentIndex++;
+        
+        setTimeout(() => {
+            displayProfessionQuestion();
+        }, 1500);
+    }
+    
+    function useProfessionHint() {
+        if (!professionGameActive || professionHintUsed) return;
+        
+        if (spendCoins(1)) {
+            const question = currentProfessionQuestions[professionCurrentIndex];
+            const optionsContainer = document.getElementById('professionOptions');
+            const children = optionsContainer.children;
+            
+            const wrongIndices = [];
+            for (let i = 0; i < question.options.length; i++) {
+                if (i !== question.correct) {
+                    wrongIndices.push(i);
+                }
+            }
+            
+            const toRemove = wrongIndices.slice(0, 2);
+            toRemove.forEach(index => {
+                if (children[index]) {
+                    children[index].style.display = 'none';
+                }
+            });
+            
+            professionHintUsed = true;
+            document.getElementById('professionHintBtn').classList.add('disabled');
+            document.getElementById('professionHintBtn').disabled = true;
+            showNotification('💡 Подсказка использована! Осталось 2 варианта.', 1500);
+        }
+    }
+    
+    function endProfessionQuizGame() {
+        professionGameActive = false;
+        const resultText = `📊 Результат:\nПравильных ответов: ${professionCorrectCount}/${currentProfessionQuestions.length}\nЗаработано монет: ${professionCoinsEarned} 🪙`;
+        document.getElementById('professionResultText').innerHTML = resultText.replace(/\n/g, '<br>');
+        document.getElementById('professionQuizQuestionArea').style.display = 'none';
+        document.getElementById('professionQuizResultArea').style.display = 'block';
+    }
+    
+    // ========== ИГРА 5: НАЙДИ МАСТЕРА (НОВАЯ) ==========
+    
+    function initFindMasterGame() {
+        document.getElementById('findMasterStartBtn').onclick = () => {
+            if (findMasterGameActive) return;
+            startFindMasterGame();
+        };
+        document.getElementById('findMasterNewBtn').onclick = () => {
+            if (findMasterGameActive) return;
+            startFindMasterGame();
+        };
+    }
+    
+    function updateLocationCycle() {
+        const today = new Date();
+        const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+        currentLocationIndex = dayOfYear % findMasterLocations.length;
+    }
+    
+    function generateFindMasterGrid() {
+        updateLocationCycle();
+        const location = findMasterLocations[currentLocationIndex];
+        const gridSize = 25;
+        const grid = [];
+        
+        for (let i = 0; i < gridSize; i++) {
+            grid.push({
+                icon: getRandomBackgroundEmoji(location.bg),
+                isMaster: false,
+                found: false,
+                masterType: null
+            });
+        }
+        
+        location.masters.forEach((position, idx) => {
+            if (position < gridSize) {
+                grid[position] = {
+                    icon: findMasterMasterIcons[idx % findMasterMasterIcons.length],
+                    isMaster: true,
+                    found: false,
+                    masterType: idx
+                };
+            }
+        });
+        
+        return grid;
+    }
+    
+    function getRandomBackgroundEmoji(bgString) {
+        const emojis = bgString.split('');
+        const validEmojis = emojis.filter(e => e.trim().length > 0 && !e.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g)?.some(m => m.length > 0));
+        if (validEmojis.length === 0) return '⬜';
+        return validEmojis[Math.floor(Math.random() * validEmojis.length)];
+    }
+    
+    function renderFindMasterGrid() {
+        const container = document.getElementById('findMasterGrid');
+        container.innerHTML = '';
+        
+        for (let i = 0; i < findMasterGrid.length; i++) {
+            const cell = findMasterGrid[i];
+            const cellDiv = document.createElement('div');
+            cellDiv.className = 'find-master-cell';
+            if (cell.found) cellDiv.classList.add('found');
+            cellDiv.textContent = cell.icon;
+            cellDiv.onclick = () => {
+                if (!findMasterGameActive) return;
+                if (cell.found) return;
+                if (cell.isMaster) {
+                    cell.found = true;
+                    findMasterFound++;
+                    findMasterCoinsEarned++;
+                    addCoins(1);
+                    cellDiv.classList.add('found');
+                    updateFindMasterStats();
+                    showNotification(`🔧 Найден ${getMasterName(cell.masterType)}! +1 монета!`, 1000);
+                    
+                    if (findMasterFound === 5) {
+                        addCoins(5);
+                        findMasterCoinsEarned += 5;
+                        showNotification(`🎉 БОНУС! Все мастера найдены! +5 монет! 🎉`, 2000);
+                        endFindMasterGame(true);
+                    }
+                }
+            };
+            container.appendChild(cellDiv);
+        }
+    }
+    
+    function getMasterName(type) {
+        const names = ['Сантехник', 'Электрик', 'Плиточник', 'Маляр', 'Столяр'];
+        return names[type] || 'Мастер';
+    }
+    
+    function updateFindMasterStats() {
+        document.getElementById('findMasterFound').textContent = findMasterFound;
+        document.getElementById('findMasterCoins').textContent = findMasterCoinsEarned;
+        document.getElementById('findMasterTimer').textContent = findMasterTimer;
+    }
+    
+    function startFindMasterGame() {
+        if (findMasterInterval) clearInterval(findMasterInterval);
+        
+        findMasterGrid = generateFindMasterGrid();
+        findMasterFound = 0;
+        findMasterTimer = 30;
+        findMasterCoinsEarned = 0;
+        findMasterGameActive = true;
+        
+        renderFindMasterGrid();
+        updateFindMasterStats();
+        
+        document.getElementById('findMasterStartBtn').style.display = 'none';
+        document.getElementById('findMasterNewBtn').style.display = 'block';
+        document.getElementById('findMasterMessage').innerHTML = '';
+        
+        findMasterInterval = setInterval(() => {
+            if (!findMasterGameActive) return;
+            findMasterTimer--;
+            updateFindMasterStats();
+            if (findMasterTimer <= 0) {
+                endFindMasterGame(false);
+            }
+        }, 1000);
+    }
+    
+    function endFindMasterGame(isWin) {
+        findMasterGameActive = false;
+        if (findMasterInterval) clearInterval(findMasterInterval);
+        
+        if (isWin) {
+            document.getElementById('findMasterMessage').innerHTML = '<div style="background: #48bb78; padding: 10px; border-radius: 10px;">🎉 Поздравляем! Вы нашли всех мастеров! 🎉</div>';
+        } else {
+            document.getElementById('findMasterMessage').innerHTML = '<div style="background: #f56565; padding: 10px; border-radius: 10px;">⏰ Время вышло! Попробуйте снова!</div>';
+        }
+        
+        document.getElementById('findMasterStartBtn').style.display = 'block';
+        document.getElementById('findMasterNewBtn').style.display = 'none';
+        document.getElementById('findMasterStartBtn').textContent = '🎮 Играть снова';
     }
     
     // ========== УПРАВЛЕНИЕ МОДАЛЬНЫМ ОКНОМ ИГР ==========
@@ -5379,13 +5547,12 @@
         const modal = document.getElementById('gamesModal');
         modal.classList.add('active');
         
-        // Инициализация игр при открытии модального окна
         setTimeout(() => {
             initWheelGame();
-            initCatchGame();
             initMemoryGame();
-            initTapGame();
-            initQuizGame();
+            initDailyQuizGame();
+            initProfessionQuizGame();
+            initFindMasterGame();
         }, 100);
     }
     
@@ -5394,17 +5561,12 @@
         const modal = document.getElementById('gamesModal');
         modal.classList.remove('active');
         
-        // Сброс игр при закрытии
-        if (catchInterval) clearInterval(catchInterval);
-        if (catchAnimationId) cancelAnimationFrame(catchAnimationId);
         if (memoryTimerInterval) clearInterval(memoryTimerInterval);
-        if (tapInterval) clearInterval(tapInterval);
+        if (findMasterInterval) clearInterval(findMasterInterval);
         
-        catchGameActive = false;
         memoryGameActive = false;
-        tapGameActive = false;
+        findMasterGameActive = false;
         
-        // Скрыть все игровые контейнеры
         const gameContainers = document.querySelectorAll('.game-container');
         gameContainers.forEach(container => {
             container.classList.remove('active');
@@ -5426,18 +5588,19 @@
         
         currentGame = gameId;
         
-        // Обновить UI в зависимости от игры
         if (gameId === 'wheelGame') {
             updateWheelUI();
-        } else if (gameId === 'catchGame') {
-            document.getElementById('catchStartBtn').textContent = '🎮 Начать игру';
-            loadCatchRecords();
         } else if (gameId === 'memoryGame') {
             startMemoryGame();
-        } else if (gameId === 'tapGame') {
-            document.getElementById('tapStartBtn').textContent = '🎮 Начать';
-        } else if (gameId === 'quizGame') {
-            updateQuizUI();
+        } else if (gameId === 'dailyQuizGame') {
+            updateDailyQuizUI();
+        } else if (gameId === 'professionQuizGame') {
+            startProfessionQuizGame();
+        } else if (gameId === 'findMasterGame') {
+            document.getElementById('findMasterStartBtn').style.display = 'block';
+            document.getElementById('findMasterNewBtn').style.display = 'none';
+            document.getElementById('findMasterStartBtn').textContent = '🎮 Начать игру';
+            document.getElementById('findMasterMessage').innerHTML = '';
         }
     }
     
@@ -6201,6 +6364,7 @@
         } else {
             visitkaSelectedSkills = visitkaSelectedSkills.filter(id => id !== skillId);
         }
+        saveVisitkaSelectedSkills(visitkaSelectedSkills);
     }
     
     function showVisitkaSkillDetail(skillId) {
@@ -9520,10 +9684,10 @@
         
         // Инициализация игр
         initWheelGame();
-        initCatchGame();
         initMemoryGame();
-        initTapGame();
-        initQuizGame();
+        initDailyQuizGame();
+        initProfessionQuizGame();
+        initFindMasterGame();
     });
     </script>
 </body>
