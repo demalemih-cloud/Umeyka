@@ -60,6 +60,329 @@
             transform: scale(0.95);
         }
         
+        /* Кнопка прогресса */
+        .progress-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            border: none;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Модальное окно прогресса */
+        .progress-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .progress-modal-overlay.active {
+            display: flex;
+        }
+        
+        .progress-modal-content {
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f2b4d 100%);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .progress-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .progress-modal-title {
+            font-size: 22px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .progress-modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        /* Табы прогресса */
+        .progress-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 40px;
+            padding: 5px;
+        }
+        
+        .progress-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .progress-tab.active {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            color: #1a1a2e;
+        }
+        
+        .progress-tab-content {
+            display: none;
+        }
+        
+        .progress-tab-content.active {
+            display: block;
+        }
+        
+        /* Прогресс-бар уровня */
+        .level-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .level-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .level-progress {
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            height: 12px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .level-progress-fill {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            border-radius: 20px;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .level-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        /* Статистика */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        /* Достижения */
+        .achievement-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .achievement-item.completed {
+            opacity: 0.6;
+            background: rgba(72, 187, 120, 0.2);
+        }
+        
+        .achievement-icon {
+            font-size: 32px;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .achievement-info {
+            flex: 1;
+        }
+        
+        .achievement-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .achievement-reward {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+        
+        .achievement-progress {
+            font-size: 11px;
+            color: #fbbf24;
+        }
+        
+        .achievement-btn {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            min-width: 100px;
+        }
+        
+        .achievement-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Ежедневные задания */
+        .quest-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .quest-item.completed {
+            opacity: 0.6;
+            background: rgba(72, 187, 120, 0.2);
+        }
+        
+        .quest-icon {
+            font-size: 28px;
+            min-width: 45px;
+            text-align: center;
+        }
+        
+        .quest-info {
+            flex: 1;
+        }
+        
+        .quest-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .quest-reward {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+        
+        .quest-status {
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .quest-status.completed {
+            color: #48bb78;
+        }
+        
+        .quest-status.pending {
+            color: #fbbf24;
+        }
+        
+        /* Календарь */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin: 20px 0;
+        }
+        
+        .calendar-day {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .calendar-day.checked {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+        
+        .calendar-day.today {
+            border: 2px solid #fbbf24;
+        }
+        
+        .calendar-reward {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
         /* Модальное окно игр */
         .games-modal-overlay {
             position: fixed;
@@ -124,12 +447,6 @@
             transition: all 0.2s;
         }
         
-        .games-modal-close:active {
-            transform: scale(0.95);
-            background: rgba(255,255,255,0.3);
-        }
-        
-        /* Стили карточек игр */
         .games-grid {
             display: flex;
             flex-direction: column;
@@ -185,7 +502,6 @@
             display: inline-block;
         }
         
-        /* Стили для каждой игры */
         .game-container {
             margin-top: 15px;
             padding: 15px;
@@ -198,7 +514,7 @@
             display: block;
         }
         
-        /* Колесо удачи (исправленное) */
+        /* Колесо удачи */
         .wheel-container {
             text-align: center;
             position: relative;
@@ -459,7 +775,7 @@
             margin-top: 15px;
         }
         
-        /* Игра "Найди мастера" */
+        /* Игра "Найди мастера" - ИСПРАВЛЕННАЯ */
         .find-master-game-area {
             text-align: center;
         }
@@ -503,6 +819,17 @@
             opacity: 0.4;
             cursor: default;
             background: #48bb78;
+        }
+        
+        .find-master-cell.error {
+            animation: shake 0.3s ease-in-out;
+            background: rgba(245, 101, 101, 0.5);
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
         
         .find-master-start-btn {
@@ -3588,6 +3915,12 @@
         <span>Игры</span>
     </button>
 
+    <!-- Кнопка вызова прогресса -->
+    <button class="progress-button" id="progressButton" onclick="triggerHapticFeedback(); openProgressModal();">
+        <span>🏆</span>
+        <span>Прогресс</span>
+    </button>
+
     <!-- Модальное окно с играми -->
     <div id="gamesModal" class="games-modal-overlay">
         <div class="games-modal-content">
@@ -3700,7 +4033,7 @@
                     </div>
                 </div>
 
-                <!-- Игра 5: Найди мастера (новая) -->
+                <!-- Игра 5: Найди мастера (ИСПРАВЛЕННАЯ) -->
                 <div class="game-card" onclick="triggerHapticFeedback(); showGame('findMasterGame');">
                     <div class="game-card-header">
                         <div class="game-icon">🔍</div>
@@ -3723,6 +4056,77 @@
                         <button class="find-master-new-btn" id="findMasterNewBtn" style="display: none;">🔄 Новая игра</button>
                         <div id="findMasterMessage" style="margin-top: 10px; font-size: 14px;"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно "Мой прогресс" -->
+    <div id="progressModal" class="progress-modal-overlay">
+        <div class="progress-modal-content">
+            <div class="progress-modal-header">
+                <div class="progress-modal-title">
+                    <span>🏆</span>
+                    <span>Мой прогресс</span>
+                </div>
+                <button class="progress-modal-close" onclick="triggerHapticFeedback(); closeProgressModal();">×</button>
+            </div>
+            
+            <div class="progress-tabs">
+                <div class="progress-tab active" data-tab="stats">📊 Статистика</div>
+                <div class="progress-tab" data-tab="achievements">🏅 Достижения</div>
+                <div class="progress-tab" data-tab="daily">📅 Ежедневные</div>
+            </div>
+            
+            <!-- Вкладка Статистика -->
+            <div id="statsTab" class="progress-tab-content active">
+                <div class="level-container">
+                    <div class="level-title" id="levelTitle">Новичок</div>
+                    <div class="level-progress">
+                        <div class="level-progress-fill" id="levelProgressFill" style="width: 0%"></div>
+                    </div>
+                    <div class="level-stats">
+                        <span>Текущий опыт: <span id="currentXP">0</span> XP</span>
+                        <span>До следующего: <span id="nextXP">50</span> XP</span>
+                    </div>
+                </div>
+                
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statCoins">0</div>
+                        <div class="stat-label">💰 Монеты</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statStars">0</div>
+                        <div class="stat-label">⭐ Звёзды</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statDeals">0</div>
+                        <div class="stat-label">📝 Завершённые сделки</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statSkills">0</div>
+                        <div class="stat-label">✨ Опубликованные умейки</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statGameWins">0</div>
+                        <div class="stat-label">🎮 Победы в играх</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вкладка Достижения -->
+            <div id="achievementsTab" class="progress-tab-content">
+                <div id="achievementsList"></div>
+            </div>
+            
+            <!-- Вкладка Ежедневные задания -->
+            <div id="dailyTab" class="progress-tab-content">
+                <div id="dailyQuestsList"></div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="margin-bottom: 10px;">📅 Календарь наград</h4>
+                    <div class="calendar-grid" id="calendarGrid"></div>
                 </div>
             </div>
         </div>
@@ -4781,12 +5185,13 @@
     let professionHintUsed = false;
     let professionOriginalOptions = [];
     
-    // Найди мастера
-    let findMasterLocations = [
-        { name: "кухня", bg: "🍳🧼🍽️🚰🗑️", masters: [0, 7, 12, 18, 22] },
-        { name: "ванная", bg: "🚿🛁🧴🚽🪞", masters: [2, 9, 14, 19, 23] },
-        { name: "гостиная", bg: "🛋️📺🪑🖼️🚪", masters: [4, 11, 16, 20, 24] }
-    ];
+    // Найди мастера - ИСПРАВЛЕННАЯ
+    const findMasterLocations = {
+        "кухня": ['🍳', '🧼', '🍽️', '🚰', '🗑️', '🔪', '🍲', '🥘', '🧽', '🍴'],
+        "ванная": ['🚿', '🛁', '🧴', '🚽', '🪞', '🧼', '🧽', '🚰', '🧴', '🧺'],
+        "гостиная": ['🛋️', '📺', '🪑', '🖼️', '🚪', '💡', '📚', '🪟', '🪴', '🧸']
+    };
+    const locationNames = ['кухня', 'ванная', 'гостиная'];
     let currentLocationIndex = 0;
     let findMasterGameActive = false;
     let findMasterGrid = [];
@@ -4794,7 +5199,435 @@
     let findMasterTimer = 30;
     let findMasterCoinsEarned = 0;
     let findMasterInterval = null;
-    let findMasterMasterIcons = ['👨‍🔧', '⚡', '🧱', '🎨', '🔨'];
+    const findMasterMasterIcons = ['👨‍🔧', '⚡', '🧱', '🎨', '🔨'];
+    const masterNames = ['Сантехник', 'Электрик', 'Плиточник', 'Маляр', 'Столяр'];
+    
+    // ========== СИСТЕМА УРОВНЕЙ И ДОСТИЖЕНИЙ ==========
+    
+    const levelThresholds = [
+        { level: 1, name: "Новичок", minXP: 0 },
+        { level: 2, name: "Ученик", minXP: 50 },
+        { level: 3, name: "Подмастерье", minXP: 150 },
+        { level: 4, name: "Профи", minXP: 300 },
+        { level: 5, name: "Мастер", minXP: 500 },
+        { level: 6, name: "Эксперт", minXP: 800 },
+        { level: 7, name: "Гуру", minXP: 1200 }
+    ];
+    
+    const achievementsList = [
+        { id: "first_skill", title: "Первый шаг", desc: "Добавить первую умейку", icon: "🎓", rewardCoins: 5, rewardStars: 0, condition: (data) => data.skillsCount >= 1, progress: (data) => `${data.skillsCount}/1` },
+        { id: "memory_master", title: "Мастер памяти", desc: "Выиграть в игре 'Память' 3 раза", icon: "🃏", rewardCoins: 15, rewardStars: 2, condition: (data) => data.memoryWins >= 3, progress: (data) => `${data.memoryWins}/3` },
+        { id: "lucky", title: "Везунчик", desc: "Выиграть супер-приз в колесе удачи", icon: "🎡", rewardCoins: 10, rewardStars: 1, condition: (data) => data.wheelSuperWin === true, progress: (data) => data.wheelSuperWin ? "✅" : "❌" },
+        { id: "saver", title: "Копитель", desc: "Накопить 100 монет", icon: "💰", rewardCoins: 20, rewardStars: 0, condition: (data) => data.coins >= 100, progress: (data) => `${data.coins}/100` },
+        { id: "star_collector", title: "Звёздный", desc: "Накопить 50 звёзд", icon: "⭐", rewardCoins: 0, rewardStars: 10, condition: (data) => data.stars >= 50, progress: (data) => `${data.stars}/50` },
+        { id: "dealer", title: "Делец", desc: "Завершить 3 сделки", icon: "🤝", rewardCoins: 30, rewardStars: 3, condition: (data) => data.completedDeals >= 3, progress: (data) => `${data.completedDeals}/3` },
+        { id: "king", title: "Король Ymeyka", desc: "Получить все достижения", icon: "👑", rewardCoins: 100, rewardStars: 20, condition: (data) => data.allAchievementsCompleted === true, progress: (data) => data.achievementsCompletedCount + "/" + data.totalAchievements },
+        { id: "pro", title: "Профи", desc: "Опубликовать 5 умейок", icon: "✨", rewardCoins: 25, rewardStars: 5, condition: (data) => data.skillsCount >= 5, progress: (data) => `${data.skillsCount}/5` },
+        { id: "sniper", title: "Снайпер", desc: "Найти всех мастеров в игре 'Найди мастера'", icon: "🎯", rewardCoins: 15, rewardStars: 0, condition: (data) => data.findMasterWinCount >= 1, progress: (data) => data.findMasterWinCount >= 1 ? "✅" : "❌" },
+        { id: "shooter", title: "Стрелок", desc: "Набрать 100 очков в игре 'Лови заказ'", icon: "🔥", rewardCoins: 10, rewardStars: 0, condition: (data) => data.shooterScore >= 100, progress: (data) => `${data.shooterScore || 0}/100` }
+    ];
+    
+    const dailyQuestsList = [
+        { id: "play_game", title: "Сыграть в любую игру", desc: "Открыть раздел игр", icon: "🎮", rewardCoins: 5, rewardStars: 0, check: (data) => data.openedGamesToday === true },
+        { id: "win_memory", title: "Победить в игре 'Память'", desc: "", icon: "🧠", rewardCoins: 10, rewardStars: 0, check: (data) => data.memoryWinToday === true },
+        { id: "spin_wheel", title: "Покрутить колесо удачи", desc: "1 раз", icon: "🎡", rewardCoins: 0, rewardStars: 1, check: (data) => data.wheelSpunToday === true },
+        { id: "share_referral", title: "Поделиться реферальной ссылкой", desc: "Нажать кнопку 'Поделиться'", icon: "📤", rewardCoins: 0, rewardStars: 2, check: (data) => data.sharedReferralToday === true },
+        { id: "complete_deal", title: "Завершить сделку", desc: "Любую", icon: "🤝", rewardCoins: 20, rewardStars: 5, check: (data) => data.completedDealToday === true }
+    ];
+    
+    const calendarRewards = [
+        { day: 1, coins: 10, stars: 0, bonusSpin: false },
+        { day: 2, coins: 15, stars: 0, bonusSpin: false },
+        { day: 3, coins: 20, stars: 1, bonusSpin: false },
+        { day: 4, coins: 25, stars: 0, bonusSpin: false },
+        { day: 5, coins: 30, stars: 2, bonusSpin: false },
+        { day: 6, coins: 40, stars: 0, bonusSpin: false },
+        { day: 7, coins: 50, stars: 5, bonusSpin: true }
+    ];
+    
+    function getProgressData() {
+        let data = getLocalStorage(`progress_${currentUserId}`);
+        if (!data) {
+            data = {
+                xp: 0,
+                skillsCount: 0,
+                memoryWins: 0,
+                wheelSuperWin: false,
+                coins: 0,
+                stars: 0,
+                completedDeals: 0,
+                findMasterWinCount: 0,
+                shooterScore: 0,
+                achievementsClaimed: {},
+                dailyQuests: {},
+                calendarCheckedDays: [],
+                lastCheckInDate: null,
+                totalAchievements: achievementsList.length,
+                openedGamesToday: false,
+                memoryWinToday: false,
+                wheelSpunToday: false,
+                sharedReferralToday: false,
+                completedDealToday: false
+            };
+        }
+        data.coins = getCoins();
+        data.stars = getStars();
+        return data;
+    }
+    
+    function saveProgressData(data) {
+        setLocalStorage(`progress_${currentUserId}`, data);
+    }
+    
+    function calculateXP(progressData) {
+        const coins = progressData.coins || 0;
+        const stars = progressData.stars || 0;
+        const completedDeals = progressData.completedDeals || 0;
+        const gameWins = (progressData.memoryWins || 0) + (progressData.findMasterWinCount || 0);
+        return coins + stars + (completedDeals * 10) + (gameWins * 5);
+    }
+    
+    function getCurrentLevel(xp) {
+        let currentLevel = levelThresholds[0];
+        for (let i = levelThresholds.length - 1; i >= 0; i--) {
+            if (xp >= levelThresholds[i].minXP) {
+                currentLevel = levelThresholds[i];
+                break;
+            }
+        }
+        return currentLevel;
+    }
+    
+    function getNextLevelXP(currentXP) {
+        for (let i = 0; i < levelThresholds.length; i++) {
+            if (currentXP < levelThresholds[i].minXP) {
+                return levelThresholds[i].minXP;
+            }
+        }
+        return levelThresholds[levelThresholds.length - 1].minXP;
+    }
+    
+    function getLevelProgressPercent(currentXP, currentLevel, nextXP) {
+        if (currentLevel.level === levelThresholds[levelThresholds.length - 1].level) return 100;
+        const prevXP = levelThresholds[currentLevel.level - 1].minXP;
+        const xpInLevel = currentXP - prevXP;
+        const xpNeeded = nextXP - prevXP;
+        return (xpInLevel / xpNeeded) * 100;
+    }
+    
+    function addXP(amount) {
+        const data = getProgressData();
+        data.xp += amount;
+        const oldLevel = getCurrentLevel(data.xp - amount).name;
+        const newLevel = getCurrentLevel(data.xp).name;
+        saveProgressData(data);
+        if (oldLevel !== newLevel) {
+            showNotification(`🎉 Поздравляем! Вы достигли уровня "${newLevel}"! 🎉`, 3000);
+        }
+        return data.xp;
+    }
+    
+    function getXP() {
+        const data = getProgressData();
+        return data.xp;
+    }
+    
+    function updateDailyQuests() {
+        const today = new Date().toDateString();
+        const data = getProgressData();
+        if (data.lastDailyReset !== today) {
+            data.dailyQuests = {};
+            data.lastDailyReset = today;
+            data.openedGamesToday = false;
+            data.memoryWinToday = false;
+            data.wheelSpunToday = false;
+            data.sharedReferralToday = false;
+            data.completedDealToday = false;
+            saveProgressData(data);
+        }
+    }
+    
+    function checkDailyQuest(questId, conditionValue) {
+        updateDailyQuests();
+        const data = getProgressData();
+        if (data.dailyQuests[questId]) return true;
+        data.dailyQuests[questId] = true;
+        const quest = dailyQuestsList.find(q => q.id === questId);
+        if (quest) {
+            if (quest.rewardCoins > 0) addCoins(quest.rewardCoins);
+            if (quest.rewardStars > 0) addStars(quest.rewardStars);
+            showNotification(`✅ Задание выполнено! +${quest.rewardCoins > 0 ? quest.rewardCoins + ' 🪙' : ''} ${quest.rewardStars > 0 ? quest.rewardStars + ' ⭐' : ''}`, 2000);
+        }
+        saveProgressData(data);
+        return true;
+    }
+    
+    function checkCalendarCheckIn() {
+        const today = new Date().toDateString();
+        const data = getProgressData();
+        if (data.lastCheckInDate === today) return false;
+        
+        let dayNumber = 1;
+        if (data.lastCheckInDate) {
+            const lastDate = new Date(data.lastCheckInDate);
+            const todayDate = new Date();
+            const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+            if (diffDays === 1) {
+                dayNumber = (data.calendarCheckedDays.length % 7) + 1;
+            } else {
+                dayNumber = 1;
+                data.calendarCheckedDays = [];
+            }
+        } else {
+            dayNumber = 1;
+        }
+        
+        const reward = calendarRewards[dayNumber - 1];
+        if (reward) {
+            if (reward.coins > 0) addCoins(reward.coins);
+            if (reward.stars > 0) addStars(reward.stars);
+            if (reward.bonusSpin) {
+                wheelSpins++;
+                saveWheelData();
+                showNotification(`🎉 Бонусное вращение в колесе удачи!`, 2000);
+            }
+            showNotification(`📅 День ${dayNumber}! Получено: +${reward.coins}🪙 ${reward.stars > 0 ? `+${reward.stars}⭐` : ''}`, 3000);
+        }
+        
+        data.lastCheckInDate = today;
+        data.calendarCheckedDays.push(today);
+        if (data.calendarCheckedDays.length > 7) data.calendarCheckedDays = data.calendarCheckedDays.slice(-7);
+        saveProgressData(data);
+        return true;
+    }
+    
+    function updateAchievements() {
+        const data = getProgressData();
+        const allSkills = getLocalStorage('umeyka_global_skills') || [];
+        data.skillsCount = allSkills.filter(s => s.userId === currentUserId).length;
+        data.completedDeals = (getOrCreateUserProfile(currentUserId).completedDeals || 0);
+        data.coins = getCoins();
+        data.stars = getStars();
+        
+        let achievementsCompletedCount = 0;
+        for (const achievement of achievementsList) {
+            if (data.achievementsClaimed[achievement.id]) {
+                achievementsCompletedCount++;
+                continue;
+            }
+            let conditionMet = false;
+            if (achievement.id === "king") {
+                const allOthersCompleted = achievementsList.filter(a => a.id !== "king").every(a => data.achievementsClaimed[a.id]);
+                conditionMet = allOthersCompleted;
+            } else if (achievement.id === "sniper") {
+                conditionMet = data.findMasterWinCount >= 1;
+            } else if (achievement.id === "shooter") {
+                conditionMet = (data.shooterScore || 0) >= 100;
+            } else {
+                conditionMet = achievement.condition(data);
+            }
+            
+            if (conditionMet && !data.achievementsClaimed[achievement.id]) {
+                renderAchievementsList();
+            }
+        }
+        
+        data.totalAchievements = achievementsList.length;
+        data.achievementsCompletedCount = achievementsCompletedCount;
+        data.allAchievementsCompleted = achievementsCompletedCount === achievementsList.length - 1;
+        saveProgressData(data);
+    }
+    
+    function claimAchievement(achievementId) {
+        const data = getProgressData();
+        if (data.achievementsClaimed[achievementId]) return false;
+        
+        const achievement = achievementsList.find(a => a.id === achievementId);
+        if (!achievement) return false;
+        
+        let conditionMet = false;
+        if (achievement.id === "king") {
+            const allOthersCompleted = achievementsList.filter(a => a.id !== "king").every(a => data.achievementsClaimed[a.id]);
+            conditionMet = allOthersCompleted;
+        } else if (achievement.id === "sniper") {
+            conditionMet = data.findMasterWinCount >= 1;
+        } else if (achievement.id === "shooter") {
+            conditionMet = (data.shooterScore || 0) >= 100;
+        } else {
+            conditionMet = achievement.condition(data);
+        }
+        
+        if (!conditionMet) return false;
+        
+        if (achievement.rewardCoins > 0) addCoins(achievement.rewardCoins);
+        if (achievement.rewardStars > 0) addStars(achievement.rewardStars);
+        
+        data.achievementsClaimed[achievementId] = true;
+        data.xp += achievement.rewardCoins + achievement.rewardStars * 2;
+        saveProgressData(data);
+        
+        showNotification(`🏆 Достижение "${achievement.title}" получено! +${achievement.rewardCoins}🪙 ${achievement.rewardStars > 0 ? `+${achievement.rewardStars}⭐` : ''}`, 3000);
+        renderAchievementsList();
+        updateAchievements();
+        return true;
+    }
+    
+    function renderAchievementsList() {
+        const data = getProgressData();
+        const container = document.getElementById('achievementsList');
+        if (!container) return;
+        
+        container.innerHTML = achievementsList.map(achievement => {
+            let conditionMet = false;
+            if (achievement.id === "king") {
+                const allOthersCompleted = achievementsList.filter(a => a.id !== "king").every(a => data.achievementsClaimed[a.id]);
+                conditionMet = allOthersCompleted;
+            } else if (achievement.id === "sniper") {
+                conditionMet = data.findMasterWinCount >= 1;
+            } else if (achievement.id === "shooter") {
+                conditionMet = (data.shooterScore || 0) >= 100;
+            } else {
+                conditionMet = achievement.condition(data);
+            }
+            
+            const isClaimed = data.achievementsClaimed[achievement.id];
+            const isAvailable = conditionMet && !isClaimed;
+            
+            let progressText = "";
+            if (achievement.progress && !isClaimed) {
+                progressText = achievement.progress(data);
+            }
+            
+            return `
+                <div class="achievement-item ${isClaimed ? 'completed' : ''}">
+                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-info">
+                        <div class="achievement-title">${achievement.title}</div>
+                        <div class="achievement-reward">🎁 +${achievement.rewardCoins}🪙 ${achievement.rewardStars > 0 ? `+${achievement.rewardStars}⭐` : ''}</div>
+                        ${progressText ? `<div class="achievement-progress">Прогресс: ${progressText}</div>` : ''}
+                    </div>
+                    ${!isClaimed ? `
+                        <button class="achievement-btn" onclick="triggerHapticFeedback(); claimAchievement('${achievement.id}');" ${!isAvailable ? 'disabled' : ''}>
+                            ${isAvailable ? 'Забрать' : (conditionMet ? '✅' : '🔒')}
+                        </button>
+                    ` : '<span style="color: #48bb78;">✅ Получено</span>'}
+                </div>
+            `;
+        }).join('');
+    }
+    
+    function renderDailyQuests() {
+        updateDailyQuests();
+        const data = getProgressData();
+        const container = document.getElementById('dailyQuestsList');
+        if (!container) return;
+        
+        container.innerHTML = dailyQuestsList.map(quest => {
+            const isCompleted = data.dailyQuests[quest.id] === true;
+            return `
+                <div class="quest-item ${isCompleted ? 'completed' : ''}">
+                    <div class="quest-icon">${quest.icon}</div>
+                    <div class="quest-info">
+                        <div class="quest-title">${quest.title}</div>
+                        <div class="quest-reward">🎁 +${quest.rewardCoins > 0 ? quest.rewardCoins + '🪙 ' : ''}${quest.rewardStars > 0 ? quest.rewardStars + '⭐' : ''}</div>
+                    </div>
+                    <div class="quest-status ${isCompleted ? 'completed' : 'pending'}">
+                        ${isCompleted ? '✅ Выполнено' : '⏳ Не выполнено'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    function renderCalendar() {
+        const data = getProgressData();
+        const container = document.getElementById('calendarGrid');
+        if (!container) return;
+        
+        const today = new Date().toDateString();
+        const checkedDaysSet = new Set(data.calendarCheckedDays || []);
+        
+        let lastCheckedDay = 0;
+        for (let i = 0; i < calendarRewards.length; i++) {
+            if (checkedDaysSet.has(data.calendarCheckedDays?.[i])) {
+                lastCheckedDay = i + 1;
+            } else {
+                break;
+            }
+        }
+        
+        const isTodayChecked = checkedDaysSet.has(today);
+        
+        container.innerHTML = calendarRewards.map((reward, index) => {
+            const dayNum = index + 1;
+            const isChecked = dayNum <= lastCheckedDay;
+            const isToday = !isTodayChecked && dayNum === lastCheckedDay + 1;
+            return `
+                <div class="calendar-day ${isChecked ? 'checked' : ''} ${isToday ? 'today' : ''}">
+                    <div>День ${dayNum}</div>
+                    <div class="calendar-reward">+${reward.coins}🪙 ${reward.stars > 0 ? `+${reward.stars}⭐` : ''}</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    function renderStatsTab() {
+        const data = getProgressData();
+        const currentXP = calculateXP(data);
+        const currentLevel = getCurrentLevel(currentXP);
+        const nextXP = getNextLevelXP(currentXP);
+        const progressPercent = getLevelProgressPercent(currentXP, currentLevel, nextXP);
+        
+        document.getElementById('levelTitle').textContent = currentLevel.name;
+        document.getElementById('levelProgressFill').style.width = `${progressPercent}%`;
+        document.getElementById('currentXP').textContent = currentXP;
+        document.getElementById('nextXP').textContent = nextXP;
+        
+        const allSkills = getLocalStorage('umeyka_global_skills') || [];
+        const userSkillsCount = allSkills.filter(s => s.userId === currentUserId).length;
+        const userProfile = getOrCreateUserProfile(currentUserId);
+        const completedDeals = userProfile.completedDeals || 0;
+        const gameWins = (data.memoryWins || 0) + (data.findMasterWinCount || 0);
+        
+        document.getElementById('statCoins').textContent = getCoins();
+        document.getElementById('statStars').textContent = getStars();
+        document.getElementById('statDeals').textContent = completedDeals;
+        document.getElementById('statSkills').textContent = userSkillsCount;
+        document.getElementById('statGameWins').textContent = gameWins;
+    }
+    
+    function openProgressModal() {
+        triggerHapticFeedback();
+        updateDailyQuests();
+        updateAchievements();
+        const modal = document.getElementById('progressModal');
+        modal.classList.add('active');
+        
+        renderStatsTab();
+        renderAchievementsList();
+        renderDailyQuests();
+        renderCalendar();
+        
+        const today = new Date().toDateString();
+        const data = getProgressData();
+        if (data.lastCheckInDate !== today) {
+            setTimeout(() => {
+                if (confirm("🎁 Вы ещё не получили ежедневную награду сегодня! Забрать?")) {
+                    checkCalendarCheckIn();
+                    renderCalendar();
+                    renderStatsTab();
+                    showNotification("✅ Награда получена!", 1500);
+                }
+            }, 500);
+        }
+    }
+    
+    function closeProgressModal() {
+        triggerHapticFeedback();
+        const modal = document.getElementById('progressModal');
+        modal.classList.remove('active');
+        updateAchievements();
+    }
     
     // ========== ФУНКЦИИ ДЛЯ МОНЕТ И ЗВЁЗД ==========
     
@@ -4804,6 +5637,7 @@
         saveCoins(currentCoins);
         showCoinAnimation(amount);
         showNotification(`+${amount} 🪙 монет!`, 1500);
+        updateAchievements();
         return currentCoins;
     }
     
@@ -4815,6 +5649,9 @@
     function saveCoins(coins) {
         setLocalStorage(`user_coins_${currentUserId}`, coins);
         updateUserStatsDisplay();
+        const progressData = getProgressData();
+        progressData.coins = coins;
+        saveProgressData(progressData);
     }
     
     function addStars(amount) {
@@ -4823,6 +5660,7 @@
         saveStars(currentStars);
         showStarAnimation(amount);
         showNotification(`+${amount} ⭐ звезд!`, 1500);
+        updateAchievements();
         return currentStars;
     }
     
@@ -4834,6 +5672,9 @@
     function saveStars(stars) {
         setLocalStorage(`user_stars_${currentUserId}`, stars);
         updateUserStatsDisplay();
+        const progressData = getProgressData();
+        progressData.stars = stars;
+        saveProgressData(progressData);
     }
     
     function spendCoins(amount) {
@@ -4874,7 +5715,7 @@
         setTimeout(() => star.remove(), 800);
     }
     
-    // ========== ИГРА 1: КОЛЕСО УДАЧИ (ИСПРАВЛЕННОЕ) ==========
+    // ========== ИГРА 1: КОЛЕСО УДАЧИ ==========
     
     function initWheelGame() {
         const canvas = document.getElementById('wheelCanvas');
@@ -4941,7 +5782,7 @@
             const startAngle = i * angleStep + wheelRotation;
             const endAngle = startAngle + angleStep;
             
-            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7B05E'];
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'];
             ctx.beginPath();
             ctx.fillStyle = colors[i % colors.length];
             ctx.moveTo(centerX, centerY);
@@ -5036,8 +5877,16 @@
                 addCoins(10);
                 addStars(2);
                 rewardMessage = `🎉✨ СУПЕР-ПРИЗ! +10 монет и +2 звезды! ✨🎉`;
+                const progressData = getProgressData();
+                progressData.wheelSuperWin = true;
+                saveProgressData(progressData);
+                updateAchievements();
                 break;
         }
+        
+        const progressData = getProgressData();
+        progressData.wheelSpunToday = true;
+        saveProgressData(progressData);
         
         document.getElementById('wheelResult').innerHTML = `<div style="background: rgba(72,187,120,0.3); padding: 10px; border-radius: 10px;">${rewardMessage}</div>`;
         showNotification(rewardMessage, 2500);
@@ -5046,6 +5895,7 @@
         }, 3000);
         
         updateWheelUI();
+        checkDailyQuest('spin_wheel', true);
     }
     
     // ========== ИГРА 2: КАРТОЧНАЯ ПАМЯТЬ ==========
@@ -5156,6 +6006,13 @@
         if (memoryTimerInterval) clearInterval(memoryTimerInterval);
         
         addCoins(10);
+        const progressData = getProgressData();
+        progressData.memoryWins = (progressData.memoryWins || 0) + 1;
+        progressData.memoryWinToday = true;
+        saveProgressData(progressData);
+        updateAchievements();
+        checkDailyQuest('win_memory', true);
+        
         document.getElementById('memoryResult').innerHTML = `<div style="background: rgba(72,187,120,0.3); padding: 10px; border-radius: 10px;">🎉 Поздравляем! Вы нашли все пары! +10 монет! Ходов: ${memoryMoves}, Время: ${memoryTime}с 🎉</div>`;
         setTimeout(() => {
             document.getElementById('memoryResult').innerHTML = '';
@@ -5262,7 +6119,7 @@
         }, 3000);
     }
     
-    // ========== ИГРА 4: УГАДАЙ ПРОФЕССИЮ (НОВАЯ) ==========
+    // ========== ИГРА 4: УГАДАЙ ПРОФЕССИЮ ==========
     
     function initProfessionQuizGame() {
         document.getElementById('professionNewGameBtn').onclick = () => {
@@ -5399,7 +6256,7 @@
         document.getElementById('professionQuizResultArea').style.display = 'block';
     }
     
-    // ========== ИГРА 5: НАЙДИ МАСТЕРА (НОВАЯ) ==========
+    // ========== ИГРА 5: НАЙДИ МАСТЕРА (ИСПРАВЛЕННАЯ) ==========
     
     function initFindMasterGame() {
         document.getElementById('findMasterStartBtn').onclick = () => {
@@ -5412,46 +6269,51 @@
         };
     }
     
-    function updateLocationCycle() {
+    function getRandomEmojiFromLocation(locationName) {
+        const emojis = findMasterLocations[locationName];
+        if (!emojis || emojis.length === 0) return '❓';
+        return emojis[Math.floor(Math.random() * emojis.length)];
+    }
+    
+    function getCurrentLocation() {
         const today = new Date();
         const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-        currentLocationIndex = dayOfYear % findMasterLocations.length;
+        currentLocationIndex = dayOfYear % locationNames.length;
+        return locationNames[currentLocationIndex];
     }
     
     function generateFindMasterGrid() {
-        updateLocationCycle();
-        const location = findMasterLocations[currentLocationIndex];
+        const locationName = getCurrentLocation();
         const gridSize = 25;
-        const grid = [];
+        const grid = new Array(gridSize);
         
         for (let i = 0; i < gridSize; i++) {
-            grid.push({
-                icon: getRandomBackgroundEmoji(location.bg),
+            grid[i] = {
+                icon: getRandomEmojiFromLocation(locationName),
                 isMaster: false,
                 found: false,
                 masterType: null
-            });
+            };
         }
         
-        location.masters.forEach((position, idx) => {
-            if (position < gridSize) {
-                grid[position] = {
-                    icon: findMasterMasterIcons[idx % findMasterMasterIcons.length],
-                    isMaster: true,
-                    found: false,
-                    masterType: idx
-                };
+        const masterPositions = [];
+        while (masterPositions.length < 5) {
+            const pos = Math.floor(Math.random() * gridSize);
+            if (!masterPositions.includes(pos)) {
+                masterPositions.push(pos);
             }
+        }
+        
+        masterPositions.forEach((pos, idx) => {
+            grid[pos] = {
+                icon: findMasterMasterIcons[idx % findMasterMasterIcons.length],
+                isMaster: true,
+                found: false,
+                masterType: idx
+            };
         });
         
         return grid;
-    }
-    
-    function getRandomBackgroundEmoji(bgString) {
-        const emojis = bgString.split('');
-        const validEmojis = emojis.filter(e => e.trim().length > 0 && !e.match(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g)?.some(m => m.length > 0));
-        if (validEmojis.length === 0) return '⬜';
-        return validEmojis[Math.floor(Math.random() * validEmojis.length)];
     }
     
     function renderFindMasterGrid() {
@@ -5474,7 +6336,7 @@
                     addCoins(1);
                     cellDiv.classList.add('found');
                     updateFindMasterStats();
-                    showNotification(`🔧 Найден ${getMasterName(cell.masterType)}! +1 монета!`, 1000);
+                    showNotification(`🔧 Найден ${masterNames[cell.masterType]}! +1 монета!`, 1000);
                     
                     if (findMasterFound === 5) {
                         addCoins(5);
@@ -5482,15 +6344,16 @@
                         showNotification(`🎉 БОНУС! Все мастера найдены! +5 монет! 🎉`, 2000);
                         endFindMasterGame(true);
                     }
+                } else {
+                    cellDiv.classList.add('error');
+                    showNotification('❌ Здесь нет мастера!', 500);
+                    setTimeout(() => {
+                        cellDiv.classList.remove('error');
+                    }, 300);
                 }
             };
             container.appendChild(cellDiv);
         }
-    }
-    
-    function getMasterName(type) {
-        const names = ['Сантехник', 'Электрик', 'Плиточник', 'Маляр', 'Столяр'];
-        return names[type] || 'Мастер';
     }
     
     function updateFindMasterStats() {
@@ -5500,7 +6363,10 @@
     }
     
     function startFindMasterGame() {
-        if (findMasterInterval) clearInterval(findMasterInterval);
+        if (findMasterInterval) {
+            clearInterval(findMasterInterval);
+            findMasterInterval = null;
+        }
         
         findMasterGrid = generateFindMasterGrid();
         findMasterFound = 0;
@@ -5527,9 +6393,16 @@
     
     function endFindMasterGame(isWin) {
         findMasterGameActive = false;
-        if (findMasterInterval) clearInterval(findMasterInterval);
+        if (findMasterInterval) {
+            clearInterval(findMasterInterval);
+            findMasterInterval = null;
+        }
         
         if (isWin) {
+            const progressData = getProgressData();
+            progressData.findMasterWinCount = (progressData.findMasterWinCount || 0) + 1;
+            saveProgressData(progressData);
+            updateAchievements();
             document.getElementById('findMasterMessage').innerHTML = '<div style="background: #48bb78; padding: 10px; border-radius: 10px;">🎉 Поздравляем! Вы нашли всех мастеров! 🎉</div>';
         } else {
             document.getElementById('findMasterMessage').innerHTML = '<div style="background: #f56565; padding: 10px; border-radius: 10px;">⏰ Время вышло! Попробуйте снова!</div>';
@@ -5544,6 +6417,11 @@
     
     function openGamesModal() {
         triggerHapticFeedback();
+        const progressData = getProgressData();
+        progressData.openedGamesToday = true;
+        saveProgressData(progressData);
+        checkDailyQuest('play_game', true);
+        
         const modal = document.getElementById('gamesModal');
         modal.classList.add('active');
         
@@ -6429,6 +7307,12 @@
         const userData = getOrCreateUserProfile(currentUserId);
         const userName = userData.firstName || 'Пользователь';
         const shareText = `📇 Визитка мастера ${userName} в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке, чтобы посмотреть мои умейки:\n${shareUrl}`;
+        
+        const progressData = getProgressData();
+        progressData.sharedReferralToday = true;
+        saveProgressData(progressData);
+        checkDailyQuest('share_referral', true);
+        
         if (navigator.share) {
             navigator.share({
                 title: `Визитка ${userName}`,
@@ -7725,6 +8609,7 @@
                         loadMySkills();
                         loadProfileSkills();
                         generateMainScreenQR();
+                        updateAchievements();
                         return;
                     }
                 }
@@ -7762,6 +8647,7 @@
                 loadMySkills();
                 loadProfileSkills();
                 generateMainScreenQR();
+                updateAchievements();
             }
         } catch (error) {
             hideLoadingIndicator();
@@ -8063,6 +8949,7 @@
             await loadMySkills();
             await loadProfileSkills();
             generateMainScreenQR();
+            updateAchievements();
         } catch (error) {
             hideLoadingIndicator();
             console.error('❌ Ошибка сохранения умейки:', error);
@@ -8099,6 +8986,7 @@
                 await loadMySkills();
                 await loadProfileSkills();
                 generateMainScreenQR();
+                updateAchievements();
                 alert('✅ Умейка удалена!');
             } catch (error) {
                 hideLoadingIndicator();
@@ -8667,6 +9555,13 @@
                     clientData.completedDeals = (clientData.completedDeals || 0) + 1;
                     clientData.rating = (clientData.rating || 0) + 0.5;
                     setLocalStorage(`user_${deal.clientId}`, clientData);
+                    
+                    const progressData = getProgressData();
+                    progressData.completedDealToday = true;
+                    saveProgressData(progressData);
+                    checkDailyQuest('complete_deal', true);
+                    updateAchievements();
+                    
                     alert('✅ Сделка успешно завершена! Средства переведены на ваш баланс (за вычетом комиссии 5%). Получена +1 🪙 монета!');
                     loadDeals();
                     loadUserProfile();
@@ -9032,6 +9927,12 @@
         const referralLink = generateReferralLink();
         const shareText = `Привет! Хочу порекомендовать полезное приложение — Ymeyka. Ymeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
         const tgShareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
+        
+        const progressData = getProgressData();
+        progressData.sharedReferralToday = true;
+        saveProgressData(progressData);
+        checkDailyQuest('share_referral', true);
+        
         if (window.Telegram?.WebApp) {
             window.Telegram.WebApp.openTelegramLink(tgShareUrl);
         } else {
@@ -9653,6 +10554,17 @@
         
         initSwipeNavigation();
         
+        // Инициализация табов прогресса
+        document.querySelectorAll('.progress-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                document.querySelectorAll('.progress-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.progress-tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`${tabName}Tab`).classList.add('active');
+            });
+        });
+        
         currentMasterStatus = 'ready';
         currentEditMasterStatus = 'ready';
         currentRadius = 10;
@@ -9688,6 +10600,11 @@
         initDailyQuizGame();
         initProfessionQuizGame();
         initFindMasterGame();
+        
+        // Инициализация прогресса
+        const progressData = getProgressData();
+        addXP(progressData.xp);
+        updateAchievements();
     });
     </script>
 </body>
