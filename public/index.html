@@ -302,32 +302,6 @@
             backdrop-filter: blur(10px);
         }
         
-        /* Кнопка игр */
-        .games-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
-            border: none;
-            color: #1a3a2b;
-            padding: 12px 18px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(132, 204, 22, 0.4);
-            transition: all 0.3s ease;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .games-button:active {
-            transform: scale(0.95);
-        }
-        
         .logo {
             font-size: 45px;
             margin-bottom: 5px;
@@ -3066,190 +3040,347 @@
             color: white;
         }
 
-        /* ===== СТИЛИ ДЛЯ МИНИ-ИГР ===== */
-        .games-modal-overlay {
+        /* ============================================================
+           СТИЛИ ДЛЯ МИНИ-ИГР
+           ============================================================ */
+
+        /* Кнопка вызова игр (фисташковый цвет) */
+        #gamesButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
+            border: none;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(132, 204, 22, 0.5);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        #gamesButton:active {
+            transform: scale(0.95);
+        }
+        #gamesButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(132, 204, 22, 0.6);
+        }
+
+        /* Модальное окно игр */
+        #gamesModal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 15000;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10001;
             display: none;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            backdrop-filter: blur(5px);
         }
-        .games-modal-overlay.active {
+        #gamesModal.active {
             display: flex;
         }
-        .games-modal-content {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+
+        #gamesModal .games-modal-content {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
             border-radius: 28px;
-            max-width: 500px;
+            padding: 25px 20px 30px;
+            max-width: 580px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
         }
-        .games-modal-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+
+        #gamesModal .games-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: rgba(255,255,255,0.08);
+            border: none;
+            font-size: 26px;
+            color: #94a3b8;
+            cursor: pointer;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            transition: 0.2s;
         }
-        .games-modal-header h2 {
-            font-size: 20px;
-            font-weight: 700;
+        #gamesModal .games-modal-close:hover {
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+
+        #gamesModal .games-modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #f1f5f9;
+            letter-spacing: -0.5px;
+        }
+        #gamesModal .games-modal-title span {
             background: linear-gradient(135deg, #a3e635, #84cc16);
             -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            -webkit-text-fill-color: transparent;
         }
-        .games-close {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            color: white;
-            transition: all 0.2s;
-        }
-        .games-close:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
+
+        /* Вкладки игр */
         .games-tabs {
             display: flex;
-            padding: 0 20px;
             gap: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 22px;
         }
-        .game-tab {
+        .games-tab {
             flex: 1;
-            padding: 12px;
-            background: transparent;
-            border: none;
-            color: rgba(255,255,255,0.6);
-            font-weight: 600;
-            font-size: 16px;
+            padding: 12px 8px;
+            border: 2px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.04);
+            color: #94a3b8;
+            font-weight: 700;
+            font-size: 15px;
             cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            text-align: center;
+            backdrop-filter: blur(4px);
         }
-        .game-tab.active {
-            color: #84cc16;
-            border-bottom-color: #84cc16;
+        .games-tab.active {
+            background: rgba(132, 204, 22, 0.18);
+            border-color: #84cc16;
+            color: #bef264;
+            box-shadow: 0 0 30px rgba(132, 204, 22, 0.1);
         }
-        .game-pane {
+        .games-tab:active {
+            transform: scale(0.97);
+        }
+
+        /* Контейнеры игр */
+        .game-container {
             display: none;
-            padding: 20px;
+            animation: gameFadeIn 0.35s ease;
         }
-        .game-pane.active {
+        .game-container.active {
             display: block;
         }
-        /* Runner Game */
-        .runner-game-container {
-            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+
+        @keyframes gameFadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== ИГРА "БЕГУНОК" ===== */
+        #runnerGame {
+            background: #0b1120;
             border-radius: 20px;
             padding: 15px;
             position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        #runnerCanvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #0f1a2e;
+            border-radius: 14px;
+            cursor: pointer;
+            touch-action: none;
+            image-rendering: pixelated;
         }
         .runner-stats {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
-            background: rgba(0,0,0,0.5);
-            padding: 10px 15px;
-            border-radius: 40px;
+            padding: 12px 6px 4px;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 15px;
         }
-        .runner-score, .runner-time {
-            font-weight: 700;
-            font-size: 18px;
+        .runner-stats span {
+            background: rgba(255,255,255,0.06);
+            padding: 4px 14px;
+            border-radius: 30px;
+            backdrop-filter: blur(4px);
         }
-        .runner-score span, .runner-time span {
-            color: #84cc16;
-        }
-        .runner-canvas {
-            background: #0f172a;
-            border-radius: 16px;
-            display: block;
-            margin: 0 auto;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        .runner-stats .runner-score {
+            color: #facc15;
         }
         .runner-controls {
-            margin-top: 15px;
             display: flex;
-            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
         }
-        .runner-jump-btn {
-            background: linear-gradient(135deg, #a3e635, #84cc16);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 40px;
-            font-weight: 700;
-            color: #1a2e1f;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(132,204,22,0.4);
-        }
-        .runner-start-btn {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            border: none;
-            padding: 10px 24px;
-            border-radius: 40px;
-            font-weight: 700;
-            color: white;
-        }
-        /* Wheel Game */
-        .wheel-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .wheel-canvas {
-            background: #2d3748;
-            border-radius: 50%;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-        }
-        .wheel-spin-btn {
-            background: linear-gradient(135deg, #a3e635, #84cc16);
-            border: none;
-            padding: 14px 32px;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 18px;
-            color: #1a2e1f;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(132,204,22,0.4);
-        }
-        .wheel-timer {
-            background: rgba(0,0,0,0.5);
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 14px;
-        }
-        .wheel-result {
-            background: rgba(255,255,255,0.1);
+        .runner-controls button {
+            flex: 1;
             padding: 12px;
-            border-radius: 16px;
-            margin-top: 15px;
-            text-align: center;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: rgba(255,255,255,0.06);
+            color: #e2e8f0;
+            border: 1px solid rgba(255,255,255,0.06);
         }
-        .runner-result-popup {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
+        .runner-controls button:active {
+            transform: scale(0.95);
+        }
+        .runner-controls .runner-start-btn {
+            background: linear-gradient(135deg, #84cc16, #65a30d);
+            color: white;
+            box-shadow: 0 4px 20px rgba(132, 204, 22, 0.3);
+        }
+        .runner-controls .runner-start-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== ИГРА "КОЛЕСО УДАЧИ" ===== */
+        #wheelGame {
+            background: #0b1120;
             border-radius: 20px;
-            padding: 20px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .wheel-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+        #wheelCanvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 50%;
+            box-shadow: 0 0 60px rgba(132, 204, 22, 0.08);
+            cursor: pointer;
+        }
+        .wheel-center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #f1f5f9;
+            font-weight: 800;
+            font-size: 16px;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+            pointer-events: none;
+            background: rgba(15,23,42,0.7);
+            padding: 6px 14px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .wheel-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 16px 0 10px;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 14px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .wheel-info .wheel-result {
+            background: rgba(250,204,21,0.12);
+            padding: 6px 18px;
+            border-radius: 30px;
+            color: #facc15;
+            border: 1px solid rgba(250,204,21,0.15);
+            font-size: 15px;
+        }
+        .wheel-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .wheel-controls button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            background: rgba(255,255,255,0.06);
+            color: #e2e8f0;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .wheel-controls button:active {
+            transform: scale(0.95);
+        }
+        .wheel-controls .wheel-spin-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+        }
+        .wheel-controls .wheel-spin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .wheel-timer {
+            font-size: 13px;
+            color: #94a3b8;
             text-align: center;
-            border: 1px solid #84cc16;
+            margin-top: 8px;
+        }
+
+        /* Адаптив */
+        @media (max-width: 480px) {
+            #gamesModal .games-modal-content {
+                padding: 18px 12px 22px;
+            }
+            .games-tab {
+                font-size: 13px;
+                padding: 10px 6px;
+            }
+            .runner-stats {
+                font-size: 13px;
+            }
+            .wheel-info {
+                font-size: 13px;
+            }
+            #gamesButton {
+                padding: 10px 14px;
+                font-size: 14px;
+                bottom: 16px;
+                right: 16px;
+            }
+        }
+        @media (max-width: 380px) {
+            #gamesButton {
+                padding: 8px 12px;
+                font-size: 12px;
+                bottom: 12px;
+                right: 12px;
+            }
+            #gamesButton .button-icon {
+                font-size: 18px;
+                margin-right: 4px;
+            }
         }
     </style>
 </head>
@@ -3890,46 +4021,6 @@
         </div>
     </div>
 
-    <!-- КНОПКА ВЫЗОВА ИГР (ДОБАВЛЕНА) -->
-    <button class="games-button" onclick="triggerHapticFeedback(); openGamesModal();">
-        🎮 Игры
-    </button>
-
-    <!-- МОДАЛЬНОЕ ОКНО С ИГРАМИ (ДОБАВЛЕНО) -->
-    <div id="gamesModal" class="games-modal-overlay">
-        <div class="games-modal-content">
-            <div class="games-modal-header">
-                <h2>🎲 Мини-игры Ymeyka 🎮</h2>
-                <button class="games-close" onclick="closeGamesModal();">✕</button>
-            </div>
-            <div class="games-tabs">
-                <button class="game-tab active" data-game="runner">🏃‍♂️ Бегунок</button>
-                <button class="game-tab" data-game="wheel">🎡 Колесо удачи</button>
-            </div>
-            <div id="runnerPane" class="game-pane active">
-                <div class="runner-game-container">
-                    <div class="runner-stats">
-                        <div class="runner-score">🏆 Счёт: <span id="runnerScore">0</span></div>
-                        <div class="runner-time">⏱️ Время: <span id="runnerTime">30</span>с</div>
-                    </div>
-                    <canvas id="runnerCanvas" width="400" height="300" class="runner-canvas"></canvas>
-                    <div class="runner-controls">
-                        <button class="runner-jump-btn" onclick="runnerJump()">🦘 Прыжок (Tap)</button>
-                    </div>
-                    <button class="runner-start-btn" onclick="startRunnerGame()" style="margin-top: 10px; width: 100%;">▶️ Начать забег</button>
-                </div>
-            </div>
-            <div id="wheelPane" class="game-pane">
-                <div class="wheel-container">
-                    <canvas id="wheelCanvas" width="280" height="280" class="wheel-canvas"></canvas>
-                    <button class="wheel-spin-btn" onclick="spinWheel()">🎡 Крутить</button>
-                    <div class="wheel-timer" id="wheelTimer">До следующего вращения: —</div>
-                    <div class="wheel-result" id="wheelResult"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- МОДАЛЬНОЕ ОКНО ВИЗИТКИ -->
     <div id="visitkaModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 450px;">
@@ -4244,6 +4335,56 @@
         </div>
     </div>
 
+    <!-- ============================================================
+         МОДАЛЬНОЕ ОКНО МИНИ-ИГР
+         ============================================================ -->
+    <div id="gamesModal">
+        <div class="games-modal-content">
+            <button class="games-modal-close" onclick="triggerHapticFeedback(); closeGamesModal();">✕</button>
+            <div class="games-modal-title">🎲 <span>Мини-игры Ymeyka</span> 🎮</div>
+
+            <!-- Вкладки -->
+            <div class="games-tabs">
+                <div class="games-tab active" data-game="runner" onclick="switchGameTab('runner')">🏃 Бегунок</div>
+                <div class="games-tab" data-game="wheel" onclick="switchGameTab('wheel')">🎡 Колесо удачи</div>
+            </div>
+
+            <!-- Игра "Бегунок" -->
+            <div id="runnerGame" class="game-container active">
+                <canvas id="runnerCanvas" width="500" height="300"></canvas>
+                <div class="runner-stats">
+                    <span>⏱ <span id="runnerTimer">30</span>с</span>
+                    <span class="runner-score">⭐ <span id="runnerScore">0</span></span>
+                    <span>🏆 <span id="runnerBest">0</span></span>
+                </div>
+                <div class="runner-controls">
+                    <button class="runner-start-btn" id="runnerStartBtn" onclick="startRunnerGame()">▶ Старт</button>
+                    <button onclick="resetRunnerGame()">🔄 Сброс</button>
+                </div>
+            </div>
+
+            <!-- Игра "Колесо удачи" -->
+            <div id="wheelGame" class="game-container">
+                <div class="wheel-wrapper">
+                    <canvas id="wheelCanvas" width="400" height="400"></canvas>
+                    <div class="wheel-center-text">🎡</div>
+                </div>
+                <div class="wheel-info">
+                    <span>Ваш выигрыш:</span>
+                    <span class="wheel-result" id="wheelResult">—</span>
+                </div>
+                <div class="wheel-controls">
+                    <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="spinWheel()">🎡 Крутить!</button>
+                </div>
+                <div class="wheel-timer" id="wheelTimer">⏳ Доступно сейчас</div>
+            </div>
+        </div>
+    </div>
+
+    <button id="gamesButton" onclick="triggerHapticFeedback(); openGamesModal();">
+        <span class="button-icon">🎮</span> Игры
+    </button>
+
     <script>
     // ========== КОНФИГУРАЦИЯ ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
@@ -4292,20 +4433,36 @@
     let currentMapFilterSubcategory = null;
 
     // ========== ПЕРЕМЕННЫЕ ДЛЯ ИГР ==========
-    let runnerAnimationId = null;
-    let runnerGameActive = false;
-    let runnerScore = 0;
+    let runnerGameRunning = false;
+    let runnerGameLoop = null;
     let runnerTimeLeft = 30;
+    let runnerScore = 0;
+    let runnerBest = parseInt(localStorage.getItem('umeyka_runner_best') || '0');
+    let runnerJumping = false;
+    let runnerY = 0;
+    let runnerVelY = 0;
     let runnerObstacles = [];
-    let runnerFrame = 0;
-    let runnerBaseSpeed = 5;
-    let runnerScorePerObstacle = 1;
-    let lastSpinTimestamp = null;
-    let wheelSectors = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-    let wheelRotation = 0;
-    let wheelSpinning = false;
-    let wheelCanvas = null;
-    let wheelCtx = null;
+    let runnerFrameId = null;
+    let runnerGameEnded = false;
+
+    let wheelIsSpinning = false;
+    let wheelAngle = 0;
+    let wheelCurrentResult = 0;
+    let wheelLastSpinTime = 0;
+    const WHEEL_COOLDOWN = 3600000; // 1 час
+    const WHEEL_SEGMENTS = [
+        { label: '10', value: 10, color: '#f97316' },
+        { label: '20', value: 20, color: '#eab308' },
+        { label: '30', value: 30, color: '#22c55e' },
+        { label: '40', value: 40, color: '#3b82f6' },
+        { label: '50', value: 50, color: '#8b5cf6' },
+        { label: '60', value: 60, color: '#ec4899' },
+        { label: '70', value: 70, color: '#14b8a6' },
+        { label: '80', value: 80, color: '#f59e0b' },
+        { label: '90', value: 90, color: '#ef4444' },
+        { label: '100', value: 100, color: '#06b6d4' },
+    ];
+    const WHEEL_SEG_ANGLE = (2 * Math.PI) / WHEEL_SEGMENTS.length;
 
     // ========== ФУНКЦИИ ДЛЯ ФОРМАТА РАБОТЫ ==========
     
@@ -8370,430 +8527,669 @@
             console.error('❌ [Referral] Ошибка обработки реферальной ссылки:', error);
         }
     }
-
+    
     // ========== ФУНКЦИИ ДЛЯ МИНИ-ИГР ==========
     
+    // ---------- ОТКРЫТИЕ/ЗАКРЫТИЕ МОДАЛЬНОГО ОКНА ----------
     function openGamesModal() {
         triggerHapticFeedback();
         const modal = document.getElementById('gamesModal');
-        if (modal) {
-            modal.classList.add('active');
-            // Сброс колеса при открытии
-            if (wheelCanvas) {
-                drawWheel();
-                updateWheelTimer();
-            }
-            // Сброс раннера (если был активен)
-            if (runnerGameActive) {
-                stopRunnerGame();
-                resetRunnerUI();
-            }
+        modal.classList.add('active');
+        // Инициализируем игры, если ещё не инициализированы
+        if (!window._gamesInitialized) {
+            initRunnerGame();
+            initWheelGame();
+            window._gamesInitialized = true;
         }
+        updateWheelTimer();
     }
     
     function closeGamesModal() {
         triggerHapticFeedback();
         const modal = document.getElementById('gamesModal');
-        if (modal) {
-            modal.classList.remove('active');
-            if (runnerGameActive) stopRunnerGame();
-        }
-    }
-    
-    // Вкладки игр
-    document.addEventListener('click', (e) => {
-        if (e.target.classList && e.target.classList.contains('game-tab')) {
-            const tab = e.target;
-            const gameName = tab.dataset.game;
-            document.querySelectorAll('.game-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            document.querySelectorAll('.game-pane').forEach(p => p.classList.remove('active'));
-            if (gameName === 'runner') {
-                document.getElementById('runnerPane').classList.add('active');
-            } else if (gameName === 'wheel') {
-                document.getElementById('wheelPane').classList.add('active');
-                if (wheelCanvas) drawWheel();
-                updateWheelTimer();
-            }
-            triggerHapticFeedback();
-        }
-    });
-    
-    // ==================== ИГРА "БЕГУНОК" ====================
-    const runnerCanvas = document.getElementById('runnerCanvas');
-    let runnerCtx = runnerCanvas?.getContext('2d');
-    
-    // Размеры
-    const GROUND_Y = 250;
-    const PLAYER_WIDTH = 30;
-    const PLAYER_HEIGHT = 30;
-    const PLAYER_X = 70;
-    const OBSTACLE_WIDTH = 20;
-    const OBSTACLE_HEIGHT = 25;
-    
-    let playerY = GROUND_Y - PLAYER_HEIGHT;
-    let velocity = 0;
-    let gravity = 0.8;
-    let jumpPower = -12;
-    let isJumping = false;
-    
-    function initRunner() {
-        if (!runnerCtx) return;
-        runnerCanvas.width = 400;
-        runnerCanvas.height = 300;
-        resetRunnerUI();
-    }
-    
-    function resetRunnerUI() {
-        if (runnerCtx) {
-            runnerCtx.clearRect(0, 0, runnerCanvas.width, runnerCanvas.height);
-            drawGround();
-            drawPlayer();
-        }
-        document.getElementById('runnerScore').innerText = '0';
-        document.getElementById('runnerTime').innerText = '30';
-        runnerScore = 0;
-        runnerTimeLeft = 30;
-        runnerObstacles = [];
-        runnerFrame = 0;
-        playerY = GROUND_Y - PLAYER_HEIGHT;
-        velocity = 0;
-        isJumping = false;
-        if (runnerGameActive) {
+        modal.classList.remove('active');
+        // Останавливаем игру "Бегунок", если она запущена
+        if (runnerGameRunning) {
             stopRunnerGame();
         }
     }
     
-    function drawGround() {
-        if (!runnerCtx) return;
-        runnerCtx.fillStyle = '#2d3748';
-        runnerCtx.fillRect(0, GROUND_Y, runnerCanvas.width, 5);
-        runnerCtx.fillStyle = '#a3e635';
-        runnerCtx.fillRect(0, GROUND_Y + 5, runnerCanvas.width, 15);
-    }
-    
-    function drawPlayer() {
-        if (!runnerCtx) return;
-        runnerCtx.fillStyle = '#fbbf24';
-        runnerCtx.fillRect(PLAYER_X, playerY, PLAYER_WIDTH, PLAYER_HEIGHT);
-        runnerCtx.fillStyle = '#000';
-        runnerCtx.fillRect(PLAYER_X + 20, playerY + 5, 5, 5);
-        runnerCtx.fillRect(PLAYER_X + 5, playerY + 5, 5, 5);
-        runnerCtx.fillStyle = '#ed8936';
-        runnerCtx.fillRect(PLAYER_X + 10, playerY + 15, 10, 8);
-    }
-    
-    function drawObstacles() {
-        if (!runnerCtx) return;
-        runnerObstacles.forEach(obs => {
-            runnerCtx.fillStyle = '#ef4444';
-            runnerCtx.fillRect(obs.x, obs.y, OBSTACLE_WIDTH, OBSTACLE_HEIGHT);
-            runnerCtx.fillStyle = '#7f1d1d';
-            runnerCtx.fillRect(obs.x + 5, obs.y - 5, 10, 5);
-        });
-    }
-    
-    function updateRunner() {
-        if (!runnerGameActive) return;
+    function switchGameTab(tab) {
+        triggerHapticFeedback();
+        // Переключаем вкладки
+        document.querySelectorAll('.games-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`.games-tab[data-game="${tab}"]`).classList.add('active');
         
-        // Генерация препятствий
-        if (runnerFrame % 60 === 0 && runnerObstacles.length < 3) {
-            runnerObstacles.push({
-                x: runnerCanvas.width,
-                y: GROUND_Y - OBSTACLE_HEIGHT,
-                width: OBSTACLE_WIDTH,
-                height: OBSTACLE_HEIGHT
-            });
+        document.querySelectorAll('.game-container').forEach(c => c.classList.remove('active'));
+        if (tab === 'runner') {
+            document.getElementById('runnerGame').classList.add('active');
+        } else {
+            document.getElementById('wheelGame').classList.add('active');
+        }
+    }
+    
+    // ========== ИГРА "БЕГУНОК" ==========
+    
+    let runnerCanvas, runnerCtx;
+    let runnerPlayer = { x: 80, y: 0, width: 30, height: 40 };
+    let runnerGravity = 0.6;
+    let runnerJumpPower = -12;
+    let runnerGroundY = 0;
+    let runnerSpeed = 3.5;
+    let runnerObstacleTimer = 0;
+    let runnerObstacleInterval = 60;
+    let runnerFrameCount = 0;
+    let runnerGameStarted = false;
+    let runnerGamePaused = false;
+    let runnerGameOver = false;
+    let runnerBestScore = parseInt(localStorage.getItem('umeyka_runner_best') || '0');
+    
+    function initRunnerGame() {
+        runnerCanvas = document.getElementById('runnerCanvas');
+        runnerCtx = runnerCanvas.getContext('2d');
+        
+        // Адаптируем размер canvas под контейнер
+        resizeRunnerCanvas();
+        window.addEventListener('resize', resizeRunnerCanvas);
+        
+        // Обработчик клика/тапа для прыжка
+        runnerCanvas.addEventListener('click', () => runnerJump());
+        runnerCanvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            runnerJump();
+        }, { passive: false });
+        
+        // Устанавливаем лучший результат
+        document.getElementById('runnerBest').textContent = runnerBestScore;
+        
+        // Сбрасываем игру
+        resetRunnerGame();
+    }
+    
+    function resizeRunnerCanvas() {
+        if (!runnerCanvas) return;
+        const container = runnerCanvas.parentElement;
+        const rect = container.getBoundingClientRect();
+        const width = Math.min(rect.width || 500, 500);
+        const height = width * 0.6;
+        runnerCanvas.style.width = width + 'px';
+        runnerCanvas.style.height = height + 'px';
+        runnerCanvas.width = 500;
+        runnerCanvas.height = 300;
+        runnerGroundY = 260;
+        runnerPlayer.y = runnerGroundY - runnerPlayer.height;
+    }
+    
+    function runnerJump() {
+        if (!runnerGameStarted || runnerGameOver || runnerGamePaused) {
+            // Если игра ещё не началась, стартуем при первом прыжке
+            if (!runnerGameStarted && !runnerGameOver) {
+                startRunnerGame();
+                return;
+            }
+            return;
+        }
+        if (!runnerJumping) {
+            runnerVelY = runnerJumpPower;
+            runnerJumping = true;
+        }
+    }
+    
+    function startRunnerGame() {
+        if (runnerGameRunning) return;
+        triggerHapticFeedback();
+        
+        // Сбрасываем состояние
+        resetRunnerGame();
+        
+        runnerGameStarted = true;
+        runnerGameRunning = true;
+        runnerGameOver = false;
+        runnerTimeLeft = 30;
+        runnerScore = 0;
+        runnerSpeed = 3.5;
+        runnerObstacles = [];
+        runnerObstacleTimer = 0;
+        runnerFrameCount = 0;
+        
+        document.getElementById('runnerTimer').textContent = '30';
+        document.getElementById('runnerScore').textContent = '0';
+        document.getElementById('runnerStartBtn').textContent = '⏳ Игра идёт...';
+        document.getElementById('runnerStartBtn').disabled = true;
+        
+        // Запускаем игровой цикл
+        if (runnerFrameId) cancelAnimationFrame(runnerFrameId);
+        runnerGameLoop();
+    }
+    
+    function stopRunnerGame() {
+        runnerGameRunning = false;
+        runnerGameStarted = false;
+        if (runnerFrameId) {
+            cancelAnimationFrame(runnerFrameId);
+            runnerFrameId = null;
+        }
+        document.getElementById('runnerStartBtn').textContent = '▶ Старт';
+        document.getElementById('runnerStartBtn').disabled = false;
+    }
+    
+    function resetRunnerGame() {
+        runnerGameRunning = false;
+        runnerGameStarted = false;
+        runnerGameOver = false;
+        runnerTimeLeft = 30;
+        runnerScore = 0;
+        runnerSpeed = 3.5;
+        runnerObstacles = [];
+        runnerObstacleTimer = 0;
+        runnerFrameCount = 0;
+        runnerJumping = false;
+        runnerVelY = 0;
+        runnerPlayer.y = runnerGroundY - runnerPlayer.height;
+        
+        if (runnerFrameId) {
+            cancelAnimationFrame(runnerFrameId);
+            runnerFrameId = null;
         }
         
-        // Обновление препятствий
-        for (let i = 0; i < runnerObstacles.length; i++) {
-            runnerObstacles[i].x -= runnerBaseSpeed;
-            if (runnerObstacles[i].x + OBSTACLE_WIDTH < 0) {
-                runnerObstacles.splice(i, 1);
-                i--;
-                runnerScore += runnerScorePerObstacle;
-                document.getElementById('runnerScore').innerText = runnerScore;
+        document.getElementById('runnerTimer').textContent = '30';
+        document.getElementById('runnerScore').textContent = '0';
+        document.getElementById('runnerStartBtn').textContent = '▶ Старт';
+        document.getElementById('runnerStartBtn').disabled = false;
+        
+        drawRunnerScene();
+    }
+    
+    function drawRunnerScene() {
+        const ctx = runnerCtx;
+        const W = runnerCanvas.width;
+        const H = runnerCanvas.height;
+        
+        // Очищаем
+        ctx.clearRect(0, 0, W, H);
+        
+        // Небо (градиент)
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, H);
+        skyGrad.addColorStop(0, '#0f172a');
+        skyGrad.addColorStop(0.6, '#1e293b');
+        skyGrad.addColorStop(1, '#334155');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, W, H);
+        
+        // Земля
+        ctx.fillStyle = '#1a2a3a';
+        ctx.fillRect(0, runnerGroundY, W, H - runnerGroundY);
+        ctx.fillStyle = '#2a3a4a';
+        ctx.fillRect(0, runnerGroundY, W, 4);
+        
+        // Линия дороги
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.setLineDash([20, 20]);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, runnerGroundY + 10);
+        ctx.lineTo(W, runnerGroundY + 10);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // Игрок (плиточник 🧱)
+        const px = runnerPlayer.x;
+        const py = runnerPlayer.y;
+        const pw = runnerPlayer.width;
+        const ph = runnerPlayer.height;
+        
+        // Тело
+        ctx.fillStyle = '#f59e0b';
+        ctx.shadowColor = 'rgba(245, 158, 11, 0.3)';
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.roundRect(px, py, pw, ph, 4);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        // Лицо (эмодзи)
+        ctx.font = '22px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🧱', px + pw/2, py + ph/2 - 2);
+        
+        // Препятствия
+        runnerObstacles.forEach(obs => {
+            ctx.fillStyle = obs.type === 'hole' ? '#1a1a2e' : '#dc2626';
+            ctx.shadowColor = obs.type === 'hole' ? 'rgba(0,0,0,0.5)' : 'rgba(220, 38, 38, 0.3)';
+            ctx.shadowBlur = 10;
+            
+            if (obs.type === 'hole') {
+                ctx.beginPath();
+                ctx.ellipse(obs.x + obs.width/2, runnerGroundY + 8, obs.width/2, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#0a0a1a';
+                ctx.shadowBlur = 0;
+                ctx.beginPath();
+                ctx.ellipse(obs.x + obs.width/2, runnerGroundY + 10, obs.width/2 - 4, 8, 0, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                ctx.beginPath();
+                ctx.roundRect(obs.x, runnerGroundY - obs.height, obs.width, obs.height, 3);
+                ctx.fill();
+                
+                // Детали на препятствии
+                ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                ctx.shadowBlur = 0;
+                ctx.beginPath();
+                ctx.roundRect(obs.x + 4, runnerGroundY - obs.height + 6, 6, 6, 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.roundRect(obs.x + obs.width - 10, runnerGroundY - obs.height + 6, 6, 6, 2);
+                ctx.fill();
             }
+            ctx.shadowBlur = 0;
+        });
+        
+        // Статус "Игра окончена"
+        if (runnerGameOver) {
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.fillRect(0, 0, W, H);
+            ctx.fillStyle = '#facc15';
+            ctx.font = 'bold 32px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🏁 Игра окончена!', W/2, H/2 - 40);
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = '20px sans-serif';
+            ctx.fillText(`Счёт: ${runnerScore}`, W/2, H/2 + 20);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '16px sans-serif';
+            ctx.fillText('Нажмите "Старт" для новой игры', W/2, H/2 + 60);
+        }
+    }
+    
+    function runnerGameLoop() {
+        if (!runnerGameRunning) return;
+        
+        runnerFrameCount++;
+        
+        // Таймер
+        if (runnerFrameCount % 60 === 0 && runnerTimeLeft > 0) {
+            runnerTimeLeft--;
+            document.getElementById('runnerTimer').textContent = runnerTimeLeft;
+            
+            // Увеличиваем скорость со временем
+            if (runnerTimeLeft < 20) {
+                runnerSpeed = 3.5 + (30 - runnerTimeLeft) * 0.08;
+            }
+        }
+        
+        // Проверка окончания времени
+        if (runnerTimeLeft <= 0) {
+            endRunnerGame();
+            return;
         }
         
         // Физика игрока
-        if (isJumping || playerY < GROUND_Y - PLAYER_HEIGHT) {
-            velocity += gravity;
-            playerY += velocity;
-            if (playerY >= GROUND_Y - PLAYER_HEIGHT) {
-                playerY = GROUND_Y - PLAYER_HEIGHT;
-                velocity = 0;
-                isJumping = false;
+        if (runnerJumping) {
+            runnerPlayer.y += runnerVelY;
+            runnerVelY += runnerGravity;
+            
+            if (runnerPlayer.y >= runnerGroundY - runnerPlayer.height) {
+                runnerPlayer.y = runnerGroundY - runnerPlayer.height;
+                runnerJumping = false;
+                runnerVelY = 0;
             }
         }
         
-        // Проверка коллизий
-        for (let obs of runnerObstacles) {
-            if (PLAYER_X < obs.x + OBSTACLE_WIDTH &&
-                PLAYER_X + PLAYER_WIDTH > obs.x &&
-                playerY < obs.y + OBSTACLE_HEIGHT &&
-                playerY + PLAYER_HEIGHT > obs.y) {
-                endRunnerGame(false);
+        // Генерация препятствий
+        runnerObstacleTimer++;
+        const currentInterval = Math.max(30, runnerObstacleInterval - runnerTimeLeft * 0.5);
+        if (runnerObstacleTimer >= currentInterval) {
+            runnerObstacleTimer = 0;
+            const type = Math.random() > 0.4 ? 'box' : 'hole';
+            const width = type === 'hole' ? 35 + Math.random() * 20 : 20 + Math.random() * 15;
+            const height = type === 'hole' ? 0 : 20 + Math.random() * 25;
+            runnerObstacles.push({
+                x: 500,
+                width: width,
+                height: height,
+                type: type
+            });
+        }
+        
+        // Движение препятствий и проверка столкновений
+        const playerRect = {
+            x: runnerPlayer.x + 6,
+            y: runnerPlayer.y + 4,
+            width: runnerPlayer.width - 12,
+            height: runnerPlayer.height - 6
+        };
+        
+        for (let i = runnerObstacles.length - 1; i >= 0; i--) {
+            const obs = runnerObstacles[i];
+            obs.x -= runnerSpeed;
+            
+            // Проверка столкновения
+            const obsRect = {
+                x: obs.x + 4,
+                y: obs.type === 'hole' ? runnerGroundY - 8 : runnerGroundY - obs.height,
+                width: obs.width - 8,
+                height: obs.type === 'hole' ? 12 : obs.height
+            };
+            
+            if (obs.x + obs.width < 0) {
+                runnerObstacles.splice(i, 1);
+                if (!runnerGameOver) {
+                    runnerScore++;
+                    document.getElementById('runnerScore').textContent = runnerScore;
+                }
+                continue;
+            }
+            
+            // Проверка пересечения
+            if (!runnerGameOver && 
+                playerRect.x < obsRect.x + obsRect.width &&
+                playerRect.x + playerRect.width > obsRect.x &&
+                playerRect.y < obsRect.y + obsRect.height &&
+                playerRect.y + playerRect.height > obsRect.y) {
+                endRunnerGame();
                 return;
             }
         }
         
         // Отрисовка
-        runnerCtx.clearRect(0, 0, runnerCanvas.width, runnerCanvas.height);
-        drawGround();
-        drawObstacles();
-        drawPlayer();
+        drawRunnerScene();
         
-        runnerFrame++;
+        // Следующий кадр
+        runnerFrameId = requestAnimationFrame(runnerGameLoop);
     }
     
-    function runnerJump() {
-        if (!runnerGameActive) return;
-        if (!isJumping && playerY >= GROUND_Y - PLAYER_HEIGHT) {
-            velocity = jumpPower;
-            isJumping = true;
-            triggerHapticFeedback();
-        }
-    }
-    
-    let runnerTimerInterval = null;
-    
-    function startRunnerGame() {
-        if (runnerGameActive) return;
-        resetRunnerUI();
-        runnerGameActive = true;
-        runnerTimeLeft = 30;
-        runnerScore = 0;
-        runnerFrame = 0;
-        runnerObstacles = [];
-        document.getElementById('runnerScore').innerText = '0';
-        document.getElementById('runnerTime').innerText = '30';
-        playerY = GROUND_Y - PLAYER_HEIGHT;
-        velocity = 0;
-        isJumping = false;
+    function endRunnerGame() {
+        if (runnerGameOver) return;
+        runnerGameOver = true;
+        runnerGameRunning = false;
+        runnerGameStarted = false;
         
-        if (runnerTimerInterval) clearInterval(runnerTimerInterval);
-        runnerTimerInterval = setInterval(() => {
-            if (!runnerGameActive) return;
-            runnerTimeLeft--;
-            document.getElementById('runnerTime').innerText = runnerTimeLeft;
-            if (runnerTimeLeft <= 0) {
-                endRunnerGame(true);
-            }
-        }, 1000);
-        
-        function gameLoop() {
-            if (!runnerGameActive) return;
-            updateRunner();
-            requestAnimationFrame(gameLoop);
-        }
-        gameLoop();
-        triggerHapticFeedback();
-    }
-    
-    function endRunnerGame(isVictory) {
-        if (!runnerGameActive) return;
-        runnerGameActive = false;
-        if (runnerTimerInterval) {
-            clearInterval(runnerTimerInterval);
-            runnerTimerInterval = null;
+        if (runnerFrameId) {
+            cancelAnimationFrame(runnerFrameId);
+            runnerFrameId = null;
         }
         
-        let rewardStars = 0;
-        if (isVictory) {
-            rewardStars = Math.min(5, Math.floor(runnerScore / 10));
-            if (rewardStars > 0) {
-                addGameStars(rewardStars);
-                showNotification(`🏆 Игра "Бегунок" завершена! Счёт: ${runnerScore}. Вы получаете ${rewardStars} ⭐!`);
-            } else {
-                showNotification(`🏃 Игра "Бегунок" завершена! Счёт: ${runnerScore}. Набрано мало очков для награды.`);
-            }
-        } else {
-            showNotification(`💥 Игра "Бегунок" завершена! Вы врезались в препятствие. Счёт: ${runnerScore}.`);
+        // Обновляем лучший результат
+        if (runnerScore > runnerBestScore) {
+            runnerBestScore = runnerScore;
+            localStorage.setItem('umeyka_runner_best', runnerBestScore.toString());
+            document.getElementById('runnerBest').textContent = runnerBestScore;
         }
-        resetRunnerUI();
-    }
-    
-    function stopRunnerGame() {
-        if (runnerGameActive) {
-            runnerGameActive = false;
-            if (runnerTimerInterval) {
-                clearInterval(runnerTimerInterval);
-                runnerTimerInterval = null;
-            }
+        
+        // Рассчитываем награду
+        let reward = Math.floor(runnerScore / 10);
+        if (reward > 5) reward = 5;
+        
+        // Показываем результат
+        drawRunnerScene();
+        
+        // Добавляем оверлей с результатом
+        const ctx = runnerCtx;
+        const W = runnerCanvas.width;
+        const H = runnerCanvas.height;
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(0, 0, W, H);
+        
+        ctx.fillStyle = '#facc15';
+        ctx.font = 'bold 28px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🏁 Игра окончена!', W/2, H/2 - 60);
+        
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = '20px sans-serif';
+        ctx.fillText(`Твой счёт: ${runnerScore} очков`, W/2, H/2 - 10);
+        
+        ctx.fillStyle = '#22c55e';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.fillText(`⭐ Награда: +${reward} звёзд`, W/2, H/2 + 40);
+        
+        if (reward > 0) {
+            // Начисляем звёзды
+            const referralData = getReferralData();
+            referralData.starsEarned = (referralData.starsEarned || 0) + reward;
+            saveReferralData(referralData);
+            showNotification(`🎉 +${reward} звёзд за игру!`);
         }
+        
+        document.getElementById('runnerStartBtn').textContent = '▶ Старт';
+        document.getElementById('runnerStartBtn').disabled = false;
     }
     
-    // Клик/тап по канвасу для прыжка
-    if (runnerCanvas) {
-        runnerCanvas.addEventListener('click', runnerJump);
-        runnerCanvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            runnerJump();
-        });
-    }
+    // ========== ИГРА "КОЛЕСО УДАЧИ" ==========
     
-    // ==================== ИГРА "КОЛЕСО УДАЧИ" ====================
-    function initWheel() {
+    let wheelCanvas, wheelCtx;
+    let wheelIsSpinning = false;
+    let wheelSpinAngle = 0;
+    let wheelTargetAngle = 0;
+    let wheelVelocity = 0;
+    let wheelAnimationId = null;
+    let wheelResultIndex = -1;
+    
+    function initWheelGame() {
         wheelCanvas = document.getElementById('wheelCanvas');
-        if (!wheelCanvas) return;
         wheelCtx = wheelCanvas.getContext('2d');
-        wheelCanvas.width = 280;
-        wheelCanvas.height = 280;
-        drawWheel();
+        
+        resizeWheelCanvas();
+        window.addEventListener('resize', resizeWheelCanvas);
+        
+        drawWheel(0);
         updateWheelTimer();
     }
     
-    function drawWheel() {
-        if (!wheelCtx) return;
-        const width = wheelCanvas.width;
-        const height = wheelCanvas.height;
-        const centerX = width / 2;
-        const centerY = height / 2;
-        const radius = width / 2 - 10;
-        const angleStep = (Math.PI * 2) / wheelSectors.length;
+    function resizeWheelCanvas() {
+        if (!wheelCanvas) return;
+        const container = wheelCanvas.parentElement;
+        const rect = container.getBoundingClientRect();
+        const size = Math.min(rect.width || 400, 400, window.innerHeight * 0.35);
+        wheelCanvas.style.width = size + 'px';
+        wheelCanvas.style.height = size + 'px';
+        wheelCanvas.width = 400;
+        wheelCanvas.height = 400;
+        drawWheel(wheelSpinAngle);
+    }
+    
+    function drawWheel(angle) {
+        const ctx = wheelCtx;
+        const W = wheelCanvas.width;
+        const H = wheelCanvas.height;
+        const cx = W/2;
+        const cy = H/2;
+        const radius = Math.min(W, H) / 2 - 10;
         
-        wheelCtx.clearRect(0, 0, width, height);
+        ctx.clearRect(0, 0, W, H);
         
-        for (let i = 0; i < wheelSectors.length; i++) {
-            const startAngle = i * angleStep + wheelRotation;
-            const endAngle = (i + 1) * angleStep + wheelRotation;
-            const color = `hsl(${i * 36}, 70%, 55%)`;
-            wheelCtx.beginPath();
-            wheelCtx.arc(centerX, centerY, radius, startAngle, endAngle);
-            wheelCtx.lineTo(centerX, centerY);
-            wheelCtx.fillStyle = color;
-            wheelCtx.fill();
-            wheelCtx.save();
-            wheelCtx.translate(centerX, centerY);
-            wheelCtx.rotate(startAngle + angleStep / 2);
-            wheelCtx.fillStyle = 'white';
-            wheelCtx.font = 'bold 14px sans-serif';
-            wheelCtx.shadowBlur = 0;
-            wheelCtx.fillText(wheelSectors[i], radius / 1.5, 5);
-            wheelCtx.restore();
+        // Тень
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 30;
+        
+        // Рисуем сектора
+        const segmentAngle = WHEEL_SEG_ANGLE;
+        for (let i = 0; i < WHEEL_SEGMENTS.length; i++) {
+            const startAngle = angle + i * segmentAngle;
+            const endAngle = startAngle + segmentAngle;
+            
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, radius, startAngle, endAngle);
+            ctx.closePath();
+            
+            ctx.fillStyle = WHEEL_SEGMENTS[i].color;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'rgba(0,0,0,0.2)';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            
+            // Текст
+            const midAngle = startAngle + segmentAngle / 2;
+            const textRadius = radius * 0.7;
+            const tx = cx + Math.cos(midAngle) * textRadius;
+            const ty = cy + Math.sin(midAngle) * textRadius;
+            
+            ctx.save();
+            ctx.translate(tx, ty);
+            ctx.rotate(midAngle + Math.PI/2);
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 20px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.fillText(WHEEL_SEGMENTS[i].label, 0, 0);
+            ctx.restore();
         }
         
-        // Стрелка
-        wheelCtx.beginPath();
-        wheelCtx.moveTo(centerX - 10, 10);
-        wheelCtx.lineTo(centerX + 10, 10);
-        wheelCtx.lineTo(centerX, 30);
-        wheelCtx.fillStyle = '#fbbf24';
-        wheelCtx.fill();
-        wheelCtx.beginPath();
-        wheelCtx.arc(centerX, centerY, 12, 0, Math.PI * 2);
-        wheelCtx.fillStyle = '#2d3748';
-        wheelCtx.fill();
-        wheelCtx.fillStyle = '#a3e635';
-        wheelCtx.font = 'bold 16px sans-serif';
-        wheelCtx.fillText('🎲', centerX - 8, centerY + 6);
+        // Внешняя обводка
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Маркер-указатель (сверху)
+        ctx.fillStyle = '#facc15';
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = 'rgba(250, 204, 21, 0.5)';
+        ctx.beginPath();
+        ctx.moveTo(cx - 16, 8);
+        ctx.lineTo(cx + 16, 8);
+        ctx.lineTo(cx, 32);
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        // Центральный круг
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 30);
+        grad.addColorStop(0, '#facc15');
+        grad.addColorStop(1, '#d97706');
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = 'rgba(250, 204, 21, 0.3)';
+        ctx.beginPath();
+        ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
     }
     
     function spinWheel() {
-        if (wheelSpinning) {
-            showNotification('Колесо уже крутится!');
-            return;
-        }
+        if (wheelIsSpinning) return;
         
-        const lastSpin = localStorage.getItem(`last_wheel_spin_${currentUserId}`);
-        if (lastSpin) {
-            const lastTime = parseInt(lastSpin);
-            const now = Date.now();
-            const hour = 60 * 60 * 1000;
-            if (now - lastTime < hour) {
-                const remain = Math.ceil((hour - (now - lastTime)) / 60000);
-                showNotification(`Крутить можно раз в час. Осталось ${remain} минут.`);
-                return;
-            }
+        // Проверка кулдауна
+        const now = Date.now();
+        const lastSpin = parseInt(localStorage.getItem('umeyka_wheel_last_spin') || '0');
+        if (now - lastSpin < WHEEL_COOLDOWN) {
+            const remaining = Math.ceil((WHEEL_COOLDOWN - (now - lastSpin)) / 60000);
+            showNotification(`⏳ Колесо будет доступно через ${remaining} мин`);
+            return;
         }
         
         triggerHapticFeedback();
-        wheelSpinning = true;
-        const spins = 10 + Math.random() * 10;
-        const targetSector = Math.floor(Math.random() * wheelSectors.length);
-        const targetAngle = (Math.PI * 2) - (targetSector * (Math.PI * 2 / wheelSectors.length));
-        const finalRotation = wheelRotation + (Math.PI * 2 * spins) + targetAngle;
+        wheelIsSpinning = true;
+        document.getElementById('wheelSpinBtn').disabled = true;
+        document.getElementById('wheelResult').textContent = '🌀 Крутим...';
         
+        // Случайный результат
+        wheelResultIndex = Math.floor(Math.random() * WHEEL_SEGMENTS.length);
+        const targetValue = WHEEL_SEGMENTS[wheelResultIndex].value;
+        
+        // Вычисляем угол для остановки на нужном секторе (указатель сверху)
+        const segmentAngle = WHEEL_SEG_ANGLE;
+        const targetAngle = -wheelResultIndex * segmentAngle - segmentAngle / 2 + Math.PI / 2;
+        
+        // Добавляем несколько полных оборотов для эффекта
+        const extraSpins = 5 + Math.random() * 3;
+        const totalAngle = targetAngle + extraSpins * 2 * Math.PI;
+        
+        // Анимируем вращение
+        const startAngle = wheelSpinAngle;
+        const duration = 4000 + Math.random() * 2000;
         const startTime = performance.now();
-        const duration = 2500;
         
-        function animateSpin(currentTime) {
-            const elapsed = currentTime - startTime;
-            let t = Math.min(1, elapsed / duration);
-            const easeOut = 1 - Math.pow(1 - t, 3);
-            wheelRotation = finalRotation * easeOut;
-            drawWheel();
-            if (t < 1) {
-                requestAnimationFrame(animateSpin);
+        function animateSpin(time) {
+            const elapsed = time - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Easing: замедление в конце
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const currentAngle = startAngle + (totalAngle - startAngle) * eased;
+            
+            wheelSpinAngle = currentAngle;
+            drawWheel(currentAngle);
+            
+            if (progress < 1) {
+                wheelAnimationId = requestAnimationFrame(animateSpin);
             } else {
-                finishSpin(targetSector);
+                wheelSpinAngle = totalAngle;
+                drawWheel(totalAngle);
+                finishWheelSpin(targetValue);
             }
         }
         
-        requestAnimationFrame(animateSpin);
+        wheelAnimationId = requestAnimationFrame(animateSpin);
     }
     
-    function finishSpin(sectorIndex) {
-        wheelSpinning = false;
-        const reward = wheelSectors[sectorIndex];
-        addGameStars(reward);
-        showNotification(`🎉 Колесо удачи! Вы выиграли ${reward} ⭐!`);
+    function finishWheelSpin(value) {
+        wheelIsSpinning = false;
+        document.getElementById('wheelSpinBtn').disabled = false;
         
-        localStorage.setItem(`last_wheel_spin_${currentUserId}`, Date.now().toString());
+        // Сохраняем время последнего вращения
+        localStorage.setItem('umeyka_wheel_last_spin', Date.now().toString());
+        
+        // Показываем результат
+        document.getElementById('wheelResult').textContent = `⭐ +${value} звёзд!`;
+        
+        // Начисляем звёзды
+        const referralData = getReferralData();
+        referralData.starsEarned = (referralData.starsEarned || 0) + value;
+        saveReferralData(referralData);
+        
+        // Обновляем UI
+        const userData = getOrCreateUserProfile(currentUserId);
+        userData.stars = (userData.stars || 0) + value;
+        setLocalStorage(`user_${currentUserId}`, userData);
+        
+        showNotification(`🎉 Колесо удачи: +${value} звёзд!`);
         updateWheelTimer();
         
-        const resultDiv = document.getElementById('wheelResult');
-        if (resultDiv) {
-            resultDiv.innerHTML = `<div style="background: #a3e63520; padding: 8px; border-radius: 12px;">🎉 Выпало: <strong>${reward} ⭐</strong>!</div>`;
-            setTimeout(() => {
-                if (resultDiv) resultDiv.innerHTML = '';
-            }, 3000);
-        }
+        // Визуальный фидбек
+        setTimeout(() => {
+            document.getElementById('wheelResult').textContent = `⭐ +${value}`;
+        }, 1000);
     }
     
     function updateWheelTimer() {
-        const lastSpin = localStorage.getItem(`last_wheel_spin_${currentUserId}`);
-        const timerDiv = document.getElementById('wheelTimer');
-        if (!timerDiv) return;
-        
-        if (!lastSpin) {
-            timerDiv.textContent = '🎡 Готов к вращению!';
-            return;
-        }
-        
-        const lastTime = parseInt(lastSpin);
         const now = Date.now();
-        const hour = 60 * 60 * 1000;
-        const diff = hour - (now - lastTime);
+        const lastSpin = parseInt(localStorage.getItem('umeyka_wheel_last_spin') || '0');
+        const timerEl = document.getElementById('wheelTimer');
         
-        if (diff <= 0) {
-            timerDiv.textContent = '🎡 Готов к вращению!';
+        if (now - lastSpin < WHEEL_COOLDOWN) {
+            const remaining = WHEEL_COOLDOWN - (now - lastSpin);
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            timerEl.textContent = `⏳ Доступно через ${minutes}мин ${seconds}с`;
+            timerEl.style.color = '#facc15';
+            document.getElementById('wheelSpinBtn').disabled = true;
         } else {
-            const minutes = Math.ceil(diff / 60000);
-            timerDiv.textContent = `⏳ До следующего вращения: ${minutes} мин.`;
+            timerEl.textContent = '🎡 Готово к вращению!';
+            timerEl.style.color = '#22c55e';
+            if (!wheelIsSpinning) {
+                document.getElementById('wheelSpinBtn').disabled = false;
+            }
         }
     }
     
-    function addGameStars(amount) {
-        if (amount <= 0) return;
-        const key = `stars_${currentUserId}`;
-        let currentStars = parseInt(localStorage.getItem(key) || '0');
-        currentStars += amount;
-        localStorage.setItem(key, currentStars);
-        
-        // Обновляем баланс звезд в профиле (если есть переменная starsEarned в рефералке)
-        const referralData = getReferralData();
-        if (referralData) {
-            referralData.starsEarned = (referralData.starsEarned || 0) + amount;
-            saveReferralData(referralData);
-        }
-        // Обновляем UI профиля
-        loadUserProfile();
-        updateReferralStats();
-        showNotification(`✨ +${amount} звезд добавлено в ваш кошелек!`);
-    }
+    // Обновляем таймер колеса каждую секунду
+    setInterval(updateWheelTimer, 1000);
     
     // ========== ИНИЦИАЛИЗАЦИЯ ==========
     
@@ -8834,22 +9230,12 @@
         selectEditWorkFormat('Один');
         
         // Инициализация игр
-        initRunner();
-        initWheel();
+        initRunnerGame();
+        initWheelGame();
+        window._gamesInitialized = true;
         
-        // Переключение вкладок игр при клике (дублируем для надежности)
-        const tabs = document.querySelectorAll('.game-tab');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                const game = tab.dataset.game;
-                if (game === 'runner') {
-                    if (!runnerGameActive) resetRunnerUI();
-                } else if (game === 'wheel') {
-                    drawWheel();
-                    updateWheelTimer();
-                }
-            });
-        });
+        // Обновляем таймер колеса
+        updateWheelTimer();
     });
     </script>
 </body>
