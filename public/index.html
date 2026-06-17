@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* ========== СУЩЕСТВУЮЩИЕ СТИЛИ (без изменений) ========== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -405,502 +404,7 @@
             margin-right: 12px;
         }
         
-        /* ===== НОВЫЙ СТИЛЬ: КНОПКА ИГР ===== */
-        .games-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
-            border: none;
-            border-radius: 20px;
-            padding: 16px 24px;
-            color: #1a1a2e;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(132, 204, 22, 0.5);
-            transition: all 0.3s ease;
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-        
-        .games-button:active {
-            transform: scale(0.95);
-        }
-        
-        .games-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 30px rgba(132, 204, 22, 0.6);
-        }
-        
-        .games-button .button-icon {
-            font-size: 24px;
-            margin: 0;
-        }
-
-        /* ===== МОДАЛЬНОЕ ОКНО ИГР ===== */
-        .games-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 10000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .games-modal-overlay.active {
-            display: flex;
-        }
-        
-        .games-modal {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 30px;
-            max-width: 650px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 30px;
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
-            position: relative;
-        }
-        
-        .games-modal-close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .games-modal-close:hover {
-            background: rgba(255,255,255,0.2);
-            transform: rotate(90deg);
-        }
-        
-        .games-modal-title {
-            font-size: 28px;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 25px;
-            color: white;
-            background: linear-gradient(135deg, #a3e635, #84cc16);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .games-tabs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-            padding-bottom: 15px;
-        }
-        
-        .games-tab {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.08);
-            color: rgba(255,255,255,0.6);
-            text-align: center;
-        }
-        
-        .games-tab.active {
-            background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
-            color: #1a1a2e;
-            box-shadow: 0 4px 20px rgba(132, 204, 22, 0.3);
-        }
-        
-        .games-tab:active {
-            transform: scale(0.97);
-        }
-        
-        .games-content {
-            display: block;
-        }
-        
-        .game-panel {
-            display: none;
-            animation: fadeInUp 0.4s ease;
-        }
-        
-        .game-panel.active {
-            display: block;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* ===== ИГРА "БЕГУНОК" ===== */
-        .runner-game-container {
-            background: linear-gradient(180deg, #1a3a5c 0%, #0d1f33 100%);
-            border-radius: 20px;
-            padding: 15px;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.1);
-            touch-action: none;
-        }
-        
-        .runner-canvas-wrapper {
-            position: relative;
-            width: 100%;
-            padding-bottom: 60%;
-            background: #0d1f33;
-            border-radius: 12px;
-            overflow: hidden;
-            touch-action: none;
-        }
-        
-        .runner-canvas-wrapper canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-            touch-action: none;
-        }
-        
-        .runner-stats {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 10px 8px 10px;
-            color: white;
-            font-weight: 700;
-            font-size: 16px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px 12px 0 0;
-        }
-        
-        .runner-stats span {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .runner-controls {
-            display: flex;
-            gap: 12px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-        
-        .runner-controls button {
-            flex: 1;
-            min-width: 100px;
-            padding: 14px 20px;
-            border: none;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .runner-controls button:active {
-            transform: scale(0.95);
-        }
-        
-        .runner-controls .btn-start {
-            background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
-            color: #1a1a2e;
-            box-shadow: 0 4px 15px rgba(132, 204, 22, 0.3);
-        }
-        
-        .runner-controls .btn-reset {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .runner-result-popup {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.85);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            border-radius: 12px;
-            padding: 30px;
-            backdrop-filter: blur(5px);
-            z-index: 10;
-        }
-        
-        .runner-result-popup.show {
-            display: flex;
-            animation: fadeInUp 0.5s ease;
-        }
-        
-        .runner-result-popup .result-title {
-            font-size: 32px;
-            font-weight: 800;
-            color: #a3e635;
-            margin-bottom: 10px;
-        }
-        
-        .runner-result-popup .result-text {
-            font-size: 18px;
-            color: white;
-            text-align: center;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-        
-        .runner-result-popup .result-text .highlight {
-            color: #a3e635;
-            font-weight: 700;
-            font-size: 24px;
-        }
-        
-        .runner-result-popup .btn-close-result {
-            padding: 14px 40px;
-            background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
-            border: none;
-            border-radius: 15px;
-            color: #1a1a2e;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .runner-result-popup .btn-close-result:active {
-            transform: scale(0.95);
-        }
-        
-        /* ===== ИГРА "КОЛЕСО УДАЧИ" ===== */
-        .wheel-game-container {
-            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 20px;
-            padding: 20px;
-            border: 2px solid rgba(255,255,255,0.1);
-            text-align: center;
-        }
-        
-        .wheel-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
-        .wheel-wrapper canvas {
-            width: 100%;
-            height: auto;
-            display: block;
-            border-radius: 50%;
-            box-shadow: 0 0 40px rgba(132, 204, 22, 0.2);
-        }
-        
-        .wheel-pointer {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 40px;
-            color: #a3e635;
-            text-shadow: 0 0 20px rgba(132, 204, 22, 0.5);
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
-            z-index: 5;
-        }
-        
-        .wheel-result {
-            margin: 20px 0 15px 0;
-            font-size: 22px;
-            font-weight: 700;
-            color: white;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .wheel-result .win-amount {
-            color: #a3e635;
-            font-size: 32px;
-        }
-        
-        .wheel-controls {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .wheel-controls button {
-            padding: 14px 30px;
-            border: none;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 140px;
-            justify-content: center;
-        }
-        
-        .wheel-controls button:active {
-            transform: scale(0.95);
-        }
-        
-        .wheel-controls .btn-spin {
-            background: linear-gradient(135deg, #a3e635 0%, #84cc16 100%);
-            color: #1a1a2e;
-            box-shadow: 0 4px 15px rgba(132, 204, 22, 0.3);
-        }
-        
-        .wheel-controls .btn-spin:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .wheel-cooldown {
-            font-size: 14px;
-            color: rgba(255,255,255,0.6);
-            margin-top: 10px;
-        }
-        
-        .wheel-cooldown span {
-            color: #a3e635;
-            font-weight: 700;
-        }
-        
-        /* ===== ОБЩИЕ АНИМАЦИИ ДЛЯ ИГР ===== */
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        .pulse {
-            animation: pulse 1s ease-in-out infinite;
-        }
-        
-        /* ===== АДАПТИВНОСТЬ ===== */
-        @media (max-width: 480px) {
-            .games-modal {
-                padding: 20px 15px;
-                border-radius: 20px;
-            }
-            
-            .games-modal-title {
-                font-size: 22px;
-            }
-            
-            .games-tab {
-                font-size: 14px;
-                padding: 10px 14px;
-            }
-            
-            .games-button {
-                padding: 12px 18px;
-                font-size: 14px;
-                bottom: 15px;
-                right: 15px;
-            }
-            
-            .games-button .button-icon {
-                font-size: 20px;
-            }
-            
-            .runner-stats {
-                font-size: 14px;
-                flex-wrap: wrap;
-                gap: 5px;
-            }
-            
-            .runner-controls button {
-                font-size: 14px;
-                padding: 12px 16px;
-                min-width: 80px;
-            }
-            
-            .wheel-controls button {
-                font-size: 14px;
-                padding: 12px 20px;
-                min-width: 100px;
-            }
-            
-            .wheel-result {
-                font-size: 18px;
-            }
-            
-            .runner-result-popup .result-title {
-                font-size: 24px;
-            }
-            
-            .runner-result-popup .result-text {
-                font-size: 16px;
-            }
-        }
-        
-        @media (max-width: 380px) {
-            .games-tab {
-                font-size: 12px;
-                padding: 8px 10px;
-            }
-            
-            .games-button {
-                padding: 10px 14px;
-                font-size: 12px;
-                bottom: 10px;
-                right: 10px;
-            }
-            
-            .games-button .button-icon {
-                font-size: 16px;
-            }
-        }
-
-        /* ========== ОСТАЛЬНЫЕ СУЩЕСТВУЮЩИЕ СТИЛИ ========== */
-        
+        /* QR-код визитки на главном экране */
         .visitka-qr-section {
             padding: 15px 20px 25px;
             display: flex;
@@ -3535,12 +3039,570 @@
             font-weight: bold;
             color: white;
         }
+
+        /* Стили для кнопки игр */
+        .games-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #a3e635;
+            border: none;
+            color: #1e293b;
+            padding: 12px 18px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(163, 230, 53, 0.4);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .games-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Модальное окно игр */
+        .games-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .games-modal-overlay.active {
+            display: flex;
+        }
+
+        .games-modal {
+            background: #1e293b;
+            border-radius: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .games-modal-header {
+            padding: 20px 24px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+        }
+
+        .games-modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .games-modal-close {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .games-modal-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .games-tabs {
+            display: flex;
+            padding: 10px 20px 0;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .games-tab {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6);
+            flex: 1;
+        }
+
+        .games-tab.active {
+            background: rgba(163, 230, 53, 0.2);
+            color: #a3e635;
+        }
+
+        .games-tab:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .games-content {
+            padding: 20px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .game-container {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+        }
+
+        .game-container.active {
+            display: flex;
+        }
+
+        /* Стили для игры Бегунок */
+        .runner-game-area {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            touch-action: none;
+            border: 2px solid rgba(255,255,255,0.1);
+            min-height: 250px;
+        }
+
+        .runner-ground {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30%;
+            background: linear-gradient(180deg, #475569 0%, #334155 100%);
+            border-top: 3px solid #64748b;
+        }
+
+        .runner-player {
+            position: absolute;
+            bottom: 32%;
+            left: 10%;
+            font-size: 40px;
+            transition: bottom 0.1s ease;
+            z-index: 10;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+        }
+
+        .runner-player.jumping {
+            bottom: 65%;
+        }
+
+        .runner-obstacle {
+            position: absolute;
+            bottom: 32%;
+            font-size: 36px;
+            z-index: 5;
+        }
+
+        .runner-score {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .runner-score span {
+            background: rgba(0,0,0,0.5);
+            padding: 4px 12px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .runner-timer {
+            color: #fbbf24;
+        }
+
+        .runner-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .runner-controls button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .runner-start-btn {
+            background: linear-gradient(135deg, #a3e635, #84cc16);
+            color: #1e293b;
+        }
+
+        .runner-start-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .runner-restart-btn {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+            color: white;
+        }
+
+        .runner-result-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+            border-radius: 16px;
+            flex-direction: column;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .runner-result-overlay.active {
+            display: flex;
+        }
+
+        .runner-result-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #fbbf24;
+        }
+
+        .runner-result-stats {
+            font-size: 18px;
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+
+        .runner-result-reward {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1e293b;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 20px;
+            margin: 12px 0;
+            display: inline-block;
+        }
+
+        /* Стили для Колеса удачи */
+        .wheel-container {
+            position: relative;
+            width: 100%;
+            max-width: 350px;
+            margin: 0 auto;
+            aspect-ratio: 1/1;
+        }
+
+        .wheel-canvas-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+        }
+
+        #wheelCanvas {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(163, 230, 53, 0.2);
+            transition: transform 0.1s ease;
+        }
+
+        .wheel-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            z-index: 10;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+        }
+
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: #1e293b;
+            border-radius: 50%;
+            border: 3px solid #fbbf24;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            color: #fbbf24;
+            z-index: 5;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+        }
+
+        .wheel-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .wheel-spin-btn {
+            padding: 14px 40px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .wheel-spin-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+        }
+
+        .wheel-spin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .wheel-timer {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+        }
+
+        .wheel-result {
+            margin-top: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            min-height: 30px;
+        }
+
+        .wheel-result .win {
+            color: #a3e635;
+        }
+
+        .wheel-history {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .wheel-history-item {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .wheel-history-item .stars-win {
+            color: #fbbf24;
+        }
+
+        /* Адаптив */
+        @media (max-width: 500px) {
+            .games-modal {
+                max-width: 100%;
+                border-radius: 20px;
+                max-height: 95vh;
+            }
+
+            .games-modal-header {
+                padding: 16px 18px 8px;
+            }
+
+            .games-modal-title {
+                font-size: 17px;
+            }
+
+            .games-content {
+                padding: 16px 18px;
+            }
+
+            .runner-game-area {
+                height: 250px;
+                min-height: 200px;
+            }
+
+            .runner-player {
+                font-size: 32px;
+            }
+
+            .runner-obstacle {
+                font-size: 28px;
+            }
+
+            .runner-score {
+                font-size: 14px;
+            }
+
+            #wheelCanvas {
+                max-width: 300px;
+                margin: 0 auto;
+            }
+
+            .wheel-container {
+                max-width: 280px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .runner-game-area {
+                height: 200px;
+                min-height: 180px;
+            }
+
+            .runner-player {
+                font-size: 28px;
+            }
+
+            .runner-obstacle {
+                font-size: 24px;
+            }
+
+            .wheel-container {
+                max-width: 220px;
+            }
+
+            .wheel-center {
+                width: 36px;
+                height: 36px;
+                font-size: 10px;
+            }
+
+            .wheel-spin-btn {
+                font-size: 15px;
+                padding: 12px 24px;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Элементы для визуальной индикации свайпа -->
     <div class="swipe-indicator" id="swipeIndicator"></div>
     <div class="swipe-arrow" id="swipeArrow">←</div>
+
+    <!-- КНОПКА ИГР -->
+    <button class="games-button" id="gamesButton" onclick="triggerHapticFeedback(); openGamesModal();">
+        🎮 Игры
+    </button>
+
+    <!-- МОДАЛЬНОЕ ОКНО ИГР -->
+    <div class="games-modal-overlay" id="gamesModal">
+        <div class="games-modal">
+            <div class="games-modal-header">
+                <div class="games-modal-title">🎲 Мини-игры Ymeyka 🎮</div>
+                <button class="games-modal-close" onclick="triggerHapticFeedback(); closeGamesModal();">✕</button>
+            </div>
+            
+            <div class="games-tabs">
+                <button class="games-tab active" data-game="runner" onclick="switchGameTab('runner')">🏃 Бегунок</button>
+                <button class="games-tab" data-game="wheel" onclick="switchGameTab('wheel')">🎡 Колесо</button>
+            </div>
+
+            <div class="games-content">
+                <!-- Игра 1: Бегунок -->
+                <div class="game-container active" id="gameRunner">
+                    <div class="runner-game-area" id="runnerGameArea">
+                        <div class="runner-ground"></div>
+                        <div class="runner-player" id="runnerPlayer">🧱</div>
+                        <div class="runner-score">
+                            <span>⏱️ <span class="runner-timer" id="runnerTimer">30</span>с</span>
+                            <span>🏆 <span id="runnerScore">0</span></span>
+                        </div>
+                        <div class="runner-result-overlay" id="runnerResult">
+                            <div class="runner-result-title" id="resultTitle">⏰ Время вышло!</div>
+                            <div class="runner-result-stats" id="resultStats">Дистанция: 0м | Очки: 0</div>
+                            <div class="runner-result-reward" id="resultReward">⭐ +0 звёзд</div>
+                            <button class="runner-restart-btn" onclick="triggerHapticFeedback(); startRunnerGame();" style="margin-top: 12px; padding: 10px 30px; border: none; border-radius: 20px; font-weight: 700; font-size: 16px; cursor: pointer; background: #a3e635; color: #1e293b;">
+                                🔄 Играть снова
+                            </button>
+                        </div>
+                    </div>
+                    <div class="runner-controls">
+                        <button class="runner-start-btn" id="runnerStartBtn" onclick="triggerHapticFeedback(); startRunnerGame();">▶️ Старт</button>
+                    </div>
+                    <div style="font-size: 13px; color: rgba(255,255,255,0.5); text-align: center; margin-top: 4px;">
+                        👆 Нажми на поле, чтобы прыгнуть
+                    </div>
+                </div>
+
+                <!-- Игра 2: Колесо удачи -->
+                <div class="game-container" id="gameWheel">
+                    <div class="wheel-container">
+                        <div class="wheel-canvas-wrapper">
+                            <canvas id="wheelCanvas" width="400" height="400"></canvas>
+                            <div class="wheel-pointer">▼</div>
+                            <div class="wheel-center">КРУТИ</div>
+                        </div>
+                    </div>
+                    <div class="wheel-controls">
+                        <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="triggerHapticFeedback(); spinWheel();">🎡 Крутить</button>
+                        <div class="wheel-timer" id="wheelTimer">⏳ Доступно сейчас</div>
+                        <div class="wheel-result" id="wheelResult"></div>
+                        <div class="wheel-history" id="wheelHistory"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <!-- ГЛАВНЫЙ ЭКРАН (без карты) -->
@@ -3584,71 +3646,6 @@
                 <div class="visitka-qr-card" onclick="triggerHapticFeedback(); openVisitkaModal();">
                     <div id="mainScreenQRCode" class="qr-code-small"></div>
                     <div class="qr-label">Моя визитка</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== МОДАЛЬНОЕ ОКНО ИГР ===== -->
-        <div id="gamesModal" class="games-modal-overlay">
-            <div class="games-modal">
-                <button class="games-modal-close" onclick="closeGamesModal();">✕</button>
-                <div class="games-modal-title">🎲 Мини-игры Ymeyka 🎮</div>
-                
-                <!-- Вкладки -->
-                <div class="games-tabs">
-                    <button class="games-tab active" data-game="runner" onclick="switchGameTab('runner');">🏃 Бегунок</button>
-                    <button class="games-tab" data-game="wheel" onclick="switchGameTab('wheel');">🎡 Колесо удачи</button>
-                </div>
-                
-                <!-- Контент игр -->
-                <div class="games-content">
-                    <!-- Игра "Бегунок" -->
-                    <div id="runnerGame" class="game-panel active">
-                        <div class="runner-game-container">
-                            <div class="runner-stats">
-                                <span>⏱️ <span id="runnerTimer">30</span>с</span>
-                                <span>🏆 <span id="runnerScore">0</span> очков</span>
-                            </div>
-                            <div class="runner-canvas-wrapper" id="runnerCanvasWrapper">
-                                <canvas id="runnerCanvas"></canvas>
-                                <div id="runnerResultPopup" class="runner-result-popup">
-                                    <div class="result-title">🏁 Финиш!</div>
-                                    <div class="result-text" id="runnerResultText">
-                                        Ты пробежал <span class="highlight" id="runnerDistance">0</span> метров!<br>
-                                        Твой счёт: <span class="highlight" id="runnerFinalScore">0</span> очков.<br>
-                                        Награда: ⭐ <span class="highlight" id="runnerReward">0</span> звёзд
-                                    </div>
-                                    <button class="btn-close-result" onclick="closeRunnerResult();">🔄 Играть снова</button>
-                                </div>
-                            </div>
-                            <div class="runner-controls">
-                                <button class="btn-start" onclick="startRunnerGame();">▶️ Старт</button>
-                                <button class="btn-reset" onclick="resetRunnerGame();">🔄 Сброс</button>
-                            </div>
-                            <div style="text-align: center; color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 8px;">
-                                👆 Тап/клик по экрану — прыжок
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Игра "Колесо удачи" -->
-                    <div id="wheelGame" class="game-panel">
-                        <div class="wheel-game-container">
-                            <div class="wheel-wrapper">
-                                <div class="wheel-pointer">▼</div>
-                                <canvas id="wheelCanvas" width="400" height="400"></canvas>
-                            </div>
-                            <div class="wheel-result" id="wheelResult">
-                                🎡 Крутите колесо!
-                            </div>
-                            <div class="wheel-controls">
-                                <button class="btn-spin" id="spinButton" onclick="spinWheel();">🎡 Крутить</button>
-                            </div>
-                            <div class="wheel-cooldown" id="wheelCooldown">
-                                Следующий раз через: <span id="cooldownTimer">0</span>с
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -4239,12 +4236,6 @@
         </div>
     </div>
 
-    <!-- КНОПКА ВЫЗОВА ИГР -->
-    <button class="games-button" onclick="openGamesModal();">
-        <span class="button-icon">🎮</span>
-        Игры
-    </button>
-
     <!-- МОДАЛЬНОЕ ОКНО ВИЗИТКИ -->
     <div id="visitkaModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 450px;">
@@ -4607,55 +4598,199 @@
     let currentMapFilterSubcategory = null;
 
     // ========== ПЕРЕМЕННЫЕ ДЛЯ ИГР ==========
+    // Бегунок
     let runnerGameRunning = false;
     let runnerGameInterval = null;
+    let runnerObstacleInterval = null;
+    let runnerTimeLeft = 30;
     let runnerScore = 0;
-    let runnerTime = 30;
-    let runnerObstacles = [];
-    let runnerPlayerY = 0;
-    let runnerVelocity = 0;
-    let runnerGravity = 0.6;
-    let runnerJumpPower = -12;
-    let runnerGroundY = 0;
-    let runnerCanvas = null;
-    let runnerCtx = null;
-    let runnerWidth = 0;
-    let runnerHeight = 0;
-    let runnerFrameId = null;
-    let runnerObstacleTimer = 0;
-    let runnerSpeed = 4;
-    let runnerDistance = 0;
     let runnerIsJumping = false;
+    let runnerJumpCooldown = false;
+    let runnerObstacleSpeed = 3;
+    let runnerObstacles = [];
+    let runnerGameLoop = null;
+    let runnerAnimationFrame = null;
+    let runnerGameArea = null;
+    let runnerPlayerEl = null;
+    let runnerScoreEl = null;
+    let runnerTimerEl = null;
+    let runnerResultEl = null;
+    let runnerStartBtn = null;
+    let runnerGameStarted = false;
     let runnerGameEnded = false;
-    let runnerObstacleSpawnRate = 60;
-    let runnerSpawnCounter = 0;
 
-    // ========== ПЕРЕМЕННЫЕ ДЛЯ КОЛЕСА УДАЧИ ==========
-    const WHEEL_SECTORS = [
-        { label: '10', value: 10, color: '#FF6B6B' },
-        { label: '20', value: 20, color: '#4ECDC4' },
-        { label: '30', value: 30, color: '#45B7D1' },
-        { label: '40', value: 40, color: '#96CEB4' },
-        { label: '50', value: 50, color: '#FFEAA7' },
-        { label: '60', value: 60, color: '#DDA0DD' },
-        { label: '70', value: 70, color: '#FF9FF3' },
-        { label: '80', value: 80, color: '#54A0FF' },
-        { label: '90', value: 90, color: '#5F27CD' },
-        { label: '100', value: 100, color: '#FF6B6B' }
+    // Колесо удачи
+    const wheelSectors = [
+        { label: '10', value: 10, color: '#f87171' },
+        { label: '20', value: 20, color: '#fbbf24' },
+        { label: '30', value: 30, color: '#34d399' },
+        { label: '40', value: 40, color: '#60a5fa' },
+        { label: '50', value: 50, color: '#a78bfa' },
+        { label: '60', value: 60, color: '#f472b6' },
+        { label: '70', value: 70, color: '#fb923c' },
+        { label: '80', value: 80, color: '#22d3ee' },
+        { label: '90', value: 90, color: '#f87171' },
+        { label: '100', value: 100, color: '#fbbf24' },
     ];
-    const SEGMENTS = WHEEL_SECTORS.length;
-    const ARC = (2 * Math.PI) / SEGMENTS;
+    let wheelCurrentAngle = 0;
+    let wheelIsSpinning = false;
+    let wheelLastSpinTime = 0;
+    const WHEEL_COOLDOWN = 60 * 60 * 1000; // 1 час
+    let wheelHistory = [];
     let wheelCanvas = null;
     let wheelCtx = null;
-    let wheelIsSpinning = false;
-    let wheelCurrentAngle = 0;
-    let wheelSpinVelocity = 0;
-    let wheelSpinDecay = 0.985;
-    let wheelMinSpin = 0.5;
-    let wheelLastSpinTime = 0;
-    const WHEEL_COOLDOWN = 3600000; // 1 час
 
-    // ========== СУЩЕСТВУЮЩИЕ ФУНКЦИИ (без изменений) ==========
+    // ========== ФУНКЦИИ ДЛЯ ФОРМАТА РАБОТЫ ==========
+    
+    function getWorkFormatBadge(workFormat) {
+        if (!workFormat) return '';
+        let icon = '';
+        let classMod = '';
+        switch(workFormat) {
+            case 'Один': icon = '👤'; classMod = 'one'; break;
+            case 'Вдвоём': icon = '👥'; classMod = 'two'; break;
+            case 'Бригада': icon = '🏢'; classMod = 'team'; break;
+            case 'Ищу бригаду': icon = '🔍'; classMod = 'looking'; break;
+            default: icon = '👤'; classMod = 'one';
+        }
+        return `<div class="workformat-badge ${classMod}">${icon} ${workFormat}</div>`;
+    }
+    
+    function selectWorkFormat(format) {
+        console.log('🔄 Выбор формата работы (создание):', format);
+        currentWorkFormat = format;
+        document.querySelectorAll('#masterSection .workformat-option').forEach(option => {
+            option.classList.remove('selected');
+            if (option.dataset.workformat === format) {
+                option.classList.add('selected');
+            }
+        });
+    }
+    
+    function selectEditWorkFormat(format) {
+        console.log('🔄 Выбор формата работы (редактирование):', format);
+        currentEditWorkFormat = format;
+        document.querySelectorAll('#editWorkFormatSelector .workformat-option').forEach(option => {
+            option.classList.remove('selected');
+            if (option.dataset.workformat === format) {
+                option.classList.add('selected');
+            }
+        });
+    }
+
+    // ========== НОВАЯ ЛОГИКА СВАЙПА ==========
+    let swipeStartX = 0;
+    let swipeStartTime = 0;
+    const SWIPE_THRESHOLD = 50;
+    const SWIPE_MAX_TIME = 300;
+    
+    function initSwipeNavigation() {
+        const sections = document.querySelectorAll('.section');
+        
+        sections.forEach(section => {
+            section.addEventListener('touchstart', handleTouchStart, { passive: false });
+            section.addEventListener('touchmove', handleTouchMove, { passive: false });
+            section.addEventListener('touchend', handleTouchEnd, { passive: false });
+        });
+    }
+    
+    function handleTouchStart(e) {
+        const touch = e.touches[0];
+        swipeStartX = touch.clientX;
+        swipeStartTime = Date.now();
+        
+        const indicator = document.getElementById('swipeIndicator');
+        const arrow = document.getElementById('swipeArrow');
+        indicator.classList.remove('active');
+        arrow.classList.remove('active');
+    }
+    
+    function handleTouchMove(e) {
+        if (swipeStartX === 0) return;
+        
+        const touch = e.touches[0];
+        const currentX = touch.clientX;
+        const diffX = currentX - swipeStartX;
+        
+        if (diffX > 10) {
+            const indicator = document.getElementById('swipeIndicator');
+            const arrow = document.getElementById('swipeArrow');
+            indicator.classList.add('active');
+            arrow.classList.add('active');
+            
+            const opacity = Math.min(0.5, diffX / 200);
+            indicator.style.opacity = opacity;
+            
+            const scale = Math.min(1.2, 0.8 + diffX / 150);
+            arrow.style.transform = `translateY(-50%) scale(${scale})`;
+            arrow.style.opacity = Math.min(0.9, diffX / 100);
+        } else {
+            const indicator = document.getElementById('swipeIndicator');
+            const arrow = document.getElementById('swipeArrow');
+            indicator.classList.remove('active');
+            arrow.classList.remove('active');
+        }
+        
+        if (diffX > 30) {
+            e.preventDefault();
+        }
+    }
+    
+    function handleTouchEnd(e) {
+        if (swipeStartX === 0) return;
+        
+        const touchEnd = e.changedTouches[0];
+        const endX = touchEnd.clientX;
+        const diffX = endX - swipeStartX;
+        const diffTime = Date.now() - swipeStartTime;
+        
+        const indicator = document.getElementById('swipeIndicator');
+        const arrow = document.getElementById('swipeArrow');
+        indicator.classList.remove('active');
+        arrow.classList.remove('active');
+        indicator.style.opacity = '';
+        arrow.style.transform = '';
+        arrow.style.opacity = '';
+        
+        if (diffX > SWIPE_THRESHOLD && diffTime < SWIPE_MAX_TIME) {
+            triggerHapticFeedback();
+            
+            let activeSection = null;
+            const sections = ['masterSection', 'clientSection', 'profileSection', 'financeSection', 'editProfileSection', 'createDealSection', 'aboutSection'];
+            for (const sectionId of sections) {
+                const section = document.getElementById(sectionId);
+                if (section && section.style.display === 'block') {
+                    activeSection = sectionId;
+                    break;
+                }
+            }
+            
+            if (activeSection) {
+                switch (activeSection) {
+                    case 'masterSection':
+                    case 'clientSection':
+                    case 'profileSection':
+                    case 'aboutSection':
+                        showMainScreen();
+                        break;
+                    case 'financeSection':
+                    case 'editProfileSection':
+                    case 'createDealSection':
+                        showProfileSection();
+                        break;
+                    default:
+                        showMainScreen();
+                }
+            } else {
+                showMainScreen();
+            }
+        }
+        
+        swipeStartX = 0;
+        swipeStartTime = 0;
+    }
+
+    // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ХРАНИЛИЩЕМ И КЭШЕМ ==========
     
     function getLocalStorage(key) {
         try {
@@ -6624,6 +6759,7 @@
                         await preloadAllSkills();
                         loadMySkills();
                         loadProfileSkills();
+                        // Обновляем QR-код на главном экране
                         generateMainScreenQR();
                         return;
                     }
@@ -8567,406 +8703,225 @@
             console.error('❌ [Referral] Ошибка обработки реферальной ссылки:', error);
         }
     }
+    
+    // ========== ИГРЫ ==========
+    // ========== БЕГУНОК ==========
 
-    // ========== НОВЫЕ ФУНКЦИИ ДЛЯ ИГР ==========
+    function initRunnerGame() {
+        runnerGameArea = document.getElementById('runnerGameArea');
+        runnerPlayerEl = document.getElementById('runnerPlayer');
+        runnerScoreEl = document.getElementById('runnerScore');
+        runnerTimerEl = document.getElementById('runnerTimer');
+        runnerResultEl = document.getElementById('runnerResult');
+        runnerStartBtn = document.getElementById('runnerStartBtn');
 
-    // -------- ФУНКЦИИ ДЛЯ МОДАЛЬНОГО ОКНА ИГР --------
-    function openGamesModal() {
-        triggerHapticFeedback();
-        const modal = document.getElementById('gamesModal');
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        
-        // Инициализируем игры при первом открытии
-        if (!wheelCanvas) {
-            setTimeout(() => {
-                initWheelCanvas();
-                initRunnerCanvas();
-                updateCooldownDisplay();
-            }, 100);
-        } else {
-            updateCooldownDisplay();
-        }
-    }
+        if (!runnerGameArea) return;
 
-    function closeGamesModal() {
-        triggerHapticFeedback();
-        const modal = document.getElementById('gamesModal');
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-        
-        // Останавливаем игру "Бегунок", если она запущена
-        if (runnerGameRunning) {
-            stopRunnerGame();
-        }
-    }
-
-    function switchGameTab(tabName) {
-        triggerHapticFeedback();
-        
-        // Обновляем вкладки
-        document.querySelectorAll('.games-tab').forEach(tab => {
-            tab.classList.remove('active');
+        // Обработка клика/тапа для прыжка
+        runnerGameArea.addEventListener('click', (e) => {
+            if (runnerGameRunning && !runnerIsJumping && !runnerJumpCooldown) {
+                jumpRunner();
+            }
         });
-        document.querySelector(`.games-tab[data-game="${tabName}"]`).classList.add('active');
-        
-        // Обновляем панели
-        document.querySelectorAll('.game-panel').forEach(panel => {
-            panel.classList.remove('active');
-        });
-        document.getElementById(tabName + 'Game').classList.add('active');
-        
-        // Если переключаемся на колесо - обновляем canvas
-        if (tabName === 'wheel' && wheelCanvas) {
-            drawWheel();
-            updateCooldownDisplay();
-        }
-        
-        // Если переключаемся на бегунок - инициализируем canvas
-        if (tabName === 'runner') {
-            setTimeout(() => initRunnerCanvas(), 50);
-        }
+
+        runnerGameArea.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (runnerGameRunning && !runnerIsJumping && !runnerJumpCooldown) {
+                jumpRunner();
+            }
+        }, { passive: false });
+
+        // Сброс игры
+        resetRunnerGame();
+        updateRunnerUI();
     }
 
-    // ========== ИГРА "БЕГУНОК" ==========
-    function initRunnerCanvas() {
-        const wrapper = document.getElementById('runnerCanvasWrapper');
-        if (!wrapper) return;
+    function resetRunnerGame() {
+        if (runnerGameInterval) {
+            clearInterval(runnerGameInterval);
+            runnerGameInterval = null;
+        }
+        if (runnerObstacleInterval) {
+            clearInterval(runnerObstacleInterval);
+            runnerObstacleInterval = null;
+        }
+        if (runnerGameLoop) {
+            cancelAnimationFrame(runnerGameLoop);
+            runnerGameLoop = null;
+        }
         
-        const canvas = document.getElementById('runnerCanvas');
-        if (!canvas) return;
-        
-        const rect = wrapper.getBoundingClientRect();
-        const width = wrapper.clientWidth || rect.width || 300;
-        const height = wrapper.clientHeight || rect.height || 200;
-        
-        canvas.width = width * 2;
-        canvas.height = height * 2;
-        canvas.style.width = width + 'px';
-        canvas.style.height = height + 'px';
-        
-        runnerCanvas = canvas;
-        runnerCtx = canvas.getContext('2d');
-        runnerWidth = canvas.width;
-        runnerHeight = canvas.height;
-        runnerGroundY = runnerHeight * 0.85;
-        runnerPlayerY = runnerGroundY - 40;
-        runnerVelocity = 0;
-        runnerObstacles = [];
-        runnerScore = 0;
-        runnerDistance = 0;
-        runnerTime = 30;
-        runnerGameEnded = false;
         runnerGameRunning = false;
-        runnerObstacleTimer = 0;
-        runnerSpeed = 4;
+        runnerGameStarted = false;
+        runnerGameEnded = false;
+        runnerTimeLeft = 30;
+        runnerScore = 0;
         runnerIsJumping = false;
-        runnerSpawnCounter = 0;
-        runnerObstacleSpawnRate = 55;
-        
-        drawRunnerGame();
+        runnerJumpCooldown = false;
+        runnerObstacleSpeed = 3;
+        runnerObstacles = [];
+
+        // Удаляем все препятствия
+        document.querySelectorAll('.runner-obstacle').forEach(el => el.remove());
+
+        // Сбрасываем позицию игрока
+        if (runnerPlayerEl) {
+            runnerPlayerEl.classList.remove('jumping');
+            runnerPlayerEl.style.bottom = '32%';
+        }
+
+        // Скрываем результат
+        if (runnerResultEl) {
+            runnerResultEl.classList.remove('active');
+        }
+
+        updateRunnerUI();
+
+        if (runnerStartBtn) {
+            runnerStartBtn.textContent = '▶️ Старт';
+            runnerStartBtn.disabled = false;
+        }
     }
 
-    function drawRunnerGame() {
-        if (!runnerCtx || !runnerCanvas) return;
-        
-        const ctx = runnerCtx;
-        const w = runnerWidth;
-        const h = runnerHeight;
-        
-        // Очистка
-        ctx.clearRect(0, 0, w, h);
-        
-        // Небо
-        const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
-        skyGrad.addColorStop(0, '#0a1628');
-        skyGrad.addColorStop(0.6, '#1a3a5c');
-        ctx.fillStyle = skyGrad;
-        ctx.fillRect(0, 0, w, h);
-        
-        // Звёзды на небе
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
-        for (let i = 0; i < 30; i++) {
-            const x = (i * 137 + i * i * 13) % w;
-            const y = (i * 89 + i * 7) % (h * 0.6);
-            const size = 1 + (i % 3);
-            ctx.beginPath();
-            ctx.arc(x, y, size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        
-        // Земля
-        const groundGrad = ctx.createLinearGradient(0, runnerGroundY, 0, h);
-        groundGrad.addColorStop(0, '#2d5016');
-        groundGrad.addColorStop(1, '#1a3a0a');
-        ctx.fillStyle = groundGrad;
-        ctx.fillRect(0, runnerGroundY, w, h - runnerGroundY);
-        
-        // Линия земли
-        ctx.strokeStyle = '#4a8c2a';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(0, runnerGroundY);
-        ctx.lineTo(w, runnerGroundY);
-        ctx.stroke();
-        
-        // Трава (декоративная)
-        ctx.strokeStyle = '#3d7a22';
-        ctx.lineWidth = 2;
-        for (let x = 0; x < w; x += 15) {
-            const offset = Math.sin(x * 0.05 + Date.now() * 0.001) * 3;
-            ctx.beginPath();
-            ctx.moveTo(x, runnerGroundY);
-            ctx.lineTo(x + 5, runnerGroundY - 12 + offset);
-            ctx.stroke();
-        }
-        
-        // Препятствия
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.shadowBlur = 10;
-        runnerObstacles.forEach(obs => {
-            if (obs.type === 'box') {
-                // Ящик
-                ctx.fillStyle = '#8B4513';
-                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-                ctx.fillStyle = '#A0522D';
-                ctx.fillRect(obs.x + 5, obs.y + 5, obs.width - 10, 5);
-                ctx.fillRect(obs.x + 5, obs.y + obs.height - 10, obs.width - 10, 5);
-                ctx.fillRect(obs.x + 5, obs.y + obs.height/2 - 3, obs.width - 10, 6);
-            } else if (obs.type === 'spike') {
-                // Шип
-                ctx.fillStyle = '#cc3333';
-                ctx.beginPath();
-                ctx.moveTo(obs.x + obs.width/2, obs.y - obs.height);
-                ctx.lineTo(obs.x, obs.y);
-                ctx.lineTo(obs.x + obs.width, obs.y);
-                ctx.closePath();
-                ctx.fill();
-                ctx.fillStyle = '#ff4444';
-                ctx.beginPath();
-                ctx.moveTo(obs.x + obs.width/2, obs.y - obs.height * 0.6);
-                ctx.lineTo(obs.x + obs.width * 0.25, obs.y - obs.height * 0.2);
-                ctx.lineTo(obs.x + obs.width * 0.75, obs.y - obs.height * 0.2);
-                ctx.closePath();
-                ctx.fill();
-            }
-        });
-        ctx.shadowBlur = 0;
-        
-        // Персонаж (мастер)
-        const playerX = 80;
-        const playerY = runnerPlayerY;
-        const size = 28;
-        
-        // Тень
-        ctx.fillStyle = 'rgba(0,0,0,0.2)';
-        ctx.beginPath();
-        ctx.ellipse(playerX + size/2, runnerGroundY + 4, size/2, 6, 0, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Тело
-        const bodyGrad = ctx.createRadialGradient(
-            playerX + size/2 - 5, playerY + 5, 5,
-            playerX + size/2, playerY + size/2, size
-        );
-        bodyGrad.addColorStop(0, '#4a9eff');
-        bodyGrad.addColorStop(1, '#1a6bc4');
-        ctx.fillStyle = bodyGrad;
-        ctx.shadowColor = 'rgba(74, 158, 255, 0.3)';
-        ctx.shadowBlur = 15;
-        
-        // Круглое тело
-        ctx.beginPath();
-        ctx.arc(playerX + size/2, playerY + size/2, size/2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        
-        // Лицо
-        ctx.fillStyle = '#FFD700';
-        ctx.beginPath();
-        ctx.arc(playerX + size/2 - 6, playerY + size/2 - 4, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(playerX + size/2 + 6, playerY + size/2 - 4, 4, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Глаза
-        ctx.fillStyle = '#1a1a2e';
-        ctx.beginPath();
-        ctx.arc(playerX + size/2 - 4, playerY + size/2 - 2, 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(playerX + size/2 + 8, playerY + size/2 - 2, 2, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Улыбка
-        ctx.strokeStyle = '#1a1a2e';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(playerX + size/2, playerY + size/2 + 4, 8, 0.1 * Math.PI, 0.9 * Math.PI);
-        ctx.stroke();
-        
-        // Инструмент (отвёртка)
-        ctx.fillStyle = '#666';
-        ctx.fillRect(playerX + size + 2, playerY + 4, 12, 4);
-        ctx.fillStyle = '#ff6600';
-        ctx.fillRect(playerX + size + 14, playerY + 2, 4, 8);
-        
-        // Ноги (если бежит)
-        if (runnerGameRunning && !runnerIsJumping) {
-            const legOffset = Math.sin(Date.now() * 0.02) * 4;
-            ctx.fillStyle = '#2d5016';
-            ctx.fillRect(playerX + 4, runnerGroundY - 4, 6, 4 + legOffset);
-            ctx.fillRect(playerX + size - 10, runnerGroundY - 4, 6, 4 - legOffset);
-        } else {
-            ctx.fillStyle = '#2d5016';
-            ctx.fillRect(playerX + 4, runnerGroundY - 4, 6, 4);
-            ctx.fillRect(playerX + size - 10, runnerGroundY - 4, 6, 4);
-        }
-        
-        // "Мастер на все руки" над персонажем
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        ctx.font = '12px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('🔧 Мастер', playerX + size/2, playerY - 12);
-        
-        // Обновление счётчика на UI
-        document.getElementById('runnerScore').textContent = runnerScore;
-        document.getElementById('runnerTimer').textContent = Math.ceil(runnerTime);
-    }
-
-    function spawnObstacle() {
-        const w = runnerWidth;
-        const groundY = runnerGroundY;
-        const type = Math.random() > 0.5 ? 'box' : 'spike';
-        const width = type === 'box' ? 25 + Math.random() * 20 : 20 + Math.random() * 15;
-        const height = type === 'box' ? 25 + Math.random() * 15 : 25 + Math.random() * 10;
-        
-        runnerObstacles.push({
-            x: w,
-            y: groundY - height,
-            width: width,
-            height: height,
-            type: type
-        });
-    }
-
-    function updateRunnerGame() {
-        if (!runnerGameRunning || runnerGameEnded) return;
-        
-        // Обновление времени
-        runnerTime -= 1/60;
-        document.getElementById('runnerTimer').textContent = Math.ceil(Math.max(0, runnerTime));
-        
-        // Проверка окончания игры
-        if (runnerTime <= 0) {
-            endRunnerGame();
-            return;
-        }
-        
-        // Физика прыжка
-        if (runnerIsJumping) {
-            runnerVelocity += runnerGravity;
-            runnerPlayerY += runnerVelocity;
-            
-            if (runnerPlayerY >= runnerGroundY - 40) {
-                runnerPlayerY = runnerGroundY - 40;
-                runnerVelocity = 0;
-                runnerIsJumping = false;
-            }
-        }
-        
-        // Спавн препятствий
-        runnerSpawnCounter++;
-        const spawnRate = Math.max(25, runnerObstacleSpawnRate - runnerScore * 0.5);
-        if (runnerSpawnCounter >= spawnRate) {
-            spawnObstacle();
-            runnerSpawnCounter = 0;
-            runnerObstacleSpawnRate = Math.max(30, runnerObstacleSpawnRate - 0.3);
-        }
-        
-        // Движение препятствий
-        const speed = runnerSpeed + runnerScore * 0.02;
-        for (let i = runnerObstacles.length - 1; i >= 0; i--) {
-            const obs = runnerObstacles[i];
-            obs.x -= speed;
-            
-            // Удаление за пределами экрана
-            if (obs.x + obs.width < 0) {
-                runnerObstacles.splice(i, 1);
-                runnerScore++;
-                runnerDistance += 5;
-                document.getElementById('runnerScore').textContent = runnerScore;
-                continue;
-            }
-            
-            // Проверка столкновения
-            const playerX = 80;
-            const playerSize = 28;
-            if (obs.x < playerX + playerSize && 
-                obs.x + obs.width > playerX &&
-                obs.y < runnerPlayerY + playerSize &&
-                obs.y + obs.height > runnerPlayerY) {
-                // Столкновение!
-                endRunnerGame();
-                return;
-            }
-        }
-        
-        // Увеличение скорости со временем
-        runnerSpeed += 0.005;
-        
-        // Рисуем игру
-        drawRunnerGame();
-        
-        // Продолжаем цикл
-        runnerFrameId = requestAnimationFrame(updateRunnerGame);
-    }
-
-    function handleRunnerJump() {
-        if (!runnerGameRunning || runnerGameEnded) return;
-        if (runnerIsJumping) return;
+    function jumpRunner() {
+        if (!runnerPlayerEl || runnerIsJumping || runnerJumpCooldown) return;
         
         runnerIsJumping = true;
-        runnerVelocity = runnerJumpPower;
-        triggerHapticFeedback();
+        runnerPlayerEl.classList.add('jumping');
+        
+        // Анимация прыжка
+        setTimeout(() => {
+            if (runnerPlayerEl) {
+                runnerPlayerEl.classList.remove('jumping');
+                runnerPlayerEl.style.bottom = '32%';
+            }
+            runnerIsJumping = false;
+            runnerJumpCooldown = true;
+            
+            setTimeout(() => {
+                runnerJumpCooldown = false;
+            }, 200);
+        }, 300);
+    }
+
+    function updateRunnerUI() {
+        if (runnerTimerEl) runnerTimerEl.textContent = Math.ceil(runnerTimeLeft);
+        if (runnerScoreEl) runnerScoreEl.textContent = runnerScore;
+    }
+
+    function createRunnerObstacle() {
+        if (!runnerGameRunning || runnerGameEnded) return;
+        
+        const obstacle = document.createElement('div');
+        obstacle.className = 'runner-obstacle';
+        // Используем эмодзи препятствий
+        const obstacles = ['📦', '🪣', '🧰', '🪚', '🔨'];
+        obstacle.textContent = obstacles[Math.floor(Math.random() * obstacles.length)];
+        obstacle.style.right = '-40px';
+        // Разная высота препятствий для разнообразия
+        const bottomPositions = ['32%', '28%', '35%', '30%'];
+        obstacle.style.bottom = bottomPositions[Math.floor(Math.random() * bottomPositions.length)];
+        obstacle.dataset.x = runnerGameArea.offsetWidth;
+        
+        runnerGameArea.appendChild(obstacle);
+        runnerObstacles.push(obstacle);
     }
 
     function startRunnerGame() {
         if (runnerGameRunning) return;
         
-        // Сброс
-        runnerScore = 0;
-        runnerTime = 30;
-        runnerDistance = 0;
-        runnerSpeed = 4;
-        runnerObstacles = [];
-        runnerGameEnded = false;
-        runnerIsJumping = false;
-        runnerPlayerY = runnerGroundY - 40;
-        runnerVelocity = 0;
-        runnerSpawnCounter = 0;
-        runnerObstacleSpawnRate = 55;
-        
-        document.getElementById('runnerScore').textContent = '0';
-        document.getElementById('runnerTimer').textContent = '30';
-        document.getElementById('runnerResultPopup').classList.remove('show');
-        
+        resetRunnerGame();
         runnerGameRunning = true;
-        drawRunnerGame();
+        runnerGameStarted = true;
+        runnerGameEnded = false;
+        runnerTimeLeft = 30;
+        runnerScore = 0;
+        runnerObstacleSpeed = 3;
         
-        if (runnerFrameId) cancelAnimationFrame(runnerFrameId);
-        updateRunnerGame();
-        
-        showNotification('🏃 Беги! Тапай по экрану для прыжка!');
-    }
-
-    function stopRunnerGame() {
-        runnerGameRunning = false;
-        if (runnerFrameId) {
-            cancelAnimationFrame(runnerFrameId);
-            runnerFrameId = null;
+        if (runnerStartBtn) {
+            runnerStartBtn.textContent = '🏃 Бежим...';
+            runnerStartBtn.disabled = true;
         }
+        
+        if (runnerResultEl) {
+            runnerResultEl.classList.remove('active');
+        }
+        
+        updateRunnerUI();
+
+        // Таймер обратного отсчета
+        runnerGameInterval = setInterval(() => {
+            runnerTimeLeft -= 0.1;
+            if (runnerTimerEl) {
+                runnerTimerEl.textContent = Math.ceil(runnerTimeLeft);
+            }
+            
+            // Увеличиваем скорость со временем
+            if (runnerTimeLeft < 20) runnerObstacleSpeed = 4;
+            if (runnerTimeLeft < 10) runnerObstacleSpeed = 5;
+            
+            if (runnerTimeLeft <= 0) {
+                endRunnerGame();
+            }
+        }, 100);
+
+        // Генерация препятствий
+        runnerObstacleInterval = setInterval(() => {
+            if (runnerGameRunning && !runnerGameEnded) {
+                createRunnerObstacle();
+            }
+        }, 1200);
+
+        // Основной игровой цикл
+        function gameLoop() {
+            if (!runnerGameRunning || runnerGameEnded) {
+                runnerGameLoop = null;
+                return;
+            }
+            
+            // Двигаем препятствия
+            const obstaclesToRemove = [];
+            runnerObstacles.forEach((obstacle, index) => {
+                let x = parseFloat(obstacle.dataset.x) || runnerGameArea.offsetWidth;
+                x -= runnerObstacleSpeed;
+                obstacle.dataset.x = x;
+                obstacle.style.right = (runnerGameArea.offsetWidth - x) + 'px';
+                
+                // Проверка столкновения
+                if (x < 60 && x > 20 && !runnerIsJumping) {
+                    // Проверка высоты
+                    const playerBottom = runnerPlayerEl.style.bottom || '32%';
+                    const obstacleBottom = obstacle.style.bottom || '32%';
+                    const playerBottomNum = parseFloat(playerBottom);
+                    const obstacleBottomNum = parseFloat(obstacleBottom);
+                    
+                    if (Math.abs(playerBottomNum - obstacleBottomNum) < 10) {
+                        // Столкновение - заканчиваем игру
+                        endRunnerGame();
+                        return;
+                    }
+                }
+                
+                if (x < -50) {
+                    // Препятствие ушло за экран - начисляем очки
+                    runnerScore += 1;
+                    if (runnerScoreEl) runnerScoreEl.textContent = runnerScore;
+                    obstaclesToRemove.push(index);
+                }
+            });
+            
+            // Удаляем ушедшие препятствия
+            obstaclesToRemove.sort((a, b) => b - a).forEach(index => {
+                const obstacle = runnerObstacles[index];
+                if (obstacle && obstacle.parentNode) {
+                    obstacle.remove();
+                }
+                runnerObstacles.splice(index, 1);
+            });
+            
+            runnerGameLoop = requestAnimationFrame(gameLoop);
+        }
+        
+        runnerGameLoop = requestAnimationFrame(gameLoop);
     }
 
     function endRunnerGame() {
@@ -8974,203 +8929,222 @@
         runnerGameEnded = true;
         runnerGameRunning = false;
         
-        if (runnerFrameId) {
-            cancelAnimationFrame(runnerFrameId);
-            runnerFrameId = null;
+        if (runnerGameInterval) {
+            clearInterval(runnerGameInterval);
+            runnerGameInterval = null;
+        }
+        if (runnerObstacleInterval) {
+            clearInterval(runnerObstacleInterval);
+            runnerObstacleInterval = null;
+        }
+        if (runnerGameLoop) {
+            cancelAnimationFrame(runnerGameLoop);
+            runnerGameLoop = null;
         }
         
-        // Расчёт награды
-        const reward = Math.min(5, Math.floor(runnerScore / 10));
+        // Начисление звезд
+        let starsEarned = Math.floor(runnerScore / 10);
+        if (starsEarned > 5) starsEarned = 5;
+        
+        // Добавляем звезды в профиль пользователя
+        if (starsEarned > 0) {
+            addStarsToUser(starsEarned);
+        }
         
         // Показываем результат
-        document.getElementById('runnerDistance').textContent = Math.floor(runnerDistance);
-        document.getElementById('runnerFinalScore').textContent = runnerScore;
-        document.getElementById('runnerReward').textContent = reward;
-        document.getElementById('runnerResultPopup').classList.add('show');
-        
-        // Добавляем звёзды
-        if (reward > 0) {
-            addStarsToProfile(reward);
-            showNotification(`⭐ +${reward} звёзд за игру!`);
-        } else {
-            showNotification('😅 Попробуй ещё раз!');
+        if (runnerResultEl) {
+            runnerResultEl.classList.add('active');
+            document.getElementById('resultTitle').textContent = '🏁 Финиш!';
+            document.getElementById('resultStats').textContent = `Дистанция: ${runnerScore}м | Очки: ${runnerScore}`;
+            document.getElementById('resultReward').textContent = `⭐ +${starsEarned} звёзд${starsEarned !== 1 ? 'ы' : ''}`;
         }
         
-        triggerHapticFeedback();
-    }
-
-    function closeRunnerResult() {
-        document.getElementById('runnerResultPopup').classList.remove('show');
-        resetRunnerGame();
-    }
-
-    function resetRunnerGame() {
-        stopRunnerGame();
-        runnerScore = 0;
-        runnerTime = 30;
-        runnerDistance = 0;
-        runnerSpeed = 4;
+        if (runnerStartBtn) {
+            runnerStartBtn.textContent = '🔄 Играть снова';
+            runnerStartBtn.disabled = false;
+            runnerStartBtn.onclick = () => {
+                triggerHapticFeedback();
+                resetRunnerGame();
+                startRunnerGame();
+            };
+        }
+        
+        // Удаляем оставшиеся препятствия
+        document.querySelectorAll('.runner-obstacle').forEach(el => el.remove());
         runnerObstacles = [];
-        runnerGameEnded = false;
-        runnerIsJumping = false;
-        runnerPlayerY = runnerGroundY - 40;
-        runnerVelocity = 0;
-        runnerSpawnCounter = 0;
-        runnerObstacleSpawnRate = 55;
         
-        document.getElementById('runnerScore').textContent = '0';
-        document.getElementById('runnerTimer').textContent = '30';
-        document.getElementById('runnerResultPopup').classList.remove('show');
-        
-        drawRunnerGame();
+        showNotification(`🏁 Игра завершена! Заработано ${starsEarned} ⭐!`);
     }
 
-    // ========== ИГРА "КОЛЕСО УДАЧИ" ==========
-    function initWheelCanvas() {
-        const canvas = document.getElementById('wheelCanvas');
-        if (!canvas) return;
-        wheelCanvas = canvas;
-        wheelCtx = canvas.getContext('2d');
+    // ========== КОЛЕСО УДАЧИ ==========
+
+    function initWheelGame() {
+        wheelCanvas = document.getElementById('wheelCanvas');
+        if (!wheelCanvas) return;
+        wheelCtx = wheelCanvas.getContext('2d');
         
-        // Устанавливаем размеры
-        const rect = canvas.parentElement.getBoundingClientRect();
-        const size = Math.min(rect.width || 400, 400);
-        canvas.width = size;
-        canvas.height = size;
+        // Загружаем историю
+        const savedHistory = getLocalStorage(`wheel_history_${currentUserId}`);
+        if (savedHistory && Array.isArray(savedHistory)) {
+            wheelHistory = savedHistory;
+        }
         
         drawWheel();
+        updateWheelUI();
     }
 
-    function drawWheel(angle = wheelCurrentAngle) {
+    function drawWheel(angle = null) {
         if (!wheelCtx || !wheelCanvas) return;
         
         const ctx = wheelCtx;
-        const w = wheelCanvas.width;
-        const h = wheelCanvas.height;
-        const centerX = w / 2;
-        const centerY = h / 2;
-        const radius = Math.min(w, h) / 2 - 10;
+        const canvas = wheelCanvas;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const radius = canvas.width / 2 - 10;
+        const sectorAngle = (2 * Math.PI) / wheelSectors.length;
         
-        ctx.clearRect(0, 0, w, h);
-        
-        // Тень
-        ctx.shadowColor = 'rgba(132, 204, 22, 0.3)';
-        ctx.shadowBlur = 30;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         // Рисуем сектора
-        const segmentAngle = (2 * Math.PI) / SEGMENTS;
+        const currentAngle = angle !== null ? angle : wheelCurrentAngle;
         
-        for (let i = 0; i < SEGMENTS; i++) {
-            const startAngle = i * segmentAngle + angle;
-            const endAngle = startAngle + segmentAngle;
+        wheelSectors.forEach((sector, index) => {
+            const startAngle = currentAngle + index * sectorAngle;
+            const endAngle = startAngle + sectorAngle;
             
-            // Заливка сектора
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
             ctx.arc(centerX, centerY, radius, startAngle, endAngle);
             ctx.closePath();
-            ctx.fillStyle = WHEEL_SECTORS[i].color;
+            
+            // Цвет с градиентом для красоты
+            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+            gradient.addColorStop(0, lightenColor(sector.color, 30));
+            gradient.addColorStop(1, sector.color);
+            ctx.fillStyle = gradient;
             ctx.fill();
+            
             ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            
-            // Текст на секторе
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate(startAngle + segmentAngle / 2);
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillStyle = '#1a1a2e';
-            ctx.font = 'bold 18px sans-serif';
-            ctx.shadowBlur = 0;
-            
-            const textRadius = radius * 0.7;
-            ctx.fillText(WHEEL_SECTORS[i].label + '⭐', textRadius, 0);
-            ctx.restore();
-            
-            // Разделительные линии
-            ctx.shadowBlur = 0;
-            ctx.beginPath();
-            ctx.moveTo(centerX, centerY);
-            ctx.lineTo(centerX + radius * Math.cos(startAngle), centerY + radius * Math.sin(startAngle));
-            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
             ctx.lineWidth = 2;
             ctx.stroke();
+            
+            // Текст
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(startAngle + sectorAngle / 2);
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.shadowColor = 'rgba(0,0,0,0.5)';
+            ctx.shadowBlur = 8;
+            ctx.fillText(sector.label, radius * 0.6, 0);
+            ctx.restore();
+        });
+        
+        // Внешнее кольцо
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        
+        // Внутренний круг
+        const innerGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 20);
+        innerGradient.addColorStop(0, '#fbbf24');
+        innerGradient.addColorStop(1, '#d97706');
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
+        ctx.fillStyle = innerGradient;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    function lightenColor(hex, percent) {
+        const num = parseInt(hex.replace('#', ''), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = Math.min(255, (num >> 16) + amt);
+        const G = Math.min(255, (num >> 8 & 0x00FF) + amt);
+        const B = Math.min(255, (num & 0x0000FF) + amt);
+        return `#${(1 << 24 | R << 16 | G << 8 | B).toString(16).slice(1)}`;
+    }
+
+    function updateWheelUI() {
+        const now = Date.now();
+        const timeSinceLastSpin = now - wheelLastSpinTime;
+        const canSpin = timeSinceLastSpin >= WHEEL_COOLDOWN;
+        
+        const spinBtn = document.getElementById('wheelSpinBtn');
+        const timerEl = document.getElementById('wheelTimer');
+        
+        if (spinBtn) {
+            spinBtn.disabled = wheelIsSpinning || !canSpin;
         }
         
-        // Центральный круг
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = 'rgba(132, 204, 22, 0.3)';
-        const gradient = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, 30);
-        gradient.addColorStop(0, '#a3e635');
-        gradient.addColorStop(1, '#84cc16');
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 3;
-        ctx.stroke();
+        if (timerEl) {
+            if (canSpin) {
+                timerEl.textContent = '✅ Доступно сейчас';
+                timerEl.style.color = '#a3e635';
+            } else {
+                const remaining = WHEEL_COOLDOWN - timeSinceLastSpin;
+                const hours = Math.floor(remaining / (60 * 60 * 1000));
+                const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+                const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
+                timerEl.textContent = `⏳ Доступно через ${hours}ч ${minutes}м ${seconds}с`;
+                timerEl.style.color = 'rgba(255,255,255,0.7)';
+            }
+        }
         
-        // Текст в центре
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#1a1a2e';
-        ctx.font = 'bold 14px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🎡', centerX, centerY);
-        
-        // Внешний обод
-        ctx.shadowBlur = 0;
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        
-        // Кружочки по краям
-        for (let i = 0; i < SEGMENTS; i++) {
-            const dotAngle = i * segmentAngle + angle + segmentAngle / 2;
-            const dotX = centerX + radius * Math.cos(dotAngle);
-            const dotY = centerY + radius * Math.sin(dotAngle);
-            ctx.beginPath();
-            ctx.arc(dotX, dotY, 5, 0, Math.PI * 2);
-            ctx.fillStyle = 'white';
-            ctx.fill();
+        // Обновляем историю
+        const historyEl = document.getElementById('wheelHistory');
+        if (historyEl) {
+            if (wheelHistory.length === 0) {
+                historyEl.innerHTML = '';
+            } else {
+                historyEl.innerHTML = wheelHistory.slice(-5).map(item => 
+                    `<span class="wheel-history-item">🎡 ${item.value}⭐</span>`
+                ).join('');
+            }
         }
     }
 
     function spinWheel() {
         if (wheelIsSpinning) return;
         
-        // Проверка кулдауна
         const now = Date.now();
         if (now - wheelLastSpinTime < WHEEL_COOLDOWN) {
-            const remaining = Math.ceil((WHEEL_COOLDOWN - (now - wheelLastSpinTime)) / 1000);
-            showNotification(`⏳ Подождите ${remaining} секунд до следующего вращения`);
+            showNotification('⏳ Подождите, колесо перезаряжается!');
             return;
         }
         
         triggerHapticFeedback();
         wheelIsSpinning = true;
-        document.getElementById('spinButton').disabled = true;
-        document.getElementById('wheelResult').innerHTML = '🌀 Крутим...';
+        const spinBtn = document.getElementById('wheelSpinBtn');
+        if (spinBtn) spinBtn.disabled = true;
+        document.getElementById('wheelResult').innerHTML = '';
         
-        // Случайная скорость и угол
-        const spins = 5 + Math.random() * 5;
-        const targetAngle = Math.random() * 2 * Math.PI;
-        const totalRotation = spins * 2 * Math.PI + targetAngle;
+        // Случайный сектор
+        const winIndex = Math.floor(Math.random() * wheelSectors.length);
+        const winValue = wheelSectors[winIndex].value;
         
+        // Расчет угла остановки (чтобы сектор оказался под указателем)
+        const sectorAngle = (2 * Math.PI) / wheelSectors.length;
+        const targetAngle = -(winIndex * sectorAngle + sectorAngle / 2);
+        
+        // Добавляем несколько полных оборотов для анимации
+        const fullRotations = 5 + Math.floor(Math.random() * 3);
+        const totalRotation = fullRotations * 2 * Math.PI + targetAngle;
         const startAngle = wheelCurrentAngle;
-        const duration = 4000 + Math.random() * 2000;
-        const startTime = Date.now();
+        const duration = 4000 + Math.random() * 1500;
+        const startTime = performance.now();
         
-        function animateSpin() {
-            const elapsed = Date.now() - startTime;
+        function animateSpin(time) {
+            const elapsed = time - startTime;
             const progress = Math.min(elapsed / duration, 1);
             
-            // Easing
+            // Easing функция (замедление в конце)
             const eased = 1 - Math.pow(1 - progress, 3);
             const currentAngle = startAngle + totalRotation * eased;
             
@@ -9180,262 +9154,108 @@
             if (progress < 1) {
                 requestAnimationFrame(animateSpin);
             } else {
-                wheelCurrentAngle = currentAngle;
+                // Завершение вращения
                 wheelIsSpinning = false;
-                document.getElementById('spinButton').disabled = false;
                 wheelLastSpinTime = Date.now();
                 
-                // Определяем выигрыш
-                const normalizedAngle = ((currentAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-                const sectorIndex = Math.floor((2 * Math.PI - normalizedAngle) / ARC) % SEGMENTS;
-                const winValue = WHEEL_SECTORS[sectorIndex].value;
+                // Сохраняем результат
+                wheelHistory.push({ value: winValue, timestamp: Date.now() });
+                if (wheelHistory.length > 20) wheelHistory = wheelHistory.slice(-20);
+                setLocalStorage(`wheel_history_${currentUserId}`, wheelHistory);
+                
+                // Начисляем звезды
+                addStarsToUser(winValue);
                 
                 // Показываем результат
-                document.getElementById('wheelResult').innerHTML = `
-                    🎉 Вы выиграли <span class="win-amount">${winValue}</span> ⭐!
-                `;
+                const resultEl = document.getElementById('wheelResult');
+                resultEl.innerHTML = `🎉 <span class="win">Выиграно ${winValue} ⭐!</span>`;
                 
-                // Добавляем звёзды
-                addStarsToProfile(winValue);
-                showNotification(`⭐ +${winValue} звёзд!`);
-                triggerHapticFeedback();
-                
-                // Обновляем кулдаун
-                updateCooldownDisplay();
+                if (spinBtn) spinBtn.disabled = false;
+                updateWheelUI();
+                showNotification(`🎡 Колесо удачи: +${winValue} ⭐!`);
             }
         }
         
-        animateSpin();
+        requestAnimationFrame(animateSpin);
     }
 
-    function updateCooldownDisplay() {
-        const now = Date.now();
-        const elapsed = now - wheelLastSpinTime;
-        const remaining = Math.max(0, Math.ceil((WHEEL_COOLDOWN - elapsed) / 1000));
+    // ========== ОБЩИЕ ФУНКЦИИ ДЛЯ ИГР ==========
+
+    function addStarsToUser(starsAmount) {
+        if (!currentUserId || starsAmount <= 0) return;
         
-        const cooldownElement = document.getElementById('cooldownTimer');
-        const cooldownContainer = document.getElementById('wheelCooldown');
+        const key = `stars_${currentUserId}`;
+        let currentStars = getLocalStorage(key) || 0;
+        currentStars += starsAmount;
+        setLocalStorage(key, currentStars);
         
-        if (cooldownElement) {
-            cooldownElement.textContent = remaining;
-        }
+        // Также обновляем в профиле пользователя
+        const userData = getOrCreateUserProfile(currentUserId);
+        userData.stars = (userData.stars || 0) + starsAmount;
+        setLocalStorage(`user_${currentUserId}`, userData);
         
-        if (cooldownContainer) {
-            if (remaining > 0) {
-                cooldownContainer.style.display = 'block';
-                if (remaining < 60) {
-                    cooldownElement.style.color = '#f56565';
-                } else {
-                    cooldownElement.style.color = '#a3e635';
-                }
-            } else {
-                cooldownContainer.style.display = 'none';
-            }
-        }
+        console.log(`⭐ Добавлено ${starsAmount} звёзд. Всего: ${currentStars}`);
         
-        // Если игра активна и модалка открыта, обновляем каждую секунду
+        // Обновляем UI статистики
+        loadUserProfile();
+    }
+
+    function getTotalStars() {
+        const key = `stars_${currentUserId}`;
+        return getLocalStorage(key) || 0;
+    }
+
+    // ========== МОДАЛЬНОЕ ОКНО ИГР ==========
+
+    function openGamesModal() {
+        triggerHapticFeedback();
         const modal = document.getElementById('gamesModal');
-        if (modal.classList.contains('active')) {
-            setTimeout(updateCooldownDisplay, 1000);
-        }
-    }
-
-    // ========== ОБЩАЯ ФУНКЦИЯ ДЛЯ ДОБАВЛЕНИЯ ЗВЁЗД ==========
-    function addStarsToProfile(amount) {
-        if (!currentUserId || amount <= 0) return;
+        modal.classList.add('active');
         
-        try {
-            // Используем существующую систему звёзд из реферальной программы
-            const referralData = getReferralData();
-            referralData.starsEarned = (referralData.starsEarned || 0) + amount;
-            saveReferralData(referralData);
-            
-            // Обновляем профиль пользователя
-            const userData = getOrCreateUserProfile(currentUserId);
-            userData.stars = (userData.stars || 0) + amount;
-            setLocalStorage(`user_${currentUserId}`, userData);
-            
-            // Обновляем интерфейс, если открыт профиль
-            if (document.getElementById('profileSection').style.display === 'block') {
-                loadUserProfile();
-            }
-            
-            console.log(`⭐ Добавлено ${amount} звёзд пользователю ${currentUserId}`);
-        } catch (error) {
-            console.error('❌ Ошибка добавления звёзд:', error);
-        }
-    }
-
-    // ========== ОБРАБОТЧИКИ СОБЫТИЙ ДЛЯ ИГР ==========
-    function setupGameEventListeners() {
-        // Клик/тап по области игры "Бегунок" для прыжка
-        const canvasWrapper = document.getElementById('runnerCanvasWrapper');
-        if (canvasWrapper) {
-            canvasWrapper.addEventListener('click', (e) => {
-                e.preventDefault();
-                handleRunnerJump();
-            });
-            canvasWrapper.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                handleRunnerJump();
-            }, { passive: false });
-        }
+        // Инициализируем игры при открытии
+        initRunnerGame();
+        initWheelGame();
         
-        // Кнопка "Крутить" для колеса
-        const spinButton = document.getElementById('spinButton');
-        if (spinButton) {
-            spinButton.addEventListener('click', spinWheel);
+        // Обновляем UI колеса
+        updateWheelUI();
+    }
+
+    function closeGamesModal() {
+        triggerHapticFeedback();
+        const modal = document.getElementById('gamesModal');
+        modal.classList.remove('active');
+        
+        // Останавливаем игру, если она запущена
+        if (runnerGameRunning) {
+            endRunnerGame();
         }
     }
 
-    // ========== ФУНКЦИИ ДЛЯ ФОРМАТА РАБОТЫ ==========
-    
-    function getWorkFormatBadge(workFormat) {
-        if (!workFormat) return '';
-        let icon = '';
-        let classMod = '';
-        switch(workFormat) {
-            case 'Один': icon = '👤'; classMod = 'one'; break;
-            case 'Вдвоём': icon = '👥'; classMod = 'two'; break;
-            case 'Бригада': icon = '🏢'; classMod = 'team'; break;
-            case 'Ищу бригаду': icon = '🔍'; classMod = 'looking'; break;
-            default: icon = '👤'; classMod = 'one';
-        }
-        return `<div class="workformat-badge ${classMod}">${icon} ${workFormat}</div>`;
-    }
-    
-    function selectWorkFormat(format) {
-        console.log('🔄 Выбор формата работы (создание):', format);
-        currentWorkFormat = format;
-        document.querySelectorAll('#masterSection .workformat-option').forEach(option => {
-            option.classList.remove('selected');
-            if (option.dataset.workformat === format) {
-                option.classList.add('selected');
+    function switchGameTab(tabName) {
+        triggerHapticFeedback();
+        
+        // Обновляем вкладки
+        document.querySelectorAll('.games-tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.dataset.game === tabName) {
+                tab.classList.add('active');
             }
         });
-    }
-    
-    function selectEditWorkFormat(format) {
-        console.log('🔄 Выбор формата работы (редактирование):', format);
-        currentEditWorkFormat = format;
-        document.querySelectorAll('#editWorkFormatSelector .workformat-option').forEach(option => {
-            option.classList.remove('selected');
-            if (option.dataset.workformat === format) {
-                option.classList.add('selected');
-            }
+        
+        // Обновляем контент
+        document.querySelectorAll('.game-container').forEach(container => {
+            container.classList.remove('active');
         });
-    }
-
-    // ========== НОВАЯ ЛОГИКА СВАЙПА ==========
-    let swipeStartX = 0;
-    let swipeStartTime = 0;
-    const SWIPE_THRESHOLD = 50;
-    const SWIPE_MAX_TIME = 300;
-    
-    function initSwipeNavigation() {
-        const sections = document.querySelectorAll('.section');
         
-        sections.forEach(section => {
-            section.addEventListener('touchstart', handleTouchStart, { passive: false });
-            section.addEventListener('touchmove', handleTouchMove, { passive: false });
-            section.addEventListener('touchend', handleTouchEnd, { passive: false });
-        });
-    }
-    
-    function handleTouchStart(e) {
-        const touch = e.touches[0];
-        swipeStartX = touch.clientX;
-        swipeStartTime = Date.now();
-        
-        const indicator = document.getElementById('swipeIndicator');
-        const arrow = document.getElementById('swipeArrow');
-        indicator.classList.remove('active');
-        arrow.classList.remove('active');
-    }
-    
-    function handleTouchMove(e) {
-        if (swipeStartX === 0) return;
-        
-        const touch = e.touches[0];
-        const currentX = touch.clientX;
-        const diffX = currentX - swipeStartX;
-        
-        if (diffX > 10) {
-            const indicator = document.getElementById('swipeIndicator');
-            const arrow = document.getElementById('swipeArrow');
-            indicator.classList.add('active');
-            arrow.classList.add('active');
-            
-            const opacity = Math.min(0.5, diffX / 200);
-            indicator.style.opacity = opacity;
-            
-            const scale = Math.min(1.2, 0.8 + diffX / 150);
-            arrow.style.transform = `translateY(-50%) scale(${scale})`;
-            arrow.style.opacity = Math.min(0.9, diffX / 100);
-        } else {
-            const indicator = document.getElementById('swipeIndicator');
-            const arrow = document.getElementById('swipeArrow');
-            indicator.classList.remove('active');
-            arrow.classList.remove('active');
+        const targetContainer = document.getElementById(`game${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+        if (targetContainer) {
+            targetContainer.classList.add('active');
         }
         
-        if (diffX > 30) {
-            e.preventDefault();
+        // Если переключились на колесо - обновляем UI
+        if (tabName === 'wheel') {
+            updateWheelUI();
         }
-    }
-    
-    function handleTouchEnd(e) {
-        if (swipeStartX === 0) return;
-        
-        const touchEnd = e.changedTouches[0];
-        const endX = touchEnd.clientX;
-        const diffX = endX - swipeStartX;
-        const diffTime = Date.now() - swipeStartTime;
-        
-        const indicator = document.getElementById('swipeIndicator');
-        const arrow = document.getElementById('swipeArrow');
-        indicator.classList.remove('active');
-        arrow.classList.remove('active');
-        indicator.style.opacity = '';
-        arrow.style.transform = '';
-        arrow.style.opacity = '';
-        
-        if (diffX > SWIPE_THRESHOLD && diffTime < SWIPE_MAX_TIME) {
-            triggerHapticFeedback();
-            
-            let activeSection = null;
-            const sections = ['masterSection', 'clientSection', 'profileSection', 'financeSection', 'editProfileSection', 'createDealSection', 'aboutSection'];
-            for (const sectionId of sections) {
-                const section = document.getElementById(sectionId);
-                if (section && section.style.display === 'block') {
-                    activeSection = sectionId;
-                    break;
-                }
-            }
-            
-            if (activeSection) {
-                switch (activeSection) {
-                    case 'masterSection':
-                    case 'clientSection':
-                    case 'profileSection':
-                    case 'aboutSection':
-                        showMainScreen();
-                        break;
-                    case 'financeSection':
-                    case 'editProfileSection':
-                    case 'createDealSection':
-                        showProfileSection();
-                        break;
-                    default:
-                        showMainScreen();
-                }
-            } else {
-                showMainScreen();
-            }
-        }
-        
-        swipeStartX = 0;
-        swipeStartTime = 0;
     }
 
     // ========== ИНИЦИАЛИЗАЦИЯ ==========
@@ -9475,17 +9295,10 @@
         // Инициализация селекторов формата работы
         selectWorkFormat('Один');
         selectEditWorkFormat('Один');
-        
+
         // Инициализация игр
-        setupGameEventListeners();
-        
-        // Инициализация колеса удачи
-        setTimeout(() => {
-            initWheelCanvas();
-            updateCooldownDisplay();
-        }, 500);
-        
-        console.log('🎮 Мини-игры инициализированы!');
+        initRunnerGame();
+        initWheelGame();
     });
     </script>
 </body>
