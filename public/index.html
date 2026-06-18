@@ -6292,7 +6292,6 @@
                         await preloadAllSkills();
                         loadMySkills();
                         loadProfileSkills();
-                        // Обновляем QR-код на главном экране
                         generateMainScreenQR();
                         return;
                     }
@@ -7797,12 +7796,14 @@
         showNotification(`📂 Вы выбрали категорию "${category}"`, 2000);
     };
     
+    // ====== ИСПРАВЛЕННАЯ ФУНКЦИЯ searchBySubcategory ======
     window.searchBySubcategory = async function(category, subcategory) {
         triggerHapticFeedback();
         const skillsContainer = document.getElementById('subcategorySkills');
         skillsContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div> Загрузка мастеров...</div>';
         
-        await preloadAllSkills();
+        // 🔥 ПРИНУДИТЕЛЬНАЯ ЗАГРУЗКА СВЕЖИХ ДАННЫХ С СЕРВЕРА
+        await preloadAllSkills(); // true = forceRefresh
         const allSkills = await getGlobalSkills();
         
         const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
@@ -7812,11 +7813,12 @@
             return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
         });
         
-        // Дополнительная фильтрация по подразделу (формату работы)
+        // Фильтрация по подразделу (формату работы)
         if (subcategory) {
             filteredSkills = filteredSkills.filter(skill => skill.workFormat === subcategory);
         }
         
+        // Убираем дубликаты
         const uniqueSkills = [];
         const seenIds = new Set();
         for (const skill of filteredSkills) {
