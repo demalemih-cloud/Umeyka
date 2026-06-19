@@ -4269,11 +4269,9 @@
         }
     }
     
-    /**
-     * ИСПРАВЛЕННАЯ ЛОГИКА СВАЙПА     * При свайпе вправо в clientSection:
-     * - Если открыта подкатегория (отображается categorySearchResults) → возврат в список категорий
-     * - Если категории открыты → переход на главный экран
-     */
+    // ===== ИСПРАВЛЕННАЯ ЛОГИКА СВАЙПА =====
+    // Теперь: если в архиве открыта подкатегория → возвращаем в список категорий
+    // Если список категорий → переходим на главный экран
     function handleTouchEnd(e) {
         if (swipeStartX === 0) return;
         
@@ -4293,31 +4291,55 @@
         if (diffX > SWIPE_THRESHOLD && diffTime < SWIPE_MAX_TIME) {
             triggerHapticFeedback();
             
-            // Проверяем, находимся ли мы в clientSection
-            const clientSection = document.getElementById('clientSection');
-            const isClientSectionVisible = clientSection && clientSection.style.display === 'block';
+            // Определяем активную секцию
+            let activeSection = null;
+            const sections = ['masterSection', 'clientSection', 'profileSection', 'financeSection', 'editProfileSection', 'createDealSection', 'aboutSection'];
+            for (const sectionId of sections) {
+                const section = document.getElementById(sectionId);
+                if (section && section.style.display === 'block') {
+                    activeSection = sectionId;
+                    break;
+                }
+            }
             
-            if (isClientSectionVisible) {
-                // Проверяем, открыта ли подкатегория (отображается categorySearchResults)
+            // Если активна секция архива
+            if (activeSection === 'clientSection') {
+                // Проверяем, открыта ли подкатегория (видны результаты поиска)
                 const resultsContainer = document.getElementById('categorySearchResults');
                 const categoriesContainer = document.getElementById('categoriesList');
-                const isSubcategoryOpen = resultsContainer && resultsContainer.style.display === 'block';
                 
-                if (isSubcategoryOpen) {
-                    // Возврат в список категорий
-                    console.log('🔙 [Свайп] Возврат в список категорий (архив)');
+                // Если результаты поиска видны и категории скрыты → возвращаем в список категорий
+                if (resultsContainer && resultsContainer.style.display !== 'none' && 
+                    categoriesContainer && categoriesContainer.style.display === 'none') {
+                    
+                    // Скрываем результаты и показываем список категорий
                     resultsContainer.style.display = 'none';
                     resultsContainer.innerHTML = '';
-                    if (categoriesContainer) categoriesContainer.style.display = 'block';
-                    showNotification('🔙 Возврат в список категорий', 1000);
-                } else {
-                    // Переход на главный экран
-                    console.log('🏠 [Свайп] Переход на главный экран');
-                    showMainScreen();
+                    categoriesContainer.style.display = 'block';
+                    renderCategories();
+                    showNotification('⬅️ Возврат в список категорий', 1500);
+                    return;
+                }
+            }
+            
+            // Для всех остальных секций или если в архиве открыт список категорий → на главный
+            if (activeSection) {
+                switch (activeSection) {
+                    case 'masterSection':
+                    case 'clientSection':
+                    case 'profileSection':
+                    case 'aboutSection':
+                        showMainScreen();
+                        break;
+                    case 'financeSection':
+                    case 'editProfileSection':
+                    case 'createDealSection':
+                        showProfileSection();
+                        break;
+                    default:
+                        showMainScreen();
                 }
             } else {
-                // Для других секций — переход на главный экран
-                console.log('🏠 [Свайп] Переход на главный экран из другой секции');
                 showMainScreen();
             }
         }
@@ -4416,41 +4438,21 @@
         }
     }
     
-    /**
-     * ИСПРАВЛЕННАЯ ФУНКЦИЯ getGlobalSkills()
-     * Теперь гарантированно возвращает умейки всех пользователей, а не только текущего
-     */
+    // ИСПРАВЛЕННАЯ: getGlobalSkills() — всегда загружает все умейки, с проверкой
     async function getGlobalSkills() {
-        // Если данные ещё не загружены, выполняем принудительную загрузку
+        // Всегда выполняем принудительную загрузку при входе в архив
         if (!isSkillsLoaded) {
             await preloadAllSkills();
             isSkillsLoaded = true;
         }
-        
-        // Пытаемся получить данные из глобального хранилища
-        let skills = getLocalStorage('umeyka_global_skills') || [];
-        
-        // Если хранилище пусто, пробуем загрузить из кэша
-        if (skills.length === 0) {
+        // Если офлайн-режим, используем кэш
+        if (offlineMode) {
             const cached = getCachedSkills();
-            if (cached && cached.length > 0) {
-                skills = cached;
-                setLocalStorage('umeyka_global_skills', skills);
-                console.log(`📦 [getGlobalSkills] Загружено ${skills.length} умейок из кэша`);
-            }
+            if (cached) return cached;
         }
-        
-        // Логируем количество загруженных умейок для отладки
-        console.log(`📊 [getGlobalSkills] Всего умейок в хранилище: ${skills.length}`);
-        
-        // Дополнительная проверка: если умейок мало (меньше 10), возможно данные не загружены
-        if (skills.length < 10) {
-            console.log('🔄 [getGlobalSkills] Мало умейок, пробую перезагрузить...');
-            await preloadAllSkills();
-            skills = getLocalStorage('umeyka_global_skills') || [];
-            console.log(`📊 [getGlobalSkills] После перезагрузки: ${skills.length} умейок`);
-        }
-        
+        // В любом случае возвращаем данные из хранилища (они уже загружены через preloadAllSkills)
+        const skills = getLocalStorage('umeyka_global_skills') || [];
+        console.log(`📊 [getGlobalSkills] Возвращено ${skills.length} умейок (из них загружены все пользователи)`);
         return skills;
     }
     
@@ -6797,17 +6799,18 @@
             selectWorkFormat('Один');
             loadMySkills();
         } else if (sectionId === 'clientSection') {
-            // При входе в архив выполняем принудительную загрузку всех умейок с сервера
+            // При входе в архив - принудительно загружаем все умейки
             preloadAllSkills().then(() => {
                 renderCategories();
+                const resultsContainer = document.getElementById('categorySearchResults');
+                const categoriesContainer = document.getElementById('categoriesList');
+                if (resultsContainer) {
+                    resultsContainer.innerHTML = '';
+                    resultsContainer.style.display = 'none';
+                }
+                if (categoriesContainer) categoriesContainer.style.display = 'block';
+                console.log('📚 [Архив] Данные загружены, готов к работе');
             });
-            const resultsContainer = document.getElementById('categorySearchResults');
-            const categoriesContainer = document.getElementById('categoriesList');
-            if (resultsContainer) {
-                resultsContainer.innerHTML = '';
-                resultsContainer.style.display = 'none';
-            }
-            if (categoriesContainer) categoriesContainer.style.display = 'block';
         }
     };
     
@@ -7829,42 +7832,34 @@
         showNotification(`📂 Вы выбрали категорию "${category}"`, 2000);
     };
     
-    /**
-     * ИСПРАВЛЕННАЯ ФУНКЦИЯ searchBySubcategory()
-     * Теперь корректно загружает все умейки и фильтрует по категории и формату работы
-     */
+    // ===== ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОИСКА ПО ПОДКАТЕГОРИИ =====
+    // Теперь корректно загружает все умейки через getGlobalSkills() и фильтрует
     window.searchBySubcategory = async function(category, subcategory) {
         triggerHapticFeedback();
         const skillsContainer = document.getElementById('subcategorySkills');
         skillsContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div> Загрузка мастеров...</div>';
         
-        // Принудительная загрузка всех умейок с сервера перед поиском
+        // Принудительная загрузка всех умейок с сервера
         await preloadAllSkills();
         const allSkills = await getGlobalSkills();
         
-        // Отладочный лог: количество всех умейок
-        console.log(`🔍 [Поиск] Всего умейок в хранилище: ${allSkills.length}`);
-        
-        // Очищаем категорию от эмодзи для сравнения
-        const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
+        // Отладочный лог: сколько всего умейок загружено
+        console.log(`🔍 [Поиск] Всего умейок в базе: ${allSkills.length}`);
         
         // Фильтрация по категории
+        const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
         let filteredSkills = allSkills.filter(skill => {
-            if (!skill.category) {
-                return false;
-            }
+            if (!skill.category) return false;
             const skillCategoryClean = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
             return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
         });
         
-        console.log(`🔍 [Поиск] После фильтрации по категории "${category}": ${filteredSkills.length} умейок`);
+        console.log(`📊 [Поиск] После фильтрации по категории "${category}": ${filteredSkills.length} умейок`);
         
-        // Дополнительная фильтрация по подразделу (формату работы)
+        // Фильтрация по подразделу (формату работы)
         if (subcategory) {
-            filteredSkills = filteredSkills.filter(skill => {
-                return skill.workFormat === subcategory;
-            });
-            console.log(`🔍 [Поиск] После фильтрации по формату "${subcategory}": ${filteredSkills.length} умейок`);
+            filteredSkills = filteredSkills.filter(skill => skill.workFormat === subcategory);
+            console.log(`📊 [Поиск] После фильтрации по подразделу "${subcategory}": ${filteredSkills.length} умейок`);
         }
         
         // Убираем дубликаты
@@ -7877,13 +7872,9 @@
             }
         }
         filteredSkills = uniqueSkills;
-        
-        // Сортируем по имени пользователя для удобства
         filteredSkills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
         
-        // Отладочный лог: итоговое количество умейок
-        console.log(`🔍 [Поиск] Итоговое количество умейок: ${filteredSkills.length}`);
-        console.log('🔍 [Поиск] Примеры найденных умейок:', filteredSkills.slice(0, 3).map(s => `${s.skill} (${s.username})`));
+        console.log(`✅ [Поиск] Итоговый результат: ${filteredSkills.length} умейок`);
         
         if (filteredSkills.length > 0) {
             skillsContainer.innerHTML = `
