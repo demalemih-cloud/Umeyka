@@ -78,7 +78,6 @@
         .games-button .icon {
             font-size: 22px;
         }
-        /* Кнопка скрыта по умолчанию, показываем только на главном экране */
         .games-button.hidden {
             display: none !important;
         }
@@ -4410,8 +4409,8 @@
         }
     }
     
-    async function getGlobalSkills() {
-        if (!isSkillsLoaded) {
+    async function getGlobalSkills(forceRefresh = false) {
+        if (!isSkillsLoaded || forceRefresh) {
             await preloadAllSkills();
             isSkillsLoaded = true;
         }
@@ -4636,7 +4635,7 @@
             markers = [];
         }
         
-        let allSkills = await getGlobalSkills();
+        let allSkills = await getGlobalSkills(true);
         
         let filteredSkills = allSkills;
         if (category) {
@@ -4801,7 +4800,7 @@
     }
     
     async function getUserSkills() {
-        const globalSkills = await getGlobalSkills();
+        const globalSkills = await getGlobalSkills(true);
         return globalSkills.filter(s => s.userId === currentUserId);
     }
     
@@ -5036,14 +5035,14 @@
         modal.style.display = 'flex';
         content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки мастера...</div></div>';
         await preloadAllSkills();
-        let allSkills = await getGlobalSkills();
+        let allSkills = await getGlobalSkills(true);
         try {
             const response = await fetch(`${API_URL}/api/skills/user/${userId}`);
             if (response.ok) {
                 const result = await response.json();
                 if (result.success && result.skills) {
                     result.skills.forEach(skill => addGlobalSkill(skill));
-                    allSkills = await getGlobalSkills();
+                    allSkills = await getGlobalSkills(true);
                     console.log(`✅ Загружено ${result.skills.length} умейок для пользователя ${userId} с сервера`);
                 }
             }
@@ -6358,7 +6357,7 @@
                 return;
             }
             skillsList.innerHTML = '<div class="loading">⏳ Загрузка ваших умейок...</div>';
-            const allSkills = await getGlobalSkills();
+            const allSkills = await getGlobalSkills(true);
             const mySkills = allSkills.filter(s => s.userId === currentUserId);
             if (mySkills.length > 0) {
                 skillsList.innerHTML = mySkills.map(skill => {
@@ -6440,7 +6439,7 @@
         try {
             if (!currentUserId) return;
             const skillsList = document.getElementById('profileSkillsList');
-            const allSkills = await getGlobalSkills();
+            const allSkills = await getGlobalSkills(true);
             const mySkills = allSkills.filter(s => s.userId === currentUserId);
             if (mySkills.length > 0) {
                 skillsList.innerHTML = mySkills.map(skill => {
@@ -6667,7 +6666,7 @@
                 } catch (serverError) {
                     console.log('⚠️ Сервер недоступен, удаляем локально');
                 }
-                const allSkills = await getGlobalSkills();
+                const allSkills = await getGlobalSkills(true);
                 const updatedSkills = allSkills.filter(s => s._id !== skillId);
                 setLocalStorage('umeyka_global_skills', updatedSkills);
                 setCachedSkills(updatedSkills);
@@ -6783,56 +6782,9 @@
             selectWorkFormat('Один');
             loadMySkills();
         } else if (sectionId === 'clientSection') {
-            // НЕСТАНДАРТНЫЙ ПОДХОД: принудительная синхронизация при открытии архива
-            console.log('📚 [Архив] Открытие архива с принудительной синхронизацией данных');
-            // Сначала загружаем из кэша, затем запрашиваем с сервера
-            showLoadingIndicator();
-            
-            // 1. Сначала показываем категории из локальных данных
-            renderCategories();
-            
-            // 2. Затем делаем принудительный запрос на сервер с обходом кэша
-            fetch(`${API_URL}/api/skills/all?t=${Date.now()}`)
-                .then(response => {
-                    if (response.ok) return response.json();
-                    throw new Error('Сервер не ответил');
-                })
-                .then(result => {
-                    if (result.success && result.skills) {
-                        console.log(`📚 [Архив] Загружено ${result.skills.length} умейок с сервера (принудительно)`);
-                        setCachedSkills(result.skills);
-                        setLocalStorage('umeyka_global_skills', result.skills);
-                        isSkillsLoaded = true;
-                        offlineMode = false;
-                        hideLoadingIndicator();
-                        // Перерендериваем категории с обновленными данными
-                        renderCategories();
-                        showNotification(`✅ Загружено ${result.skills.length} мастеров`, 1500);
-                    } else {
-                        hideLoadingIndicator();
-                        showNotification('⚠️ Ошибка загрузки данных с сервера', 1500);
-                    }
-                })
-                .catch(error => {
-                    console.warn('📚 [Архив] Сервер недоступен, использую локальные данные:', error);
-                    // Если сервер недоступен, используем локальные данные
-                    const localSkills = getLocalStorage('umeyka_global_skills') || [];
-                    if (localSkills.length > 0) {
-                        console.log(`📚 [Архив] Использую локальные данные: ${localSkills.length} умейок`);
-                        // Обновляем кэш из локальных данных
-                        setCachedSkills(localSkills);
-                        offlineMode = true;
-                        hideLoadingIndicator();
-                        renderCategories();
-                        showNotification(`📦 Офлайн-режим: ${localSkills.length} мастеров`, 2000);
-                    } else {
-                        hideLoadingIndicator();
-                        renderCategories();
-                        showNotification('❌ Нет данных о мастерах', 2000);
-                    }
-                });
-            
-            // Сбрасываем состояние подкатегорий
+            preloadAllSkills().then(() => {
+                renderCategories();
+            });
             const resultsContainer = document.getElementById('categorySearchResults');
             const categoriesContainer = document.getElementById('categoriesList');
             if (resultsContainer) {
@@ -7785,20 +7737,10 @@
     function renderCategories() {
         const container = document.getElementById('categoriesList');
         if (!container) return;
-        
-        // Проверяем наличие данных в localStorage
-        const allSkills = getLocalStorage('umeyka_global_skills') || [];
-        const masterCount = allSkills.length;
-        console.log(`📚 [Архив] Рендер категорий. Всего мастеров в базе: ${masterCount}`);
-        
         container.innerHTML = `
             <div style="margin-bottom: 15px;">
                 <div style="color: white; font-size: 16px; margin-bottom: 15px; text-align: center; opacity: 0.9;">
                     📋 Выберите категорию мастера:
-                    ${offlineMode ? '<span style="display:inline-block; margin-left: 8px; background: #f56565; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px;">📶 Офлайн</span>' : ''}
-                    <span style="display:inline-block; margin-left: 8px; background: rgba(255,255,255,0.15); padding: 2px 10px; border-radius: 12px; font-size: 12px; color: rgba(255,255,255,0.8);">
-                        ${masterCount} мастеров
-                    </span>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 12px;">
                     ${skillCategories.map(category => `
@@ -7876,31 +7818,11 @@
         const skillsContainer = document.getElementById('subcategorySkills');
         skillsContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div> Загрузка мастеров...</div>';
         
-        // Принудительная загрузка данных с сервера с обходом кэша
-        let allSkills = [];
-        try {
-            const response = await fetch(`${API_URL}/api/skills/all?t=${Date.now()}`);
-            if (response.ok) {
-                const result = await response.json();
-                if (result.success && result.skills) {
-                    console.log(`📚 [Поиск] Загружено ${result.skills.length} умейок с сервера`);
-                    setCachedSkills(result.skills);
-                    setLocalStorage('umeyka_global_skills', result.skills);
-                    allSkills = result.skills;
-                } else {
-                    throw new Error('Ошибка сервера');
-                }
-            } else {
-                throw new Error(`HTTP ${response.status}`);
-            }
-        } catch (error) {
-            console.warn('📚 [Поиск] Сервер недоступен, использую локальные данные:', error);
-            allSkills = getLocalStorage('umeyka_global_skills') || [];
-            offlineMode = true;
-            showNotification('📶 Офлайн-режим: показаны кэшированные данные', 1500);
-        }
+        // КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: принудительно обновляем данные с сервера
+        await preloadAllSkills();
+        const allSkills = await getGlobalSkills(true); // forceRefresh = true
         
-        console.log(`📚 [Поиск] Всего умейок в хранилище: ${allSkills.length}`);
+        console.log(`🔍 [Поиск] Всего умейок в хранилище: ${allSkills.length}`);
         
         const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
         
@@ -7912,13 +7834,13 @@
             return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
         });
         
-        console.log(`📚 [Поиск] После фильтрации по категории "${category}": ${filteredSkills.length} умейок`);
+        console.log(`🔍 [Поиск] После фильтрации по категории "${category}": ${filteredSkills.length} умейок`);
         
         if (subcategory) {
             filteredSkills = filteredSkills.filter(skill => {
                 return skill.workFormat === subcategory;
             });
-            console.log(`📚 [Поиск] После фильтрации по формату "${subcategory}": ${filteredSkills.length} умейок`);
+            console.log(`🔍 [Поиск] После фильтрации по формату "${subcategory}": ${filteredSkills.length} умейок`);
         }
         
         const uniqueSkills = [];
@@ -7931,10 +7853,10 @@
         }
         filteredSkills = uniqueSkills;
         
-        // Сортируем по имени
         filteredSkills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
         
-        console.log(`📚 [Поиск] Итоговое количество умейок: ${filteredSkills.length}`);
+        console.log(`🔍 [Поиск] Итоговое количество умейок: ${filteredSkills.length}`);
+        console.log('🔍 [Поиск] Примеры найденных умейок:', filteredSkills.slice(0, 3).map(s => `${s.skill} (${s.username})`));
         
         if (filteredSkills.length > 0) {
             skillsContainer.innerHTML = `
@@ -8369,7 +8291,7 @@
         isOver: false,
         
         // Дорожки (3 полосы)
-        lanes: [-1, 0, 1], // -1: левая, 0: центр, 1: правая
+        lanes: [-1, 0, 1],
         laneWidth: 0,
         carWidth: 40,
         carHeight: 50,
@@ -8404,12 +8326,10 @@
             this.resize();
             window.addEventListener('resize', () => this.resize());
             
-            // Сенсорное управление
             this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
             this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
             this.canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
             
-            // Клавиатура (для десктопа)
             document.addEventListener('keydown', (e) => {
                 if (!this.isRunning || this.isOver) return;
                 if (e.key === 'ArrowLeft' || e.key === 'a') {
@@ -8439,7 +8359,6 @@
         start() {
             if (this.isRunning) return;
             
-            // Сброс состояния
             this.timeLeft = 60;
             this.score = 0;
             this.speed = this.baseSpeed;
@@ -8459,10 +8378,8 @@
             document.getElementById('raceScore').textContent = this.score;
             document.getElementById('raceOverlay').classList.remove('active');
             
-            // Обновление UI
             this.updateUI();
             
-            // Запуск таймера
             if (this.timerInterval) clearInterval(this.timerInterval);
             this.timerInterval = setInterval(() => {
                 this.timeLeft--;
@@ -8472,7 +8389,6 @@
                 }
             }, 1000);
             
-            // Запуск игрового цикла
             if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
             this.gameLoop = requestAnimationFrame(() => this.update());
         },
@@ -8483,7 +8399,6 @@
                 return;
             }
             
-            // Сложность: скорость растёт со временем
             this.difficultyTimer += 1/60;
             if (this.difficultyTimer > 2) {
                 this.difficultyTimer = 0;
@@ -8491,7 +8406,6 @@
                 if (this.speed > 8) this.speed = 8;
             }
             
-            // Спавн препятствий
             this.spawnTimer += 1/60;
             const spawnInterval = Math.max(0.8, 2.2 - this.speed * 0.12);
             if (this.spawnTimer > spawnInterval) {
@@ -8499,14 +8413,12 @@
                 this.spawnObstacle();
             }
             
-            // Спавн звёзд
             this.starSpawnTimer += 1/60;
             if (this.starSpawnTimer > 0.6) {
                 this.starSpawnTimer = 0;
                 this.spawnStar();
             }
             
-            // Обновление препятствий
             const currentSpeed = this.boostActive ? this.speed * 1.6 : this.speed;
             for (let i = this.obstacles.length - 1; i >= 0; i--) {
                 const obs = this.obstacles[i];
@@ -8515,14 +8427,12 @@
                     this.obstacles.splice(i, 1);
                     continue;
                 }
-                // Проверка столкновения с машиной
                 if (this.checkCollision(obs)) {
                     this.endGame();
                     return;
                 }
             }
             
-            // Обновление звёзд
             for (let i = this.stars.length - 1; i >= 0; i--) {
                 const star = this.stars[i];
                 star.y += currentSpeed;
@@ -8530,13 +8440,11 @@
                     this.stars.splice(i, 1);
                     continue;
                 }
-                // Проверка сбора звезды
                 if (this.checkStarCollision(star)) {
                     this.score++;
                     this.boostStreak++;
                     document.getElementById('raceScore').textContent = this.score;
                     
-                    // Бонус: 10 звёзд подряд = режим ускорения
                     if (this.boostStreak >= 10 && !this.boostActive) {
                         this.boostActive = true;
                         this.boostTimer = 0;
@@ -8548,7 +8456,6 @@
                 }
             }
             
-            // Таймер бонуса
             if (this.boostActive) {
                 this.boostTimer += 1/60;
                 if (this.boostTimer > 5) {
@@ -8558,7 +8465,6 @@
                 }
             }
             
-            // Отрисовка
             this.draw();
             
             this.gameLoop = requestAnimationFrame(() => this.update());
@@ -8569,17 +8475,14 @@
             const w = this.width;
             const h = this.height;
             
-            // Фон дороги
             ctx.clearRect(0, 0, w, h);
             
-            // Асфальт
             const gradient = ctx.createLinearGradient(0, 0, 0, h);
             gradient.addColorStop(0, '#1a1a2e');
             gradient.addColorStop(1, '#2d2d44');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, w, h);
             
-            // Разметка дороги (линии)
             ctx.strokeStyle = 'rgba(255,255,255,0.15)';
             ctx.lineWidth = 2;
             for (let i = 0; i < 3; i++) {
@@ -8590,7 +8493,6 @@
                 ctx.stroke();
             }
             
-            // Центральная линия (пунктир)
             ctx.strokeStyle = 'rgba(255,255,255,0.3)';
             ctx.lineWidth = 3;
             ctx.setLineDash([20, 20]);
@@ -8600,7 +8502,6 @@
             ctx.stroke();
             ctx.setLineDash([]);
             
-            // Боковые линии
             ctx.strokeStyle = 'rgba(255,255,255,0.2)';
             ctx.lineWidth = 4;
             ctx.beginPath();
@@ -8612,25 +8513,20 @@
             ctx.lineTo(w, h);
             ctx.stroke();
             
-            // Обочина
             ctx.fillStyle = 'rgba(132, 204, 22, 0.15)';
             ctx.fillRect(0, 0, 6, h);
             ctx.fillRect(w-6, 0, 6, h);
             
-            // Звёзды
             for (const star of this.stars) {
                 this.drawStar(ctx, star.x, star.y, 14, '#FFD700');
             }
             
-            // Препятствия
             for (const obs of this.obstacles) {
                 this.drawObstacle(ctx, obs);
             }
             
-            // Машина игрока
             this.drawCar(ctx, this.carX, this.carY);
             
-            // Бонусный индикатор
             if (this.boostActive) {
                 ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
                 ctx.fillRect(0, 0, w, 4);
@@ -8644,11 +8540,9 @@
             const w = this.carWidth;
             const h = this.carHeight;
             
-            // Тень
             ctx.shadowColor = 'rgba(0,0,0,0.4)';
             ctx.shadowBlur = 20;
             
-            // Кузов
             const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
             if (this.boostActive) {
                 gradient.addColorStop(0, '#FFD700');
@@ -8663,7 +8557,6 @@
             ctx.shadowColor = this.boostActive ? 'rgba(255, 215, 0, 0.6)' : 'rgba(0,0,0,0.3)';
             ctx.shadowBlur = this.boostActive ? 30 : 15;
             
-            // Округлённый прямоугольник
             const r = 8;
             ctx.beginPath();
             ctx.moveTo(x + r, y);
@@ -8680,14 +8573,12 @@
             
             ctx.shadowBlur = 0;
             
-            // Окна
             ctx.fillStyle = 'rgba(100, 200, 255, 0.4)';
             const winW = w * 0.3;
             const winH = h * 0.25;
             ctx.fillRect(x + w * 0.1, y + h * 0.08, winW, winH);
             ctx.fillRect(x + w * 0.6, y + h * 0.08, winW, winH);
             
-            // Фары
             ctx.fillStyle = '#FFD700';
             ctx.shadowColor = '#FFD700';
             ctx.shadowBlur = 10;
@@ -8695,7 +8586,6 @@
             ctx.fillRect(x + w - 10, y - 2, 8, 5);
             ctx.shadowBlur = 0;
             
-            // Задние фонари
             ctx.fillStyle = '#ff4444';
             ctx.fillRect(x + 2, y + h - 4, 8, 4);
             ctx.fillRect(x + w - 10, y + h - 4, 8, 4);
@@ -8706,12 +8596,10 @@
             const y = obs.y;
             const size = obs.size || 30;
             
-            // Тень
             ctx.shadowColor = 'rgba(0,0,0,0.3)';
             ctx.shadowBlur = 15;
             
             if (obs.type === 'car') {
-                // Другая машина
                 const w = size * 1.2;
                 const h = size * 1.5;
                 ctx.fillStyle = '#e53e3e';
@@ -8720,19 +8608,16 @@
                 ctx.beginPath();
                 ctx.roundRect(x - w/2, y - h/2, w, h, 6);
                 ctx.fill();
-                // Окна
                 ctx.fillStyle = 'rgba(100, 200, 255, 0.3)';
                 ctx.fillRect(x - w*0.35, y - h*0.3, w*0.25, h*0.2);
                 ctx.fillRect(x + w*0.1, y - h*0.3, w*0.25, h*0.2);
             } else {
-                // Камень / препятствие
                 ctx.fillStyle = '#718096';
                 ctx.shadowColor = 'rgba(0,0,0,0.3)';
                 ctx.shadowBlur = 15;
                 ctx.beginPath();
                 ctx.arc(x, y, size/2, 0, Math.PI * 2);
                 ctx.fill();
-                // Блик
                 ctx.fillStyle = 'rgba(255,255,255,0.2)';
                 ctx.beginPath();
                 ctx.arc(x - size*0.15, y - size*0.15, size*0.2, 0, Math.PI * 2);
@@ -8792,17 +8677,12 @@
             const halfW = this.carWidth / 2 - 4;
             const halfH = this.carHeight / 2 - 4;
             
-            // Проверка на столкновение (упрощённая)
             const dx = Math.abs(cx - obs.x);
             const dy = Math.abs(cy - obs.y);
             const overlapX = dx < halfW + halfSize;
             const overlapY = dy < halfH + halfSize;
             
             if (overlapX && overlapY) {
-                // Дополнительная проверка для машин
-                if (obs.type === 'car') {
-                    return true;
-                }
                 return true;
             }
             return false;
@@ -8848,12 +8728,6 @@
         },
         
         showBoostNotification(msg) {
-            const overlay = document.getElementById('raceOverlay');
-            const title = document.getElementById('raceOverlayTitle');
-            const desc = document.getElementById('raceOverlayDesc');
-            const scoreEl = document.getElementById('raceOverlayScore');
-            
-            // Показываем уведомление на 1.5 секунды
             const notif = document.createElement('div');
             notif.style.cssText = `
                 position: absolute;
@@ -8878,9 +8752,7 @@
             setTimeout(() => notif.remove(), 1600);
         },
         
-        updateUI() {
-            // UI обновляется в цикле
-        },
+        updateUI() {},
         
         endGame() {
             if (this.isOver) return;
@@ -8890,10 +8762,8 @@
             if (this.timerInterval) clearInterval(this.timerInterval);
             if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
             
-            // Сохраняем очки в localStorage
             this.saveScore(this.score);
             
-            // Показываем оверлей
             const overlay = document.getElementById('raceOverlay');
             const title = document.getElementById('raceOverlayTitle');
             const scoreEl = document.getElementById('raceOverlayScore');
@@ -8911,7 +8781,6 @@
         },
         
         saveScore(score) {
-            // Сохраняем очки в общую статистику игрока
             const statsKey = `game_stats_${currentUserId}`;
             let stats = getLocalStorage(statsKey) || { totalStars: 0, raceHighScore: 0, wheelLastSpin: null, wheelCooldown: false };
             stats.totalStars = (stats.totalStars || 0) + score;
@@ -8920,7 +8789,6 @@
             }
             setLocalStorage(statsKey, stats);
             
-            // Обновляем реферальные звёзды
             const referralData = getReferralData();
             if (referralData) {
                 referralData.starsEarned = (referralData.starsEarned || 0) + score;
@@ -8932,12 +8800,10 @@
         },
         
         updateLeaderboard() {
-            // Обновляем таблицу лидеров при изменении очков
             renderLeaderboard();
         },
         
         restart() {
-            // Сброс и перезапуск
             if (this.timerInterval) clearInterval(this.timerInterval);
             if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
             this.isRunning = false;
@@ -8946,7 +8812,6 @@
         }
     };
 
-    // Добавляем roundRect для canvas
     if (!CanvasRenderingContext2D.prototype.roundRect) {
         CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             if (typeof r === 'number') r = { tl: r, tr: r, br: r, bl: r };
@@ -8980,6 +8845,7 @@
         maxSpinSpeed: 800,
         lastSpinDate: null,
         cooldownHours: 24,
+        _timerInterval: null,
         
         init() {
             this.canvas = document.getElementById('wheelCanvas');
@@ -8999,7 +8865,6 @@
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Рисуем сегменты
             for (let i = 0; i < numSegments; i++) {
                 const startAngle = this.currentAngle + i * angleStep;
                 const endAngle = startAngle + angleStep;
@@ -9015,7 +8880,6 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 
-                // Текст
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(startAngle + angleStep / 2);
@@ -9029,14 +8893,12 @@
                 ctx.restore();
             }
             
-            // Внешний обод
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
             ctx.strokeStyle = 'rgba(255,255,255,0.2)';
             ctx.lineWidth = 4;
             ctx.stroke();
             
-            // Центральный круг
             const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 30);
             grad.addColorStop(0, '#FFD700');
             grad.addColorStop(1, '#F59E0B');
@@ -9048,7 +8910,6 @@
             ctx.lineWidth = 3;
             ctx.stroke();
             
-            // Декоративные точки на ободе
             for (let i = 0; i < 20; i++) {
                 const angle = (i / 20) * Math.PI * 2;
                 const x = centerX + radius * Math.cos(angle);
@@ -9063,7 +8924,6 @@
         spin() {
             if (this.isSpinning) return;
             
-            // Проверка кулдауна
             if (this.isCooldownActive()) {
                 const remaining = this.getCooldownRemaining();
                 document.getElementById('wheelResult').textContent = `⏳ Доступно через ${remaining}`;
@@ -9074,35 +8934,25 @@
             document.getElementById('wheelSpinBtn').disabled = true;
             document.getElementById('wheelResult').textContent = '🎡 Крутим...';
             
-            // Случайная скорость
             this.spinVelocity = this.minSpinSpeed + Math.random() * (this.maxSpinSpeed - this.minSpinSpeed);
-            // Добавляем несколько полных оборотов для эффекта
             this.spinVelocity += 360 * (2 + Math.random() * 3);
             
-            // Анимация
             const spinInterval = setInterval(() => {
-                // Замедление
                 this.spinVelocity *= this.spinDecay;
                 this.currentAngle += this.spinVelocity * 0.01;
                 
-                // Отрисовка
                 this.drawWheel();
                 
-                // Остановка
                 if (this.spinVelocity < 0.5) {
                     clearInterval(spinInterval);
                     this.isSpinning = false;
                     document.getElementById('wheelSpinBtn').disabled = false;
                     
-                    // Определение выпавшего сегмента
                     const numSegments = this.segments.length;
                     const angleStep = (Math.PI * 2) / numSegments;
-                    // Нормализуем угол
                     let normalizedAngle = this.currentAngle % (Math.PI * 2);
                     if (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
                     
-                    // Определяем индекс сегмента (указатель сверху)
-                    // Указатель находится на 12 часах = -PI/2
                     const pointerAngle = -Math.PI / 2;
                     let rawIndex = Math.floor((pointerAngle - normalizedAngle) / angleStep);
                     let index = rawIndex % numSegments;
@@ -9115,18 +8965,15 @@
         },
         
         handleResult(value) {
-            // Сохраняем время последнего вращения
             this.lastSpinDate = new Date().toISOString();
             localStorage.setItem(`wheel_last_spin_${currentUserId}`, this.lastSpinDate);
             
-            // Начисляем звёзды
             const statsKey = `game_stats_${currentUserId}`;
             let stats = getLocalStorage(statsKey) || { totalStars: 0, raceHighScore: 0, wheelLastSpin: null, wheelCooldown: false };
             stats.totalStars = (stats.totalStars || 0) + value;
             stats.wheelLastSpin = this.lastSpinDate;
             setLocalStorage(statsKey, stats);
             
-            // Обновляем реферальные звёзды
             const referralData = getReferralData();
             if (referralData) {
                 referralData.starsEarned = (referralData.starsEarned || 0) + value;
@@ -9136,15 +8983,11 @@
             document.getElementById('wheelResult').textContent = `🎉 ${value} ⭐`;
             this.showResultNotification(`🎉 Вы выиграли ${value} звёзд!`);
             
-            // Обновляем таблицу лидеров
             this.updateLeaderboard();
-            
-            // Обновляем таймер
             this.checkCooldown();
         },
         
         showResultNotification(msg) {
-            const container = document.getElementById('wheelGameFullscreen');
             const notif = document.createElement('div');
             notif.style.cssText = `
                 position: fixed;
@@ -9201,7 +9044,6 @@
                 timerEl.textContent = `⏳ Доступно через ${remaining}`;
                 document.getElementById('wheelSpinBtn').disabled = true;
                 
-                // Обновляем таймер каждую минуту
                 if (this._timerInterval) clearInterval(this._timerInterval);
                 this._timerInterval = setInterval(() => {
                     if (!this.isCooldownActive()) {
@@ -9233,7 +9075,6 @@
         const container = document.getElementById('gamesLeaderboard');
         if (!container) return;
         
-        // Собираем статистику всех пользователей из localStorage
         const usersStats = [];
         const keys = Object.keys(localStorage);
         for (const key of keys) {
@@ -9241,7 +9082,6 @@
                 const userId = key.replace('game_stats_', '');
                 const stats = getLocalStorage(key);
                 if (stats && stats.totalStars > 0) {
-                    // Пытаемся получить имя пользователя
                     let userName = 'Игрок';
                     const userData = getLocalStorage(`user_${userId}`);
                     if (userData && userData.firstName) {
@@ -9257,10 +9097,8 @@
             }
         }
         
-        // Сортируем по звёздам (по убыванию)
         usersStats.sort((a, b) => b.totalStars - a.totalStars);
         
-        // Берём топ-3
         const top3 = usersStats.slice(0, 3);
         
         if (top3.length === 0) {
@@ -9304,7 +9142,6 @@
         const container = document.getElementById('raceGameFullscreen');
         container.classList.add('active');
         
-        // Инициализация игры при первом запуске
         if (!raceGame.canvas) {
             raceGame.init();
         }
@@ -9321,7 +9158,6 @@
             if (raceGame.timerInterval) clearInterval(raceGame.timerInterval);
             if (raceGame.gameLoop) cancelAnimationFrame(raceGame.gameLoop);
         }
-        // Показываем модалку игр снова
         setTimeout(() => openGamesModal(), 300);
     }
 
@@ -9359,7 +9195,6 @@
         wheelGame.spin();
     }
 
-    // Добавляем анимации для уведомлений
     const styleSheet = document.createElement('style');
     styleSheet.textContent = `
         @keyframes fadeInUp {
@@ -9394,7 +9229,6 @@
     document.addEventListener('DOMContentLoaded', async function() {
         console.log('🚀 Ymeyka app loaded successfully!');
         
-        // Инициализация свайп-навигации
         initSwipeNavigation();
         
         currentMasterStatus = 'ready';
@@ -9423,11 +9257,9 @@
         }
         initAdminAccess();
         
-        // Инициализация селекторов формата работы
         selectWorkFormat('Один');
         selectEditWorkFormat('Один');
         
-        // Инициализация игр
         if (document.getElementById('raceCanvas')) {
             raceGame.init();
         }
@@ -9435,7 +9267,6 @@
             wheelGame.init();
         }
         
-        // Загружаем таблицу лидеров при первом открытии
         renderLeaderboard();
     });
     </script>
