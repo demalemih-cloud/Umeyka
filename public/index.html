@@ -7268,7 +7268,11 @@
         } else if (sectionId === 'clientSection') {
             console.log('📚 [Архив] Открытие архива с принудительной синхронизацией данных');
             showLoadingIndicator();
+            
+            // Сначала показываем категории с индикатором загрузки
             renderCategories();
+            
+            // Загружаем свежие данные с сервера
             fetch(`${API_URL}/api/skills/all?t=${Date.now()}`)
                 .then(response => {
                     if (response.ok) return response.json();
@@ -7300,11 +7304,22 @@
                         renderCategories();
                         showNotification(`📦 Офлайн-режим: ${localSkills.length} мастеров`, 2000);
                     } else {
-                        hideLoadingIndicator();
-                        renderCategories();
-                        showNotification('❌ Нет данных о мастерах', 2000);
+                        // Если нет локальных данных, пытаемся загрузить из кэша
+                        const cached = getCachedSkills();
+                        if (cached && cached.length > 0) {
+                            setLocalStorage('umeyka_global_skills', cached);
+                            offlineMode = true;
+                            hideLoadingIndicator();
+                            renderCategories();
+                            showNotification(`📦 Офлайн-режим: ${cached.length} мастеров (из кэша)`, 2000);
+                        } else {
+                            hideLoadingIndicator();
+                            renderCategories();
+                            showNotification('❌ Нет данных о мастерах', 2000);
+                        }
                     }
                 });
+            
             const resultsContainer = document.getElementById('categorySearchResults');
             const categoriesContainer = document.getElementById('categoriesList');
             if (resultsContainer) {
