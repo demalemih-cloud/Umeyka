@@ -78,12 +78,10 @@
         .games-button .icon {
             font-size: 22px;
         }
-        /* Кнопка скрыта по умолчанию, показываем только на главном экране */
         .games-button.hidden {
             display: none !important;
         }
 
-        /* Модальное окно игр */
         .games-modal-overlay {
             position: fixed;
             top: 0;
@@ -146,7 +144,6 @@
             letter-spacing: 1px;
         }
 
-        /* Карточки игр */
         .game-card {
             background: rgba(255,255,255,0.06);
             border-radius: 20px;
@@ -196,7 +193,6 @@
             color: rgba(255,255,255,0.8);
         }
 
-        /* ---------- ИГРА 1: ГОНКА ЗА ЗВЁЗДАМИ ---------- */
         .race-game-container {
             background: linear-gradient(180deg, #0b0e1a 0%, #1a1f35 100%);
             border-radius: 24px;
@@ -318,7 +314,6 @@
             transform: scale(0.95);
         }
 
-        /* ---------- ИГРА 2: КОЛЕСО УДАЧИ ---------- */
         .wheel-game-container {
             background: linear-gradient(180deg, #0b0e1a 0%, #1a1f35 100%);
             border-radius: 24px;
@@ -395,7 +390,6 @@
             margin-top: 6px;
         }
 
-        /* ---------- ОБЩИЕ СТИЛИ ИГР ---------- */
         .game-fullscreen {
             position: fixed;
             top: 0;
@@ -435,7 +429,6 @@
             background: rgba(255,255,255,0.2);
         }
 
-        /* ---------- АДАПТИВ ---------- */
         @media (max-width: 480px) {
             .games-modal-content {
                 padding: 16px 12px 20px;
@@ -465,7 +458,6 @@
             }
         }
 
-        /* остальные стили приложения (без изменений) */
         .workformat-selector {
             display: flex;
             flex-wrap: wrap;
@@ -1699,7 +1691,6 @@
             box-shadow: 0 6px 15px rgba(245, 101, 101, 0.4);
         }
         
-        /* ========== НОВЫЙ СТИЛЬ ДЛЯ ФИНАНСОВ ========== */
         .finance-section {
             background: linear-gradient(180deg, #0f0e17 0%, #1a1a2e 100%);
             min-height: 100vh;
@@ -2091,7 +2082,6 @@
             font-size: 14px;
         }
 
-        /* ====== ОСТАЛЬНЫЕ СТИЛИ (без изменений) ====== */
         .wallet-section {
             background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
             padding: 25px 20px;
@@ -4154,8 +4144,7 @@
         </div>
     </div>
 
-    <!-- ====== НОВЫЙ РАЗДЕЛ: ИГРЫ ====== -->
-    <!-- КНОПКА ВЫЗОВА ИГР (показывается только на главном экране) -->
+    <!-- КНОПКА ВЫЗОВА ИГР -->
     <button class="games-button" id="gamesMainButton" onclick="triggerHapticFeedback(); openGamesModal();">
         <span class="icon">🎮</span>
         <span>Игры</span>
@@ -4167,7 +4156,6 @@
             <button class="games-modal-close" onclick="triggerHapticFeedback(); closeGamesModal();">✕</button>
             <div class="games-modal-title">🎮 Игры</div>
             
-            <!-- Игра 1: Гонка за звёздами -->
             <div class="game-card" onclick="triggerHapticFeedback(); openRaceGame();">
                 <div class="game-card-header">
                     <span class="game-card-icon">🏎️</span>
@@ -4184,7 +4172,6 @@
                 </div>
             </div>
 
-            <!-- Игра 2: Колесо удачи -->
             <div class="game-card" onclick="triggerHapticFeedback(); openWheelGame();">
                 <div class="game-card-header">
                     <span class="game-card-icon">🎡</span>
@@ -4201,7 +4188,6 @@
                 </div>
             </div>
 
-            <!-- Таблица лидеров (топ-3) -->
             <div style="margin-top: 20px; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 16px;">
                 <div style="color: rgba(255,255,255,0.6); font-size: 14px; text-align: center; margin-bottom: 10px;">🏆 Топ игроков</div>
                 <div id="gamesLeaderboard">
@@ -4643,7 +4629,29 @@
         });
     }
 
-    // ========== НОВАЯ ЛОГИКА СВАЙПА ==========
+    // ========== ИСПРАВЛЕННАЯ ЛОГИКА СВАЙПА ==========
+    // Храним историю переходов между разделами
+    let navigationHistory = [];
+    
+    function pushNavigationHistory(fromSection, toSection) {
+        navigationHistory.push({ from: fromSection, to: toSection });
+        // Ограничиваем историю 10 записями
+        if (navigationHistory.length > 10) {
+            navigationHistory.shift();
+        }
+        console.log('📜 История навигации:', navigationHistory);
+    }
+    
+    function getPreviousSection(currentSection) {
+        // Ищем последний переход, где текущий раздел был целевым
+        for (let i = navigationHistory.length - 1; i >= 0; i--) {
+            if (navigationHistory[i].to === currentSection) {
+                return navigationHistory[i].from;
+            }
+        }
+        return null;
+    }
+
     let swipeStartX = 0;
     let swipeStartTime = 0;
     const SWIPE_THRESHOLD = 50;
@@ -4720,10 +4728,26 @@
         if (diffX > SWIPE_THRESHOLD && diffTime < SWIPE_MAX_TIME) {
             triggerHapticFeedback();
             
-            const clientSection = document.getElementById('clientSection');
-            const isClientSectionVisible = clientSection && clientSection.style.display === 'block';
+            // Определяем текущий видимый раздел
+            const visibleSections = ['financeSection', 'clientSection', 'profileSection', 'masterSection'];
+            let currentSection = null;
             
-            if (isClientSectionVisible) {
+            for (const sectionId of visibleSections) {
+                const el = document.getElementById(sectionId);
+                if (el && el.style.display === 'block') {
+                    currentSection = sectionId;
+                    break;
+                }
+            }
+            
+            console.log('🔄 [Свайп] Текущий раздел:', currentSection);
+            
+            if (currentSection === 'financeSection') {
+                // ИЗ ФИНАНСОВ ВОЗВРАЩАЕМСЯ В ПРОФИЛЬ
+                console.log('🔙 [Свайп] Возврат из финансов в личный кабинет');
+                showProfileSection();
+                showNotification('🔙 Возврат в личный кабинет', 1000);
+            } else if (currentSection === 'clientSection') {
                 const resultsContainer = document.getElementById('categorySearchResults');
                 const categoriesContainer = document.getElementById('categoriesList');
                 const isSubcategoryOpen = resultsContainer && resultsContainer.style.display === 'block';
@@ -4747,6 +4771,75 @@
         swipeStartX = 0;
         swipeStartTime = 0;
     }
+
+    // ========== ПЕРЕОПРЕДЕЛЕНИЕ ФУНКЦИЙ НАВИГАЦИИ ДЛЯ ЗАПИСИ ИСТОРИИ ==========
+    
+    const originalShowSection = window.showSection;
+    window.showSection = function(sectionId) {
+        // Определяем текущий видимый раздел
+        const visibleSections = ['financeSection', 'clientSection', 'profileSection', 'masterSection', 'editProfileSection', 'createDealSection', 'aboutSection'];
+        let currentSection = 'mainScreen';
+        
+        for (const id of visibleSections) {
+            const el = document.getElementById(id);
+            if (el && el.style.display === 'block') {
+                currentSection = id;
+                break;
+            }
+        }
+        
+        // Записываем историю, если переход не на главный экран и не из главного
+        if (currentSection !== 'mainScreen' && sectionId !== 'mainScreen') {
+            pushNavigationHistory(currentSection, sectionId);
+        }
+        
+        // Вызываем оригинальную функцию
+        originalShowSection(sectionId);
+    };
+    
+    const originalShowProfileSection = window.showProfileSection;
+    window.showProfileSection = function() {
+        // Определяем текущий видимый раздел
+        const visibleSections = ['financeSection', 'clientSection', 'profileSection', 'masterSection', 'editProfileSection', 'createDealSection', 'aboutSection'];
+        let currentSection = 'mainScreen';
+        
+        for (const id of visibleSections) {
+            const el = document.getElementById(id);
+            if (el && el.style.display === 'block') {
+                currentSection = id;
+                break;
+            }
+        }
+        
+        // Если мы в финансах, записываем переход в историю
+        if (currentSection === 'financeSection') {
+            pushNavigationHistory('financeSection', 'profileSection');
+        }
+        
+        originalShowProfileSection();
+    };
+    
+    const originalShowFinanceSection = window.showFinanceSection;
+    window.showFinanceSection = function() {
+        // Определяем текущий видимый раздел
+        const visibleSections = ['financeSection', 'clientSection', 'profileSection', 'masterSection', 'editProfileSection', 'createDealSection', 'aboutSection'];
+        let currentSection = 'mainScreen';
+        
+        for (const id of visibleSections) {
+            const el = document.getElementById(id);
+            if (el && el.style.display === 'block') {
+                currentSection = id;
+                break;
+            }
+        }
+        
+        // Если мы в профиле, записываем переход в историю
+        if (currentSection === 'profileSection') {
+            pushNavigationHistory('profileSection', 'financeSection');
+        }
+        
+        originalShowFinanceSection();
+    };
 
     // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ХРАНИЛИЩЕМ И КЭШЕМ ==========
     
@@ -6139,20 +6232,15 @@
         return transaction;
     }
     
-    // ========== НОВАЯ ФУНКЦИЯ ОБНОВЛЕНИЯ ИНТЕРФЕЙСА ФИНАНСОВ ==========
     function updateFinanceUI() {
         const wallet = getWalletData();
         
-        // Главный баланс
         document.getElementById('financeMainBalance').innerHTML = `${wallet.availableBalance} <span>⭐</span>`;
-        
-        // Карточки
         document.getElementById('financeAvailable').textContent = `${wallet.availableBalance} ⭐`;
         document.getElementById('financeFrozen').textContent = `${wallet.frozenBalance} ⭐`;
         document.getElementById('financeEarned').textContent = `${wallet.totalEarned} ⭐`;
         document.getElementById('financeCommission').textContent = `${wallet.totalCommission} ⭐`;
         
-        // Статус Wallet
         const dot = document.getElementById('financeWalletDot');
         const text = document.getElementById('financeWalletText');
         const action = document.getElementById('financeWalletAction');
@@ -6172,7 +6260,6 @@
             withdrawBtn.style.display = 'none';
         }
         
-        // История
         renderFinanceHistory(wallet.transactions);
     }
     
@@ -6230,13 +6317,10 @@
     
     function filterHistory(filter, btn) {
         const wallet = getWalletData();
-        // Обновляем активную кнопку
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         if (btn) btn.classList.add('active');
         renderFinanceHistory(wallet.transactions, filter);
     }
-    
-    // ========== СТАРЫЕ ФУНКЦИИ ФИНАНСОВ (адаптированы под новый UI) ==========
     
     async function connectWallet() {
         triggerHapticFeedback();
@@ -7238,7 +7322,6 @@
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
         
-        // Показываем кнопку "Игры" только на главном экране
         document.getElementById('gamesMainButton').classList.remove('hidden');
     };
     
@@ -7254,7 +7337,6 @@
         document.getElementById('aboutSection').style.display = 'none';
         document.getElementById(sectionId).style.display = 'block';
         
-        // Скрываем кнопку "Игры" во всех разделах, кроме главного
         document.getElementById('gamesMainButton').classList.add('hidden');
         
         if (sectionId === 'masterSection') {
@@ -7269,10 +7351,8 @@
             console.log('📚 [Архив] Открытие архива с принудительной синхронизацией данных');
             showLoadingIndicator();
             
-            // Сначала показываем категории с индикатором загрузки
             renderCategories();
             
-            // Загружаем свежие данные с сервера
             fetch(`${API_URL}/api/skills/all?t=${Date.now()}`)
                 .then(response => {
                     if (response.ok) return response.json();
@@ -7304,7 +7384,6 @@
                         renderCategories();
                         showNotification(`📦 Офлайн-режим: ${localSkills.length} мастеров`, 2000);
                     } else {
-                        // Если нет локальных данных, пытаемся загрузить из кэша
                         const cached = getCachedSkills();
                         if (cached && cached.length > 0) {
                             setLocalStorage('umeyka_global_skills', cached);
@@ -7328,7 +7407,6 @@
             }
             if (categoriesContainer) categoriesContainer.style.display = 'block';
         } else if (sectionId === 'financeSection') {
-            // Обновляем UI финансов при открытии
             updateFinanceUI();
         }
     };
@@ -8831,13 +8909,10 @@
             console.error('❌ [Referral] Ошибка обработки реферальной ссылки:', error);
         }
     }
-    
 
     // ======================================================================
     // ========== НОВЫЙ РАЗДЕЛ: ИГРЫ ==========
     // ======================================================================
-
-    // -------- ИГРА 1: ГОНКА ЗА ЗВЁЗДАМИ --------
 
     let raceGame = {
         canvas: null,
@@ -8846,40 +8921,28 @@
         animationId: null,
         gameLoop: null,
         timerInterval: null,
-        
-        // Игровые параметры
         timeLeft: 60,
         score: 0,
         speed: 3,
         baseSpeed: 3,
         isRunning: false,
         isOver: false,
-        
-        // Дорожки (3 полосы)
-        lanes: [-1, 0, 1], // -1: левая, 0: центр, 1: правая
+        lanes: [-1, 0, 1],
         laneWidth: 0,
         carWidth: 40,
         carHeight: 50,
         carX: 0,
         carY: 0,
-        
-        // Препятствия и звёзды
         obstacles: [],
         stars: [],
         spawnTimer: 0,
         starSpawnTimer: 0,
         difficultyTimer: 0,
-        
-        // Бонус: режим ускорения
         boostActive: false,
         boostTimer: 0,
         boostStreak: 0,
-        
-        // Размеры
         width: 0,
         height: 0,
-        
-        // Сенсорное управление
         touchStartX: 0,
         isDragging: false,
         
@@ -8887,16 +8950,11 @@
             this.canvas = document.getElementById('raceCanvas');
             this.ctx = this.canvas.getContext('2d');
             this.container = document.getElementById('raceGameContainer');
-            
             this.resize();
             window.addEventListener('resize', () => this.resize());
-            
-            // Сенсорное управление
             this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
             this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
             this.canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
-            
-            // Клавиатура (для десктопа)
             document.addEventListener('keydown', (e) => {
                 if (!this.isRunning || this.isOver) return;
                 if (e.key === 'ArrowLeft' || e.key === 'a') {
@@ -8915,7 +8973,6 @@
             this.height = rect.height;
             this.canvas.width = this.width;
             this.canvas.height = this.height;
-            
             this.laneWidth = this.width / 3;
             this.carWidth = Math.min(40, this.laneWidth * 0.6);
             this.carHeight = this.carWidth * 1.25;
@@ -8925,8 +8982,6 @@
         
         start() {
             if (this.isRunning) return;
-            
-            // Сброс состояния
             this.timeLeft = 60;
             this.score = 0;
             this.speed = this.baseSpeed;
@@ -8941,15 +8996,10 @@
             this.boostTimer = 0;
             this.boostStreak = 0;
             this.carX = this.width / 2 - this.carWidth / 2;
-            
             document.getElementById('raceTimer').textContent = this.timeLeft;
             document.getElementById('raceScore').textContent = this.score;
             document.getElementById('raceOverlay').classList.remove('active');
-            
-            // Обновление UI
             this.updateUI();
-            
-            // Запуск таймера
             if (this.timerInterval) clearInterval(this.timerInterval);
             this.timerInterval = setInterval(() => {
                 this.timeLeft--;
@@ -8958,8 +9008,6 @@
                     this.endGame();
                 }
             }, 1000);
-            
-            // Запуск игрового цикла
             if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
             this.gameLoop = requestAnimationFrame(() => this.update());
         },
@@ -8969,31 +9017,23 @@
                 this.gameLoop = requestAnimationFrame(() => this.update());
                 return;
             }
-            
-            // Сложность: скорость растёт со временем
             this.difficultyTimer += 1/60;
             if (this.difficultyTimer > 2) {
                 this.difficultyTimer = 0;
                 this.speed += 0.15;
                 if (this.speed > 8) this.speed = 8;
             }
-            
-            // Спавн препятствий
             this.spawnTimer += 1/60;
             const spawnInterval = Math.max(0.8, 2.2 - this.speed * 0.12);
             if (this.spawnTimer > spawnInterval) {
                 this.spawnTimer = 0;
                 this.spawnObstacle();
             }
-            
-            // Спавн звёзд
             this.starSpawnTimer += 1/60;
             if (this.starSpawnTimer > 0.6) {
                 this.starSpawnTimer = 0;
                 this.spawnStar();
             }
-            
-            // Обновление препятствий
             const currentSpeed = this.boostActive ? this.speed * 1.6 : this.speed;
             for (let i = this.obstacles.length - 1; i >= 0; i--) {
                 const obs = this.obstacles[i];
@@ -9002,14 +9042,11 @@
                     this.obstacles.splice(i, 1);
                     continue;
                 }
-                // Проверка столкновения с машиной
                 if (this.checkCollision(obs)) {
                     this.endGame();
                     return;
                 }
             }
-            
-            // Обновление звёзд
             for (let i = this.stars.length - 1; i >= 0; i--) {
                 const star = this.stars[i];
                 star.y += currentSpeed;
@@ -9017,25 +9054,19 @@
                     this.stars.splice(i, 1);
                     continue;
                 }
-                // Проверка сбора звезды
                 if (this.checkStarCollision(star)) {
                     this.score++;
                     this.boostStreak++;
                     document.getElementById('raceScore').textContent = this.score;
-                    
-                    // Бонус: 10 звёзд подряд = режим ускорения
                     if (this.boostStreak >= 10 && !this.boostActive) {
                         this.boostActive = true;
                         this.boostTimer = 0;
                         this.boostStreak = 0;
                         this.showBoostNotification('⚡ РЕЖИМ УСКОРЕНИЯ! Звёзды x2!');
                     }
-                    
                     this.stars.splice(i, 1);
                 }
             }
-            
-            // Таймер бонуса
             if (this.boostActive) {
                 this.boostTimer += 1/60;
                 if (this.boostTimer > 5) {
@@ -9044,10 +9075,7 @@
                     this.showBoostNotification('⏳ Режим ускорения закончился');
                 }
             }
-            
-            // Отрисовка
             this.draw();
-            
             this.gameLoop = requestAnimationFrame(() => this.update());
         },
         
@@ -9055,18 +9083,12 @@
             const ctx = this.ctx;
             const w = this.width;
             const h = this.height;
-            
-            // Фон дороги
             ctx.clearRect(0, 0, w, h);
-            
-            // Асфальт
             const gradient = ctx.createLinearGradient(0, 0, 0, h);
             gradient.addColorStop(0, '#1a1a2e');
             gradient.addColorStop(1, '#2d2d44');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, w, h);
-            
-            // Разметка дороги (линии)
             ctx.strokeStyle = 'rgba(255,255,255,0.15)';
             ctx.lineWidth = 2;
             for (let i = 0; i < 3; i++) {
@@ -9076,8 +9098,6 @@
                 ctx.lineTo(x, h);
                 ctx.stroke();
             }
-            
-            // Центральная линия (пунктир)
             ctx.strokeStyle = 'rgba(255,255,255,0.3)';
             ctx.lineWidth = 3;
             ctx.setLineDash([20, 20]);
@@ -9086,8 +9106,6 @@
             ctx.lineTo(w/2, h);
             ctx.stroke();
             ctx.setLineDash([]);
-            
-            // Боковые линии
             ctx.strokeStyle = 'rgba(255,255,255,0.2)';
             ctx.lineWidth = 4;
             ctx.beginPath();
@@ -9098,26 +9116,16 @@
             ctx.moveTo(w, 0);
             ctx.lineTo(w, h);
             ctx.stroke();
-            
-            // Обочина
             ctx.fillStyle = 'rgba(132, 204, 22, 0.15)';
             ctx.fillRect(0, 0, 6, h);
             ctx.fillRect(w-6, 0, 6, h);
-            
-            // Звёзды
             for (const star of this.stars) {
                 this.drawStar(ctx, star.x, star.y, 14, '#FFD700');
             }
-            
-            // Препятствия
             for (const obs of this.obstacles) {
                 this.drawObstacle(ctx, obs);
             }
-            
-            // Машина игрока
             this.drawCar(ctx, this.carX, this.carY);
-            
-            // Бонусный индикатор
             if (this.boostActive) {
                 ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
                 ctx.fillRect(0, 0, w, 4);
@@ -9130,12 +9138,8 @@
         drawCar(ctx, x, y) {
             const w = this.carWidth;
             const h = this.carHeight;
-            
-            // Тень
             ctx.shadowColor = 'rgba(0,0,0,0.4)';
             ctx.shadowBlur = 20;
-            
-            // Кузов
             const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
             if (this.boostActive) {
                 gradient.addColorStop(0, '#FFD700');
@@ -9149,8 +9153,6 @@
             ctx.fillStyle = gradient;
             ctx.shadowColor = this.boostActive ? 'rgba(255, 215, 0, 0.6)' : 'rgba(0,0,0,0.3)';
             ctx.shadowBlur = this.boostActive ? 30 : 15;
-            
-            // Округлённый прямоугольник
             const r = 8;
             ctx.beginPath();
             ctx.moveTo(x + r, y);
@@ -9164,25 +9166,18 @@
             ctx.quadraticCurveTo(x, y, x + r, y);
             ctx.closePath();
             ctx.fill();
-            
             ctx.shadowBlur = 0;
-            
-            // Окна
             ctx.fillStyle = 'rgba(100, 200, 255, 0.4)';
             const winW = w * 0.3;
             const winH = h * 0.25;
             ctx.fillRect(x + w * 0.1, y + h * 0.08, winW, winH);
             ctx.fillRect(x + w * 0.6, y + h * 0.08, winW, winH);
-            
-            // Фары
             ctx.fillStyle = '#FFD700';
             ctx.shadowColor = '#FFD700';
             ctx.shadowBlur = 10;
             ctx.fillRect(x + 2, y - 2, 8, 5);
             ctx.fillRect(x + w - 10, y - 2, 8, 5);
             ctx.shadowBlur = 0;
-            
-            // Задние фонари
             ctx.fillStyle = '#ff4444';
             ctx.fillRect(x + 2, y + h - 4, 8, 4);
             ctx.fillRect(x + w - 10, y + h - 4, 8, 4);
@@ -9192,13 +9187,9 @@
             const x = obs.x;
             const y = obs.y;
             const size = obs.size || 30;
-            
-            // Тень
             ctx.shadowColor = 'rgba(0,0,0,0.3)';
             ctx.shadowBlur = 15;
-            
             if (obs.type === 'car') {
-                // Другая машина
                 const w = size * 1.2;
                 const h = size * 1.5;
                 ctx.fillStyle = '#e53e3e';
@@ -9207,25 +9198,21 @@
                 ctx.beginPath();
                 ctx.roundRect(x - w/2, y - h/2, w, h, 6);
                 ctx.fill();
-                // Окна
                 ctx.fillStyle = 'rgba(100, 200, 255, 0.3)';
                 ctx.fillRect(x - w*0.35, y - h*0.3, w*0.25, h*0.2);
                 ctx.fillRect(x + w*0.1, y - h*0.3, w*0.25, h*0.2);
             } else {
-                // Камень / препятствие
                 ctx.fillStyle = '#718096';
                 ctx.shadowColor = 'rgba(0,0,0,0.3)';
                 ctx.shadowBlur = 15;
                 ctx.beginPath();
                 ctx.arc(x, y, size/2, 0, Math.PI * 2);
                 ctx.fill();
-                // Блик
                 ctx.fillStyle = 'rgba(255,255,255,0.2)';
                 ctx.beginPath();
                 ctx.arc(x - size*0.15, y - size*0.15, size*0.2, 0, Math.PI * 2);
                 ctx.fill();
             }
-            
             ctx.shadowBlur = 0;
         },
         
@@ -9278,15 +9265,11 @@
             const halfSize = size / 2;
             const halfW = this.carWidth / 2 - 4;
             const halfH = this.carHeight / 2 - 4;
-            
-            // Проверка на столкновение (упрощённая)
             const dx = Math.abs(cx - obs.x);
             const dy = Math.abs(cy - obs.y);
             const overlapX = dx < halfW + halfSize;
             const overlapY = dy < halfH + halfSize;
-            
             if (overlapX && overlapY) {
-                // Дополнительная проверка для машин
                 if (obs.type === 'car') {
                     return true;
                 }
@@ -9339,8 +9322,6 @@
             const title = document.getElementById('raceOverlayTitle');
             const desc = document.getElementById('raceOverlayDesc');
             const scoreEl = document.getElementById('raceOverlayScore');
-            
-            // Показываем уведомление на 1.5 секунды
             const notif = document.createElement('div');
             notif.style.cssText = `
                 position: absolute;
@@ -9365,40 +9346,29 @@
             setTimeout(() => notif.remove(), 1600);
         },
         
-        updateUI() {
-            // UI обновляется в цикле
-        },
+        updateUI() {},
         
         endGame() {
             if (this.isOver) return;
             this.isRunning = false;
             this.isOver = true;
-            
             if (this.timerInterval) clearInterval(this.timerInterval);
             if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
-            
-            // Сохраняем очки в localStorage
             this.saveScore(this.score);
-            
-            // Показываем оверлей
             const overlay = document.getElementById('raceOverlay');
             const title = document.getElementById('raceOverlayTitle');
             const scoreEl = document.getElementById('raceOverlayScore');
             const desc = document.getElementById('raceOverlayDesc');
-            
             title.textContent = '🏁 Гонка завершена!';
             scoreEl.textContent = `${this.score} ⭐`;
-            
             if (this.score >= 30) desc.textContent = '🌟 Отличный результат! Ты настоящий гонщик!';
             else if (this.score >= 20) desc.textContent = '🚗 Хорошая езда! Продолжай в том же духе!';
             else if (this.score >= 10) desc.textContent = '👍 Неплохо, но можно лучше!';
             else desc.textContent = '💪 Тренируйся, и звёзды будут твои!';
-            
             overlay.classList.add('active');
         },
         
         saveScore(score) {
-            // Сохраняем очки в общую статистику игрока
             const statsKey = `game_stats_${currentUserId}`;
             let stats = getLocalStorage(statsKey) || { totalStars: 0, raceHighScore: 0, wheelLastSpin: null, wheelCooldown: false };
             stats.totalStars = (stats.totalStars || 0) + score;
@@ -9406,25 +9376,20 @@
                 stats.raceHighScore = score;
             }
             setLocalStorage(statsKey, stats);
-            
-            // Обновляем реферальные звёзды
             const referralData = getReferralData();
             if (referralData) {
                 referralData.starsEarned = (referralData.starsEarned || 0) + score;
                 saveReferralData(referralData);
             }
-            
             console.log(`⭐ Сохранено ${score} звёзд от игры Гонка. Всего: ${stats.totalStars}`);
             this.updateLeaderboard();
         },
         
         updateLeaderboard() {
-            // Обновляем таблицу лидеров при изменении очков
             renderLeaderboard();
         },
         
         restart() {
-            // Сброс и перезапуск
             if (this.timerInterval) clearInterval(this.timerInterval);
             if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
             this.isRunning = false;
@@ -9433,7 +9398,6 @@
         }
     };
 
-    // Добавляем roundRect для canvas
     if (!CanvasRenderingContext2D.prototype.roundRect) {
         CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             if (typeof r === 'number') r = { tl: r, tr: r, br: r, bl: r };
@@ -9452,8 +9416,6 @@
         };
     }
 
-    // -------- ИГРА 2: КОЛЕСО УДАЧИ --------
-
     let wheelGame = {
         canvas: null,
         ctx: null,
@@ -9467,6 +9429,7 @@
         maxSpinSpeed: 800,
         lastSpinDate: null,
         cooldownHours: 24,
+        _timerInterval: null,
         
         init() {
             this.canvas = document.getElementById('wheelCanvas');
@@ -9483,15 +9446,11 @@
             const radius = Math.min(canvas.width, canvas.height) / 2 - 10;
             const numSegments = this.segments.length;
             const angleStep = (Math.PI * 2) / numSegments;
-            
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Рисуем сегменты
             for (let i = 0; i < numSegments; i++) {
                 const startAngle = this.currentAngle + i * angleStep;
                 const endAngle = startAngle + angleStep;
                 const color = this.colors[i % this.colors.length];
-                
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -9501,8 +9460,6 @@
                 ctx.strokeStyle = 'rgba(255,255,255,0.3)';
                 ctx.lineWidth = 2;
                 ctx.stroke();
-                
-                // Текст
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(startAngle + angleStep / 2);
@@ -9515,15 +9472,11 @@
                 ctx.fillText(this.segments[i], radius * 0.7, 0);
                 ctx.restore();
             }
-            
-            // Внешний обод
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
             ctx.strokeStyle = 'rgba(255,255,255,0.2)';
             ctx.lineWidth = 4;
             ctx.stroke();
-            
-            // Центральный круг
             const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 30);
             grad.addColorStop(0, '#FFD700');
             grad.addColorStop(1, '#F59E0B');
@@ -9534,8 +9487,6 @@
             ctx.strokeStyle = 'rgba(255,255,255,0.4)';
             ctx.lineWidth = 3;
             ctx.stroke();
-            
-            // Декоративные точки на ободе
             for (let i = 0; i < 20; i++) {
                 const angle = (i / 20) * Math.PI * 2;
                 const x = centerX + radius * Math.cos(angle);
@@ -9549,52 +9500,32 @@
         
         spin() {
             if (this.isSpinning) return;
-            
-            // Проверка кулдауна
             if (this.isCooldownActive()) {
                 const remaining = this.getCooldownRemaining();
                 document.getElementById('wheelResult').textContent = `⏳ Доступно через ${remaining}`;
                 return;
             }
-            
             this.isSpinning = true;
             document.getElementById('wheelSpinBtn').disabled = true;
             document.getElementById('wheelResult').textContent = '🎡 Крутим...';
-            
-            // Случайная скорость
             this.spinVelocity = this.minSpinSpeed + Math.random() * (this.maxSpinSpeed - this.minSpinSpeed);
-            // Добавляем несколько полных оборотов для эффекта
             this.spinVelocity += 360 * (2 + Math.random() * 3);
-            
-            // Анимация
             const spinInterval = setInterval(() => {
-                // Замедление
                 this.spinVelocity *= this.spinDecay;
                 this.currentAngle += this.spinVelocity * 0.01;
-                
-                // Отрисовка
                 this.drawWheel();
-                
-                // Остановка
                 if (this.spinVelocity < 0.5) {
                     clearInterval(spinInterval);
                     this.isSpinning = false;
                     document.getElementById('wheelSpinBtn').disabled = false;
-                    
-                    // Определение выпавшего сегмента
                     const numSegments = this.segments.length;
                     const angleStep = (Math.PI * 2) / numSegments;
-                    // Нормализуем угол
                     let normalizedAngle = this.currentAngle % (Math.PI * 2);
                     if (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
-                    
-                    // Определяем индекс сегмента (указатель сверху)
-                    // Указатель находится на 12 часах = -PI/2
                     const pointerAngle = -Math.PI / 2;
                     let rawIndex = Math.floor((pointerAngle - normalizedAngle) / angleStep);
                     let index = rawIndex % numSegments;
                     if (index < 0) index += numSegments;
-                    
                     const result = this.segments[index];
                     this.handleResult(result);
                 }
@@ -9602,31 +9533,21 @@
         },
         
         handleResult(value) {
-            // Сохраняем время последнего вращения
             this.lastSpinDate = new Date().toISOString();
             localStorage.setItem(`wheel_last_spin_${currentUserId}`, this.lastSpinDate);
-            
-            // Начисляем звёзды
             const statsKey = `game_stats_${currentUserId}`;
             let stats = getLocalStorage(statsKey) || { totalStars: 0, raceHighScore: 0, wheelLastSpin: null, wheelCooldown: false };
             stats.totalStars = (stats.totalStars || 0) + value;
             stats.wheelLastSpin = this.lastSpinDate;
             setLocalStorage(statsKey, stats);
-            
-            // Обновляем реферальные звёзды
             const referralData = getReferralData();
             if (referralData) {
                 referralData.starsEarned = (referralData.starsEarned || 0) + value;
                 saveReferralData(referralData);
             }
-            
             document.getElementById('wheelResult').textContent = `🎉 ${value} ⭐`;
             this.showResultNotification(`🎉 Вы выиграли ${value} звёзд!`);
-            
-            // Обновляем таблицу лидеров
             this.updateLeaderboard();
-            
-            // Обновляем таймер
             this.checkCooldown();
         },
         
@@ -9687,8 +9608,6 @@
                 const remaining = this.getCooldownRemaining();
                 timerEl.textContent = `⏳ Доступно через ${remaining}`;
                 document.getElementById('wheelSpinBtn').disabled = true;
-                
-                // Обновляем таймер каждую минуту
                 if (this._timerInterval) clearInterval(this._timerInterval);
                 this._timerInterval = setInterval(() => {
                     if (!this.isCooldownActive()) {
@@ -9714,13 +9633,9 @@
         }
     };
 
-    // -------- ТАБЛИЦА ЛИДЕРОВ --------
-
     function renderLeaderboard() {
         const container = document.getElementById('gamesLeaderboard');
         if (!container) return;
-        
-        // Собираем статистику всех пользователей из localStorage
         const usersStats = [];
         const keys = Object.keys(localStorage);
         for (const key of keys) {
@@ -9728,7 +9643,6 @@
                 const userId = key.replace('game_stats_', '');
                 const stats = getLocalStorage(key);
                 if (stats && stats.totalStars > 0) {
-                    // Пытаемся получить имя пользователя
                     let userName = 'Игрок';
                     const userData = getLocalStorage(`user_${userId}`);
                     if (userData && userData.firstName) {
@@ -9743,18 +9657,12 @@
                 }
             }
         }
-        
-        // Сортируем по звёздам (по убыванию)
         usersStats.sort((a, b) => b.totalStars - a.totalStars);
-        
-        // Берём топ-3
         const top3 = usersStats.slice(0, 3);
-        
         if (top3.length === 0) {
             container.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; padding: 8px;">Нет данных</div>';
             return;
         }
-        
         const medals = ['🥇', '🥈', '🥉'];
         container.innerHTML = top3.map((user, index) => `
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; 
@@ -9772,8 +9680,6 @@
         `).join('');
     }
 
-    // -------- ОБЩИЕ ФУНКЦИИ ДЛЯ ИГР --------
-
     function openGamesModal() {
         triggerHapticFeedback();
         document.getElementById('gamesModal').classList.add('active');
@@ -9790,8 +9696,6 @@
         closeGamesModal();
         const container = document.getElementById('raceGameFullscreen');
         container.classList.add('active');
-        
-        // Инициализация игры при первом запуске
         if (!raceGame.canvas) {
             raceGame.init();
         }
@@ -9808,7 +9712,6 @@
             if (raceGame.timerInterval) clearInterval(raceGame.timerInterval);
             if (raceGame.gameLoop) cancelAnimationFrame(raceGame.gameLoop);
         }
-        // Показываем модалку игр снова
         setTimeout(() => openGamesModal(), 300);
     }
 
@@ -9822,7 +9725,6 @@
         closeGamesModal();
         const container = document.getElementById('wheelGameFullscreen');
         container.classList.add('active');
-        
         if (!wheelGame.canvas) {
             wheelGame.init();
         }
@@ -9846,7 +9748,6 @@
         wheelGame.spin();
     }
 
-    // Добавляем анимации для уведомлений
     const styleSheet = document.createElement('style');
     styleSheet.textContent = `
         @keyframes fadeInUp {
@@ -9881,7 +9782,6 @@
     document.addEventListener('DOMContentLoaded', async function() {
         console.log('🚀 Ymeyka app loaded successfully!');
         
-        // Инициализация свайп-навигации
         initSwipeNavigation();
         
         currentMasterStatus = 'ready';
@@ -9910,11 +9810,9 @@
         }
         initAdminAccess();
         
-        // Инициализация селекторов формата работы
         selectWorkFormat('Один');
         selectEditWorkFormat('Один');
         
-        // Инициализация игр
         if (document.getElementById('raceCanvas')) {
             raceGame.init();
         }
@@ -9922,10 +9820,7 @@
             wheelGame.init();
         }
         
-        // Загружаем таблицу лидеров при первом открытии
         renderLeaderboard();
-        
-        // Инициализируем UI финансов
         updateFinanceUI();
     });
     </script>
