@@ -78,7 +78,6 @@
         .games-button .icon {
             font-size: 22px;
         }
-        /* Кнопка скрыта по умолчанию, показываем только на главном экране */
         .games-button.hidden {
             display: none !important;
         }
@@ -3481,77 +3480,77 @@
             font-weight: bold;
             color: white;
         }
-        /* Стили для выбора города в архиве */
-        .city-selector-wrapper {
-            margin-bottom: 16px;
-        }
-        .city-selector-wrapper select {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 14px;
-            border: 2px solid rgba(255,255,255,0.25);
-            background: rgba(255,255,255,0.12);
-            backdrop-filter: blur(12px);
-            color: #fff;
-            font-size: 16px;
-            font-weight: 500;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            background-size: 20px;
-            cursor: pointer;
-        }
-        .city-selector-wrapper select option {
-            background: #1e1b4b;
-            color: #fff;
-        }
-        .city-selector-wrapper select:focus {
-            outline: none;
-            border-color: rgba(255,255,255,0.5);
-            box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
-        }
-        /* Стили категорий в архиве — компактные кнопки с эмодзи */
-        .category-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .category-btn {
+
+        /* ========== НОВЫЕ СТИЛИ ДЛЯ КАТЕГОРИЙ В АРХИВЕ ========== */
+        .category-button {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 16px 18px;
+            gap: 12px;
+            padding: 16px 20px;
             background: rgba(255,255,255,0.12);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 16px;
+            border-radius: 14px;
             color: white;
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            width: 100%;
             text-align: left;
         }
-        .category-btn:active {
-            transform: scale(0.98);
-            background: rgba(255,255,255,0.22);
+        .category-button:active {
+            transform: scale(0.97);
+            background: rgba(255,255,255,0.2);
         }
-        .category-btn .emoji {
-            font-size: 28px;
-            line-height: 1;
+        .category-button .cat-emoji {
+            font-size: 24px;
             flex-shrink: 0;
         }
-        .category-btn .name {
+        .category-button .cat-name {
             flex: 1;
         }
-        .category-btn .count {
-            font-size: 14px;
-            font-weight: 400;
-            opacity: 0.7;
-            background: rgba(255,255,255,0.08);
+        .category-button .cat-count {
+            background: rgba(255,255,255,0.15);
             padding: 2px 12px;
-            border-radius: 30px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        /* Стили для селектора города */
+        .city-selector-wrapper {
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .city-selector-wrapper label {
+            display: block;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .city-select {
+            width: 100%;
+            padding: 14px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.95);
+            color: #2d3748;
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+        }
+        .city-select:focus {
+            outline: 2px solid rgba(255,255,255,0.4);
+        }
+        .city-select option {
+            padding: 10px;
         }
     </style>
 </head>
@@ -3773,15 +3772,16 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ КЛИЕНТА / АРХИВ -->
+        <!-- СЕКЦИЯ КЛИЕНТА / АРХИВ (ИСПРАВЛЕННАЯ) -->
         <div id="clientSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📚 Архив мастеров</h2>
                 
-                <!-- ВЫБОР ГОРОДА -->
+                <!-- НОВЫЙ СЕЛЕКТОР ГОРОДА -->
                 <div class="city-selector-wrapper">
-                    <select id="citySelector" onchange="onCityChange()">
-                        <option value="__all__">🌍 Все города</option>
+                    <label for="cityFilterSelect">🏙️ Выберите город</label>
+                    <select id="cityFilterSelect" class="city-select" onchange="onCityFilterChange(this.value)">
+                        <option value="all">🌍 Все города</option>
                     </select>
                 </div>
                 
@@ -4683,10 +4683,6 @@
     // Переменные для фильтрации карты
     let currentMapFilterCategory = null;
     let currentMapFilterSubcategory = null;
-
-    // Переменная для выбранного города в архиве
-    let selectedCity = '__all__';
-    let allSkillsCache = [];
 
     // ========== ФУНКЦИИ ДЛЯ ФОРМАТА РАБОТЫ ==========
     
@@ -7352,6 +7348,12 @@
             console.log('📚 [Архив] Открытие архива с принудительной синхронизацией данных');
             showLoadingIndicator();
             
+            // Инициализируем селектор городов
+            initCitySelector();
+            
+            // Сначала показываем категории с индикатором загрузки
+            renderCategories();
+            
             // Загружаем свежие данные с сервера
             fetch(`${API_URL}/api/skills/all?t=${Date.now()}`)
                 .then(response => {
@@ -7366,13 +7368,10 @@
                         isSkillsLoaded = true;
                         offlineMode = false;
                         hideLoadingIndicator();
-                        populateCitySelector(result.skills);
                         renderCategories();
                         showNotification(`✅ Загружено ${result.skills.length} мастеров`, 1500);
                     } else {
                         hideLoadingIndicator();
-                        populateCitySelector([]);
-                        renderCategories();
                         showNotification('⚠️ Ошибка загрузки данных с сервера', 1500);
                     }
                 })
@@ -7384,21 +7383,19 @@
                         setCachedSkills(localSkills);
                         offlineMode = true;
                         hideLoadingIndicator();
-                        populateCitySelector(localSkills);
                         renderCategories();
                         showNotification(`📦 Офлайн-режим: ${localSkills.length} мастеров`, 2000);
                     } else {
+                        // Если нет локальных данных, пытаемся загрузить из кэша
                         const cached = getCachedSkills();
                         if (cached && cached.length > 0) {
                             setLocalStorage('umeyka_global_skills', cached);
                             offlineMode = true;
                             hideLoadingIndicator();
-                            populateCitySelector(cached);
                             renderCategories();
                             showNotification(`📦 Офлайн-режим: ${cached.length} мастеров (из кэша)`, 2000);
                         } else {
                             hideLoadingIndicator();
-                            populateCitySelector([]);
                             renderCategories();
                             showNotification('❌ Нет данных о мастерах', 2000);
                         }
@@ -8282,143 +8279,113 @@
     // ========== КАТЕГОРИИ ДЛЯ АРХИВА И ПОДРАЗДЕЛЫ ==========
     
     const skillCategories = [
-        "🚕 Такси",
-        "🧱 Плиточник",
-        "🏗️ Строитель",
-        "✂️ Парикмахер",
-        "🔧 Ремонт техники",
-        "⚡ Электрик",
-        "🏠 Кровельщик",
-        "🎨 Отделочник",
-        "🍳 Повар",
-        "⛏️ Копаю",
-        "🏥 Доктор",
-        "🧶 Вяжу",
-        "🔨 Сантехник",
-        "🎨 Дизайнер интерьера",
-        "🚗 Автослесарь",
-        "💻 Компьютерный мастер",
-        "📱 Ремонт телефонов",
-        "🧹 Уборка/Клининг",
-        "🚚 Грузчик",
-        "📚 Репетитор",
-        "🏋️ Тренер/Фитнес",
-        "🐕 Кинолог/Выгул собак",
-        "🌳 Садовник",
-        "🪚 Столяр/Плотник",
-        "🔩 Сварщик",
-        "🖼️ Маляр",
-        "🔊 Монтажник",
-        "❄️ Холодильщик",
-        "🔥 Отопление/Газ",
-        "📷 Фотограф",
-        "🎥 Видеограф",
-        "🎂 Кондитер",
-        "🧴 Косметолог",
-        "💆 Массажист",
-        "📦 Другое"
+        { name: "Такси", emoji: "🚕" },
+        { name: "Плиточник", emoji: "🧱" },
+        { name: "Строитель", emoji: "🏗️" },
+        { name: "Парикмахер", emoji: "✂️" },
+        { name: "Ремонт техники", emoji: "🔧" },
+        { name: "Электрик", emoji: "⚡" },
+        { name: "Кровельщик", emoji: "🏠" },
+        { name: "Отделочник", emoji: "🎨" },
+        { name: "Повар", emoji: "🍳" },
+        { name: "Копаю", emoji: "⛏️" },
+        { name: "Доктор", emoji: "🏥" },
+        { name: "Вяжу", emoji: "🧶" },
+        { name: "Сантехник", emoji: "🔨" },
+        { name: "Дизайнер интерьера", emoji: "🎨" },
+        { name: "Автослесарь", emoji: "🚗" },
+        { name: "Компьютерный мастер", emoji: "💻" },
+        { name: "Ремонт телефонов", emoji: "📱" },
+        { name: "Уборка/Клининг", emoji: "🧹" },
+        { name: "Грузчик", emoji: "🚚" },
+        { name: "Репетитор", emoji: "📚" },
+        { name: "Тренер/Фитнес", emoji: "🏋️" },
+        { name: "Кинолог/Выгул собак", emoji: "🐕" },
+        { name: "Садовник", emoji: "🌳" },
+        { name: "Столяр/Плотник", emoji: "🪚" },
+        { name: "Сварщик", emoji: "🔩" },
+        { name: "Маляр", emoji: "🖼️" },
+        { name: "Монтажник", emoji: "🔊" },
+        { name: "Холодильщик", emoji: "❄️" },
+        { name: "Отопление/Газ", emoji: "🔥" },
+        { name: "Фотограф", emoji: "📷" },
+        { name: "Видеограф", emoji: "🎥" },
+        { name: "Кондитер", emoji: "🎂" },
+        { name: "Косметолог", emoji: "🧴" },
+        { name: "Массажист", emoji: "💆" },
+        { name: "Другое", emoji: "📦" }
     ];
     
-    const subcategories = {
-        "🚕 Такси": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🧱 Плиточник": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🏗️ Строитель": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "✂️ Парикмахер": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🔧 Ремонт техники": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "⚡ Электрик": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🏠 Кровельщик": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🎨 Отделочник": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🍳 Повар": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "⛏️ Копаю": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🏥 Доктор": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🧶 Вяжу": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🔨 Сантехник": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🎨 Дизайнер интерьера": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🚗 Автослесарь": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "💻 Компьютерный мастер": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "📱 Ремонт телефонов": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🧹 Уборка/Клининг": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🚚 Грузчик": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "📚 Репетитор": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🏋️ Тренер/Фитнес": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🐕 Кинолог/Выгул собак": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🌳 Садовник": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🪚 Столяр/Плотник": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🔩 Сварщик": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🖼️ Маляр": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🔊 Монтажник": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "❄️ Холодильщик": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🔥 Отопление/Газ": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "📷 Фотограф": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🎥 Видеограф": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🎂 Кондитер": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "🧴 Косметолог": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "💆 Массажист": ["Один", "Вдвоём", "Команда", "Ищу команду"],
-        "📦 Другое": ["Один", "Вдвоём", "Команда", "Ищу команду"]
+    const subcategoriesMap = {
+        "Такси": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Плиточник": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Строитель": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Парикмахер": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Ремонт техники": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Электрик": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Кровельщик": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Отделочник": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Повар": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Копаю": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Доктор": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Вяжу": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Сантехник": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Дизайнер интерьера": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Автослесарь": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Компьютерный мастер": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Ремонт телефонов": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Уборка/Клининг": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Грузчик": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Репетитор": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Тренер/Фитнес": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Кинолог/Выгул собак": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Садовник": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Столяр/Плотник": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Сварщик": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Маляр": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Монтажник": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Холодильщик": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Отопление/Газ": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Фотограф": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Видеограф": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Кондитер": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Косметолог": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Массажист": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"],
+        "Другое": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"]
     };
     
-    // ========== НОВЫЕ ФУНКЦИИ ДЛЯ ВЫБОРА ГОРОДА В АРХИВЕ ==========
-    
-    function populateCitySelector(skills) {
-        const selector = document.getElementById('citySelector');
-        if (!selector) return;
-        
-        // Сохраняем все скиллы для фильтрации
-        allSkillsCache = skills || getLocalStorage('umeyka_global_skills') || [];
-        
-        // Собираем уникальные города из умейок
-        const citiesSet = new Set();
-        allSkillsCache.forEach(skill => {
-            if (skill.city && skill.city.trim()) {
-                citiesSet.add(skill.city.trim());
-            }
-        });
-        
-        // Сортируем города
-        const cityList = Array.from(citiesSet).sort();
+    // Функция инициализации селектора городов
+    function initCitySelector() {
+        const select = document.getElementById('cityFilterSelect');
+        if (!select) return;
         
         // Сохраняем текущее выбранное значение
-        const currentValue = selector.value;
+        const currentValue = select.value || 'all';
         
-        // Перестраиваем опции
-        selector.innerHTML = '<option value="__all__">🌍 Все города</option>';
+        // Очищаем селектор, оставляя опцию "Все города"
+        select.innerHTML = '<option value="all">🌍 Все города</option>';
         
-        cityList.forEach(city => {
-            const count = allSkillsCache.filter(s => s.city === city).length;
+        // Добавляем все города из базы
+        allCities.forEach(city => {
             const option = document.createElement('option');
             option.value = city;
-            option.textContent = `${city} (${count})`;
-            selector.appendChild(option);
+            option.textContent = city;
+            select.appendChild(option);
         });
         
-        // Восстанавливаем выбор
-        if (currentValue && (currentValue === '__all__' || cityList.includes(currentValue))) {
-            selector.value = currentValue;
-        } else {
-            // По умолчанию выбираем Евпаторию, если она есть в списке
-            if (cityList.includes('Евпатория')) {
-                selector.value = 'Евпатория';
-            } else if (cityList.length > 0) {
-                selector.value = cityList[0];
-            } else {
-                selector.value = '__all__';
-            }
-        }
-        
-        selectedCity = selector.value;
-        
-        // Перерисовываем категории
-        renderCategories();
+        // Восстанавливаем выбранное значение
+        select.value = currentValue;
     }
     
-    function onCityChange() {
-        const selector = document.getElementById('citySelector');
-        selectedCity = selector.value;
+    // Обработчик изменения выбора города
+    function onCityFilterChange(city) {
         triggerHapticFeedback();
+        console.log(`🏙️ [Фильтр] Выбран город: ${city}`);
         
-        // Скрываем результаты поиска, если они открыты
+        // Скрываем результаты подкатегорий, если они открыты
         const resultsContainer = document.getElementById('categorySearchResults');
         const categoriesContainer = document.getElementById('categoriesList');
+        
         if (resultsContainer) {
             resultsContainer.style.display = 'none';
             resultsContainer.innerHTML = '';
@@ -8427,28 +8394,94 @@
             categoriesContainer.style.display = 'block';
         }
         
+        // Перерисовываем категории с новым фильтром
         renderCategories();
-        showNotification(`🏙️ Город: ${selectedCity === '__all__' ? 'Все города' : selectedCity}`, 1000);
-    }
-    
-    function getFilteredSkills() {
-        let skills = allSkillsCache;
-        if (selectedCity !== '__all__') {
-            skills = skills.filter(s => s.city === selectedCity);
+        
+        // Показываем уведомление
+        if (city === 'all') {
+            showNotification('🌍 Показаны мастера из всех городов', 1500);
+        } else {
+            showNotification(`🏙️ Показаны мастера из города ${city}`, 1500);
         }
-        return skills;
     }
     
-    // ========== ОБНОВЛЕННАЯ ФУНКЦИЯ РЕНДЕРИНГА КАТЕГОРИЙ ==========
+    // Получить выбранный город из селектора
+    function getSelectedCity() {
+        const select = document.getElementById('cityFilterSelect');
+        return select ? select.value : 'all';
+    }
+    
+    // Подсчитать количество мастеров в выбранном городе для категории
+    function countMastersInCity(categoryName, city) {
+        const allSkills = getLocalStorage('umeyka_global_skills') || [];
+        
+        // Фильтруем по категории
+        let filtered = allSkills.filter(skill => {
+            if (!skill.category) return false;
+            const skillCategoryClean = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
+            return skillCategoryClean.toLowerCase() === categoryName.toLowerCase();
+        });
+        
+        // Фильтруем по городу
+        if (city !== 'all') {
+            filtered = filtered.filter(skill => {
+                if (!skill.city) return false;
+                return skill.city.trim().toLowerCase() === city.trim().toLowerCase();
+            });
+        }
+        
+        // Убираем дубликаты по ID
+        const unique = [];
+        const seen = new Set();
+        for (const skill of filtered) {
+            if (!seen.has(skill._id)) {
+                seen.add(skill._id);
+                unique.push(skill);
+            }
+        }
+        
+        return unique.length;
+    }
     
     function renderCategories() {
         const container = document.getElementById('categoriesList');
         if (!container) return;
         
-        const filteredSkills = getFilteredSkills();
-        const totalCount = filteredSkills.length;
+        const allSkills = getLocalStorage('umeyka_global_skills') || [];
+        const selectedCity = getSelectedCity();
         
-        const cityDisplay = selectedCity === '__all__' ? 'всех городах' : selectedCity;
+        // Подсчитываем общее количество мастеров с учетом города
+        let totalMasters = allSkills.length;
+        if (selectedCity !== 'all') {
+            totalMasters = allSkills.filter(skill => {
+                if (!skill.city) return false;
+                return skill.city.trim().toLowerCase() === selectedCity.trim().toLowerCase();
+            }).length;
+            // Убираем дубликаты
+            const unique = new Set();
+            let count = 0;
+            for (const skill of allSkills) {
+                if (!skill.city) continue;
+                if (skill.city.trim().toLowerCase() === selectedCity.trim().toLowerCase()) {
+                    if (!unique.has(skill._id)) {
+                        unique.add(skill._id);
+                        count++;
+                    }
+                }
+            }
+            totalMasters = count;
+        } else {
+            // Для "Все города" считаем уникальные умейки
+            const unique = new Set();
+            for (const skill of allSkills) {
+                if (!unique.has(skill._id)) {
+                    unique.add(skill._id);
+                }
+            }
+            totalMasters = unique.size;
+        }
+        
+        const cityDisplay = selectedCity === 'all' ? 'всех городов' : `города ${selectedCity}`;
         
         container.innerHTML = `
             <div style="margin-bottom: 15px;">
@@ -8456,28 +8489,17 @@
                     📋 Выберите категорию мастера:
                     ${offlineMode ? '<span style="display:inline-block; margin-left: 8px; background: #f56565; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px;">📶 Офлайн</span>' : ''}
                     <span style="display:inline-block; margin-left: 8px; background: rgba(255,255,255,0.15); padding: 2px 10px; border-radius: 12px; font-size: 12px; color: rgba(255,255,255,0.8);">
-                        ${totalCount} мастеров в ${cityDisplay}
+                        ${totalMasters} мастеров (${cityDisplay})
                     </span>
                 </div>
-                <div class="category-grid">
-                    ${skillCategories.map(category => {
-                        const count = filteredSkills.filter(skill => {
-                            if (!skill.category) return false;
-                            const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
-                            const skillCategoryClean = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
-                            return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
-                        }).length;
-                        
-                        // Извлекаем эмодзи из категории (первый символ)
-                        const emoji = category.charAt(0);
-                        // Имя категории без эмодзи
-                        const name = category.substring(1).trim();
-                        
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    ${skillCategories.map(cat => {
+                        const count = countMastersInCity(cat.name, selectedCity);
                         return `
-                            <button class="category-btn" onclick="triggerHapticFeedback(); showSubcategories('${category.replace(/'/g, "\\'")}');">
-                                <span class="emoji">${emoji}</span>
-                                <span class="name">${name}</span>
-                                <span class="count">${count}</span>
+                            <button class="category-button" onclick="triggerHapticFeedback(); showSubcategories('${cat.name.replace(/'/g, "\\'")}');">
+                                <span class="cat-emoji">${cat.emoji}</span>
+                                <span class="cat-name">${cat.name}</span>
+                                <span class="cat-count">${count}</span>
                             </button>
                         `;
                     }).join('')}
@@ -8486,9 +8508,9 @@
         `;
     }
     
-    window.showSubcategories = function(category) {
+    window.showSubcategories = function(categoryName) {
         triggerHapticFeedback();
-        const subcats = subcategories[category] || ["Один", "Вдвоём", "Команда", "Ищу команду"];
+        const subcats = subcategoriesMap[categoryName] || ["Один", "Вдвоём", "Бригада", "Ищу бригаду"];
         const container = document.getElementById('categoriesList');
         const resultsContainer = document.getElementById('categorySearchResults');
         
@@ -8498,21 +8520,21 @@
             <div style="margin-bottom: 20px;">
                 <div style="text-align: center; margin: 15px 0;">
                     <div class="category-filter-badge" style="background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);">
-                        📂 ${category}
+                        📂 ${categoryName}
                     </div>
                 </div>
                 <div class="subcategory-buttons">
                     ${subcats.map(sub => `
-                        <button class="subcategory-button" onclick="triggerHapticFeedback(); searchBySubcategory('${category.replace(/'/g, "\\'")}', '${sub.replace(/'/g, "\\'")}');">
+                        <button class="subcategory-button" onclick="triggerHapticFeedback(); searchBySubcategory('${categoryName.replace(/'/g, "\\'")}', '${sub.replace(/'/g, "\\'")}');">
                             👥 ${sub}
                         </button>
                     `).join('')}
                 </div>
                 <div class="action-buttons-group">
-                    <button class="action-button become" onclick="triggerHapticFeedback(); openMasterFormWithCategory('${category.replace(/'/g, "\\'")}');">
+                    <button class="action-button become" onclick="triggerHapticFeedback(); openMasterFormWithCategory('${categoryName.replace(/'/g, "\\'")}');">
                         ✨ Стать мастером в этой категории
                     </button>
-                    <button class="action-button map" onclick="triggerHapticFeedback(); openMapModal('${category.replace(/'/g, "\\'")}', '');">
+                    <button class="action-button map" onclick="triggerHapticFeedback(); openMapModal('${categoryName.replace(/'/g, "\\'")}', '');">
                         🗺️ Посмотреть на карте
                     </button>
                 </div>
@@ -8522,13 +8544,16 @@
         resultsContainer.style.display = 'block';
     };
     
-    window.openMasterFormWithCategory = function(category) {
+    window.openMasterFormWithCategory = function(categoryName) {
         triggerHapticFeedback();
         showSection('masterSection');
+        // Ищем полное название с эмодзи
+        const fullCategory = skillCategories.find(c => c.name === categoryName);
         const categorySelect = document.getElementById('skillCategory');
-        if (categorySelect) {
+        if (categorySelect && fullCategory) {
+            const fullValue = `${fullCategory.emoji} ${fullCategory.name}`;
             for (let i = 0; i < categorySelect.options.length; i++) {
-                if (categorySelect.options[i].value === category) {
+                if (categorySelect.options[i].value === fullValue) {
                     categorySelect.selectedIndex = i;
                     break;
                 }
@@ -8538,50 +8563,63 @@
                 categorySelect.style.border = '';
             }, 2000);
         }
-        showNotification(`📂 Вы выбрали категорию "${category}"`, 2000);
+        showNotification(`📂 Вы выбрали категорию "${categoryName}"`, 2000);
     };
     
-    // ========== ОБНОВЛЕННАЯ ФУНКЦИЯ ПОИСКА ПО ПОДКАТЕГОРИИ ==========
-    
-    window.searchBySubcategory = async function(category, subcategory) {
+    window.searchBySubcategory = async function(categoryName, subcategory) {
         triggerHapticFeedback();
         const skillsContainer = document.getElementById('subcategorySkills');
         skillsContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div> Загрузка мастеров...</div>';
         
-        // Используем кэшированные данные с учётом города
-        let allSkills = getFilteredSkills();
-        
-        // Если данных мало, пробуем загрузить с сервера
-        if (allSkills.length === 0) {
-            try {
-                const response = await fetch(`${API_URL}/api/skills/all?t=${Date.now()}`);
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.success && result.skills) {
-                        console.log(`📚 [Поиск] Загружено ${result.skills.length} умейок с сервера`);
-                        setCachedSkills(result.skills);
-                        setLocalStorage('umeyka_global_skills', result.skills);
-                        allSkillsCache = result.skills;
-                        allSkills = getFilteredSkills();
-                    }
+        let allSkills = [];
+        try {
+            const response = await fetch(`${API_URL}/api/skills/all?t=${Date.now()}`);
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success && result.skills) {
+                    console.log(`📚 [Поиск] Загружено ${result.skills.length} умейок с сервера`);
+                    setCachedSkills(result.skills);
+                    setLocalStorage('umeyka_global_skills', result.skills);
+                    allSkills = result.skills;
+                } else {
+                    throw new Error('Ошибка сервера');
                 }
-            } catch (error) {
-                console.warn('📚 [Поиск] Сервер недоступен, использую локальные данные:', error);
+            } else {
+                throw new Error(`HTTP ${response.status}`);
             }
+        } catch (error) {
+            console.warn('📚 [Поиск] Сервер недоступен, использую локальные данные:', error);
+            allSkills = getLocalStorage('umeyka_global_skills') || [];
+            offlineMode = true;
+            showNotification('📶 Офлайн-режим: показаны кэшированные данные', 1500);
         }
         
-        console.log(`📚 [Поиск] Всего умейок после фильтрации по городу: ${allSkills.length}`);
+        console.log(`📚 [Поиск] Всего умейок в хранилище: ${allSkills.length}`);
         
-        const cleanCategory = category.replace(/[^\w\sа-яА-Я]/g, '').trim();
+        // Получаем выбранный город
+        const selectedCity = getSelectedCity();
+        console.log(`🏙️ [Поиск] Фильтр по городу: ${selectedCity}`);
         
+        // Фильтруем по категории
+        const cleanCategory = categoryName.replace(/[^\w\sа-яА-Я]/g, '').trim();
         let filteredSkills = allSkills.filter(skill => {
             if (!skill.category) return false;
             const skillCategoryClean = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
             return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
         });
         
-        console.log(`📚 [Поиск] После фильтрации по категории "${category}": ${filteredSkills.length} умейок`);
+        console.log(`📚 [Поиск] После фильтрации по категории "${categoryName}": ${filteredSkills.length} умейок`);
         
+        // Фильтруем по городу
+        if (selectedCity !== 'all') {
+            filteredSkills = filteredSkills.filter(skill => {
+                if (!skill.city) return false;
+                return skill.city.trim().toLowerCase() === selectedCity.trim().toLowerCase();
+            });
+            console.log(`📚 [Поиск] После фильтрации по городу "${selectedCity}": ${filteredSkills.length} умейок`);
+        }
+        
+        // Фильтруем по формату работы
         if (subcategory) {
             filteredSkills = filteredSkills.filter(skill => {
                 return skill.workFormat === subcategory;
@@ -8589,6 +8627,7 @@
             console.log(`📚 [Поиск] После фильтрации по формату "${subcategory}": ${filteredSkills.length} умейок`);
         }
         
+        // Убираем дубликаты
         const uniqueSkills = [];
         const seenIds = new Set();
         for (const skill of filteredSkills) {
@@ -8599,16 +8638,15 @@
         }
         filteredSkills = uniqueSkills;
         
+        // Сортировка
         filteredSkills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
         
         console.log(`📚 [Поиск] Итоговое количество умейок: ${filteredSkills.length}`);
         
-        const cityDisplay = selectedCity === '__all__' ? 'всех городах' : selectedCity;
-        
         if (filteredSkills.length > 0) {
             skillsContainer.innerHTML = `
                 <div class="section-header">
-                    <div class="section-title">🔍 Результаты по подразделу "${subcategory}" (${cityDisplay})</div>
+                    <div class="section-title">🔍 Результаты по подразделу "${subcategory}"</div>
                     ${offlineMode ? '<span class="offline-badge">📶 Офлайн-режим</span>' : ''}
                     <div style="color: white; font-size: 14px;">Найдено: ${filteredSkills.length}</div>
                 </div>
@@ -8668,16 +8706,17 @@
                 `}).join('')}
             `;
         } else {
+            const cityDisplay = selectedCity === 'all' ? 'во всех городах' : `в городе ${selectedCity}`;
             skillsContainer.innerHTML = `
                 <div class="no-category-skills">
                     <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
-                    <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено в категории "${category}" для города "${cityDisplay}"</div>
-                    <div style="opacity: 0.7;">Попробуйте выбрать другую категорию или изменить город</div>
+                    <div style="font-size: 18px; margin-bottom: 10px;">Ничего не найдено в категории "${categoryName}" ${cityDisplay}</div>
+                    <div style="opacity: 0.7;">Попробуйте выбрать другую категорию или город</div>
                     <div class="action-buttons-group" style="margin-top: 15px;">
-                        <button class="action-button become" onclick="triggerHapticFeedback(); openMasterFormWithCategory('${category.replace(/'/g, "\\'")}');">
+                        <button class="action-button become" onclick="triggerHapticFeedback(); openMasterFormWithCategory('${categoryName.replace(/'/g, "\\'")}');">
                             ✨ Стать мастером в этой категории
                         </button>
-                        <button class="action-button map" onclick="triggerHapticFeedback(); openMapModal('${category.replace(/'/g, "\\'")}', '');">
+                        <button class="action-button map" onclick="triggerHapticFeedback(); openMapModal('${categoryName.replace(/'/g, "\\'")}', '');">
                             🗺️ Посмотреть на карте
                         </button>
                     </div>
@@ -8686,8 +8725,8 @@
         }
     };
     
-    window.searchByCategory = function(category) {
-        showSubcategories(category);
+    window.searchByCategory = function(categoryName) {
+        showSubcategories(categoryName);
     };
     
     window.showOnMap = function(lat, lon, title) {
@@ -9038,7 +9077,7 @@
         isOver: false,
         
         // Дорожки (3 полосы)
-        lanes: [-1, 0, 1], // -1: левая, 0: центр, 1: правая
+        lanes: [-1, 0, 1],
         laneWidth: 0,
         carWidth: 40,
         carHeight: 50,
@@ -10109,6 +10148,9 @@
         
         // Инициализируем UI финансов
         updateFinanceUI();
+        
+        // Инициализируем селектор городов
+        initCitySelector();
     });
     </script>
 </body>
