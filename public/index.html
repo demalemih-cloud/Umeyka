@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* Все стили остаются без изменений */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -51,6 +50,7 @@
             to { transform: rotate(360deg); }
         }
         
+        /* ---------- СТИЛИ ДЛЯ РАЗДЕЛА С ИГРАМИ ---------- */
         .games-button {
             position: fixed;
             bottom: 25px;
@@ -82,6 +82,7 @@
             display: none !important;
         }
 
+        /* Модальное окно игр */
         .games-modal-overlay {
             position: fixed;
             top: 0;
@@ -144,6 +145,7 @@
             letter-spacing: 1px;
         }
 
+        /* Карточки игр */
         .game-card {
             background: rgba(255,255,255,0.06);
             border-radius: 20px;
@@ -193,6 +195,7 @@
             color: rgba(255,255,255,0.8);
         }
 
+        /* ---------- ИГРА 1: ГОНКА ЗА ЗВЁЗДАМИ ---------- */
         .race-game-container {
             background: linear-gradient(180deg, #0b0e1a 0%, #1a1f35 100%);
             border-radius: 24px;
@@ -314,6 +317,7 @@
             transform: scale(0.95);
         }
 
+        /* ---------- ИГРА 2: КОЛЕСО УДАЧИ ---------- */
         .wheel-game-container {
             background: linear-gradient(180deg, #0b0e1a 0%, #1a1f35 100%);
             border-radius: 24px;
@@ -390,6 +394,7 @@
             margin-top: 6px;
         }
 
+        /* ---------- ОБЩИЕ СТИЛИ ИГР ---------- */
         .game-fullscreen {
             position: fixed;
             top: 0;
@@ -429,6 +434,7 @@
             background: rgba(255,255,255,0.2);
         }
 
+        /* ---------- АДАПТИВ ---------- */
         @media (max-width: 480px) {
             .games-modal-content {
                 padding: 16px 12px 20px;
@@ -458,6 +464,7 @@
             }
         }
 
+        /* остальные стили приложения (без изменений) */
         .workformat-selector {
             display: flex;
             flex-wrap: wrap;
@@ -1691,6 +1698,7 @@
             box-shadow: 0 6px 15px rgba(245, 101, 101, 0.4);
         }
         
+        /* ========== НОВЫЙ СТИЛЬ ДЛЯ ФИНАНСОВ ========== */
         .finance-section {
             background: linear-gradient(180deg, #0f0e17 0%, #1a1a2e 100%);
             min-height: 100vh;
@@ -2082,6 +2090,7 @@
             font-size: 14px;
         }
 
+        /* ====== ОСТАЛЬНЫЕ СТИЛИ (без изменений) ====== */
         .wallet-section {
             background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
             padding: 25px 20px;
@@ -3472,6 +3481,7 @@
             color: white;
         }
 
+        /* ========== НОВЫЕ СТИЛИ ДЛЯ КАТЕГОРИЙ В АРХИВЕ ========== */
         .category-button {
             display: flex;
             align-items: center;
@@ -3509,6 +3519,7 @@
             color: rgba(255,255,255,0.8);
         }
         
+        /* Стили для селектора города */
         .city-selector-wrapper {
             margin-bottom: 16px;
             position: relative;
@@ -3544,10 +3555,12 @@
     </style>
 </head>
 <body>
-    <!-- Весь HTML-код страницы остается без изменений -->
-    <!-- Опущен для краткости, но в реальном проекте должен быть полностью скопирован -->
-    
+    <!-- Элементы для визуальной индикации свайпа -->
+    <div class="swipe-indicator" id="swipeIndicator"></div>
+    <div class="swipe-arrow" id="swipeArrow">←</div>
+
     <div class="container">
+        <!-- ГЛАВНЫЙ ЭКРАН (без карты) -->
         <div id="mainScreen">
             <div class="header" id="logoHeader">
                 <button class="qr-scanner-button" onclick="triggerHapticFeedback(); openQRScanner();">📷 Сканер</button>
@@ -3583,6 +3596,7 @@
                 </button>
             </div>
 
+            <!-- QR-код визитки на главном экране -->
             <div class="visitka-qr-section">
                 <div class="visitka-qr-card" onclick="triggerHapticFeedback(); openVisitkaModal();">
                     <div id="mainScreenQRCode" class="qr-code-small"></div>
@@ -3591,6 +3605,7 @@
             </div>
         </div>
 
+        <!-- МОДАЛЬНОЕ ОКНО КАРТЫ -->
         <div id="mapModalOverlay" class="map-modal-overlay">
             <div class="map-modal-header">
                 <div class="map-modal-title">🗺️ Мастера на карте</div>
@@ -3601,6 +3616,7 @@
             </div>
         </div>
 
+        <!-- МОДАЛЬНОЕ ОКНО СКАНЕРА QR-КОДОВ -->
         <div id="scannerModal" class="scanner-modal-overlay">
             <div class="scanner-modal-content">
                 <button class="scanner-close" onclick="triggerHapticFeedback(); closeQRScanner();">×</button>
@@ -3611,6 +3627,7 @@
             </div>
         </div>
 
+        <!-- СЕКЦИЯ МАСТЕРА -->
         <div id="masterSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✨ Добавьте свою умейку</h2>
@@ -3755,10 +3772,12 @@
             </div>
         </div>
 
+        <!-- СЕКЦИЯ КЛИЕНТА / АРХИВ (ИСПРАВЛЕННАЯ) -->
         <div id="clientSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📚 Архив мастеров</h2>
                 
+                <!-- НОВЫЙ СЕЛЕКТОР ГОРОДА -->
                 <div class="city-selector-wrapper">
                     <label for="cityFilterSelect">🏙️ Выберите город</label>
                     <select id="cityFilterSelect" class="city-select" onchange="onCityFilterChange(this.value)">
@@ -3771,6 +3790,7 @@
             </div>
         </div>
 
+        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА -->
         <div id="profileSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
@@ -3951,19 +3971,23 @@
             </div>
         </div>
 
+        <!-- ====== НОВАЯ СЕКЦИЯ ФИНАНСОВ ====== -->
         <div id="financeSection" class="section" style="background: transparent; padding: 0;">
             <div class="finance-section">
+                <!-- Шапка с балансом -->
                 <div class="finance-header">
                     <span class="finance-icon">💰</span>
                     <h2>Мои финансы</h2>
                     <div class="finance-subtitle">Управляйте своим кошельком</div>
                 </div>
 
+                <!-- Главный баланс -->
                 <div class="finance-balance-main">
                     <div class="label">Доступный баланс</div>
                     <div class="amount" id="financeMainBalance">0 <span>⭐</span></div>
                 </div>
 
+                <!-- Сетка карточек 2x2 -->
                 <div class="finance-grid">
                     <div class="finance-card green">
                         <div class="card-glow"></div>
@@ -3991,6 +4015,7 @@
                     </div>
                 </div>
 
+                <!-- Статус Wallet -->
                 <div class="finance-wallet-status" id="financeWalletStatus">
                     <div class="status-left">
                         <span class="status-dot disconnected" id="financeWalletDot"></span>
@@ -4002,6 +4027,7 @@
                     <span class="status-action" id="financeWalletAction" onclick="connectWallet();">Подключить</span>
                 </div>
 
+                <!-- Кнопки действий -->
                 <div class="finance-actions">
                     <button class="finance-action-btn deposit" onclick="triggerHapticFeedback(); depositFunds();">
                         <span class="btn-icon">⬆️</span> Пополнить
@@ -4011,6 +4037,7 @@
                     </button>
                 </div>
 
+                <!-- История транзакций -->
                 <div class="finance-history">
                     <div class="history-header">
                         <h3>📋 История операций</h3>
@@ -4030,6 +4057,7 @@
             </div>
         </div>
 
+        <!-- ФОРМА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
         <div id="editProfileSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
@@ -4052,6 +4080,7 @@
             </div>
         </div>
 
+        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
         <div id="createDealSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📄 Создание сделки</h2>
@@ -4108,6 +4137,7 @@
             </div>
         </div>
 
+        <!-- РАЗДЕЛ "О ПРОЕКТЕ" -->
         <div id="aboutSection" class="section">
             <div class="form-section">
                 <div class="about-section">
@@ -4203,16 +4233,20 @@
         </div>
     </div>
 
+    <!-- ====== НОВЫЙ РАЗДЕЛ: ИГРЫ ====== -->
+    <!-- КНОПКА ВЫЗОВА ИГР (показывается только на главном экране) -->
     <button class="games-button" id="gamesMainButton" onclick="triggerHapticFeedback(); openGamesModal();">
         <span class="icon">🎮</span>
         <span>Игры</span>
     </button>
 
+    <!-- МОДАЛЬНОЕ ОКНО СО СПИСКОМ ИГР -->
     <div class="games-modal-overlay" id="gamesModal">
         <div class="games-modal-content">
             <button class="games-modal-close" onclick="triggerHapticFeedback(); closeGamesModal();">✕</button>
             <div class="games-modal-title">🎮 Игры</div>
             
+            <!-- Игра 1: Гонка за звёздами -->
             <div class="game-card" onclick="triggerHapticFeedback(); openRaceGame();">
                 <div class="game-card-header">
                     <span class="game-card-icon">🏎️</span>
@@ -4229,6 +4263,7 @@
                 </div>
             </div>
 
+            <!-- Игра 2: Колесо удачи -->
             <div class="game-card" onclick="triggerHapticFeedback(); openWheelGame();">
                 <div class="game-card-header">
                     <span class="game-card-icon">🎡</span>
@@ -4245,6 +4280,7 @@
                 </div>
             </div>
 
+            <!-- Таблица лидеров (топ-3) -->
             <div style="margin-top: 20px; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 16px;">
                 <div style="color: rgba(255,255,255,0.6); font-size: 14px; text-align: center; margin-bottom: 10px;">🏆 Топ игроков</div>
                 <div id="gamesLeaderboard">
@@ -4254,6 +4290,7 @@
         </div>
     </div>
 
+    <!-- Полноэкранный контейнер для Игры 1 (Гонка) -->
     <div class="game-fullscreen" id="raceGameFullscreen">
         <button class="close-game" onclick="triggerHapticFeedback(); closeRaceGame();">✕</button>
         <div class="race-game-container" id="raceGameContainer">
@@ -4272,6 +4309,7 @@
         </div>
     </div>
 
+    <!-- Полноэкранный контейнер для Игры 2 (Колесо) -->
     <div class="game-fullscreen" id="wheelGameFullscreen">
         <button class="close-game" onclick="triggerHapticFeedback(); closeWheelGame();">✕</button>
         <div class="wheel-game-container">
@@ -4285,6 +4323,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ВИЗИТКИ -->
     <div id="visitkaModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 450px;">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeVisitkaModal();">×</button>
@@ -4310,6 +4349,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ВИЗИТКИ МАСТЕРА (при сканировании) -->
     <div id="masterVisitkaModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 450px;">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeMasterVisitkaModal();">×</button>
@@ -4327,6 +4367,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ УМЕЙКИ В ВИЗИТКЕ -->
     <div id="visitkaSkillDetailModal" class="visitka-skill-detail-modal">
         <div class="modal-content" style="max-width: 400px;">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeVisitkaSkillDetailModal();">×</button>
@@ -4346,6 +4387,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ УМЕЙКИ -->
     <div id="editSkillModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeEditSkillModal();">×</button>
@@ -4485,6 +4527,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ПОДРОБНОСТЕЙ -->
     <div id="detailsModal" class="details-modal-overlay">
         <div class="details-modal-content">
             <button class="details-modal-close" onclick="closeDetailsModal();">×</button>
@@ -4494,6 +4537,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО КОНТАКТОВ МАСТЕРА -->
     <div id="contactModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeContactModal();">×</button>
@@ -4517,6 +4561,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ОПЛАТЫ -->
     <div id="paymentConfirmModal" class="payment-confirm-modal" style="display: none;">
         <div class="payment-confirm-content">
             <div class="payment-confirm-title">💳 Подтверждение оплаты</div>
@@ -4555,6 +4600,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ОТЗЫВОВ -->
     <div id="reviewsModal" class="reviews-modal">
         <div class="reviews-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeReviewsModal();">×</button>
@@ -4576,6 +4622,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО QR-КОДА -->
     <div id="qrModal" class="qr-modal-overlay">
         <div class="qr-modal-content">
             <h2 id="qrModalTitle" style="color: #2d3748; margin-bottom: 20px; font-size: 20px;"></h2>
@@ -4633,6 +4680,7 @@
     let logoClickTimer = null;
     let offlineMode = false;
     
+    // Переменные для фильтрации карты
     let currentMapFilterCategory = null;
     let currentMapFilterSubcategory = null;
 
@@ -4820,23 +4868,22 @@
         console.log('💾 [Кэш] Данные сохранены в кэш');
     }
 
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ВСЕХ УМЕЙОК С СЕРВЕРА ==========
+    // ========== ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ С УМЕЙКАМИ ==========
+    
     async function preloadAllSkills() {
         console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейок...');
         
         showLoadingIndicator();
         
         try {
-            // Добавляем параметр времени для предотвращения кэширования
-            const response = await fetch(`${API_URL}/api/skills/all?t=${Date.now()}`);
+            const response = await fetch(`${API_URL}/api/skills/all`);
             
             if (response.ok) {
                 const result = await response.json();
                 if (result.success && result.skills) {
                     console.log(`✅ [Загрузка] Загружено ${result.skills.length} умейок с сервера`);
-                    // Сохраняем в localStorage и кэш
-                    setLocalStorage('umeyka_global_skills', result.skills);
                     setCachedSkills(result.skills);
+                    setLocalStorage('umeyka_global_skills', result.skills);
                     offlineMode = false;
                     hideLoadingIndicator();
                     return result.skills;
@@ -4848,27 +4895,21 @@
             }
         } catch (error) {
             console.error('❌ [Загрузка] Ошибка загрузки с сервера:', error);
-            
-            // Пытаемся использовать кэш
             const cachedSkills = getCachedSkills();
-            if (cachedSkills && cachedSkills.length > 0) {
+            if (cachedSkills) {
                 console.log(`📦 [Офлайн] Загружено ${cachedSkills.length} умейок из кэша`);
-                setLocalStorage('umeyka_global_skills', cachedSkills);
                 offlineMode = true;
                 showNotification('⚠️ Офлайн-режим: показаны кэшированные данные', 3000);
                 hideLoadingIndicator();
                 return cachedSkills;
             }
-            
-            // Пытаемся использовать localStorage
             const oldStorage = getLocalStorage('umeyka_global_skills');
-            if (oldStorage && oldStorage.length > 0) {
+            if (oldStorage) {
                 console.log(`📦 [Офлайн] Загружено ${oldStorage.length} умейок из localStorage`);
                 offlineMode = true;
                 hideLoadingIndicator();
                 return oldStorage;
             }
-            
             console.warn('⚠️ [Загрузка] Нет данных ни на сервере, ни в кэше');
             offlineMode = true;
             hideLoadingIndicator();
@@ -4876,12 +4917,10 @@
         }
     }
     
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОЛУЧЕНИЯ ГЛОБАЛЬНЫХ УМЕЙОК ==========
-    async function getGlobalSkills(forceRefresh = false) {
-        if (!isSkillsLoaded || forceRefresh) {
-            const skills = await preloadAllSkills();
+    async function getGlobalSkills() {
+        if (!isSkillsLoaded) {
+            await preloadAllSkills();
             isSkillsLoaded = true;
-            return skills;
         }
         
         let skills = getLocalStorage('umeyka_global_skills') || [];
@@ -4892,23 +4931,26 @@
                 skills = cached;
                 setLocalStorage('umeyka_global_skills', skills);
                 console.log(`📦 [getGlobalSkills] Загружено ${skills.length} умейок из кэша`);
-            } else {
-                // Принудительная загрузка с сервера
-                return await preloadAllSkills();
             }
         }
         
         console.log(`📊 [getGlobalSkills] Всего умейок в хранилище: ${skills.length}`);
+        
+        if (skills.length < 10) {
+            console.log('🔄 [getGlobalSkills] Мало умейок, пробую перезагрузить...');
+            await preloadAllSkills();
+            skills = getLocalStorage('umeyka_global_skills') || [];
+            console.log(`📊 [getGlobalSkills] После перезагрузки: ${skills.length} умейок`);
+        }
+        
         return skills;
     }
     
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОЛУЧЕНИЯ УМЕЙКИ ПО ID ==========
     function getGlobalSkillById(skillId) {
         const skills = getLocalStorage('umeyka_global_skills') || [];
         return skills.find(s => s._id === skillId);
     }
     
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ДОБАВЛЕНИЯ УМЕЙКИ В ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ ==========
     function addGlobalSkill(skill) {
         const skills = getLocalStorage('umeyka_global_skills') || [];
         const existingIndex = skills.findIndex(s => s._id === skill._id);
@@ -4921,16 +4963,6 @@
         setCachedSkills(skills);
         console.log(`✅ Умейка добавлена/обновлена в глобальном хранилище:`, skill);
         return skill;
-    }
-    
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ УМЕЙКИ ИЗ ГЛОБАЛЬНОГО ХРАНИЛИЩА ==========
-    function removeGlobalSkill(skillId) {
-        const skills = getLocalStorage('umeyka_global_skills') || [];
-        const updatedSkills = skills.filter(s => s._id !== skillId);
-        setLocalStorage('umeyka_global_skills', updatedSkills);
-        setCachedSkills(updatedSkills);
-        console.log(`✅ Умейка удалена из глобального хранилища:`, skillId);
-        return updatedSkills;
     }
     
     function updateGlobalSkillStatus(skillId, status) {
@@ -5085,7 +5117,7 @@
         return badges[status] || badges['pending'];
     }
     
-    // ========== ФУНКЦИИ ДЛЯ КАРТЫ ==========
+    // ========== ФУНКЦИИ ДЛЯ КАРТЫ (модальное окно) ==========
     
     function initMapModal() {
         if (mapModal) return;
@@ -5111,7 +5143,7 @@
             markers = [];
         }
         
-        let allSkills = await getGlobalSkills(true); // Принудительно обновляем
+        let allSkills = await getGlobalSkills();
         
         let filteredSkills = allSkills;
         if (category) {
@@ -5511,14 +5543,14 @@
         modal.style.display = 'flex';
         content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки мастера...</div></div>';
         await preloadAllSkills();
-        let allSkills = await getGlobalSkills(true);
+        let allSkills = await getGlobalSkills();
         try {
             const response = await fetch(`${API_URL}/api/skills/user/${userId}`);
             if (response.ok) {
                 const result = await response.json();
                 if (result.success && result.skills) {
                     result.skills.forEach(skill => addGlobalSkill(skill));
-                    allSkills = await getGlobalSkills(true);
+                    allSkills = await getGlobalSkills();
                     console.log(`✅ Загружено ${result.skills.length} умейок для пользователя ${userId} с сервера`);
                 }
             }
@@ -5669,7 +5701,7 @@
         }
         console.log(`🔄 [Поиск] Умейка не найдена в кэше, запрашиваю с сервера...`);
         try {
-            const response = await fetch(`${API_URL}/api/skills/${skillId}?t=${Date.now()}`);
+            const response = await fetch(`${API_URL}/api/skills/${skillId}`);
             if (response.ok) {
                 const result = await response.json();
                 if (result.success && result.skill) {
@@ -6186,16 +6218,20 @@
         return transaction;
     }
     
+    // ========== НОВАЯ ФУНКЦИЯ ОБНОВЛЕНИЯ ИНТЕРФЕЙСА ФИНАНСОВ ==========
     function updateFinanceUI() {
         const wallet = getWalletData();
         
+        // Главный баланс
         document.getElementById('financeMainBalance').innerHTML = `${wallet.availableBalance} <span>⭐</span>`;
         
+        // Карточки
         document.getElementById('financeAvailable').textContent = `${wallet.availableBalance} ⭐`;
         document.getElementById('financeFrozen').textContent = `${wallet.frozenBalance} ⭐`;
         document.getElementById('financeEarned').textContent = `${wallet.totalEarned} ⭐`;
         document.getElementById('financeCommission').textContent = `${wallet.totalCommission} ⭐`;
         
+        // Статус Wallet
         const dot = document.getElementById('financeWalletDot');
         const text = document.getElementById('financeWalletText');
         const action = document.getElementById('financeWalletAction');
@@ -6215,6 +6251,7 @@
             withdrawBtn.style.display = 'none';
         }
         
+        // История
         renderFinanceHistory(wallet.transactions);
     }
     
@@ -6272,10 +6309,13 @@
     
     function filterHistory(filter, btn) {
         const wallet = getWalletData();
+        // Обновляем активную кнопку
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         if (btn) btn.classList.add('active');
         renderFinanceHistory(wallet.transactions, filter);
     }
+    
+    // ========== СТАРЫЕ ФУНКЦИИ ФИНАНСОВ (адаптированы под новый UI) ==========
     
     async function connectWallet() {
         triggerHapticFeedback();
@@ -6799,10 +6839,7 @@
                     const result = await response.json();
                     if (result.success) {
                         const newSkill = result.skill || skillData;
-                        // Сохраняем полученный с сервера объект (с _id)
                         addGlobalSkill(newSkill);
-                        // Обновляем кэш с сервера
-                        await preloadAllSkills();
                         alert('✅ Умейка успешно опубликована!');
                         const currentSelected = getVisitkaSelectedSkills();
                         if (!currentSelected.includes(newSkill._id)) {
@@ -6872,7 +6909,7 @@
         }
     };
     
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ МОИХ УМЕЙОК ==========
+    // ========== ФУНКЦИИ ДЛЯ ЗАГРУЗКИ УМЕЕК ПОЛЬЗОВАТЕЛЯ ==========
     
     async function loadMySkills() {
         try {
@@ -6883,11 +6920,8 @@
                 return;
             }
             skillsList.innerHTML = '<div class="loading">⏳ Загрузка ваших умейок...</div>';
-            
-            // Принудительно обновляем данные с сервера
-            const allSkills = await getGlobalSkills(true);
+            const allSkills = await getGlobalSkills();
             const mySkills = allSkills.filter(s => s.userId === currentUserId);
-            
             if (mySkills.length > 0) {
                 skillsList.innerHTML = mySkills.map(skill => {
                     const statusBadge = getStatusBadge(skill.status);
@@ -6968,7 +7002,7 @@
         try {
             if (!currentUserId) return;
             const skillsList = document.getElementById('profileSkillsList');
-            const allSkills = await getGlobalSkills(true);
+            const allSkills = await getGlobalSkills();
             const mySkills = allSkills.filter(s => s.userId === currentUserId);
             if (mySkills.length > 0) {
                 skillsList.innerHTML = mySkills.map(skill => {
@@ -7081,8 +7115,6 @@
         preview.style.display = 'none';
     };
     
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ ОТРЕДАКТИРОВАННОЙ УМЕЙКИ ==========
-    
     window.saveEditedSkill = async function() {
         triggerHapticFeedback();
         try {
@@ -7093,7 +7125,6 @@
             const skillExperience = document.getElementById('editSkillExperience').value;
             const skillPrice = document.getElementById('editSkillPrice').value;
             const skillCity = document.getElementById('editSkillCity').value;
-            
             if (!skillId) {
                 alert('❌ Ошибка: не указан ID умейки');
                 return;
@@ -7111,7 +7142,6 @@
                 alert('❌ Заполните все обязательные поля');
                 return;
             }
-            
             const skillData = {
                 skill: skillName.trim(),
                 category: skillCategory,
@@ -7124,22 +7154,18 @@
                 status: currentEditMasterStatus,
                 updatedAt: new Date().toISOString()
             };
-            
             const cityCoords = getCityCoordinates(skillCity);
             if (cityCoords) {
                 skillData.location = cityCoords;
             }
-            
             if (editSkillPhoto) {
                 skillData.photo = editSkillPhoto;
                 skillData.photoTimestamp = new Date().toISOString();
             } else if (currentEditingSkill && currentEditingSkill.photo) {
                 skillData.photo = currentEditingSkill.photo;
             }
-            
             showLoadingIndicator();
             let updateSuccess = false;
-            
             try {
                 const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                     method: 'PUT',
@@ -7149,24 +7175,18 @@
                     body: JSON.stringify(skillData)
                 });
                 hideLoadingIndicator();
-                
                 if (response.ok) {
                     const result = await response.json();
                     if (result.success) {
                         updateSuccess = true;
                         console.log('✅ Умейка обновлена на сервере');
-                        // Обновляем в локальном хранилище
-                        const updatedSkill = { ...currentEditingSkill, ...skillData };
-                        addGlobalSkill(updatedSkill);
-                        // Перезагружаем с сервера для синхронизации
-                        await preloadAllSkills();
+                        addGlobalSkill({ ...currentEditingSkill, ...skillData });
                     }
                 }
             } catch (serverError) {
                 hideLoadingIndicator();
                 console.log('⚠️ Сервер недоступен для обновления, сохраняем локально');
             }
-            
             if (!updateSuccess) {
                 const updatedSkill = {
                     ...currentEditingSkill,
@@ -7176,7 +7196,6 @@
                 addGlobalSkill(updatedSkill);
                 console.log('💾 Умейка обновлена локально');
             }
-            
             alert('✅ Умейка успешно обновлена!');
             closeEditSkillModal();
             await preloadAllSkills();
@@ -7190,15 +7209,12 @@
         }
     };
     
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ УДАЛЕНИЯ УМЕЙКИ ==========
-    
     window.deleteSkill = async function(skillId) {
         triggerHapticFeedback();
         if (confirm('❌ Удалить эту умейку?')) {
             try {
                 showLoadingIndicator();
                 let deleteSuccess = false;
-                
                 try {
                     const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                         method: 'DELETE'
@@ -7213,14 +7229,12 @@
                 } catch (serverError) {
                     console.log('⚠️ Сервер недоступен, удаляем локально');
                 }
-                
-                // Удаляем из локального хранилища
-                removeGlobalSkill(skillId);
-                
-                // Перезагружаем данные с сервера
-                await preloadAllSkills();
-                
+                const allSkills = await getGlobalSkills();
+                const updatedSkills = allSkills.filter(s => s._id !== skillId);
+                setLocalStorage('umeyka_global_skills', updatedSkills);
+                setCachedSkills(updatedSkills);
                 hideLoadingIndicator();
+                await preloadAllSkills();
                 await loadMySkills();
                 await loadProfileSkills();
                 generateMainScreenQR();
@@ -7303,6 +7317,7 @@
         document.getElementById('createDealSection').style.display = 'none';
         document.getElementById('aboutSection').style.display = 'none';
         
+        // Показываем кнопку "Игры" только на главном экране
         document.getElementById('gamesMainButton').classList.remove('hidden');
     };
     
@@ -7318,6 +7333,7 @@
         document.getElementById('aboutSection').style.display = 'none';
         document.getElementById(sectionId).style.display = 'block';
         
+        // Скрываем кнопку "Игры" во всех разделах, кроме главного
         document.getElementById('gamesMainButton').classList.add('hidden');
         
         if (sectionId === 'masterSection') {
@@ -7332,10 +7348,13 @@
             console.log('📚 [Архив] Открытие архива с принудительной синхронизацией данных');
             showLoadingIndicator();
             
+            // Инициализируем селектор городов
             initCitySelector();
+            
+            // Сначала показываем категории с индикатором загрузки
             renderCategories();
             
-            // Принудительно загружаем свежие данные с сервера
+            // Загружаем свежие данные с сервера
             fetch(`${API_URL}/api/skills/all?t=${Date.now()}`)
                 .then(response => {
                     if (response.ok) return response.json();
@@ -7367,6 +7386,7 @@
                         renderCategories();
                         showNotification(`📦 Офлайн-режим: ${localSkills.length} мастеров`, 2000);
                     } else {
+                        // Если нет локальных данных, пытаемся загрузить из кэша
                         const cached = getCachedSkills();
                         if (cached && cached.length > 0) {
                             setLocalStorage('umeyka_global_skills', cached);
@@ -7390,6 +7410,7 @@
             }
             if (categoriesContainer) categoriesContainer.style.display = 'block';
         } else if (sectionId === 'financeSection') {
+            // Обновляем UI финансов при открытии
             updateFinanceUI();
         }
     };
@@ -8333,14 +8354,18 @@
         "Другое": ["Один", "Вдвоём", "Бригада", "Ищу бригаду"]
     };
     
+    // Функция инициализации селектора городов
     function initCitySelector() {
         const select = document.getElementById('cityFilterSelect');
         if (!select) return;
         
+        // Сохраняем текущее выбранное значение
         const currentValue = select.value || 'all';
         
+        // Очищаем селектор, оставляя опцию "Все города"
         select.innerHTML = '<option value="all">🌍 Все города</option>';
         
+        // Добавляем все города из базы
         allCities.forEach(city => {
             const option = document.createElement('option');
             option.value = city;
@@ -8348,13 +8373,16 @@
             select.appendChild(option);
         });
         
+        // Восстанавливаем выбранное значение
         select.value = currentValue;
     }
     
+    // Обработчик изменения выбора города
     function onCityFilterChange(city) {
         triggerHapticFeedback();
         console.log(`🏙️ [Фильтр] Выбран город: ${city}`);
         
+        // Скрываем результаты подкатегорий, если они открыты
         const resultsContainer = document.getElementById('categorySearchResults');
         const categoriesContainer = document.getElementById('categoriesList');
         
@@ -8366,8 +8394,10 @@
             categoriesContainer.style.display = 'block';
         }
         
+        // Перерисовываем категории с новым фильтром
         renderCategories();
         
+        // Показываем уведомление
         if (city === 'all') {
             showNotification('🌍 Показаны мастера из всех городов', 1500);
         } else {
@@ -8375,20 +8405,24 @@
         }
     }
     
+    // Получить выбранный город из селектора
     function getSelectedCity() {
         const select = document.getElementById('cityFilterSelect');
         return select ? select.value : 'all';
     }
     
+    // Подсчитать количество мастеров в выбранном городе для категории
     function countMastersInCity(categoryName, city) {
         const allSkills = getLocalStorage('umeyka_global_skills') || [];
         
+        // Фильтруем по категории
         let filtered = allSkills.filter(skill => {
             if (!skill.category) return false;
             const skillCategoryClean = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
             return skillCategoryClean.toLowerCase() === categoryName.toLowerCase();
         });
         
+        // Фильтруем по городу
         if (city !== 'all') {
             filtered = filtered.filter(skill => {
                 if (!skill.city) return false;
@@ -8396,6 +8430,7 @@
             });
         }
         
+        // Убираем дубликаты по ID
         const unique = [];
         const seen = new Set();
         for (const skill of filtered) {
@@ -8415,8 +8450,14 @@
         const allSkills = getLocalStorage('umeyka_global_skills') || [];
         const selectedCity = getSelectedCity();
         
+        // Подсчитываем общее количество мастеров с учетом города
         let totalMasters = allSkills.length;
         if (selectedCity !== 'all') {
+            totalMasters = allSkills.filter(skill => {
+                if (!skill.city) return false;
+                return skill.city.trim().toLowerCase() === selectedCity.trim().toLowerCase();
+            }).length;
+            // Убираем дубликаты
             const unique = new Set();
             let count = 0;
             for (const skill of allSkills) {
@@ -8430,6 +8471,7 @@
             }
             totalMasters = count;
         } else {
+            // Для "Все города" считаем уникальные умейки
             const unique = new Set();
             for (const skill of allSkills) {
                 if (!unique.has(skill._id)) {
@@ -8505,6 +8547,7 @@
     window.openMasterFormWithCategory = function(categoryName) {
         triggerHapticFeedback();
         showSection('masterSection');
+        // Ищем полное название с эмодзи
         const fullCategory = skillCategories.find(c => c.name === categoryName);
         const categorySelect = document.getElementById('skillCategory');
         if (categorySelect && fullCategory) {
@@ -8523,16 +8566,12 @@
         showNotification(`📂 Вы выбрали категорию "${categoryName}"`, 2000);
     };
     
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ПОИСКА ПО ПОДКАТЕГОРИИ ==========
-    
     window.searchBySubcategory = async function(categoryName, subcategory) {
         triggerHapticFeedback();
         const skillsContainer = document.getElementById('subcategorySkills');
         skillsContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div> Загрузка мастеров...</div>';
         
         let allSkills = [];
-        
-        // Всегда пытаемся загрузить свежие данные с сервера
         try {
             const response = await fetch(`${API_URL}/api/skills/all?t=${Date.now()}`);
             if (response.ok) {
@@ -8542,7 +8581,6 @@
                     setCachedSkills(result.skills);
                     setLocalStorage('umeyka_global_skills', result.skills);
                     allSkills = result.skills;
-                    offlineMode = false;
                 } else {
                     throw new Error('Ошибка сервера');
                 }
@@ -8558,9 +8596,11 @@
         
         console.log(`📚 [Поиск] Всего умейок в хранилище: ${allSkills.length}`);
         
+        // Получаем выбранный город
         const selectedCity = getSelectedCity();
         console.log(`🏙️ [Поиск] Фильтр по городу: ${selectedCity}`);
         
+        // Фильтруем по категории
         const cleanCategory = categoryName.replace(/[^\w\sа-яА-Я]/g, '').trim();
         let filteredSkills = allSkills.filter(skill => {
             if (!skill.category) return false;
@@ -8570,6 +8610,7 @@
         
         console.log(`📚 [Поиск] После фильтрации по категории "${categoryName}": ${filteredSkills.length} умейок`);
         
+        // Фильтруем по городу
         if (selectedCity !== 'all') {
             filteredSkills = filteredSkills.filter(skill => {
                 if (!skill.city) return false;
@@ -8578,6 +8619,7 @@
             console.log(`📚 [Поиск] После фильтрации по городу "${selectedCity}": ${filteredSkills.length} умейок`);
         }
         
+        // Фильтруем по формату работы
         if (subcategory) {
             filteredSkills = filteredSkills.filter(skill => {
                 return skill.workFormat === subcategory;
@@ -8585,6 +8627,7 @@
             console.log(`📚 [Поиск] После фильтрации по формату "${subcategory}": ${filteredSkills.length} умейок`);
         }
         
+        // Убираем дубликаты
         const uniqueSkills = [];
         const seenIds = new Set();
         for (const skill of filteredSkills) {
@@ -8595,6 +8638,7 @@
         }
         filteredSkills = uniqueSkills;
         
+        // Сортировка
         filteredSkills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
         
         console.log(`📚 [Поиск] Итоговое количество умейок: ${filteredSkills.length}`);
@@ -9009,9 +9053,12 @@
         }
     }
     
+
     // ======================================================================
     // ========== НОВЫЙ РАЗДЕЛ: ИГРЫ ==========
     // ======================================================================
+
+    // -------- ИГРА 1: ГОНКА ЗА ЗВЁЗДАМИ --------
 
     let raceGame = {
         canvas: null,
@@ -9021,6 +9068,7 @@
         gameLoop: null,
         timerInterval: null,
         
+        // Игровые параметры
         timeLeft: 60,
         score: 0,
         speed: 3,
@@ -9028,6 +9076,7 @@
         isRunning: false,
         isOver: false,
         
+        // Дорожки (3 полосы)
         lanes: [-1, 0, 1],
         laneWidth: 0,
         carWidth: 40,
@@ -9035,19 +9084,23 @@
         carX: 0,
         carY: 0,
         
+        // Препятствия и звёзды
         obstacles: [],
         stars: [],
         spawnTimer: 0,
         starSpawnTimer: 0,
         difficultyTimer: 0,
         
+        // Бонус: режим ускорения
         boostActive: false,
         boostTimer: 0,
         boostStreak: 0,
         
+        // Размеры
         width: 0,
         height: 0,
         
+        // Сенсорное управление
         touchStartX: 0,
         isDragging: false,
         
@@ -9059,10 +9112,12 @@
             this.resize();
             window.addEventListener('resize', () => this.resize());
             
+            // Сенсорное управление
             this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
             this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
             this.canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
             
+            // Клавиатура (для десктопа)
             document.addEventListener('keydown', (e) => {
                 if (!this.isRunning || this.isOver) return;
                 if (e.key === 'ArrowLeft' || e.key === 'a') {
@@ -9092,6 +9147,7 @@
         start() {
             if (this.isRunning) return;
             
+            // Сброс состояния
             this.timeLeft = 60;
             this.score = 0;
             this.speed = this.baseSpeed;
@@ -9111,8 +9167,10 @@
             document.getElementById('raceScore').textContent = this.score;
             document.getElementById('raceOverlay').classList.remove('active');
             
+            // Обновление UI
             this.updateUI();
             
+            // Запуск таймера
             if (this.timerInterval) clearInterval(this.timerInterval);
             this.timerInterval = setInterval(() => {
                 this.timeLeft--;
@@ -9122,6 +9180,7 @@
                 }
             }, 1000);
             
+            // Запуск игрового цикла
             if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
             this.gameLoop = requestAnimationFrame(() => this.update());
         },
@@ -9132,6 +9191,7 @@
                 return;
             }
             
+            // Сложность: скорость растёт со временем
             this.difficultyTimer += 1/60;
             if (this.difficultyTimer > 2) {
                 this.difficultyTimer = 0;
@@ -9139,6 +9199,7 @@
                 if (this.speed > 8) this.speed = 8;
             }
             
+            // Спавн препятствий
             this.spawnTimer += 1/60;
             const spawnInterval = Math.max(0.8, 2.2 - this.speed * 0.12);
             if (this.spawnTimer > spawnInterval) {
@@ -9146,12 +9207,14 @@
                 this.spawnObstacle();
             }
             
+            // Спавн звёзд
             this.starSpawnTimer += 1/60;
             if (this.starSpawnTimer > 0.6) {
                 this.starSpawnTimer = 0;
                 this.spawnStar();
             }
             
+            // Обновление препятствий
             const currentSpeed = this.boostActive ? this.speed * 1.6 : this.speed;
             for (let i = this.obstacles.length - 1; i >= 0; i--) {
                 const obs = this.obstacles[i];
@@ -9160,12 +9223,14 @@
                     this.obstacles.splice(i, 1);
                     continue;
                 }
+                // Проверка столкновения с машиной
                 if (this.checkCollision(obs)) {
                     this.endGame();
                     return;
                 }
             }
             
+            // Обновление звёзд
             for (let i = this.stars.length - 1; i >= 0; i--) {
                 const star = this.stars[i];
                 star.y += currentSpeed;
@@ -9173,11 +9238,13 @@
                     this.stars.splice(i, 1);
                     continue;
                 }
+                // Проверка сбора звезды
                 if (this.checkStarCollision(star)) {
                     this.score++;
                     this.boostStreak++;
                     document.getElementById('raceScore').textContent = this.score;
                     
+                    // Бонус: 10 звёзд подряд = режим ускорения
                     if (this.boostStreak >= 10 && !this.boostActive) {
                         this.boostActive = true;
                         this.boostTimer = 0;
@@ -9189,6 +9256,7 @@
                 }
             }
             
+            // Таймер бонуса
             if (this.boostActive) {
                 this.boostTimer += 1/60;
                 if (this.boostTimer > 5) {
@@ -9198,6 +9266,7 @@
                 }
             }
             
+            // Отрисовка
             this.draw();
             
             this.gameLoop = requestAnimationFrame(() => this.update());
@@ -9208,14 +9277,17 @@
             const w = this.width;
             const h = this.height;
             
+            // Фон дороги
             ctx.clearRect(0, 0, w, h);
             
+            // Асфальт
             const gradient = ctx.createLinearGradient(0, 0, 0, h);
             gradient.addColorStop(0, '#1a1a2e');
             gradient.addColorStop(1, '#2d2d44');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, w, h);
             
+            // Разметка дороги (линии)
             ctx.strokeStyle = 'rgba(255,255,255,0.15)';
             ctx.lineWidth = 2;
             for (let i = 0; i < 3; i++) {
@@ -9226,6 +9298,7 @@
                 ctx.stroke();
             }
             
+            // Центральная линия (пунктир)
             ctx.strokeStyle = 'rgba(255,255,255,0.3)';
             ctx.lineWidth = 3;
             ctx.setLineDash([20, 20]);
@@ -9235,6 +9308,7 @@
             ctx.stroke();
             ctx.setLineDash([]);
             
+            // Боковые линии
             ctx.strokeStyle = 'rgba(255,255,255,0.2)';
             ctx.lineWidth = 4;
             ctx.beginPath();
@@ -9246,20 +9320,25 @@
             ctx.lineTo(w, h);
             ctx.stroke();
             
+            // Обочина
             ctx.fillStyle = 'rgba(132, 204, 22, 0.15)';
             ctx.fillRect(0, 0, 6, h);
             ctx.fillRect(w-6, 0, 6, h);
             
+            // Звёзды
             for (const star of this.stars) {
                 this.drawStar(ctx, star.x, star.y, 14, '#FFD700');
             }
             
+            // Препятствия
             for (const obs of this.obstacles) {
                 this.drawObstacle(ctx, obs);
             }
             
+            // Машина игрока
             this.drawCar(ctx, this.carX, this.carY);
             
+            // Бонусный индикатор
             if (this.boostActive) {
                 ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
                 ctx.fillRect(0, 0, w, 4);
@@ -9273,9 +9352,11 @@
             const w = this.carWidth;
             const h = this.carHeight;
             
+            // Тень
             ctx.shadowColor = 'rgba(0,0,0,0.4)';
             ctx.shadowBlur = 20;
             
+            // Кузов
             const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
             if (this.boostActive) {
                 gradient.addColorStop(0, '#FFD700');
@@ -9290,6 +9371,7 @@
             ctx.shadowColor = this.boostActive ? 'rgba(255, 215, 0, 0.6)' : 'rgba(0,0,0,0.3)';
             ctx.shadowBlur = this.boostActive ? 30 : 15;
             
+            // Округлённый прямоугольник
             const r = 8;
             ctx.beginPath();
             ctx.moveTo(x + r, y);
@@ -9306,12 +9388,14 @@
             
             ctx.shadowBlur = 0;
             
+            // Окна
             ctx.fillStyle = 'rgba(100, 200, 255, 0.4)';
             const winW = w * 0.3;
             const winH = h * 0.25;
             ctx.fillRect(x + w * 0.1, y + h * 0.08, winW, winH);
             ctx.fillRect(x + w * 0.6, y + h * 0.08, winW, winH);
             
+            // Фары
             ctx.fillStyle = '#FFD700';
             ctx.shadowColor = '#FFD700';
             ctx.shadowBlur = 10;
@@ -9319,6 +9403,7 @@
             ctx.fillRect(x + w - 10, y - 2, 8, 5);
             ctx.shadowBlur = 0;
             
+            // Задние фонари
             ctx.fillStyle = '#ff4444';
             ctx.fillRect(x + 2, y + h - 4, 8, 4);
             ctx.fillRect(x + w - 10, y + h - 4, 8, 4);
@@ -9329,10 +9414,12 @@
             const y = obs.y;
             const size = obs.size || 30;
             
+            // Тень
             ctx.shadowColor = 'rgba(0,0,0,0.3)';
             ctx.shadowBlur = 15;
             
             if (obs.type === 'car') {
+                // Другая машина
                 const w = size * 1.2;
                 const h = size * 1.5;
                 ctx.fillStyle = '#e53e3e';
@@ -9341,16 +9428,19 @@
                 ctx.beginPath();
                 ctx.roundRect(x - w/2, y - h/2, w, h, 6);
                 ctx.fill();
+                // Окна
                 ctx.fillStyle = 'rgba(100, 200, 255, 0.3)';
                 ctx.fillRect(x - w*0.35, y - h*0.3, w*0.25, h*0.2);
                 ctx.fillRect(x + w*0.1, y - h*0.3, w*0.25, h*0.2);
             } else {
+                // Камень / препятствие
                 ctx.fillStyle = '#718096';
                 ctx.shadowColor = 'rgba(0,0,0,0.3)';
                 ctx.shadowBlur = 15;
                 ctx.beginPath();
                 ctx.arc(x, y, size/2, 0, Math.PI * 2);
                 ctx.fill();
+                // Блик
                 ctx.fillStyle = 'rgba(255,255,255,0.2)';
                 ctx.beginPath();
                 ctx.arc(x - size*0.15, y - size*0.15, size*0.2, 0, Math.PI * 2);
@@ -9410,12 +9500,17 @@
             const halfW = this.carWidth / 2 - 4;
             const halfH = this.carHeight / 2 - 4;
             
+            // Проверка на столкновение (упрощённая)
             const dx = Math.abs(cx - obs.x);
             const dy = Math.abs(cy - obs.y);
             const overlapX = dx < halfW + halfSize;
             const overlapY = dy < halfH + halfSize;
             
             if (overlapX && overlapY) {
+                // Дополнительная проверка для машин
+                if (obs.type === 'car') {
+                    return true;
+                }
                 return true;
             }
             return false;
@@ -9461,6 +9556,12 @@
         },
         
         showBoostNotification(msg) {
+            const overlay = document.getElementById('raceOverlay');
+            const title = document.getElementById('raceOverlayTitle');
+            const desc = document.getElementById('raceOverlayDesc');
+            const scoreEl = document.getElementById('raceOverlayScore');
+            
+            // Показываем уведомление на 1.5 секунды
             const notif = document.createElement('div');
             notif.style.cssText = `
                 position: absolute;
@@ -9485,7 +9586,9 @@
             setTimeout(() => notif.remove(), 1600);
         },
         
-        updateUI() {},
+        updateUI() {
+            // UI обновляется в цикле
+        },
         
         endGame() {
             if (this.isOver) return;
@@ -9495,8 +9598,10 @@
             if (this.timerInterval) clearInterval(this.timerInterval);
             if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
             
+            // Сохраняем очки в localStorage
             this.saveScore(this.score);
             
+            // Показываем оверлей
             const overlay = document.getElementById('raceOverlay');
             const title = document.getElementById('raceOverlayTitle');
             const scoreEl = document.getElementById('raceOverlayScore');
@@ -9514,6 +9619,7 @@
         },
         
         saveScore(score) {
+            // Сохраняем очки в общую статистику игрока
             const statsKey = `game_stats_${currentUserId}`;
             let stats = getLocalStorage(statsKey) || { totalStars: 0, raceHighScore: 0, wheelLastSpin: null, wheelCooldown: false };
             stats.totalStars = (stats.totalStars || 0) + score;
@@ -9522,6 +9628,7 @@
             }
             setLocalStorage(statsKey, stats);
             
+            // Обновляем реферальные звёзды
             const referralData = getReferralData();
             if (referralData) {
                 referralData.starsEarned = (referralData.starsEarned || 0) + score;
@@ -9533,10 +9640,12 @@
         },
         
         updateLeaderboard() {
+            // Обновляем таблицу лидеров при изменении очков
             renderLeaderboard();
         },
         
         restart() {
+            // Сброс и перезапуск
             if (this.timerInterval) clearInterval(this.timerInterval);
             if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
             this.isRunning = false;
@@ -9545,6 +9654,7 @@
         }
     };
 
+    // Добавляем roundRect для canvas
     if (!CanvasRenderingContext2D.prototype.roundRect) {
         CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
             if (typeof r === 'number') r = { tl: r, tr: r, br: r, bl: r };
@@ -9563,6 +9673,8 @@
         };
     }
 
+    // -------- ИГРА 2: КОЛЕСО УДАЧИ --------
+
     let wheelGame = {
         canvas: null,
         ctx: null,
@@ -9576,7 +9688,6 @@
         maxSpinSpeed: 800,
         lastSpinDate: null,
         cooldownHours: 24,
-        _timerInterval: null,
         
         init() {
             this.canvas = document.getElementById('wheelCanvas');
@@ -9596,6 +9707,7 @@
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
+            // Рисуем сегменты
             for (let i = 0; i < numSegments; i++) {
                 const startAngle = this.currentAngle + i * angleStep;
                 const endAngle = startAngle + angleStep;
@@ -9611,6 +9723,7 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 
+                // Текст
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 ctx.rotate(startAngle + angleStep / 2);
@@ -9624,12 +9737,14 @@
                 ctx.restore();
             }
             
+            // Внешний обод
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
             ctx.strokeStyle = 'rgba(255,255,255,0.2)';
             ctx.lineWidth = 4;
             ctx.stroke();
             
+            // Центральный круг
             const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 30);
             grad.addColorStop(0, '#FFD700');
             grad.addColorStop(1, '#F59E0B');
@@ -9641,6 +9756,7 @@
             ctx.lineWidth = 3;
             ctx.stroke();
             
+            // Декоративные точки на ободе
             for (let i = 0; i < 20; i++) {
                 const angle = (i / 20) * Math.PI * 2;
                 const x = centerX + radius * Math.cos(angle);
@@ -9655,6 +9771,7 @@
         spin() {
             if (this.isSpinning) return;
             
+            // Проверка кулдауна
             if (this.isCooldownActive()) {
                 const remaining = this.getCooldownRemaining();
                 document.getElementById('wheelResult').textContent = `⏳ Доступно через ${remaining}`;
@@ -9665,25 +9782,35 @@
             document.getElementById('wheelSpinBtn').disabled = true;
             document.getElementById('wheelResult').textContent = '🎡 Крутим...';
             
+            // Случайная скорость
             this.spinVelocity = this.minSpinSpeed + Math.random() * (this.maxSpinSpeed - this.minSpinSpeed);
+            // Добавляем несколько полных оборотов для эффекта
             this.spinVelocity += 360 * (2 + Math.random() * 3);
             
+            // Анимация
             const spinInterval = setInterval(() => {
+                // Замедление
                 this.spinVelocity *= this.spinDecay;
                 this.currentAngle += this.spinVelocity * 0.01;
                 
+                // Отрисовка
                 this.drawWheel();
                 
+                // Остановка
                 if (this.spinVelocity < 0.5) {
                     clearInterval(spinInterval);
                     this.isSpinning = false;
                     document.getElementById('wheelSpinBtn').disabled = false;
                     
+                    // Определение выпавшего сегмента
                     const numSegments = this.segments.length;
                     const angleStep = (Math.PI * 2) / numSegments;
+                    // Нормализуем угол
                     let normalizedAngle = this.currentAngle % (Math.PI * 2);
                     if (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
                     
+                    // Определяем индекс сегмента (указатель сверху)
+                    // Указатель находится на 12 часах = -PI/2
                     const pointerAngle = -Math.PI / 2;
                     let rawIndex = Math.floor((pointerAngle - normalizedAngle) / angleStep);
                     let index = rawIndex % numSegments;
@@ -9696,15 +9823,18 @@
         },
         
         handleResult(value) {
+            // Сохраняем время последнего вращения
             this.lastSpinDate = new Date().toISOString();
             localStorage.setItem(`wheel_last_spin_${currentUserId}`, this.lastSpinDate);
             
+            // Начисляем звёзды
             const statsKey = `game_stats_${currentUserId}`;
             let stats = getLocalStorage(statsKey) || { totalStars: 0, raceHighScore: 0, wheelLastSpin: null, wheelCooldown: false };
             stats.totalStars = (stats.totalStars || 0) + value;
             stats.wheelLastSpin = this.lastSpinDate;
             setLocalStorage(statsKey, stats);
             
+            // Обновляем реферальные звёзды
             const referralData = getReferralData();
             if (referralData) {
                 referralData.starsEarned = (referralData.starsEarned || 0) + value;
@@ -9714,11 +9844,15 @@
             document.getElementById('wheelResult').textContent = `🎉 ${value} ⭐`;
             this.showResultNotification(`🎉 Вы выиграли ${value} звёзд!`);
             
+            // Обновляем таблицу лидеров
             this.updateLeaderboard();
+            
+            // Обновляем таймер
             this.checkCooldown();
         },
         
         showResultNotification(msg) {
+            const container = document.getElementById('wheelGameFullscreen');
             const notif = document.createElement('div');
             notif.style.cssText = `
                 position: fixed;
@@ -9775,6 +9909,7 @@
                 timerEl.textContent = `⏳ Доступно через ${remaining}`;
                 document.getElementById('wheelSpinBtn').disabled = true;
                 
+                // Обновляем таймер каждую минуту
                 if (this._timerInterval) clearInterval(this._timerInterval);
                 this._timerInterval = setInterval(() => {
                     if (!this.isCooldownActive()) {
@@ -9800,10 +9935,13 @@
         }
     };
 
+    // -------- ТАБЛИЦА ЛИДЕРОВ --------
+
     function renderLeaderboard() {
         const container = document.getElementById('gamesLeaderboard');
         if (!container) return;
         
+        // Собираем статистику всех пользователей из localStorage
         const usersStats = [];
         const keys = Object.keys(localStorage);
         for (const key of keys) {
@@ -9811,6 +9949,7 @@
                 const userId = key.replace('game_stats_', '');
                 const stats = getLocalStorage(key);
                 if (stats && stats.totalStars > 0) {
+                    // Пытаемся получить имя пользователя
                     let userName = 'Игрок';
                     const userData = getLocalStorage(`user_${userId}`);
                     if (userData && userData.firstName) {
@@ -9826,8 +9965,10 @@
             }
         }
         
+        // Сортируем по звёздам (по убыванию)
         usersStats.sort((a, b) => b.totalStars - a.totalStars);
         
+        // Берём топ-3
         const top3 = usersStats.slice(0, 3);
         
         if (top3.length === 0) {
@@ -9852,6 +9993,8 @@
         `).join('');
     }
 
+    // -------- ОБЩИЕ ФУНКЦИИ ДЛЯ ИГР --------
+
     function openGamesModal() {
         triggerHapticFeedback();
         document.getElementById('gamesModal').classList.add('active');
@@ -9869,6 +10012,7 @@
         const container = document.getElementById('raceGameFullscreen');
         container.classList.add('active');
         
+        // Инициализация игры при первом запуске
         if (!raceGame.canvas) {
             raceGame.init();
         }
@@ -9885,6 +10029,7 @@
             if (raceGame.timerInterval) clearInterval(raceGame.timerInterval);
             if (raceGame.gameLoop) cancelAnimationFrame(raceGame.gameLoop);
         }
+        // Показываем модалку игр снова
         setTimeout(() => openGamesModal(), 300);
     }
 
@@ -9922,6 +10067,7 @@
         wheelGame.spin();
     }
 
+    // Добавляем анимации для уведомлений
     const styleSheet = document.createElement('style');
     styleSheet.textContent = `
         @keyframes fadeInUp {
@@ -9956,6 +10102,7 @@
     document.addEventListener('DOMContentLoaded', async function() {
         console.log('🚀 Ymeyka app loaded successfully!');
         
+        // Инициализация свайп-навигации
         initSwipeNavigation();
         
         currentMasterStatus = 'ready';
@@ -9984,9 +10131,11 @@
         }
         initAdminAccess();
         
+        // Инициализация селекторов формата работы
         selectWorkFormat('Один');
         selectEditWorkFormat('Один');
         
+        // Инициализация игр
         if (document.getElementById('raceCanvas')) {
             raceGame.init();
         }
@@ -9994,8 +10143,13 @@
             wheelGame.init();
         }
         
+        // Загружаем таблицу лидеров при первом открытии
         renderLeaderboard();
+        
+        // Инициализируем UI финансов
         updateFinanceUI();
+        
+        // Инициализируем селектор городов
         initCitySelector();
     });
     </script>
