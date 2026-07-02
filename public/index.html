@@ -3711,23 +3711,23 @@
                 </div>
                 
                 <div style="margin: 20px 0;">
-                    <div style="color: white; margin-bottom: 10px; font-weight: 600;">👥 Формат работы *</div>
+                    <div style="color: white; margin-bottom: 10px; font-weight: 600;">👥 Опыт мастера *</div>
                     <div class="workformat-selector" id="workFormatSelector">
-                        <div class="workformat-option" data-workformat="Один" onclick="triggerHapticFeedback(); selectWorkFormat('Один');">
-                            👤 Один
+                        <div class="workformat-option" data-workformat="Мастер (от 15 лет)" onclick="triggerHapticFeedback(); selectWorkFormat('Мастер (от 15 лет)');">
+                            👤 Мастер (от 15 лет)
                         </div>
-                        <div class="workformat-option" data-workformat="Вдвоём" onclick="triggerHapticFeedback(); selectWorkFormat('Вдвоём');">
-                            👥 Вдвоём
+                        <div class="workformat-option" data-workformat="Опытный (от 5 лет)" onclick="triggerHapticFeedback(); selectWorkFormat('Опытный (от 5 лет)');">
+                            👥 Опытный (от 5 лет)
                         </div>
-                        <div class="workformat-option" data-workformat="Бригада" onclick="triggerHapticFeedback(); selectWorkFormat('Бригада');">
-                            🏢 Бригада
+                        <div class="workformat-option" data-workformat="Ученик (от 1 года)" onclick="triggerHapticFeedback(); selectWorkFormat('Ученик (от 1 года)');">
+                            🏢 Ученик (от 1 года)
                         </div>
-                        <div class="workformat-option" data-workformat="Ищу бригаду" onclick="triggerHapticFeedback(); selectWorkFormat('Ищу бригаду');">
-                            🔍 Ищу бригаду
+                        <div class="workformat-option" data-workformat="Новичок" onclick="triggerHapticFeedback(); selectWorkFormat('Новичок');">
+                            🔍 Новичок
                         </div>
                     </div>
                     <div style="color: rgba(255,255,255,0.8); font-size: 12px; margin-top: 5px;">
-                        Выберите формат работы — это поможет клиентам понять, с кем они будут иметь дело
+                        Выберите уровень опыта мастера — это поможет клиентам понять, с кем они будут иметь дело
                     </div>
                 </div>
                 
@@ -4469,23 +4469,23 @@
             </div>
             
             <div style="margin: 20px 0;">
-                <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">👥 Формат работы *</div>
+                <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">👥 Опыт мастера *</div>
                 <div class="workformat-selector" id="editWorkFormatSelector" style="background: #f7fafc;">
-                    <div class="workformat-option" data-workformat="Один" onclick="triggerHapticFeedback(); selectEditWorkFormat('Один');">
-                        👤 Один
+                    <div class="workformat-option" data-workformat="Мастер (от 15 лет)" onclick="triggerHapticFeedback(); selectEditWorkFormat('Мастер (от 15 лет)');">
+                        👤 Мастер (от 15 лет)
                     </div>
-                    <div class="workformat-option" data-workformat="Вдвоём" onclick="triggerHapticFeedback(); selectEditWorkFormat('Вдвоём');">
-                        👥 Вдвоём
+                    <div class="workformat-option" data-workformat="Опытный (от 5 лет)" onclick="triggerHapticFeedback(); selectEditWorkFormat('Опытный (от 5 лет)');">
+                        👥 Опытный (от 5 лет)
                     </div>
-                    <div class="workformat-option" data-workformat="Бригада" onclick="triggerHapticFeedback(); selectEditWorkFormat('Бригада');">
-                        🏢 Бригада
+                    <div class="workformat-option" data-workformat="Ученик (от 1 года)" onclick="triggerHapticFeedback(); selectEditWorkFormat('Ученик (от 1 года)');">
+                        🏢 Ученик (от 1 года)
                     </div>
-                    <div class="workformat-option" data-workformat="Ищу бригаду" onclick="triggerHapticFeedback(); selectEditWorkFormat('Ищу бригаду');">
-                        🔍 Ищу бригаду
+                    <div class="workformat-option" data-workformat="Новичок" onclick="triggerHapticFeedback(); selectEditWorkFormat('Новичок');">
+                        🔍 Новичок
                     </div>
                 </div>
                 <div style="color: #666; font-size: 12px; margin-top: 5px;">
-                    Выберите формат работы — это поможет клиентам понять, с кем они будут иметь дело
+                    Выберите уровень опыта мастера — это поможет клиентам понять, с кем они будут иметь дело
                 </div>
             </div>
             
@@ -4641,7 +4641,7 @@
     // ========== КОНФИГУРАЦИЯ ==========
     const API_URL = 'https://umeyka-oocn.onrender.com';
     const TELEGRAM_BOT_URL = 'https://t.me/ymeyka_bot';
-    const CACHE_TTL = 5 * 60 * 1000; // 5 минут
+    const CACHE_TTL = 10 * 60 * 1000; // 10 минут
     
     let currentUserId = null;
     let currentAvatar = null;
@@ -4663,8 +4663,8 @@
     let currentEditMasterStatus = 'ready';
     let currentRadius = 10;
     let currentEditRadius = 10;
-    let currentWorkFormat = 'Один';
-    let currentEditWorkFormat = 'Один';
+    let currentWorkFormat = 'Мастер (от 15 лет)';
+    let currentEditWorkFormat = 'Мастер (от 15 лет)';
     let pendingPaymentDealId = null;
     let currentQRSkillId = null;
     let currentQRSkillName = null;
@@ -4691,10 +4691,10 @@
         let icon = '';
         let classMod = '';
         switch(workFormat) {
-            case 'Один': icon = '👤'; classMod = 'one'; break;
-            case 'Вдвоём': icon = '👥'; classMod = 'two'; break;
-            case 'Бригада': icon = '🏢'; classMod = 'team'; break;
-            case 'Ищу бригаду': icon = '🔍'; classMod = 'looking'; break;
+            case 'Мастер (от 15 лет)': icon = '👤'; classMod = 'one'; break;
+            case 'Опытный (от 5 лет)': icon = '👥'; classMod = 'two'; break;
+            case 'Ученик (от 1 года)': icon = '🏢'; classMod = 'team'; break;
+            case 'Новичок': icon = '🔍'; classMod = 'looking'; break;
             default: icon = '👤'; classMod = 'one';
         }
         return `<div class="workformat-badge ${classMod}">${icon} ${workFormat}</div>`;
@@ -5156,8 +5156,18 @@
         }
         
         if (subcategory) {
+            // Сопоставляем новые названия с существующими workFormat
+            let workFormatMap = {
+                "Мастер (от 15 лет)": ["Один", "Мастер (от 15 лет)"],
+                "Опытный (от 5 лет)": ["Вдвоём", "Опытный (от 5 лет)"],
+                "Ученик (от 1 года)": ["Бригада", "Ученик (от 1 года)"],
+                "Новичок": ["Ищу бригаду", "Новичок"]
+            };
+            const possibleValues = workFormatMap[subcategory] || [subcategory];
+            
             filteredSkills = filteredSkills.filter(skill => {
-                return skill.workFormat === subcategory;
+                if (!skill.workFormat) return false;
+                return possibleValues.some(val => skill.workFormat === val);
             });
         }
         
@@ -5650,7 +5660,7 @@
         let detailsHtml = `<strong>💰 Цена:</strong> ${skill.price} ₽<br><br>`;
         detailsHtml += `<strong>📍 Город:</strong> ${skill.city || 'Не указан'}<br><br>`;
         detailsHtml += `<strong>📏 Радиус:</strong> ${skill.radius || 10} км<br><br>`;
-        detailsHtml += `<strong>👥 Формат работы:</strong> ${skill.workFormat || 'Один'}<br><br>`;
+        detailsHtml += `<strong>👥 Опыт:</strong> ${skill.workFormat || 'Мастер (от 15 лет)'}<br><br>`;
         detailsHtml += `<strong>⭐ Статус:</strong> ${skill.status === 'ready' ? 'Готов к работе' : 'Занят'}<br><br>`;
         if (skill.details && skill.details.trim()) {
             detailsHtml += `<strong>📝 Подробности:</strong><br>${escapeHtml(skill.details)}<br><br>`;
@@ -6858,8 +6868,8 @@
                         selectRadius(10);
                         currentMasterStatus = 'ready';
                         selectMasterStatus('ready');
-                        currentWorkFormat = 'Один';
-                        selectWorkFormat('Один');
+                        currentWorkFormat = 'Мастер (от 15 лет)';
+                        selectWorkFormat('Мастер (от 15 лет)');
                         await preloadAllSkills();
                         loadMySkills();
                         loadProfileSkills();
@@ -6895,8 +6905,8 @@
                 selectRadius(10);
                 currentMasterStatus = 'ready';
                 selectMasterStatus('ready');
-                currentWorkFormat = 'Один';
-                selectWorkFormat('Один');
+                currentWorkFormat = 'Мастер (от 15 лет)';
+                selectWorkFormat('Мастер (от 15 лет)');
                 await preloadAllSkills();
                 loadMySkills();
                 loadProfileSkills();
@@ -7081,7 +7091,7 @@
             document.getElementById('editSkillCity').value = skill.city || '';
             currentEditRadius = skill.radius || 10;
             selectEditRadius(currentEditRadius);
-            currentEditWorkFormat = skill.workFormat || 'Один';
+            currentEditWorkFormat = skill.workFormat || 'Мастер (от 15 лет)';
             selectEditWorkFormat(currentEditWorkFormat);
             const skillStatus = skill.status || 'ready';
             selectEditMasterStatus(skillStatus);
@@ -7341,8 +7351,8 @@
             selectMasterStatus('ready');
             currentRadius = 10;
             selectRadius(10);
-            currentWorkFormat = 'Один';
-            selectWorkFormat('Один');
+            currentWorkFormat = 'Мастер (от 15 лет)';
+            selectWorkFormat('Мастер (от 15 лет)');
             loadMySkills();
         } else if (sectionId === 'clientSection') {
             console.log('📚 [Архив] Открытие архива с принудительной синхронизацией данных');
@@ -10123,8 +10133,8 @@
         currentEditMasterStatus = 'ready';
         currentRadius = 10;
         currentEditRadius = 10;
-        currentWorkFormat = 'Один';
-        currentEditWorkFormat = 'Один';
+        currentWorkFormat = 'Мастер (от 15 лет)';
+        currentEditWorkFormat = 'Мастер (от 15 лет)';
         showMainScreen();
         currentUserId = checkAndSetUserId();
         showLoadingIndicator();
@@ -10146,8 +10156,8 @@
         initAdminAccess();
         
         // Инициализация селекторов формата работы
-        selectWorkFormat('Один');
-        selectEditWorkFormat('Один');
+        selectWorkFormat('Мастер (от 15 лет)');
+        selectEditWorkFormat('Мастер (от 15 лет)');
         
         // Инициализация игр
         if (document.getElementById('raceCanvas')) {
