@@ -195,7 +195,7 @@
             color: rgba(255,255,255,0.8);
         }
 
-        /* ---------- ИГРА: КОЛЕСО УДАЧИ ---------- */
+        /* ---------- ИГРА 1: КОЛЕСО УДАЧИ (только она) ---------- */
         .wheel-game-container {
             background: linear-gradient(180deg, #0b0e1a 0%, #1a1f35 100%);
             border-radius: 24px;
@@ -3693,8 +3693,7 @@
                     
                     <button class="profile-button button-stats" onclick="triggerHapticFeedback(); showProfileTab('stats');">
                         <span class="button-icon">📊</span>
-                        Статистика
-                    </button>
+                        Статистика                    </button>
                     
                     <button class="profile-button button-my-skills" onclick="triggerHapticFeedback(); showProfileTab('skills');">
                         <span class="button-icon">✨</span>
@@ -4120,7 +4119,7 @@
             <button class="games-modal-close" onclick="triggerHapticFeedback(); closeGamesModal();">✕</button>
             <div class="games-modal-title">🎮 Игры</div>
             
-            <!-- Игра: Колесо удачи (единственная) -->
+            <!-- Игра: Колесо удачи (только она) -->
             <div class="game-card" onclick="triggerHapticFeedback(); openWheelGame();">
                 <div class="game-card-header">
                     <span class="game-card-icon">🎡</span>
@@ -4714,7 +4713,7 @@
         showLoadingIndicator();
         
         try {
-            const response = await fetch(`${API_URL}/api/skills/all`);
+            const response = await fetch(`${API_URL}/api/skills/all?t=${Date.now()}`);
             
             if (response.ok) {
                 const result = await response.json();
@@ -4755,14 +4754,30 @@
         }
     }
     
-    async function getGlobalSkills() {
-        if (!isSkillsLoaded) {
-            await preloadAllSkills();
-            isSkillsLoaded = true;
+    async function getGlobalSkills(forceRefresh = false) {
+        console.log(`📊 [getGlobalSkills] Получение умейок (forceRefresh: ${forceRefresh})`);
+        
+        // Если требуется принудительное обновление, загружаем с сервера
+        if (forceRefresh) {
+            try {
+                const response = await fetch(`${API_URL}/api/skills/all?t=${Date.now()}`);
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.skills) {
+                        console.log(`✅ [getGlobalSkills] Загружено ${result.skills.length} умейок с сервера (принудительно)`);
+                        setCachedSkills(result.skills);
+                        setLocalStorage('umeyka_global_skills', result.skills);
+                        offlineMode = false;
+                        return result.skills;
+                    }
+                }
+            } catch (error) {
+                console.warn('⚠️ [getGlobalSkills] Не удалось загрузить с сервера:', error);
+            }
         }
         
+        // Проверяем кэш
         let skills = getLocalStorage('umeyka_global_skills') || [];
-        
         if (skills.length === 0) {
             const cached = getCachedSkills();
             if (cached && cached.length > 0) {
@@ -4773,14 +4788,6 @@
         }
         
         console.log(`📊 [getGlobalSkills] Всего умейок в хранилище: ${skills.length}`);
-        
-        if (skills.length < 10) {
-            console.log('🔄 [getGlobalSkills] Мало умейок, пробую перезагрузить...');
-            await preloadAllSkills();
-            skills = getLocalStorage('umeyka_global_skills') || [];
-            console.log(`📊 [getGlobalSkills] После перезагрузки: ${skills.length} умейок`);
-        }
-        
         return skills;
     }
     
@@ -4962,7 +4969,7 @@
         mapModal = L.map('mapModal', {
             attributionControl: false
         }).setView([55.7558, 37.6173], 10);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        L.tileLayer('https://{s}.basemaps.cartodcdn.com/light_all/{z}/{x}/{y}{r}.png', {
             subdomains: 'abcd',
             maxZoom: 20
         }).addTo(mapModal);
@@ -4981,7 +4988,7 @@
             markers = [];
         }
         
-        let allSkills = await getGlobalSkills();
+        let allSkills = await getGlobalSkills(true);
         
         let filteredSkills = allSkills;
         if (category) {
@@ -4994,7 +5001,6 @@
         }
         
         if (subcategory) {
-            // Сопоставляем новые названия с существующими workFormat
             let workFormatMap = {
                 "Мастер (от 15 лет)": ["Один", "Мастер (от 15 лет)"],
                 "Опытный (от 5 лет)": ["Вдвоём", "Опытный (от 5 лет)"],
@@ -5391,14 +5397,14 @@
         modal.style.display = 'flex';
         content.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки мастера...</div></div>';
         await preloadAllSkills();
-        let allSkills = await getGlobalSkills();
+        let allSkills = await getGlobalSkills(true);
         try {
             const response = await fetch(`${API_URL}/api/skills/user/${userId}`);
             if (response.ok) {
                 const result = await response.json();
                 if (result.success && result.skills) {
                     result.skills.forEach(skill => addGlobalSkill(skill));
-                    allSkills = await getGlobalSkills();
+                    allSkills = await getGlobalSkills(true);
                     console.log(`✅ Загружено ${result.skills.length} умейок для пользователя ${userId} с сервера`);
                 }
             }
@@ -6768,7 +6774,7 @@
                 return;
             }
             skillsList.innerHTML = '<div class="loading">⏳ Загрузка ваших умейок...</div>';
-            const allSkills = await getGlobalSkills();
+            const allSkills = await getGlobalSkills(true);
             const mySkills = allSkills.filter(s => s.userId === currentUserId);
             if (mySkills.length > 0) {
                 skillsList.innerHTML = mySkills.map(skill => {
@@ -6850,7 +6856,7 @@
         try {
             if (!currentUserId) return;
             const skillsList = document.getElementById('profileSkillsList');
-            const allSkills = await getGlobalSkills();
+            const allSkills = await getGlobalSkills(true);
             const mySkills = allSkills.filter(s => s.userId === currentUserId);
             if (mySkills.length > 0) {
                 skillsList.innerHTML = mySkills.map(skill => {
@@ -7077,7 +7083,7 @@
                 } catch (serverError) {
                     console.log('⚠️ Сервер недоступен, удаляем локально');
                 }
-                const allSkills = await getGlobalSkills();
+                const allSkills = await getGlobalSkills(true);
                 const updatedSkills = allSkills.filter(s => s._id !== skillId);
                 setLocalStorage('umeyka_global_skills', updatedSkills);
                 setCachedSkills(updatedSkills);
@@ -8469,11 +8475,7 @@
         }
         
         // Фильтруем по подкатегории (уровень мастерства)
-        // В старых данных это может быть в workFormat, но теперь у нас новые названия
-        // Поэтому ищем совпадение в workFormat
         if (subcategory) {
-            // Сопоставляем новые названия с существующими workFormat
-            // "Мастер (от 15 лет)" -> "Один", "Опытный (от 5 лет)" -> "Вдвоём", "Ученик (от 1 года)" -> "Бригада", "Новичок" -> "Ищу бригаду"
             let workFormatMap = {
                 "Мастер (от 15 лет)": ["Один", "Мастер (от 15 лет)"],
                 "Опытный (от 5 лет)": ["Вдвоём", "Опытный (от 5 лет)"],
@@ -8920,12 +8922,11 @@
     // ========== НОВЫЙ РАЗДЕЛ: ИГРЫ ==========
     // ======================================================================
 
-    // -------- ИГРА: КОЛЕСО УДАЧИ --------
+    // -------- ИГРА: КОЛЕСО УДАЧИ (только она) --------
 
     let wheelGame = {
         canvas: null,
         ctx: null,
-        // Новые значения сегментов: 1-10
         segments: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF8A5C', '#A29BFE', '#FD79A8', '#00CEC9'],
         currentAngle: 0,
