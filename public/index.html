@@ -14,6 +14,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
     </script>
     <style>
+        /* ===== ВСЕ СТИЛИ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -3888,7 +3889,7 @@
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">📚 Архив мастеров</h2>
 
-                <!-- НОВЫЙ СЕЛЕКТОР ГОРОДА -->
+                <!-- СЕЛЕКТОР ГОРОДА -->
                 <div class="city-selector-wrapper">
                     <label for="cityFilterSelect">🏙️ Выберите город</label>
                     <select id="cityFilterSelect" class="city-select" onchange="onCityFilterChange(this.value)">
@@ -4994,13 +4995,24 @@
 
         // ========== ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ С УМЕЙКАМИ ==========
 
-        async function preloadAllSkills() {
-            console.log('🚀 [Загрузка] Начинаю предварительную загрузку всех умейок...');
+        async function preloadAllSkills(forceRefresh = false) {
+            console.log(`🚀 [Загрузка] Начинаю предварительную загрузку всех умейок... (forceRefresh: ${forceRefresh})`);
+
+            // Если есть кэш и не принудительно, используем его
+            if (!forceRefresh) {
+                const cached = getCachedSkills();
+                if (cached && cached.length > 0) {
+                    console.log(`📦 [Загрузка] Загружено ${cached.length} умейок из кэша`);
+                    setLocalStorage('umeyka_global_skills', cached);
+                    offlineMode = true;
+                    return cached;
+                }
+            }
 
             showLoadingIndicator();
 
             try {
-                const response = await fetch(`${API_URL}/api/skills/all`);
+                const response = await fetch(`${API_URL}/api/skills/all?t=${Date.now()}`);
 
                 if (response.ok) {
                     const result = await response.json();
@@ -5022,6 +5034,7 @@
                 const cachedSkills = getCachedSkills();
                 if (cachedSkills) {
                     console.log(`📦 [Офлайн] Загружено ${cachedSkills.length} умейок из кэша`);
+                    setLocalStorage('umeyka_global_skills', cachedSkills);
                     offlineMode = true;
                     showNotification('⚠️ Офлайн-режим: показаны кэшированные данные', 3000);
                     hideLoadingIndicator();
@@ -5041,9 +5054,9 @@
             }
         }
 
-        async function getGlobalSkills() {
-            if (!isSkillsLoaded) {
-                await preloadAllSkills();
+        async function getGlobalSkills(forceRefresh = false) {
+            if (!isSkillsLoaded || forceRefresh) {
+                await preloadAllSkills(forceRefresh);
                 isSkillsLoaded = true;
             }
 
@@ -5059,14 +5072,6 @@
             }
 
             console.log(`📊 [getGlobalSkills] Всего умейок в хранилище: ${skills.length}`);
-
-            if (skills.length < 10) {
-                console.log('🔄 [getGlobalSkills] Мало умейок, пробую перезагрузить...');
-                await preloadAllSkills();
-                skills = getLocalStorage('umeyka_global_skills') || [];
-                console.log(`📊 [getGlobalSkills] После перезагрузки: ${skills.length} умейок`);
-            }
-
             return skills;
         }
 
@@ -5130,9 +5135,12 @@
         // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 
         function showLoadingIndicator() {
-            const loadingDiv = document.createElement('div');
-            loadingDiv.id = 'globalLoadingIndicator';
-            loadingDiv.style.cssText = `
+            const loadingDiv = document.getElementById('globalLoadingIndicator');
+            if (loadingDiv) return;
+
+            const newDiv = document.createElement('div');
+            newDiv.id = 'globalLoadingIndicator';
+            newDiv.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -5147,11 +5155,11 @@
             color: white;
             font-size: 18px;
         `;
-            loadingDiv.innerHTML = `
+            newDiv.innerHTML = `
             <div class="loading-spinner" style="width: 40px; height: 40px; border-width: 4px;"></div>
             <div style="margin-top: 15px;">Загрузка данных...</div>
         `;
-            document.body.appendChild(loadingDiv);
+            document.body.appendChild(newDiv);
         }
 
         function hideLoadingIndicator() {
@@ -5280,7 +5288,6 @@
             }
 
             if (subcategory) {
-                // Сопоставляем новые названия с существующими workFormat
                 let workFormatMap = {
                     "Мастер (от 15 лет)": ["Один", "Мастер (от 15 лет)"],
                     "Опытный (от 5 лет)": ["Вдвоём", "Опытный (от 5 лет)"],
@@ -6997,7 +7004,7 @@
                             selectMasterStatus('ready');
                             currentWorkFormat = 'Мастер (от 15 лет)';
                             selectWorkFormat('Мастер (от 15 лет)');
-                            await preloadAllSkills();
+                            await preloadAllSkills(true);
                             loadMySkills();
                             loadProfileSkills();
                             generateMainScreenQR();
@@ -7034,7 +7041,7 @@
                     selectMasterStatus('ready');
                     currentWorkFormat = 'Мастер (от 15 лет)';
                     selectWorkFormat('Мастер (от 15 лет)');
-                    await preloadAllSkills();
+                    await preloadAllSkills(true);
                     loadMySkills();
                     loadProfileSkills();
                     generateMainScreenQR();
@@ -7346,7 +7353,7 @@
                 }
                 alert('✅ Умейка успешно обновлена!');
                 closeEditSkillModal();
-                await preloadAllSkills();
+                await preloadAllSkills(true);
                 await loadMySkills();
                 await loadProfileSkills();
                 generateMainScreenQR();
@@ -7382,7 +7389,7 @@
                     setLocalStorage('umeyka_global_skills', updatedSkills);
                     setCachedSkills(updatedSkills);
                     hideLoadingIndicator();
-                    await preloadAllSkills();
+                    await preloadAllSkills(true);
                     await loadMySkills();
                     await loadProfileSkills();
                     generateMainScreenQR();
@@ -8473,7 +8480,7 @@
             { name: "Другое", emoji: "📦" }
         ];
 
-        // НОВЫЕ ПОДРАЗДЕЛЫ ДЛЯ АРХИВА
+        // НОВЫЕ ПОДРАЗДЕЛЫ ДЛЯ АРХИВА (сопоставление с workFormat)
         const subcategoriesMap = {
             "Такси": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
             "Плиточник": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
@@ -8620,8 +8627,9 @@
                 });
             }
 
-            // Фильтруем по формату работы (уровню опыта)
-            // Сопоставляем названия
+            // Фильтруем по формату работы (уровню опыта) с поддержкой обоих форматов
+            // Старые значения: "Один", "Вдвоём", "Бригада", "Ищу бригаду"
+            // Новые значения: "Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"
             let workFormatMap = {
                 "Мастер (от 15 лет)": ["Один", "Мастер (от 15 лет)"],
                 "Опытный (от 5 лет)": ["Вдвоём", "Опытный (от 5 лет)"],
@@ -8656,31 +8664,23 @@
             const selectedCity = getSelectedCity();
 
             // Подсчитываем общее количество мастеров с учетом города
-            let totalMasters = allSkills.length;
-            if (selectedCity !== 'all') {
-                totalMasters = allSkills.filter(skill => {
-                    if (!skill.city) return false;
-                    return skill.city.trim().toLowerCase() === selectedCity.trim().toLowerCase();
-                }).length;
-                // Убираем дубликаты
+            let totalMasters = 0;
+            if (selectedCity === 'all') {
                 const unique = new Set();
-                let count = 0;
+                for (const skill of allSkills) {
+                    if (!unique.has(skill._id)) {
+                        unique.add(skill._id);
+                    }
+                }
+                totalMasters = unique.size;
+            } else {
+                const unique = new Set();
                 for (const skill of allSkills) {
                     if (!skill.city) continue;
                     if (skill.city.trim().toLowerCase() === selectedCity.trim().toLowerCase()) {
                         if (!unique.has(skill._id)) {
                             unique.add(skill._id);
-                            count++;
                         }
-                    }
-                }
-                totalMasters = count;
-            } else {
-                // Для "Все города" считаем уникальные умейки
-                const unique = new Set();
-                for (const skill of allSkills) {
-                    if (!unique.has(skill._id)) {
-                        unique.add(skill._id);
                     }
                 }
                 totalMasters = unique.size;
@@ -8793,6 +8793,7 @@
             const skillsContainer = document.getElementById('subcategorySkills');
             skillsContainer.innerHTML = '<div class="loading"><div class="loading-spinner"></div> Загрузка мастеров...</div>';
 
+            // Принудительно загружаем свежие данные с сервера
             let allSkills = [];
             try {
                 const response = await fetch(`${API_URL}/api/skills/all?t=${Date.now()}`);
@@ -8803,6 +8804,7 @@
                         setCachedSkills(result.skills);
                         setLocalStorage('umeyka_global_skills', result.skills);
                         allSkills = result.skills;
+                        offlineMode = false;
                     } else {
                         throw new Error('Ошибка сервера');
                     }
@@ -8822,27 +8824,27 @@
             const selectedCity = getSelectedCity();
             console.log(`🏙️ [Поиск] Фильтр по городу: ${selectedCity}`);
 
-            // Фильтруем по категории
+            // ШАГ 1: Фильтруем по категории (без учёта эмодзи)
             const cleanCategory = categoryName.replace(/[^\w\sа-яА-Я]/g, '').trim();
             let filteredSkills = allSkills.filter(skill => {
                 if (!skill.category) return false;
                 const skillCategoryClean = skill.category.replace(/[^\w\sа-яА-Я]/g, '').trim();
                 return skillCategoryClean.toLowerCase() === cleanCategory.toLowerCase();
             });
+            console.log(`📚 [Поиск] Шаг 1 (категория "${categoryName}"): ${filteredSkills.length} умейок`);
 
-            console.log(`📚 [Поиск] После фильтрации по категории "${categoryName}": ${filteredSkills.length} умейок`);
-
-            // Фильтруем по городу
+            // ШАГ 2: Фильтруем по городу
             if (selectedCity !== 'all') {
                 filteredSkills = filteredSkills.filter(skill => {
                     if (!skill.city) return false;
                     return skill.city.trim().toLowerCase() === selectedCity.trim().toLowerCase();
                 });
-                console.log(`📚 [Поиск] После фильтрации по городу "${selectedCity}": ${filteredSkills.length} умейок`);
+                console.log(`📚 [Поиск] Шаг 2 (город "${selectedCity}"): ${filteredSkills.length} умейок`);
             }
 
-            // Фильтруем по подкатегории (уровень мастерства)
+            // ШАГ 3: Фильтруем по подкатегории (уровень мастерства) с поддержкой обоих форматов
             if (subcategory) {
+                // Сопоставление старых и новых значений workFormat
                 let workFormatMap = {
                     "Мастер (от 15 лет)": ["Один", "Мастер (от 15 лет)"],
                     "Опытный (от 5 лет)": ["Вдвоём", "Опытный (от 5 лет)"],
@@ -8855,10 +8857,10 @@
                     if (!skill.workFormat) return false;
                     return possibleValues.some(val => skill.workFormat === val);
                 });
-                console.log(`📚 [Поиск] После фильтрации по уровню "${subcategory}": ${filteredSkills.length} умейок`);
+                console.log(`📚 [Поиск] Шаг 3 (уровень "${subcategory}"): ${filteredSkills.length} умейок`);
             }
 
-            // Убираем дубликаты
+            // ШАГ 4: Убираем дубликаты по _id (на случай, если одна умейка попала в массив несколько раз)
             const uniqueSkills = [];
             const seenIds = new Set();
             for (const skill of filteredSkills) {
@@ -8868,11 +8870,13 @@
                 }
             }
             filteredSkills = uniqueSkills;
+            console.log(`📚 [Поиск] Шаг 4 (удаление дубликатов): ${filteredSkills.length} умейок`);
 
-            // Сортировка
+            // Сортировка по имени мастера
             filteredSkills.sort((a, b) => (a.username || '').localeCompare(b.username || ''));
 
             console.log(`📚 [Поиск] Итоговое количество умейок: ${filteredSkills.length}`);
+            console.log(`📚 [Поиск] Пример умейки (первая):`, filteredSkills[0] || 'нет');
 
             if (filteredSkills.length > 0) {
                 skillsContainer.innerHTML = `
