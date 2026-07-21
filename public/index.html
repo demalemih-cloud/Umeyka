@@ -1752,10 +1752,6 @@
             background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
         }
-        .withdraw-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(72, 187, 120, 0.4);
-        }
         .delete-deal {
             background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
             box-shadow: 0 4px 10px rgba(245, 101, 101, 0.3);
@@ -4211,127 +4207,83 @@
             </div>
         </div>
 
-        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА (упрощена - только визитка и статистика) -->
+        <!-- СЕКЦИЯ ЛИЧНОГО КАБИНЕТА (УПРОЩЕННАЯ - ТОЛЬКО ВИЗИТКА) -->
         <div id="profileSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">👤 Личный кабинет</h2>
-
                 <div id="userProfile">
                     <div style="text-align: center; margin-bottom: 20px;">
                         <div id="userAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 30px; color: white;">
                             👤
                         </div>
-                        <h3 id="userName">Пользователь</h3>
-                        <p id="userBio" style="opacity: 0.8; margin: 10px 0;">Расскажите о себе...</p>
+                        <h3 id="userName">Гость</h3>
+                        <p id="userBio" style="opacity: 0.8; margin: 10px 0;">Анонимный пользователь</p>
                         <div id="userBadges" style="margin: 10px 0;"></div>
                     </div>
-                </div>
-
-                <div class="profile-main-buttons">
-                    <button class="profile-button button-edit-profile" onclick="triggerHapticFeedback(); editProfile();">
-                        <span class="button-icon">✏️</span>
-                        Редактировать профиль
-                    </button>
-
-                    <button class="profile-button button-stats" onclick="triggerHapticFeedback(); showProfileTab('stats');">
-                        <span class="button-icon">📊</span>
-                        Статистика
-                    </button>
-
-                    <button class="profile-button button-my-skills" onclick="triggerHapticFeedback(); showProfileTab('skills');">
-                        <span class="button-icon">✨</span>
-                        Мои умейки
-                    </button>
-
-                    <!-- НОВАЯ КНОПКА: ВЕРИФИКАЦИЯ -->
-                    <button class="profile-button" onclick="triggerHapticFeedback(); showVerificationTab();" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 15px rgba(72,187,120,0.3);">
-                        <span class="button-icon">✅</span>
-                        Верификация
-                    </button>
-
-                    <!-- НОВАЯ КНОПКА: КАРТА -->
-                    <button class="profile-button" onclick="triggerHapticFeedback(); showMapTab();" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 15px rgba(102,126,234,0.3);">
-                        <span class="button-icon">🗺️</span>
-                        Карта
-                    </button>
-
-                    <!-- НОВАЯ КНОПКА: ОТЗЫВЫ -->
-                    <button class="profile-button" onclick="triggerHapticFeedback(); showReviewsTab();" style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 15px rgba(237,137,54,0.3);">
-                        <span class="button-icon">💬</span>
-                        Мои отзывы
-                    </button>
-                </div>
-
-                <div id="profileStats" class="profile-tab">
-                    <h3 style="margin-bottom: 15px; text-align: center;">📊 Моя статистика</h3>
-                    <div id="userStats" class="stats-grid"></div>
-                </div>
-
-                <div id="profileSkills" class="profile-tab" style="display: none;">
-                    <h3 style="margin-bottom: 15px; text-align: center;">✨ Мои умейки</h3>
-                    <div id="profileSkillsList"></div>
-
-                    <button class="main-button button-master" onclick="triggerHapticFeedback(); showSection('masterSection');" style="margin-top: 15px;">
-                        <span class="button-icon">➕</span>
-                        Добавить новую умейку
-                    </button>
-                </div>
-
-                <!-- НОВАЯ ВКЛАДКА: ВЕРИФИКАЦИЯ -->
-                <div id="profileVerification" class="profile-tab" style="display: none;">
-                    <h3 style="margin-bottom: 15px; text-align: center;">✅ Верификация мастера</h3>
-                    <div id="verificationContent"></div>
-                </div>
-
-                <!-- НОВАЯ ВКЛАДКА: КАРТА -->
-                <div id="profileMap" class="profile-tab" style="display: none;">
-                    <h3 style="margin-bottom: 15px; text-align: center;">🗺️ Карта мастеров</h3>
-                    <div style="height: 400px; border-radius: 16px; overflow: hidden; position: relative; background: #1a1a2e;">
-                        <div id="profileMapContainer" style="height: 100%; width: 100%;"></div>
-                        <!-- Панель управления слоями для профильной карты -->
-                        <div class="map-controls" style="position: absolute; top: 10px; right: 10px; z-index: 1000; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); border-radius: 12px; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 6px; min-width: 140px;">
-                            <label>
-                                <input type="checkbox" id="profileLayerZones" checked onchange="toggleProfileMapLayer('zones')">
-                                Зоны покрытия
-                            </label>
-                            <label>
-                                <input type="checkbox" id="profileLayerHeat" onchange="toggleProfileMapLayer('heat')">
-                                Тепловая карта
-                            </label>
-                            <label>
-                                <input type="checkbox" id="profileLayerNearby" onchange="toggleProfileMapLayer('nearby')">
-                                Ближайшие мастера
-                            </label>
-                            <button class="map-route-btn" onclick="buildRouteFromProfile()">🚗 Построить маршрут</button>
-                        </div>
-                        <div id="profileNearbyListContainer" style="position: absolute; bottom: 10px; left: 10px; right: 10px; z-index: 1000; display: none;">
-                            <div class="map-nearby-list" id="profileNearbyList"></div>
-                        </div>
+                    <div class="profile-main-buttons">
+                        <button class="profile-button button-edit-profile" onclick="triggerHapticFeedback(); editProfile();">
+                            <span class="button-icon">✏️</span>
+                            Редактировать профиль
+                        </button>
+                        <button class="profile-button button-my-skills" onclick="triggerHapticFeedback(); showProfileTab('skills');">
+                            <span class="button-icon">✨</span>
+                            Мои умейки
+                        </button>
+                        <button class="profile-button button-deals" onclick="triggerHapticFeedback(); showProfileTab('deals');">
+                            <span class="button-icon">📝</span>
+                            Сделки
+                        </button>
                     </div>
-                </div>
-
-                <!-- НОВАЯ ВКЛАДКА: ОТЗЫВЫ -->
-                <div id="profileReviews" class="profile-tab" style="display: none;">
-                    <h3 style="margin-bottom: 15px; text-align: center;">💬 Мои отзывы</h3>
-                    <div id="reviewsTabContent"></div>
-                </div>
-
-                <div class="channel-links">
-                    <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
-                        <div class="channel-icon">🎯</div>
-                        <div class="channel-info">
-                            <div class="channel-name">Мотивация</div>
-                            <div class="channel-description">Подпишись и получи бонус!</div>
+                    <div id="profileStats" class="profile-tab">
+                        <h3 style="margin-bottom: 15px; text-align: center;">📊 Моя статистика</h3>
+                        <div id="userStats" class="stats-grid"></div>
+                    </div>
+                    <div id="profileSkills" class="profile-tab" style="display: none;">
+                        <h3 style="margin-bottom: 15px; text-align: center;">✨ Мои умейки</h3>
+                        <div id="profileSkillsList"></div>
+                        <button class="main-button button-master" onclick="triggerHapticFeedback(); showSection('masterSection');" style="margin-top: 15px;">
+                            <span class="button-icon">➕</span>
+                            Добавить новую умейку
+                        </button>
+                    </div>
+                    <div id="profileDeals" class="profile-tab" style="display: none;">
+                        <h3 style="margin-bottom: 15px; text-align: center;">📝 Мои сделки</h3>
+                        <div class="deals-tab-buttons">
+                            <button class="deals-tab-button pending active" onclick="triggerHapticFeedback(); showDealsTab('pending');" id="pendingDealsTab">
+                                <span class="button-icon">✍️</span>
+                                Ожидают подписи
+                            </button>
+                            <button class="deals-tab-button active-tab" onclick="triggerHapticFeedback(); showDealsTab('active');" id="activeDealsTab">
+                                <span class="button-icon">✅</span>
+                                Активные
+                            </button>
+                            <button class="deals-tab-button completed" onclick="triggerHapticFeedback(); showDealsTab('completed');" id="completedDealsTab">
+                                <span class="button-icon">📋</span>
+                                Завершенные
+                            </button>
                         </div>
-                    </a>
-
-                    <a href="https://t.me/Ymeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
-                        <div class="channel-icon">✨</div>
-                        <div class="channel-info">
-                            <div class="channel-name">Ymeyka</div>
-                            <div class="channel-description">Официальный канал проекта</div>
-                        </div>
-                    </a>
+                        <button class="main-button button-master" onclick="triggerHapticFeedback(); showCreateDealSection();" style="margin-bottom: 20px;">
+                            <span class="button-icon">➕</span>
+                            Создать сделку
+                        </button>
+                        <div id="dealsList"></div>
+                    </div>
+                    <div class="channel-links">
+                        <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
+                            <div class="channel-icon">🎯</div>
+                            <div class="channel-info">
+                                <div class="channel-name">Мотивация</div>
+                                <div class="channel-description">Подпишись и получи бонус!</div>
+                            </div>
+                        </a>
+                        <a href="https://t.me/Ymeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
+                            <div class="channel-icon">✨</div>
+                            <div class="channel-info">
+                                <div class="channel-name">Ymeyka</div>
+                                <div class="channel-description">Официальный канал проекта</div>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -4340,7 +4292,6 @@
         <div id="editProfileSection" class="section">
             <div class="form-section">
                 <h2 style="margin-bottom: 20px; text-align: center;">✏️ Редактирование профиля</h2>
-
                 <div style="text-align: center; margin-bottom: 20px;">
                     <div id="avatarPreview" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: white; cursor: pointer;" onclick="triggerHapticFeedback(); changeAvatar();">
                         👤
@@ -4348,14 +4299,50 @@
                     <div style="color: rgba(255,255,255,0.8); font-size: 14px;">Нажмите на аватар для выбора</div>
                     <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
                 </div>
-
                 <input type="text" id="editFirstName" class="input-field" placeholder="Имя *" required>
                 <input type="number" id="editAge" class="input-field" placeholder="Возраст">
                 <input type="text" id="editExperience" class="input-field" placeholder="Общий опыт работы (например: 5 лет)">
                 <input type="text" id="editContact" class="input-field" placeholder="Контактная информация (телефон, Telegram)">
                 <textarea id="editBio" class="input-field" placeholder="О себе (расскажите о ваших навыках и опыте) *" style="height: 120px; resize: vertical;" required></textarea>
-
                 <button class="submit-button" onclick="triggerHapticFeedback(); saveProfile();">💾 Сохранить профиль</button>
+            </div>
+        </div>
+
+        <!-- ФОРМА СОЗДАНИЯ СДЕЛКИ -->
+        <div id="createDealSection" class="section">
+            <div class="form-section">
+                <h2 style="margin-bottom: 20px; text-align: center;">📄 Создание сделки</h2>
+                <input type="hidden" id="dealMasterId" value="">
+                <input type="hidden" id="dealMasterName" value="">
+                <input type="hidden" id="dealMasterSkill" value="">
+                <input type="hidden" id="dealMasterContact" value="">
+                <input type="text" id="dealTitle" class="input-field" placeholder="Название сделки *" required>
+                <textarea id="dealDescription" class="input-field" placeholder="Описание работ *" style="height: 80px; resize: vertical;" required></textarea>
+                <input type="text" id="dealPeriod" class="input-field" placeholder="Срок выполнения (например: 3 дня) *" required>
+                <input type="number" id="dealAmount" class="input-field" placeholder="Сумма в рублях *" required>
+                <div>
+                    <label style="color: white; display: block; margin-bottom: 10px;">⭐ Уровень качества *</label>
+                    <div class="quality-options">
+                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('premium');" id="qualityPremium">Премиум</div>
+                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('standard');" id="qualityStandard">Стандарт</div>
+                        <div class="quality-option" onclick="triggerHapticFeedback(); selectQuality('economy');" id="qualityEconomy">Эконом</div>
+                    </div>
+                </div>
+                <div>
+                    <label style="color: white; display: block; margin-bottom: 10px;">✅ Дополнительные условия (выберите 2)</label>
+                    <div class="additional-options">
+                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('quality');" id="optionQuality">⭐ Качество</div>
+                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('price');" id="optionPrice">💰 Цена</div>
+                        <div class="option-checkbox" onclick="triggerHapticFeedback(); toggleOption('timeRange');" id="optionTimeRange">⏱️ Диапазон Времени</div>
+                    </div>
+                </div>
+                <div id="dealCommission" style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; margin: 15px 0; color: #2d3748; display: none;">
+                    <h4 style="margin-bottom: 10px;">💰 Комиссия системы</h4>
+                    <div>Сумма сделки: <span id="dealAmountDisplay">0</span> ₽</div>
+                    <div>Комиссия 5%: <span id="commissionAmount">0</span> ₽</div>
+                    <div style="font-weight: bold; margin-top: 5px;">Итого к оплате: <span id="totalAmount">0</span> ₽</div>
+                </div>
+                <button class="submit-button" onclick="triggerHapticFeedback(); createDeal();">📝 Создать сделку</button>
             </div>
         </div>
 
@@ -4364,17 +4351,12 @@
             <div class="form-section">
                 <div class="about-section">
                     <div class="about-title">🤝 О проекте Ymeyka</div>
-
                     <p style="margin-bottom: 15px; line-height: 1.6;">
                         <strong>Ymeyka</strong> - это инновационная платформа, которая соединяет мастеров и клиентов,
                         создавая экосистему доверия и качества.
                     </p>
-
                     <h4 style="margin: 20px 0 10px 0; color: #667eea;">🎯 Наша миссия</h4>
-                    <p style="margin-bottom: 15px; line-height: 1.6;">
-                        Сделать поиск проверенных мастеров простым, быстрым и безопасным для каждого.
-                    </p>
-
+                    <p style="margin-bottom: 15px; line-height: 1.6;">Сделать поиск проверенных мастеров простым, быстрым и безопасным для каждого.</p>
                     <h4 style="margin: 20px 0 10px 0; color: #667eea;">✨ Преимущества</h4>
                     <ul style="margin-bottom: 20px; padding-left: 20px; line-height: 1.6;">
                         <li>⭐ Звездная система мотивации</li>
@@ -4383,40 +4365,22 @@
                         <li>💬 Прямое общение без посредников</li>
                         <li>📱 Удобный интерфейс для любого возраста</li>
                     </ul>
-
                     <h4 style="margin: 20px 0 10px 0; color: #667eea;">📊 Статистика</h4>
                     <div class="stats-grid" id="aboutStatsGrid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="statMastersCount">0</div>
-                            <div class="stat-label">Мастеров</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="statDealsCount">0</div>
-                            <div class="stat-label">Сделок</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="statRating">0.0</div>
-                            <div class="stat-label">Рейтинг</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="statSatisfaction">0%</div>
-                            <div class="stat-label">Довольных клиентов</div>
-                        </div>
+                        <div class="stat-card"><div class="stat-value" id="statMastersCount">0</div><div class="stat-label">Мастеров</div></div>
+                        <div class="stat-card"><div class="stat-value" id="statDealsCount">0</div><div class="stat-label">Сделок</div></div>
+                        <div class="stat-card"><div class="stat-value" id="statRating">0.0</div><div class="stat-label">Рейтинг</div></div>
+                        <div class="stat-card"><div class="stat-value" id="statSatisfaction">0%</div><div class="stat-label">Довольных клиентов</div></div>
                     </div>
-
                     <button class="reviews-button" onclick="triggerHapticFeedback(); openReviewsModal();">
-                        <span>💬</span>
-                        Отзывы участников
+                        <span>💬</span> Отзывы участников
                     </button>
                 </div>
-
                 <div class="about-section">
                     <h3 style="margin-bottom: 15px; text-align: center;">💬 Оставьте отзыв о проекте</h3>
-
                     <div id="reviewRestrictionMessage" class="review-warning" style="display: none;">
                         ❌ Оставить отзыв могут только участники с завершёнными сделками
                     </div>
-
                     <div style="text-align: center; margin-bottom: 15px;">
                         <div class="rating-stars" id="projectRatingStars">
                             <span style="cursor: pointer;" onclick="triggerHapticFeedback(); setProjectRating(1);">☆</span>
@@ -4426,98 +4390,52 @@
                             <span style="cursor: pointer;" onclick="triggerHapticFeedback(); setProjectRating(5);">☆</span>
                         </div>
                     </div>
-
                     <textarea id="projectReviewComment" class="input-field" placeholder="Ваш отзыв о проекте..." style="height: 100px; resize: vertical; background: white;"></textarea>
-
-                    <button id="submitReviewBtn" class="submit-review-button" onclick="triggerHapticFeedback(); submitProjectReview();">
-                        📤 Отправить отзыв
-                    </button>
+                    <button id="submitReviewBtn" class="submit-review-button" onclick="triggerHapticFeedback(); submitProjectReview();">📤 Отправить отзыв</button>
                 </div>
-
                 <div class="channel-links">
                     <a href="https://t.me/dozatorvdohnovenija" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
                         <div class="channel-icon">🎯</div>
-                        <div class="channel-info">
-                            <div class="channel-name">Мотивация</div>
-                            <div class="channel-description">Подпишись и получи бонус!</div>
-                        </div>
+                        <div class="channel-info"><div class="channel-name">Мотивация</div><div class="channel-description">Подпишись и получи бонус!</div></div>
                     </a>
-
                     <a href="https://t.me/Ymeyka" class="channel-link" target="_blank" onclick="triggerHapticFeedback();">
                         <div class="channel-icon">✨</div>
-                        <div class="channel-info">
-                            <div class="channel-name">Ymeyka</div>
-                            <div class="channel-description">Официальный канал проекта</div>
-                        </div>
+                        <div class="channel-info"><div class="channel-name">Ymeyka</div><div class="channel-description">Официальный канал проекта</div></div>
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ====== НОВЫЙ РАЗДЕЛ: ИГРЫ ====== -->
-    <!-- КНОПКА ВЫЗОВА ИГР -->
+    <!-- ИГРЫ -->
     <button class="games-button" id="gamesMainButton" onclick="triggerHapticFeedback(); openGamesModal();">
-        <span class="icon">🎮</span>
-        <span>Игры</span>
+        <span class="icon">🎮</span><span>Игры</span>
     </button>
-
-    <!-- МОДАЛЬНОЕ ОКНО СО СПИСКОМ ИГР -->
     <div class="games-modal-overlay" id="gamesModal">
         <div class="games-modal-content">
             <button class="games-modal-close" onclick="triggerHapticFeedback(); closeGamesModal();">✕</button>
             <div class="games-modal-title">🎮 Игры</div>
-
             <div class="game-card" onclick="triggerHapticFeedback(); openRaceGame();">
-                <div class="game-card-header">
-                    <span class="game-card-icon">🏎️</span>
-                    <span class="game-card-title">Гонка за звёздами</span>
-                </div>
-                <div class="game-card-desc">
-                    Управляй машинкой, объезжай препятствия и собирай звёзды.
-                    Время — 60 секунд, скорость растёт!
-                </div>
-                <div class="game-card-stats">
-                    <span class="game-card-stat">⭐ Собирай звёзды</span>
-                    <span class="game-card-stat">⏱️ 60 сек</span>
-                    <span class="game-card-stat">🏆 Счёт</span>
-                </div>
+                <div class="game-card-header"><span class="game-card-icon">🏎️</span><span class="game-card-title">Гонка за звёздами</span></div>
+                <div class="game-card-desc">Управляй машинкой, объезжай препятствия и собирай звёзды. Время — 60 секунд, скорость растёт!</div>
+                <div class="game-card-stats"><span class="game-card-stat">⭐ Собирай звёзды</span><span class="game-card-stat">⏱️ 60 сек</span><span class="game-card-stat">🏆 Счёт</span></div>
             </div>
-
             <div class="game-card" onclick="triggerHapticFeedback(); openWheelGame();">
-                <div class="game-card-header">
-                    <span class="game-card-icon">🎡</span>
-                    <span class="game-card-title">Колесо удачи</span>
-                </div>
-                <div class="game-card-desc">
-                    Крути колесо и получай звёзды от 10 до 100.
-                    Доступно 1 раз в день!
-                </div>
-                <div class="game-card-stats">
-                    <span class="game-card-stat">⭐ 10–100</span>
-                    <span class="game-card-stat">⏳ 1 раз/день</span>
-                    <span class="game-card-stat">🎯 Удача</span>
-                </div>
+                <div class="game-card-header"><span class="game-card-icon">🎡</span><span class="game-card-title">Колесо удачи</span></div>
+                <div class="game-card-desc">Крути колесо и получай звёзды от 10 до 100. Доступно 1 раз в день!</div>
+                <div class="game-card-stats"><span class="game-card-stat">⭐ 10–100</span><span class="game-card-stat">⏳ 1 раз/день</span><span class="game-card-stat">🎯 Удача</span></div>
             </div>
-
             <div style="margin-top: 20px; background: rgba(255,255,255,0.05); border-radius: 16px; padding: 16px;">
                 <div style="color: rgba(255,255,255,0.6); font-size: 14px; text-align: center; margin-bottom: 10px;">🏆 Топ игроков</div>
-                <div id="gamesLeaderboard">
-                    <div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; padding: 8px;">Загрузка...</div>
-                </div>
+                <div id="gamesLeaderboard"><div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; padding: 8px;">Загрузка...</div></div>
             </div>
         </div>
     </div>
-
-    <!-- Полноэкранный контейнер для Игры 1 (Гонка) -->
     <div class="game-fullscreen" id="raceGameFullscreen">
         <button class="close-game" onclick="triggerHapticFeedback(); closeRaceGame();">✕</button>
         <div class="race-game-container" id="raceGameContainer">
             <canvas class="race-game-canvas" id="raceCanvas"></canvas>
-            <div class="race-ui">
-                <div class="race-ui-item"><span class="icon">⏱️</span> <span id="raceTimer">60</span></div>
-                <div class="race-ui-item"><span class="icon">⭐</span> <span id="raceScore">0</span></div>
-            </div>
+            <div class="race-ui"><div class="race-ui-item"><span class="icon">⏱️</span> <span id="raceTimer">60</span></div><div class="race-ui-item"><span class="icon">⭐</span> <span id="raceScore">0</span></div></div>
             <button class="race-back-btn" onclick="triggerHapticFeedback(); closeRaceGame();">🏠 Назад</button>
             <div class="race-overlay" id="raceOverlay">
                 <div class="race-overlay-title" id="raceOverlayTitle">🏁 Гонка завершена!</div>
@@ -4527,15 +4445,10 @@
             </div>
         </div>
     </div>
-
-    <!-- Полноэкранный контейнер для Игры 2 (Колесо) -->
     <div class="game-fullscreen" id="wheelGameFullscreen">
         <button class="close-game" onclick="triggerHapticFeedback(); closeWheelGame();">✕</button>
         <div class="wheel-game-container">
-            <div class="wheel-wrapper">
-                <canvas class="wheel-canvas" id="wheelCanvas" width="400" height="400"></canvas>
-                <div class="wheel-pointer"></div>
-            </div>
+            <div class="wheel-wrapper"><canvas class="wheel-canvas" id="wheelCanvas" width="400" height="400"></canvas><div class="wheel-pointer"></div></div>
             <button class="wheel-spin-btn" id="wheelSpinBtn" onclick="triggerHapticFeedback(); spinWheel();">🎡 Крутить</button>
             <div class="wheel-result" id="wheelResult"></div>
             <div class="wheel-timer" id="wheelTimer"></div>
@@ -4547,42 +4460,22 @@
         <div class="modal-content" style="max-width: 450px;">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeVisitkaModal();">×</button>
             <div class="modal-title">📇 Моя визитка</div>
-
-            <div id="visitkaContent">
-                <div style="text-align: center; padding: 20px;">
-                    <div class="loading">⏳ Загрузка визитки...</div>
-                </div>
-            </div>
-
+            <div id="visitkaContent"><div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка визитки...</div></div></div>
             <div class="modal-buttons" id="visitkaButtons" style="margin-top: 20px;">
-                <button class="modal-button modal-save" id="visitkaEditBtn" onclick="triggerHapticFeedback(); toggleVisitkaEditMode();">
-                    ✏️ Редактировать
-                </button>
-                <button class="modal-button modal-save" id="visitkaShareBtn" onclick="triggerHapticFeedback(); shareVisitka();" style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);">
-                    📤 Поделиться
-                </button>
-                <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeVisitkaModal();">
-                    Закрыть
-                </button>
+                <button class="modal-button modal-save" id="visitkaEditBtn" onclick="triggerHapticFeedback(); toggleVisitkaEditMode();">✏️ Редактировать</button>
+                <button class="modal-button modal-save" id="visitkaShareBtn" onclick="triggerHapticFeedback(); shareVisitka();" style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);">📤 Поделиться</button>
+                <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeVisitkaModal();">Закрыть</button>
             </div>
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ВИЗИТКИ МАСТЕРА (при сканировании) -->
+    <!-- МОДАЛЬНОЕ ОКНО ВИЗИТКИ МАСТЕРА -->
     <div id="masterVisitkaModal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 450px;">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeMasterVisitkaModal();">×</button>
             <div class="modal-title" id="masterVisitkaTitle">📇 Визитка мастера</div>
-
-            <div id="masterVisitkaContent">
-                <div style="text-align: center; padding: 20px;">
-                    <div class="loading">⏳ Загрузка...</div>
-                </div>
-            </div>
-
-            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeMasterVisitkaModal();" style="margin-top: 20px;">
-                Закрыть
-            </button>
+            <div id="masterVisitkaContent"><div style="text-align: center; padding: 20px;"><div class="loading">⏳ Загрузка...</div></div></div>
+            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeMasterVisitkaModal();" style="margin-top: 20px;">Закрыть</button>
         </div>
     </div>
 
@@ -4593,12 +4486,9 @@
             <div class="modal-title" id="visitkaSkillDetailTitle">📝 Подробности</div>
             <div id="visitkaSkillDetailText" class="details-modal-text"></div>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="modal-button modal-save" id="visitkaSkillContactBtn" onclick="triggerHapticFeedback(); contactMasterFromVisitka();">
-                    📞 Контакт
-                </button>
-                <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeVisitkaSkillDetailModal();">
-                    Закрыть
-                </button>
+                <button class="modal-button modal-save" id="visitkaSkillContactBtn" onclick="triggerHapticFeedback(); contactMasterFromVisitka();">📞 Контакт</button>
+                <button class="modal-button modal-save" id="visitkaSkillDealBtn" onclick="triggerHapticFeedback(); createDealFromVisitkaSkill();" style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);">📝 Создать сделку</button>
+                <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeVisitkaSkillDetailModal();">Закрыть</button>
             </div>
         </div>
     </div>
@@ -4608,16 +4498,14 @@
         <div class="modal-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeEditSkillModal();">×</button>
             <div class="modal-title">✏️ Редактировать умейку</div>
-
             <input type="hidden" id="editSkillId">
-
             <input type="text" id="editSkillName" class="input-field" placeholder="Моё умение" required>
             <textarea id="editSkillDetails" class="input-field" placeholder="📝 Подробности" style="height: 80px; resize: vertical;"></textarea>
-
             <div style="margin: 15px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📂 Категория умейки *</div>
                 <select id="editSkillCategory" class="input-field" required style="cursor: pointer; background: white;">
                     <option value="">-- Выберите категорию --</option>
+                    <option value="🚕 Такси">🚕 Такси</option>
                     <option value="🧱 Плиточник">🧱 Плиточник</option>
                     <option value="🏗️ Строитель">🏗️ Строитель</option>
                     <option value="✂️ Парикмахер">✂️ Парикмахер</option>
@@ -4653,89 +4541,54 @@
                     <option value="💆 Массажист">💆 Массажист</option>
                     <option value="📦 Другое">📦 Другое</option>
                 </select>
-                <div style="color: #666; font-size: 12px; margin-top: 5px;">
-                    ⚠️ Выберите категорию, чтобы клиенты могли легко вас найти
-                </div>
+                <div style="color: #666; font-size: 12px; margin-top: 5px;">⚠️ Выберите категорию, чтобы клиенты могли легко вас найти</div>
             </div>
-
             <input type="text" id="editSkillExperience" class="input-field" placeholder="📞 Мой контакт" required>
             <input type="number" id="editSkillPrice" class="input-field" placeholder="Средняя цена в рублях" required>
-
             <div class="city-autocomplete">
                 <input type="text" id="editSkillCity" class="input-field" placeholder="🏙️ Город" required autocomplete="off" oninput="handleEditCityInput(this.value)">
                 <div id="editCityAutocompleteList" class="autocomplete-list"></div>
             </div>
-
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📍 Радиус действия</div>
                 <div class="radius-selector" style="background: #f7fafc;">
-                    <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectEditRadius(5);">
-                        5 км
-                    </div>
-                    <div class="radius-option" data-radius="10" onclick="triggerHapticFeedback(); selectEditRadius(10);">
-                        10 км
-                    </div>
-                    <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectEditRadius(25);">
-                        25 км
-                    </div>
-                    <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectEditRadius(50);">
-                        50 км
-                    </div>
+                    <div class="radius-option" data-radius="5" onclick="triggerHapticFeedback(); selectEditRadius(5);">5 км</div>
+                    <div class="radius-option" data-radius="10" onclick="triggerHapticFeedback(); selectEditRadius(10);">10 км</div>
+                    <div class="radius-option" data-radius="25" onclick="triggerHapticFeedback(); selectEditRadius(25);">25 км</div>
+                    <div class="radius-option" data-radius="50" onclick="triggerHapticFeedback(); selectEditRadius(50);">50 км</div>
                 </div>
             </div>
-
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">👥 Опыт мастера *</div>
                 <div class="workformat-selector" id="editWorkFormatSelector" style="background: #f7fafc;">
-                    <div class="workformat-option" data-workformat="Мастер (от 15 лет)" onclick="triggerHapticFeedback(); selectEditWorkFormat('Мастер (от 15 лет)');">
-                        👤 Мастер (от 15 лет)
-                    </div>
-                    <div class="workformat-option" data-workformat="Опытный (от 5 лет)" onclick="triggerHapticFeedback(); selectEditWorkFormat('Опытный (от 5 лет)');">
-                        👥 Опытный (от 5 лет)
-                    </div>
-                    <div class="workformat-option" data-workformat="Ученик (от 1 года)" onclick="triggerHapticFeedback(); selectEditWorkFormat('Ученик (от 1 года)');">
-                        🏢 Ученик (от 1 года)
-                    </div>
-                    <div class="workformat-option" data-workformat="Новичок" onclick="triggerHapticFeedback(); selectEditWorkFormat('Новичок');">
-                        🔍 Новичок
-                    </div>
+                    <div class="workformat-option" data-workformat="Мастер (от 15 лет)" onclick="triggerHapticFeedback(); selectEditWorkFormat('Мастер (от 15 лет)');">👤 Мастер (от 15 лет)</div>
+                    <div class="workformat-option" data-workformat="Опытный (от 5 лет)" onclick="triggerHapticFeedback(); selectEditWorkFormat('Опытный (от 5 лет)');">👥 Опытный (от 5 лет)</div>
+                    <div class="workformat-option" data-workformat="Ученик (от 1 года)" onclick="triggerHapticFeedback(); selectEditWorkFormat('Ученик (от 1 года)');">🏢 Ученик (от 1 года)</div>
+                    <div class="workformat-option" data-workformat="Новичок" onclick="triggerHapticFeedback(); selectEditWorkFormat('Новичок');">🔍 Новичок</div>
                 </div>
-                <div style="color: #666; font-size: 12px; margin-top: 5px;">
-                    Выберите уровень опыта мастера — это поможет клиентам понять, с кем они будут иметь дело
-                </div>
+                <div style="color: #666; font-size: 12px; margin-top: 5px;">Выберите уровень опыта мастера — это поможет клиентам понять, с кем они будут иметь дело</div>
             </div>
-
             <div style="margin: 20px 0;">
                 <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📊 Ваш статус</div>
                 <div class="status-selector" style="background: #f7fafc;">
-                    <div class="status-option ready-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('ready');" id="editStatusReadyOption">
-                        ✅ Готов
-                    </div>
-                    <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('busy');" id="editStatusBusyOption">
-                        ⏰ Занят
-                    </div>
+                    <div class="status-option ready-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('ready');" id="editStatusReadyOption">✅ Готов</div>
+                    <div class="status-option busy-option" onclick="triggerHapticFeedback(); selectEditMasterStatus('busy');" id="editStatusBusyOption">⏰ Занят</div>
                 </div>
             </div>
-
             <div style="margin: 15px 0;">
-                <div style="color: #2d3748; margin-bottom: 10px; font-weight: 600;">📸 Фото вашей работы</div>
+                <div style="color: #2d3748; margin-bottom: 10px;">📸 Фото вашей работы</div>
                 <div class="photo-upload-area" onclick="triggerHapticFeedback(); document.getElementById('editSkillPhotoInput').click();">
                     <div class="photo-upload-icon">📷</div>
                     <div style="color: #2d3748; margin-bottom: 5px;">Нажмите для загрузки нового фото</div>
                     <div class="photo-info">JPG, PNG до 1MB</div>
                 </div>
                 <input type="file" id="editSkillPhotoInput" accept="image/*" style="display: none;" onchange="handleEditSkillPhotoUpload(event)">
-
                 <div id="editSkillPhotoPreview" class="photo-preview" style="display: none;">
                     <img id="editSkillPhotoImg" src="" alt="Фото работы">
                     <button class="photo-remove" onclick="triggerHapticFeedback(); removeEditSkillPhoto();">×</button>
                 </div>
-
-                <div id="editPhotoCompressionStatus" style="color: #48bb78; font-size: 12px; text-align: center; margin-top: 5px; display: none;">
-                    ⚡ Сжимаю фото...
-                </div>
+                <div id="editPhotoCompressionStatus" style="color: #48bb78; font-size: 12px; text-align: center; margin-top: 5px; display: none;">⚡ Сжимаю фото...</div>
             </div>
-
             <div class="modal-buttons">
                 <button class="modal-button modal-save" onclick="triggerHapticFeedback(); saveEditedSkill();">💾 Сохранить</button>
                 <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeEditSkillModal();">Отмена</button>
@@ -4758,22 +4611,30 @@
         <div class="modal-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeContactModal();">×</button>
             <div class="modal-title">📞 Контакты мастера</div>
-
-            <div id="contactInfo" class="contact-info">
-            </div>
-
+            <div id="contactInfo" class="contact-info"></div>
             <div class="contact-buttons">
-                <a id="callButton" class="call-button" href="#" target="_blank" onclick="triggerHapticFeedback();">
-                    📞 Позвонить
-                </a>
-                <a id="telegramButton" class="telegram-button" href="#" target="_blank" onclick="triggerHapticFeedback();">
-                    ✈️ Написать в Telegram
-                </a>
+                <a id="callButton" class="call-button" href="#" target="_blank" onclick="triggerHapticFeedback();">📞 Позвонить</a>
+                <a id="telegramButton" class="telegram-button" href="#" target="_blank" onclick="triggerHapticFeedback();">✈️ Написать в Telegram</a>
             </div>
+            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeContactModal();" style="margin-top: 15px;">Закрыть</button>
+        </div>
+    </div>
 
-            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeContactModal();" style="margin-top: 15px;">
-                Закрыть
-            </button>
+    <!-- МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ОПЛАТЫ -->
+    <div id="paymentConfirmModal" class="payment-confirm-modal" style="display: none;">
+        <div class="payment-confirm-content">
+            <div class="payment-confirm-title">💳 Подтверждение оплаты</div>
+            <div class="payment-confirm-details">
+                <div class="payment-confirm-row"><span>Сделка:</span><span id="confirmDealTitle">-</span></div>
+                <div class="payment-confirm-row"><span>Сумма:</span><span id="confirmDealAmount">0 ⭐</span></div>
+                <div class="payment-confirm-row"><span>Комиссия (5%):</span><span id="confirmDealCommission">0 ⭐</span></div>
+                <div class="payment-confirm-total"><span>К списанию:</span><span id="confirmDealTotal">0 ⭐</span></div>
+            </div>
+            <div style="color: #666; font-size: 14px; margin: 15px 0;">Деньги будут заморожены до завершения сделки</div>
+            <div class="payment-confirm-buttons">
+                <button class="payment-confirm-button payment-confirm-yes" onclick="confirmPayment();">✅ Подтвердить</button>
+                <button class="payment-confirm-button payment-confirm-no" onclick="closePaymentConfirm();">❌ Отмена</button>
+            </div>
         </div>
     </div>
 
@@ -4781,21 +4642,13 @@
     <div id="reviewsModal" class="reviews-modal">
         <div class="reviews-content">
             <button class="modal-close" onclick="triggerHapticFeedback(); closeReviewsModal();">×</button>
-
             <div class="reviews-header">
                 <h2 style="color: #667eea; margin-bottom: 10px;">💬 Отзывы участников</h2>
                 <div class="reviews-average" id="reviewsAverageRating">0.0</div>
                 <div class="rating-stars" id="reviewsAverageStars" style="font-size: 24px; margin: 10px 0;">☆☆☆☆☆</div>
                 <div class="reviews-count" id="reviewsTotalCount">0 отзывов</div>
             </div>
-
-            <div id="reviewsList">
-                <div class="no-reviews">
-                    <div class="no-reviews-icon">💭</div>
-                    <div>Пока нет отзывов</div>
-                    <div style="font-size: 14px; opacity: 0.7; margin-top: 10px;">Будьте первым!</div>
-                </div>
-            </div>
+            <div id="reviewsList"><div class="no-reviews"><div class="no-reviews-icon">💭</div><div>Пока нет отзывов</div><div style="font-size: 14px; opacity: 0.7; margin-top: 10px;">Будьте первым!</div></div></div>
         </div>
     </div>
 
@@ -4804,13 +4657,8 @@
         <div class="qr-modal-content">
             <h2 id="qrModalTitle" style="color: #2d3748; margin-bottom: 20px; font-size: 20px;"></h2>
             <div id="qrCodeContainer" class="qr-code-large"></div>
-            <button class="qr-share-button" onclick="triggerHapticFeedback(); shareQRCode();">
-                <span>📤</span>
-                Поделиться
-            </button>
-            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeQRModal();" style="margin-top: 15px;">
-                Закрыть
-            </button>
+            <button class="qr-share-button" onclick="triggerHapticFeedback(); shareQRCode();"><span>📤</span>Поделиться</button>
+            <button class="modal-button modal-cancel" onclick="triggerHapticFeedback(); closeQRModal();" style="margin-top: 15px;">Закрыть</button>
         </div>
     </div>
 
@@ -4820,9 +4668,9 @@
         const TELEGRAM_BOT_URL = 'https://t.me/ymeyka_bot';
         const CACHE_TTL = 10 * 60 * 1000; // 10 минут
 
-        // Единый публичный пользователь
+        // Все действия выполняются от имени публичного пользователя
         const PUBLIC_USER_ID = 'public_user';
-        const PUBLIC_USER_NAME = 'Гость';
+        const PUBLIC_USERNAME = 'Гость';
 
         let currentUserId = PUBLIC_USER_ID;
         let currentAvatar = null;
@@ -4861,11 +4709,9 @@
         let logoClickTimer = null;
         let offlineMode = false;
 
-        // Переменные для фильтрации карты
         let currentMapFilterCategory = null;
         let currentMapFilterSubcategory = null;
 
-        // Переменные для новых функций
         let verificationData = null;
         let profileMapInstance = null;
         let profileMapMarkers = [];
@@ -4935,7 +4781,6 @@
 
         function initSwipeNavigation() {
             const sections = document.querySelectorAll('.section');
-
             sections.forEach(section => {
                 section.addEventListener('touchstart', handleTouchStart, { passive: false });
                 section.addEventListener('touchmove', handleTouchMove, { passive: false });
@@ -4947,7 +4792,6 @@
             const touch = e.touches[0];
             swipeStartX = touch.clientX;
             swipeStartTime = Date.now();
-
             const indicator = document.getElementById('swipeIndicator');
             const arrow = document.getElementById('swipeArrow');
             indicator.classList.remove('active');
@@ -4956,20 +4800,16 @@
 
         function handleTouchMove(e) {
             if (swipeStartX === 0) return;
-
             const touch = e.touches[0];
             const currentX = touch.clientX;
             const diffX = currentX - swipeStartX;
-
             if (diffX > 10) {
                 const indicator = document.getElementById('swipeIndicator');
                 const arrow = document.getElementById('swipeArrow');
                 indicator.classList.add('active');
                 arrow.classList.add('active');
-
                 const opacity = Math.min(0.5, diffX / 200);
                 indicator.style.opacity = opacity;
-
                 const scale = Math.min(1.2, 0.8 + diffX / 150);
                 arrow.style.transform = `translateY(-50%) scale(${scale})`;
                 arrow.style.opacity = Math.min(0.9, diffX / 100);
@@ -4979,7 +4819,6 @@
                 indicator.classList.remove('active');
                 arrow.classList.remove('active');
             }
-
             if (diffX > 30) {
                 e.preventDefault();
             }
@@ -4987,12 +4826,10 @@
 
         function handleTouchEnd(e) {
             if (swipeStartX === 0) return;
-
             const touchEnd = e.changedTouches[0];
             const endX = touchEnd.clientX;
             const diffX = endX - swipeStartX;
             const diffTime = Date.now() - swipeStartTime;
-
             const indicator = document.getElementById('swipeIndicator');
             const arrow = document.getElementById('swipeArrow');
             indicator.classList.remove('active');
@@ -5000,18 +4837,14 @@
             indicator.style.opacity = '';
             arrow.style.transform = '';
             arrow.style.opacity = '';
-
             if (diffX > SWIPE_THRESHOLD && diffTime < SWIPE_MAX_TIME) {
                 triggerHapticFeedback();
-
                 const clientSection = document.getElementById('clientSection');
                 const isClientSectionVisible = clientSection && clientSection.style.display === 'block';
-
                 if (isClientSectionVisible) {
                     const resultsContainer = document.getElementById('categorySearchResults');
                     const categoriesContainer = document.getElementById('categoriesList');
                     const isSubcategoryOpen = resultsContainer && resultsContainer.style.display === 'block';
-
                     if (isSubcategoryOpen) {
                         console.log('🔙 [Свайп] Возврат в список категорий (архив)');
                         resultsContainer.style.display = 'none';
@@ -5027,7 +4860,6 @@
                     showMainScreen();
                 }
             }
-
             swipeStartX = 0;
             swipeStartTime = 0;
         }
@@ -5138,9 +4970,7 @@
                 await preloadAllSkills(forceRefresh);
                 isSkillsLoaded = true;
             }
-
             let skills = getLocalStorage('umeyka_global_skills') || [];
-
             if (skills.length === 0) {
                 const cached = getCachedSkills();
                 if (cached && cached.length > 0) {
@@ -5149,7 +4979,6 @@
                     console.log(`📦 [getGlobalSkills] Загружено ${skills.length} умейок из кэша`);
                 }
             }
-
             console.log(`📊 [getGlobalSkills] Всего умейок в хранилище: ${skills.length}`);
             return skills;
         }
@@ -5189,61 +5018,47 @@
 
         // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ЛОКАЛЬНЫМИ ДАННЫМИ ПОЛЬЗОВАТЕЛЯ ==========
 
-        function getOrCreateUserProfile(userId, userName = PUBLIC_USER_NAME) {
+        function getOrCreateUserProfile(userId) {
             // Всегда используем публичного пользователя
-            userId = PUBLIC_USER_ID;
-            let userData = getLocalStorage(`user_${userId}`);
+            let userData = getLocalStorage(`user_${PUBLIC_USER_ID}`);
             if (!userData) {
                 userData = {
-                    firstName: PUBLIC_USER_NAME,
+                    firstName: 'Гость',
                     age: null,
                     experience: '',
                     contact: '',
-                    bio: 'Расскажите о себе...',
+                    bio: 'Анонимный пользователь',
                     avatar: null,
                     skills: [],
                     rating: 0,
                     completedDeals: 0,
                     dealsCount: 0,
-                    userId: userId,
+                    userId: PUBLIC_USER_ID,
                     verification: {
                         status: 'none',
-                        documents: {
-                            passport: null,
-                            selfie: null
-                        },
+                        documents: { passport: null, selfie: null },
                         phoneConfirmed: false,
                         verifiedAt: null,
                         rejectedReason: null
                     },
-                    reviews: {
-                        received: [],
-                        given: []
-                    }
+                    reviews: { received: [], given: [] }
                 };
-                setLocalStorage(`user_${userId}`, userData);
-                console.log(`✅ Создан профиль для публичного пользователя:`, userData);
+                setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
+                console.log(`✅ Создан профиль для публичного пользователя`);
             }
-            // Проверяем наличие поля verification
             if (!userData.verification) {
                 userData.verification = {
                     status: 'none',
-                    documents: {
-                        passport: null,
-                        selfie: null
-                    },
+                    documents: { passport: null, selfie: null },
                     phoneConfirmed: false,
                     verifiedAt: null,
                     rejectedReason: null
                 };
-                setLocalStorage(`user_${userId}`, userData);
+                setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
             }
             if (!userData.reviews) {
-                userData.reviews = {
-                    received: [],
-                    given: []
-                };
-                setLocalStorage(`user_${userId}`, userData);
+                userData.reviews = { received: [], given: [] };
+                setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
             }
             return userData;
         }
@@ -5253,7 +5068,6 @@
         function showLoadingIndicator() {
             const loadingDiv = document.getElementById('globalLoadingIndicator');
             if (loadingDiv) return;
-
             const newDiv = document.createElement('div');
             newDiv.id = 'globalLoadingIndicator';
             newDiv.style.cssText = `
@@ -5552,14 +5366,11 @@
         function openMapModal(category, subcategory) {
             currentMapFilterCategory = category;
             currentMapFilterSubcategory = subcategory;
-
             const modal = document.getElementById('mapModalOverlay');
             modal.classList.add('active');
-
             setTimeout(() => {
                 initMapModal();
                 loadSkillsOnMapModal(category, subcategory);
-                // Показываем элементы управления картой
                 document.getElementById('mapControls').style.display = 'flex';
                 document.getElementById('nearbyListContainer').style.display = 'none';
             }, 100);
@@ -5578,7 +5389,6 @@
 
         // ========== НОВЫЕ ФУНКЦИИ КАРТЫ ==========
 
-        // Переключение слоёв карты
         function toggleMapLayer(layer) {
             if (layer === 'zones') {
                 const show = document.getElementById('layerZones').checked;
@@ -5611,7 +5421,6 @@
             }
         }
 
-        // Тепловая карта
         let heatLayer = null;
 
         function addHeatMap() {
@@ -5620,7 +5429,6 @@
                 mapModal.removeLayer(heatLayer);
                 heatLayer = null;
             }
-
             const skills = getLocalStorage('umeyka_global_skills') || [];
             const points = [];
             skills.forEach(skill => {
@@ -5629,7 +5437,6 @@
                     points.push([skill.location.lat, skill.location.lon, intensity]);
                 }
             });
-
             if (points.length > 0 && window.L && window.L.heatLayer) {
                 heatLayer = window.L.heatLayer(points, {
                     radius: 25,
@@ -5657,7 +5464,6 @@
             }
         }
 
-        // Ближайшие мастера
         let nearbyMarkers = [];
         let nearbyListVisible = false;
 
@@ -5668,14 +5474,11 @@
                 document.getElementById('layerNearby').checked = false;
                 return;
             }
-
             nearbyMarkers.forEach(m => mapModal.removeLayer(m));
             nearbyMarkers = [];
-
             const skills = getLocalStorage('umeyka_global_skills') || [];
             const nearby = [];
             const RADIUS_KM = 5;
-
             skills.forEach(skill => {
                 if (skill.location && skill.location.lat && skill.location.lon) {
                     const dist = getDistance(
@@ -5687,15 +5490,12 @@
                     }
                 }
             });
-
             nearby.sort((a, b) => a.distance - b.distance);
-
             if (nearby.length === 0) {
                 showNotification('❌ Нет мастеров в радиусе 5 км');
                 document.getElementById('layerNearby').checked = false;
                 return;
             }
-
             nearby.slice(0, 10).forEach(skill => {
                 const marker = L.marker([skill.location.lat, skill.location.lon], {
                     icon: L.divIcon({
@@ -5710,7 +5510,6 @@
                 .bindPopup(`<b>⭐ Ближайший мастер</b><br>${skill.skill}<br>${skill.username}<br>📏 ${skill.distance.toFixed(1)} км`);
                 nearbyMarkers.push(marker);
             });
-
             showNearbyList(nearby);
             nearbyListVisible = true;
             showNotification(`✅ Найдено ${nearby.length} мастеров в радиусе 5 км`);
@@ -5743,7 +5542,6 @@
             }
         }
 
-        // Построение маршрута
         function buildRouteToMaster(lat, lon, name) {
             if (!userLocation) {
                 showNotification('❌ Не удалось определить ваше местоположение');
@@ -5762,7 +5560,6 @@
             buildRouteToMaster(selectedMapMaster.lat, selectedMapMaster.lon, selectedMapMaster.name);
         }
 
-        // Расчёт расстояния между двумя точками (в км)
         function getDistance(lat1, lon1, lat2, lon2) {
             const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -5809,7 +5606,7 @@
         async function renderVisitkaModal() {
             const userSkills = await getUserSkills();
             const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-            const userName = userData.firstName || PUBLIC_USER_NAME;
+            const userName = userData.firstName || 'Гость';
             const skillsCount = userSkills.length;
             const rating = userData.rating || 0;
             const verificationStatus = userData.verification?.status || 'none';
@@ -5851,12 +5648,10 @@
                         <span>${isVerified ? '✅ Верифицирован' : '❌ Не верифицирован'}</span>
                     </div>
                 </div>
-
                 <div class="visitka-qr">
                     <div id="visitkaQRCode" style="width: 250px; height: 250px; margin: 0 auto;"></div>
                     <div style="font-size: 12px; color: #666; margin-top: 8px;">QR-код вашей визитки</div>
                 </div>
-
                 <div style="margin-top: 20px;">
                     <h4 style="color: #2d3748; margin-bottom: 10px;">✨ Мои умейки</h4>
                     <div id="visitkaSkillsList">
@@ -5981,11 +5776,25 @@
             closeVisitkaSkillDetailModal();
         }
 
+        function createDealFromVisitkaSkill() {
+            if (!currentVisitkaSkill) return;
+            triggerHapticFeedback();
+            createDealFromSkill(
+                currentVisitkaSkill._id,
+                currentVisitkaSkill.skill,
+                currentVisitkaSkill.username,
+                currentVisitkaSkill.userId,
+                currentVisitkaSkill.experience || ''
+            );
+            closeVisitkaSkillDetailModal();
+            closeVisitkaModal();
+        }
+
         function shareVisitka() {
             triggerHapticFeedback();
             const shareUrl = `${TELEGRAM_BOT_URL}?start=user_${PUBLIC_USER_ID}`;
             const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-            const userName = userData.firstName || PUBLIC_USER_NAME;
+            const userName = userData.firstName || 'Гость';
             const shareText = `📇 Визитка мастера ${userName} в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке, чтобы посмотреть мои умейки:\n${shareUrl}`;
             if (navigator.share) {
                 navigator.share({
@@ -6494,12 +6303,17 @@
                 openVisitka();
                 return;
             }
+            if (/^\d+$/.test(startParam)) {
+                const referrerId = startParam;
+                console.log('🔗 [Deeplink] Обнаружена реферальная ссылка от пользователя:', referrerId);
+                showMainScreen();
+                return;
+            }
             console.log('🔗 [Deeplink] Неизвестный формат параметра start:', startParam);
         }
 
         // ========== ОСТАЛЬНЫЕ ФУНКЦИИ ==========
 
-        // БАЗА ДАННЫХ ГОРОДОВ
         const citiesDatabase = {
             'Евпатория': { lat: 45.1906, lon: 33.3666 },
             'Севастополь': { lat: 44.6167, lon: 33.5254 },
@@ -6677,20 +6491,14 @@
             return transaction;
         }
 
-        // ========== НОВАЯ ФУНКЦИЯ ОБНОВЛЕНИЯ ИНТЕРФЕЙСА ФИНАНСОВ ==========
         function updateFinanceUI() {
             const wallet = getWalletData();
-
-            // Главный баланс
             document.getElementById('financeMainBalance').innerHTML = `${wallet.availableBalance} <span>⭐</span>`;
-
-            // Карточки
             document.getElementById('financeAvailable').textContent = `${wallet.availableBalance} ⭐`;
             document.getElementById('financeFrozen').textContent = `${wallet.frozenBalance} ⭐`;
             document.getElementById('financeEarned').textContent = `${wallet.totalEarned} ⭐`;
             document.getElementById('financeCommission').textContent = `${wallet.totalCommission} ⭐`;
 
-            // Статус Wallet
             const dot = document.getElementById('financeWalletDot');
             const text = document.getElementById('financeWalletText');
             const action = document.getElementById('financeWalletAction');
@@ -6709,8 +6517,6 @@
                 action.onclick = connectWallet;
                 withdrawBtn.style.display = 'none';
             }
-
-            // История
             renderFinanceHistory(wallet.transactions);
         }
 
@@ -6725,14 +6531,12 @@
                 `;
                 return;
             }
-
             let filtered = transactions;
             if (filter === 'income') {
                 filtered = transactions.filter(tx => tx.type === 'deposit' || tx.type === 'payout' || tx.type === 'refund');
             } else if (filter === 'expense') {
                 filtered = transactions.filter(tx => tx.type === 'withdrawal' || tx.type === 'payment' || tx.type === 'commission');
             }
-
             if (filtered.length === 0) {
                 container.innerHTML = `
                     <div class="history-empty">
@@ -6742,7 +6546,6 @@
                 `;
                 return;
             }
-
             container.innerHTML = filtered.slice(0, 15).map(tx => {
                 const isIncome = tx.type === 'deposit' || tx.type === 'payout' || tx.type === 'refund';
                 const isCommission = tx.type === 'commission';
@@ -6752,7 +6555,6 @@
                 const icon = isIncome ? '💰' : (isCommission ? '💸' : '💳');
                 const date = new Date(tx.timestamp);
                 const dateStr = date.toLocaleDateString('ru-RU') + ' ' + date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-
                 return `
                     <div class="history-item ${itemClass}">
                         <span class="h-icon">${icon}</span>
@@ -6773,8 +6575,6 @@
             renderFinanceHistory(wallet.transactions, filter);
         }
 
-        // ========== СТАРЫЕ ФУНКЦИИ ФИНАНСОВ (адаптированы под новый UI) ==========
-
         async function connectWallet() {
             triggerHapticFeedback();
             try {
@@ -6786,8 +6586,7 @@
                 if (tg.openInvoice) {
                     const wallet = getWalletData();
                     wallet.connected = true;
-                    wallet.walletAddress = 'EQ' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2,
-                    15);
+                    wallet.walletAddress = 'EQ' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
                     saveWalletData(wallet);
                     showNotification('✅ Wallet успешно подключен!');
                     setTimeout(() => {
@@ -6845,8 +6644,7 @@
                 alert('❌ Нет доступных средств для вывода');
                 return;
             }
-            const amount = prompt(`💸 Введите сумму для вывода (доступно: ${wallet.availableBalance} Stars):`, wallet
-            .availableBalance);
+            const amount = prompt(`💸 Введите сумму для вывода (доступно: ${wallet.availableBalance} Stars):`, wallet.availableBalance);
             if (!amount || isNaN(amount) || amount <= 0 || amount > wallet.availableBalance) {
                 alert('❌ Неверная сумма');
                 return;
@@ -7056,8 +6854,7 @@
         window.shareQRCode = function() {
             triggerHapticFeedback();
             if (!currentQRSkillId || !currentQRSkillName) return;
-            const shareText =
-                `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`;
+            const shareText = `Посмотрите мою умейку "${currentQRSkillName}" в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке:\n${TELEGRAM_BOT_URL}?start=skill_${currentQRSkillId}`;
             if (navigator.share) {
                 navigator.share({
                     title: currentQRSkillName,
@@ -7261,9 +7058,11 @@
                     alert('❌ Название города должно содержать минимум 2 символа');
                     return;
                 }
+
                 const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
                 const cityCoords = getCityCoordinates(skillCity);
                 const location = cityCoords || userLocation || { lat: 55.7558, lon: 37.6173 };
+
                 const skillData = {
                     skill: skillName.trim(),
                     category: skillCategory,
@@ -7275,7 +7074,7 @@
                     workFormat: currentWorkFormat,
                     location: location,
                     userId: PUBLIC_USER_ID,
-                    username: PUBLIC_USER_NAME,
+                    username: PUBLIC_USERNAME,
                     status: currentMasterStatus,
                     verification: userData.verification?.status || 'none'
                 };
@@ -7283,13 +7082,12 @@
                     skillData.photo = currentSkillPhoto;
                     skillData.photoTimestamp = new Date().toISOString();
                 }
+
                 showLoadingIndicator();
                 try {
                     const response = await fetch(`${API_URL}/api/skills`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(skillData)
                     });
                     hideLoadingIndicator();
@@ -7385,12 +7183,8 @@
                         const statusBadge = getStatusBadge(skill.status);
                         const workFormatBadge = getWorkFormatBadge(skill.workFormat);
                         const verificationBadge = skill.verification === 'verified' ? getVerifiedBadgeHtml() : '';
-                        const isLocal = skill.local ?
-                            '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' :
-                            '';
-                        const cityInfo = skill.city ?
-                            `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` :
-                            '';
+                        const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                        const cityInfo = skill.city ? `<div class="city-info">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                         return `
                             <div class="skill-card">
                                 <div class="skill-header">
@@ -7472,12 +7266,8 @@
                         const statusBadge = getStatusBadge(skill.status);
                         const workFormatBadge = getWorkFormatBadge(skill.workFormat);
                         const verificationBadge = skill.verification === 'verified' ? getVerifiedBadgeHtml() : '';
-                        const isLocal = skill.local ?
-                            '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' :
-                            '';
-                        const cityInfo = skill.city ?
-                            `<div class="city-info" style="background: rgba(102,126,234,0.08); margin: 10px 0; padding: 8px 12px; border-radius: 8px; font-size: 14px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` :
-                            '';
+                        const isLocal = skill.local ? '<span style="background: #ed8936; color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-left: 8px;">Локально</span>' : '';
+                        const cityInfo = skill.city ? `<div class="city-info" style="background: rgba(102,126,234,0.08); margin: 10px 0; padding: 8px 12px; border-radius: 8px; font-size: 14px;">🏙️ ${skill.city} | 📍 ${skill.radius || 10}км</div>` : '';
                         return `
                             <div class="profile-skill-card">
                                 <div class="profile-skill-header">
@@ -7519,8 +7309,7 @@
                         `;
                     }).join('');
                 } else {
-                    skillsList.innerHTML =
-                        '<div style="text-align: center; color: #666; padding: 20px;">У вас пока нет добавленных умейок</div>';
+                    skillsList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">У вас пока нет добавленных умейок</div>';
                 }
             } catch (error) {
                 console.error('Ошибка загрузки умейок:', error);
@@ -7641,9 +7430,7 @@
                 try {
                     const response = await fetch(`${API_URL}/api/skills/${skillId}`, {
                         method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(skillData)
                     });
                     hideLoadingIndicator();
@@ -7755,8 +7542,7 @@
                         const oldClick = shareBtn.onclick;
                         shareBtn.onclick = () => {
                             triggerHapticFeedback();
-                            const shareText =
-                                `📇 Моя визитка в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке, чтобы посмотреть мои умейки:\n${qrUrl}`;
+                            const shareText = `📇 Моя визитка в Ymeyka!\n\nСканируйте QR-код или перейдите по ссылке, чтобы посмотреть мои умейки:\n${qrUrl}`;
                             if (navigator.share) {
                                 navigator.share({
                                     title: 'Моя визитка Ymeyka',
@@ -7785,15 +7571,9 @@
             document.getElementById('masterSection').style.display = 'none';
             document.getElementById('clientSection').style.display = 'none';
             document.getElementById('profileSection').style.display = 'none';
-            document.getElementById('financeSection').style.display = 'none';
             document.getElementById('editProfileSection').style.display = 'none';
             document.getElementById('createDealSection').style.display = 'none';
             document.getElementById('aboutSection').style.display = 'none';
-            document.getElementById('profileVerification').style.display = 'none';
-            document.getElementById('profileMap').style.display = 'none';
-            document.getElementById('profileReviews').style.display = 'none';
-
-            // Показываем кнопку "Игры" только на главном экране
             document.getElementById('gamesMainButton').classList.remove('hidden');
         };
 
@@ -7803,16 +7583,10 @@
             document.getElementById('masterSection').style.display = 'none';
             document.getElementById('clientSection').style.display = 'none';
             document.getElementById('profileSection').style.display = 'none';
-            document.getElementById('financeSection').style.display = 'none';
             document.getElementById('editProfileSection').style.display = 'none';
             document.getElementById('createDealSection').style.display = 'none';
             document.getElementById('aboutSection').style.display = 'none';
-            document.getElementById('profileVerification').style.display = 'none';
-            document.getElementById('profileMap').style.display = 'none';
-            document.getElementById('profileReviews').style.display = 'none';
             document.getElementById(sectionId).style.display = 'block';
-
-            // Скрываем кнопку "Игры" во всех разделах, кроме главного
             document.getElementById('gamesMainButton').classList.add('hidden');
 
             if (sectionId === 'masterSection') {
@@ -7826,14 +7600,8 @@
             } else if (sectionId === 'clientSection') {
                 console.log('📚 [Архив] Открытие архива с принудительной синхронизацией данных');
                 showLoadingIndicator();
-
-                // Инициализируем селектор городов
                 initCitySelector();
-
-                // Сначала показываем категории с индикатором загрузки
                 renderCategories();
-
-                // Загружаем свежие данные с сервера
                 fetch(`${API_URL}/api/skills/all?t=${Date.now()}`)
                     .then(response => {
                         if (response.ok) return response.json();
@@ -7879,7 +7647,6 @@
                             }
                         }
                     });
-
                 const resultsContainer = document.getElementById('categorySearchResults');
                 const categoriesContainer = document.getElementById('categoriesList');
                 if (resultsContainer) {
@@ -7887,8 +7654,6 @@
                     resultsContainer.style.display = 'none';
                 }
                 if (categoriesContainer) categoriesContainer.style.display = 'block';
-            } else if (sectionId === 'financeSection') {
-                updateFinanceUI();
             }
         };
 
@@ -7899,17 +7664,7 @@
             document.getElementById('profileStats').style.display = 'none';
             document.getElementById('profileSkills').style.display = 'none';
             document.getElementById('profileDeals').style.display = 'none';
-            document.getElementById('profileReferral').style.display = 'none';
-            document.getElementById('profileVerification').style.display = 'none';
-            document.getElementById('profileMap').style.display = 'none';
-            document.getElementById('profileReviews').style.display = 'none';
             showProfileTab('stats');
-        };
-
-        window.showFinanceSection = function() {
-            triggerHapticFeedback();
-            showSection('financeSection');
-            updateFinanceUI();
         };
 
         window.showAboutSection = function() {
@@ -7927,11 +7682,11 @@
             const coins = getCoinsData();
             const userNameElement = document.getElementById('userName');
             if (userNameElement) {
-                userNameElement.textContent = userData.firstName || PUBLIC_USER_NAME;
+                userNameElement.textContent = userData.firstName || 'Гость';
             }
             const userBioElement = document.getElementById('userBio');
             if (userBioElement) {
-                userBioElement.textContent = userData.bio || 'Расскажите о себе...';
+                userBioElement.textContent = userData.bio || 'Анонимный пользователь';
             }
             const userAvatar = document.getElementById('userAvatar');
             if (userAvatar) {
@@ -7941,8 +7696,6 @@
                     userAvatar.innerHTML = '👤';
                 }
             }
-
-            // Показываем статус верификации
             const badgesContainer = document.getElementById('userBadges');
             if (badgesContainer) {
                 const verificationStatus = userData.verification?.status || 'none';
@@ -7957,7 +7710,6 @@
                 }
                 badgesContainer.innerHTML = badgesHtml;
             }
-
             updateUserStats(userData, referralData, coins);
         }
 
@@ -7967,26 +7719,11 @@
             const stars = referralData?.starsEarned || 0;
             const goldCoins = coins || 0;
             statsGrid.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-value">${stars}</div>
-                    <div class="stat-label">⭐ Звёзды</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${goldCoins}</div>
-                    <div class="stat-label">🪙 Монеты</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${userData.completedDeals || 0}</div>
-                    <div class="stat-label">✅ Завершено сделок</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${userData.skills?.length || 0}</div>
-                    <div class="stat-label">✨ Умейки</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${referralData?.referralCount || 0}</div>
-                    <div class="stat-label">👥 Приглашено друзей</div>
-                </div>
+                <div class="stat-card"><div class="stat-value">${stars}</div><div class="stat-label">⭐ Звёзды</div></div>
+                <div class="stat-card"><div class="stat-value">${goldCoins}</div><div class="stat-label">🪙 Монеты</div></div>
+                <div class="stat-card"><div class="stat-value">${userData.completedDeals || 0}</div><div class="stat-label">✅ Завершено сделок</div></div>
+                <div class="stat-card"><div class="stat-value">${userData.skills?.length || 0}</div><div class="stat-label">✨ Умейки</div></div>
+                <div class="stat-card"><div class="stat-value">${referralData?.referralCount || 0}</div><div class="stat-label">👥 Приглашено друзей</div></div>
             `;
         }
 
@@ -8092,893 +7829,16 @@
             document.getElementById('profileStats').style.display = 'none';
             document.getElementById('profileSkills').style.display = 'none';
             document.getElementById('profileDeals').style.display = 'none';
-            document.getElementById('profileReferral').style.display = 'none';
-            document.getElementById('profileVerification').style.display = 'none';
-            document.getElementById('profileMap').style.display = 'none';
-            document.getElementById('profileReviews').style.display = 'none';
             document.getElementById('profileStats').style.display = tabName === 'stats' ? 'block' : 'none';
             document.getElementById('profileSkills').style.display = tabName === 'skills' ? 'block' : 'none';
             document.getElementById('profileDeals').style.display = tabName === 'deals' ? 'block' : 'none';
-            document.getElementById('profileReferral').style.display = tabName === 'referral' ? 'block' : 'none';
             if (tabName === 'skills') {
                 loadProfileSkills();
             } else if (tabName === 'deals') {
                 loadDeals();
-            } else if (tabName === 'referral') {
-                updateReferralStats();
             } else if (tabName === 'stats') {
                 loadUserProfile();
             }
-        };
-
-        // ========== НОВЫЕ ВКЛАДКИ ПРОФИЛЯ ==========
-
-        // ВЕРИФИКАЦИЯ
-        function showVerificationTab() {
-            triggerHapticFeedback();
-            showProfileTab('verification');
-            document.getElementById('profileVerification').style.display = 'block';
-            renderVerificationContent();
-        }
-
-        function renderVerificationContent() {
-            const container = document.getElementById('verificationContent');
-            const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-            const verification = userData.verification || {
-                status: 'none',
-                documents: { passport: null, selfie: null },
-                phoneConfirmed: false,
-                verifiedAt: null,
-                rejectedReason: null
-            };
-
-            const statusMap = {
-                'none': { label: 'Не верифицирован', class: 'none', icon: '❌' },
-                'pending': { label: 'На проверке', class: 'pending', icon: '⏳' },
-                'verified': { label: 'Верифицирован', class: 'verified', icon: '✅' },
-                'rejected': { label: 'Отклонён', class: 'rejected', icon: '❌' }
-            };
-
-            const statusInfo = statusMap[verification.status] || statusMap['none'];
-            const isVerified = verification.status === 'verified';
-            const isPending = verification.status === 'pending';
-            const isRejected = verification.status === 'rejected';
-
-            let stepsHtml = `
-                <div class="verification-progress">
-                    <div class="verification-step ${verification.documents.passport ? 'done' : (verification.documents.passport ? 'done' : 'active')}">
-                        <span class="step-icon">📄</span>
-                        Загрузка документов
-                    </div>
-                    <div class="verification-step ${verification.phoneConfirmed ? 'done' : (verification.documents.passport ? 'active' : '')}">
-                        <span class="step-icon">📱</span>
-                        Подтверждение телефона
-                    </div>
-                    <div class="verification-step ${isVerified ? 'done' : (verification.phoneConfirmed ? 'active' : '')}">
-                        <span class="step-icon">✅</span>
-                        Проверка
-                    </div>
-                </div>
-            `;
-
-            let documentsHtml = '';
-            if (!isVerified) {
-                documentsHtml = `
-                    <div style="margin: 15px 0;">
-                        <h4 style="color: #2d3748; margin-bottom: 10px;">📸 Загрузите документы</h4>
-                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <div style="flex: 1; min-width: 120px; background: #f7fafc; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer;" onclick="document.getElementById('passportInput').click();">
-                                <div style="font-size: 32px;">🪪</div>
-                                <div style="font-size: 12px; color: #666;">Паспорт</div>
-                                ${verification.documents.passport ? '<div style="color: #48bb78; font-size: 12px;">✅ Загружен</div>' : ''}
-                            </div>
-                            <div style="flex: 1; min-width: 120px; background: #f7fafc; padding: 15px; border-radius: 10px; text-align: center; cursor: pointer;" onclick="document.getElementById('selfieInput').click();">
-                                <div style="font-size: 32px;">🤳</div>
-                                <div style="font-size: 12px; color: #666;">Селфи с паспортом</div>
-                                ${verification.documents.selfie ? '<div style="color: #48bb78; font-size: 12px;">✅ Загружено</div>' : ''}
-                            </div>
-                        </div>
-                        <input type="file" id="passportInput" accept="image/*" style="display: none;" onchange="handleVerificationDocumentUpload('passport', event)">
-                        <input type="file" id="selfieInput" accept="image/*" style="display: none;" onchange="handleVerificationDocumentUpload('selfie', event)">
-                    </div>
-                    <div style="margin: 15px 0;">
-                        <h4 style="color: #2d3748; margin-bottom: 10px;">📱 Подтверждение телефона</h4>
-                        ${verification.phoneConfirmed ? 
-                            '<div style="color: #48bb78;">✅ Телефон подтверждён</div>' :
-                            `<div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <input type="text" id="phoneCodeInput" class="input-field" placeholder="Введите код из SMS" style="flex: 1; min-width: 150px; background: white;">
-                                <button class="modal-button modal-save" onclick="confirmPhoneCode();" style="flex: 0 0 auto;">Подтвердить</button>
-                            </div>
-                            <button class="modal-button modal-save" onclick="sendPhoneCode();" style="margin-top: 8px; background: #4299e1;">📲 Отправить код</button>`
-                        }
-                    </div>
-                `;
-            }
-
-            let actionButton = '';
-            if (verification.status === 'none' || verification.status === 'rejected') {
-                const isDocumentsReady = verification.documents.passport && verification.documents.selfie && verification.phoneConfirmed;
-                actionButton = `
-                    <button class="submit-button" onclick="submitVerification();" style="${isDocumentsReady ? '' : 'opacity: 0.5; pointer-events: none;'}" ${isDocumentsReady ? '' : 'disabled'}>
-                        ${isDocumentsReady ? '✅ Отправить на проверку' : '📤 Загрузите все документы и подтвердите телефон'}
-                    </button>
-                `;
-            }
-
-            container.innerHTML = `
-                <div class="verification-card">
-                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-                        <span style="font-size: 48px;">${statusInfo.icon}</span>
-                        <div>
-                            <div style="font-size: 22px; font-weight: 700; color: white;">${statusInfo.label}</div>
-                            ${isVerified ? `<div style="color: #48bb78; font-size: 14px;">Верифицирован ${new Date(verification.verifiedAt).toLocaleDateString('ru-RU')}</div>` : ''}
-                            ${isRejected ? `<div style="color: #fc8181; font-size: 14px;">Причина: ${verification.rejectedReason || 'Не указана'}</div>` : ''}
-                        </div>
-                    </div>
-                    ${stepsHtml}
-                    ${documentsHtml}
-                    ${actionButton}
-                    ${isVerified ? '<div style="text-align: center; margin-top: 15px; color: #48bb78; font-size: 18px; font-weight: 700;">✅ Вы верифицированы! 🎉</div>' : ''}
-                </div>
-            `;
-        }
-
-        // Загрузка документов для верификации
-        let verificationPassportData = null;
-        let verificationSelfieData = null;
-
-        window.handleVerificationDocumentUpload = async function(type, event) {
-            triggerHapticFeedback();
-            const file = event.target.files[0];
-            if (!file) return;
-            if (!file.type.match('image.*')) {
-                alert('❌ Пожалуйста, выберите изображение');
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                alert('❌ Файл слишком большой. Максимальный размер: 5MB');
-                return;
-            }
-
-            try {
-                const compressed = await compressImage(file, 800, 600, 0.8);
-                const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-                if (!userData.verification) {
-                    userData.verification = {
-                        status: 'none',
-                        documents: { passport: null, selfie: null },
-                        phoneConfirmed: false,
-                        verifiedAt: null,
-                        rejectedReason: null
-                    };
-                }
-                if (type === 'passport') {
-                    userData.verification.documents.passport = compressed.dataUrl;
-                    verificationPassportData = compressed.dataUrl;
-                } else if (type === 'selfie') {
-                    userData.verification.documents.selfie = compressed.dataUrl;
-                    verificationSelfieData = compressed.dataUrl;
-                }
-                setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
-                showNotification(`✅ ${type === 'passport' ? 'Паспорт' : 'Селфи'} загружено!`);
-                renderVerificationContent();
-            } catch (error) {
-                console.error('❌ Ошибка загрузки документа:', error);
-                alert('❌ Ошибка загрузки документа');
-            }
-        };
-
-        // Подтверждение телефона
-        let phoneCode = '1234'; // Имитация кода
-
-        function sendPhoneCode() {
-            triggerHapticFeedback();
-            phoneCode = Math.floor(1000 + Math.random() * 9000).toString();
-            showNotification(`📲 Код подтверждения: ${phoneCode} (введите его в поле)`);
-        }
-
-        function confirmPhoneCode() {
-            triggerHapticFeedback();
-            const input = document.getElementById('phoneCodeInput');
-            if (!input) return;
-            const code = input.value.trim();
-            if (code === phoneCode) {
-                const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-                if (!userData.verification) {
-                    userData.verification = {
-                        status: 'none',
-                        documents: { passport: null, selfie: null },
-                        phoneConfirmed: false,
-                        verifiedAt: null,
-                        rejectedReason: null
-                    };
-                }
-                userData.verification.phoneConfirmed = true;
-                setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
-                showNotification('✅ Телефон подтверждён!');
-                renderVerificationContent();
-            } else {
-                showNotification('❌ Неверный код. Попробуйте снова.');
-            }
-        }
-
-        function submitVerification() {
-            triggerHapticFeedback();
-            const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-            if (!userData.verification) {
-                alert('❌ Ошибка: данные верификации не найдены');
-                return;
-            }
-            if (!userData.verification.documents.passport || !userData.verification.documents.selfie || !userData.verification.phoneConfirmed) {
-                alert('❌ Загрузите все документы и подтвердите телефон');
-                return;
-            }
-            userData.verification.status = 'pending';
-            setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
-            showNotification('✅ Заявка на верификацию отправлена! Ожидайте проверки.');
-            renderVerificationContent();
-
-            // Имитация автоматической проверки через 5 секунд
-            setTimeout(() => {
-                const updatedUser = getOrCreateUserProfile(PUBLIC_USER_ID);
-                if (updatedUser.verification?.status === 'pending') {
-                    updatedUser.verification.status = 'verified';
-                    updatedUser.verification.verifiedAt = new Date().toISOString();
-                    setLocalStorage(`user_${PUBLIC_USER_ID}`, updatedUser);
-                    renderVerificationContent();
-                    showNotification('✅ Поздравляем! Вы успешно верифицированы! 🎉');
-                    loadUserProfile();
-                }
-            }, 5000);
-        }
-
-        // КАРТА (в профиле)
-        function showMapTab() {
-            triggerHapticFeedback();
-            showProfileTab('map');
-            document.getElementById('profileMap').style.display = 'block';
-            initProfileMap();
-        }
-
-        function initProfileMap() {
-            const container = document.getElementById('profileMapContainer');
-            if (!container) return;
-            if (profileMapInstance) {
-                profileMapInstance.invalidateSize();
-                return;
-            }
-
-            profileMapInstance = L.map(container, {
-                attributionControl: false
-            }).setView([55.7558, 37.6173], 10);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                subdomains: 'abcd',
-                maxZoom: 20
-            }).addTo(profileMapInstance);
-
-            // Загружаем мастеров на карту
-            loadProfileMapSkills();
-
-            // Определяем местоположение пользователя
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        userLocation = {
-                            lat: pos.coords.latitude,
-                            lon: pos.coords.longitude
-                        };
-                        profileMapInstance.setView([userLocation.lat, userLocation.lon], 12);
-                    },
-                    () => { console.log('Не удалось определить геолокацию'); },
-                    { enableHighAccuracy: true }
-                );
-            }
-        }
-
-        async function loadProfileMapSkills() {
-            if (!profileMapInstance) return;
-            // Очищаем старые маркеры
-            profileMapMarkers.forEach(m => profileMapInstance.removeLayer(m));
-            profileMapMarkers = [];
-            if (profileMapZones.length > 0) {
-                profileMapZones.forEach(z => profileMapInstance.removeLayer(z));
-                profileMapZones = [];
-            }
-
-            const skills = await getGlobalSkills();
-            const showZones = document.getElementById('profileLayerZones').checked;
-
-            skills.forEach(skill => {
-                if (skill.location && skill.location.lat && skill.location.lon) {
-                    const status = skill.status || 'ready';
-                    const isUserSkill = skill.userId === PUBLIC_USER_ID;
-                    const verificationBadge = skill.verification === 'verified' ? '✅' : '';
-
-                    // Зона покрытия
-                    if (showZones) {
-                        const radius = skill.radius || 10;
-                        const circle = L.circle([skill.location.lat, skill.location.lon], {
-                            color: status === 'ready' ? '#48bb78' : '#f56565',
-                            fillColor: status === 'ready' ? '#48bb78' : '#f56565',
-                            fillOpacity: 0.15,
-                            radius: radius * 1000
-                        }).addTo(profileMapInstance);
-                        profileMapZones.push(circle);
-                    }
-
-                    // Маркер
-                    const markerHtml = `<div class="umeyka-marker-container ${status === 'ready' ? 'status-ready' : 'status-busy'}">
-                                            <div class="umeyka-marker-fallback">${isUserSkill ? '👤' : '🔧'}</div>
-                                        </div>`;
-                    const marker = L.marker([skill.location.lat, skill.location.lon], {
-                        icon: L.divIcon({
-                            className: 'umeyka-marker',
-                            html: markerHtml,
-                            iconSize: [40, 40],
-                            iconAnchor: [20, 20]
-                        })
-                    })
-                    .addTo(profileMapInstance)
-                    .bindPopup(`
-                        <b>${skill.skill} ${verificationBadge}</b><br>
-                        ${skill.username} ${isUserSkill ? '(Вы)' : ''}<br>
-                        💰 ${skill.price} ₽<br>
-                        📍 ${skill.city || 'Не указан'}<br>
-                        ${status === 'ready' ? '✅ Готов' : '⏰ Занят'}<br>
-                        <button onclick="triggerHapticFeedback(); selectProfileMapMaster('${skill._id}')" style="background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 6px; margin-top: 6px; cursor: pointer;">
-                            🚗 Маршрут
-                        </button>
-                    `);
-                    profileMapMarkers.push(marker);
-
-                    marker.on('click', () => {
-                        selectedMapMaster = {
-                            lat: skill.location.lat,
-                            lon: skill.location.lon,
-                            name: skill.skill
-                        };
-                    });
-                }
-            });
-
-            if (profileMapMarkers.length > 0 && skills[0]?.location) {
-                profileMapInstance.setView([skills[0].location.lat, skills[0].location.lon], 12);
-            }
-        }
-
-        function selectProfileMapMaster(skillId) {
-            const skill = getGlobalSkillById(skillId);
-            if (skill && skill.location) {
-                selectedMapMaster = {
-                    lat: skill.location.lat,
-                    lon: skill.location.lon,
-                    name: skill.skill
-                };
-                buildRouteFromProfile();
-            }
-        }
-
-        function buildRouteFromProfile() {
-            if (!selectedMapMaster) {
-                showNotification('❌ Сначала выберите мастера на карте');
-                return;
-            }
-            if (!userLocation) {
-                showNotification('❌ Не удалось определить ваше местоположение');
-                return;
-            }
-            const url = `https://yandex.ru/maps/?rtext=${userLocation.lat},${userLocation.lon}~${selectedMapMaster.lat},${selectedMapMaster.lon}`;
-            window.open(url, '_blank');
-            showNotification(`🚗 Открываем маршрут к ${selectedMapMaster.name}`);
-        }
-
-        function toggleProfileMapLayer(layer) {
-            if (layer === 'zones') {
-                const show = document.getElementById('profileLayerZones').checked;
-                if (profileMapZones.length > 0) {
-                    profileMapZones.forEach(z => {
-                        if (show) {
-                            profileMapInstance.addLayer(z);
-                        } else {
-                            profileMapInstance.removeLayer(z);
-                        }
-                    });
-                } else {
-                    loadProfileMapSkills();
-                }
-            } else if (layer === 'heat') {
-                const show = document.getElementById('profileLayerHeat').checked;
-                if (show) {
-                    addProfileHeatMap();
-                } else {
-                    removeProfileHeatMap();
-                }
-            } else if (layer === 'nearby') {
-                const show = document.getElementById('profileLayerNearby').checked;
-                if (show) {
-                    showProfileNearbyMasters();
-                } else {
-                    hideProfileNearbyMasters();
-                }
-            }
-        }
-
-        let profileHeatLayer = null;
-
-        function addProfileHeatMap() {
-            if (!profileMapInstance) return;
-            if (profileHeatLayer) {
-                profileMapInstance.removeLayer(profileHeatLayer);
-                profileHeatLayer = null;
-            }
-
-            const skills = getLocalStorage('umeyka_global_skills') || [];
-            const points = [];
-            skills.forEach(skill => {
-                if (skill.location && skill.location.lat && skill.location.lon) {
-                    const intensity = (skill.rating?.average || 5) / 5;
-                    points.push([skill.location.lat, skill.location.lon, intensity]);
-                }
-            });
-
-            if (points.length > 0 && window.L && window.L.heatLayer) {
-                profileHeatLayer = window.L.heatLayer(points, {
-                    radius: 25,
-                    blur: 15,
-                    maxZoom: 17,
-                    gradient: {
-                        0.4: 'blue',
-                        0.6: 'lime',
-                        0.8: 'yellow',
-                        1.0: 'red'
-                    }
-                }).addTo(profileMapInstance);
-                showNotification('🔥 Тепловая карта включена');
-            } else {
-                showNotification('❌ Недостаточно данных для тепловой карты');
-                document.getElementById('profileLayerHeat').checked = false;
-            }
-        }
-
-        function removeProfileHeatMap() {
-            if (profileHeatLayer && profileMapInstance) {
-                profileMapInstance.removeLayer(profileHeatLayer);
-                profileHeatLayer = null;
-                showNotification('Тепловая карта отключена');
-            }
-        }
-
-        let profileNearbyMarkers = [];
-
-        function showProfileNearbyMasters() {
-            if (!profileMapInstance) return;
-            if (!userLocation) {
-                showNotification('❌ Не удалось определить ваше местоположение');
-                document.getElementById('profileLayerNearby').checked = false;
-                return;
-            }
-
-            profileNearbyMarkers.forEach(m => profileMapInstance.removeLayer(m));
-            profileNearbyMarkers = [];
-
-            const skills = getLocalStorage('umeyka_global_skills') || [];
-            const nearby = [];
-            const RADIUS_KM = 5;
-
-            skills.forEach(skill => {
-                if (skill.location && skill.location.lat && skill.location.lon) {
-                    const dist = getDistance(
-                        userLocation.lat, userLocation.lon,
-                        skill.location.lat, skill.location.lon
-                    );
-                    if (dist <= RADIUS_KM) {
-                        nearby.push({ ...skill, distance: dist });
-                    }
-                }
-            });
-
-            nearby.sort((a, b) => a.distance - b.distance);
-
-            if (nearby.length === 0) {
-                showNotification('❌ Нет мастеров в радиусе 5 км');
-                document.getElementById('profileLayerNearby').checked = false;
-                return;
-            }
-
-            nearby.slice(0, 10).forEach(skill => {
-                const marker = L.marker([skill.location.lat, skill.location.lon], {
-                    icon: L.divIcon({
-                        className: 'umeyka-marker',
-                        html: `<div class="umeyka-marker-container status-ready" style="border-color: #48bb78; border-width: 3px; box-shadow: 0 0 20px rgba(72,187,120,0.5);">
-                                    <div class="umeyka-marker-fallback">⭐</div>
-                                </div>`,
-                        iconSize: [40, 40],
-                        iconAnchor: [20, 20]
-                    })
-                }).addTo(profileMapInstance)
-                .bindPopup(`<b>⭐ Ближайший мастер</b><br>${skill.skill}<br>${skill.username}<br>📏 ${skill.distance.toFixed(1)} км`);
-                profileNearbyMarkers.push(marker);
-            });
-
-            // Показываем список
-            showProfileNearbyList(nearby);
-            showNotification(`✅ Найдено ${nearby.length} мастеров в радиусе 5 км`);
-        }
-
-        function hideProfileNearbyMasters() {
-            profileNearbyMarkers.forEach(m => profileMapInstance.removeLayer(m));
-            profileNearbyMarkers = [];
-            document.getElementById('profileNearbyListContainer').style.display = 'none';
-        }
-
-        function showProfileNearbyList(nearby) {
-            const container = document.getElementById('profileNearbyListContainer');
-            const list = document.getElementById('profileNearbyList');
-            container.style.display = 'block';
-            list.innerHTML = nearby.slice(0, 10).map(skill => `
-                <div class="nearby-item" onclick="triggerHapticFeedback(); selectProfileNearbyMaster('${skill._id}')">
-                    <span>${skill.skill} - ${skill.username}</span>
-                    <span class="dist">${skill.distance.toFixed(1)} км</span>
-                </div>
-            `).join('');
-        }
-
-        function selectProfileNearbyMaster(skillId) {
-            const skill = getGlobalSkillById(skillId);
-            if (skill && profileMapInstance) {
-                profileMapInstance.setView([skill.location.lat, skill.location.lon], 15);
-                selectedMapMaster = {
-                    lat: skill.location.lat,
-                    lon: skill.location.lon,
-                    name: skill.skill
-                };
-                showNotification(`📍 Выбран мастер: ${skill.skill}`);
-            }
-        }
-
-        // ОТЗЫВЫ (в профиле)
-        function showReviewsTab() {
-            triggerHapticFeedback();
-            showProfileTab('reviews');
-            document.getElementById('profileReviews').style.display = 'block';
-            renderReviewsTab();
-        }
-
-        function renderReviewsTab() {
-            const container = document.getElementById('reviewsTabContent');
-            const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-            const receivedReviews = userData.reviews?.received || [];
-            const givenReviews = userData.reviews?.given || [];
-
-            // Фильтрация
-            let filtered = receivedReviews;
-            if (currentReviewFilter === 'given') {
-                filtered = givenReviews;
-            }
-
-            // Средний рейтинг
-            let avgRating = 0;
-            if (receivedReviews.length > 0) {
-                const sum = receivedReviews.reduce((acc, r) => acc + r.overall, 0);
-                avgRating = sum / receivedReviews.length;
-            }
-
-            let ratingStarsHtml = '';
-            for (let i = 1; i <= 5; i++) {
-                ratingStarsHtml += i <= Math.round(avgRating) ? '★' : '☆';
-            }
-
-            container.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
-                    <div>
-                        <span style="font-size: 20px; font-weight: 700;">⭐ ${avgRating.toFixed(1)}</span>
-                        <span style="color: rgba(255,255,255,0.7); margin-left: 8px;">${ratingStarsHtml}</span>
-                        <span style="color: rgba(255,255,255,0.5); margin-left: 8px; font-size: 14px;">(${receivedReviews.length} отзывов)</span>
-                    </div>
-                    <div class="review-filter">
-                        <button class="review-filter-btn ${currentReviewFilter === 'all' ? 'active' : ''}" onclick="setReviewFilter('all')">Все</button>
-                        <button class="review-filter-btn ${currentReviewFilter === 'given' ? 'active' : ''}" onclick="setReviewFilter('given')">Мои отзывы</button>
-                    </div>
-                </div>
-                <div id="reviewsTabList">
-                    ${filtered.length === 0 ? 
-                        '<div style="text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">Нет отзывов</div>' :
-                        filtered.map(review => renderReviewCard(review, currentReviewFilter === 'given')).join('')
-                    }
-                </div>
-            `;
-        }
-
-        function renderReviewCard(review, isGiven) {
-            const stars = '★'.repeat(Math.round(review.overall)) + '☆'.repeat(5 - Math.round(review.overall));
-            const photosHtml = review.photos && review.photos.length > 0 ?
-                `<div class="review-photos">${review.photos.map(p => `<img src="${p}" alt="Фото работы" onclick="window.open('${p}', '_blank')">`).join('')}</div>` :
-                '';
-
-            const masterResponseHtml = review.masterResponse ?
-                `<div class="review-master-response">
-                    <div class="response-label">👨‍🔧 Ответ мастера:</div>
-                    <div class="response-text">${escapeHtml(review.masterResponse.text)}</div>
-                    <div class="response-edit" onclick="editMasterResponse('${review.id}')">✏️ Редактировать</div>
-                </div>` :
-                (isGiven ? '' : `<div style="margin-top: 10px;">
-                    <button class="modal-button modal-save" onclick="addMasterResponse('${review.id}')" style="padding: 8px 16px; font-size: 13px;">
-                        💬 Ответить на отзыв
-                    </button>
-                </div>`);
-
-            return `
-                <div class="review-card">
-                    <div class="review-header">
-                        <div class="review-user">
-                            <div class="review-avatar">${isGiven ? '👤' : (review.userName?.charAt(0) || 'U')}</div>
-                            <div>
-                                <div style="font-weight: 600;">${isGiven ? 'Вы' : escapeHtml(review.userName || 'Пользователь')}</div>
-                                <div style="font-size: 12px; color: #666;">${new Date(review.createdAt).toLocaleDateString('ru-RU')}</div>
-                            </div>
-                        </div>
-                        <div class="review-rating-stars">${stars}</div>
-                    </div>
-                    <div class="review-text">${escapeHtml(review.comment)}</div>
-                    ${photosHtml}
-                    ${masterResponseHtml}
-                </div>
-            `;
-        }
-
-        function setReviewFilter(filter) {
-            currentReviewFilter = filter;
-            renderReviewsTab();
-        }
-
-        // Функции для отзывов (мастер может отвечать)
-        function addMasterResponse(reviewId) {
-            const response = prompt('💬 Введите ответ на отзыв:');
-            if (!response || response.trim().length < 2) return;
-            const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-            if (!userData.reviews) userData.reviews = { received: [], given: [] };
-            const review = userData.reviews.received.find(r => r.id === reviewId);
-            if (review) {
-                review.masterResponse = {
-                    text: response.trim(),
-                    createdAt: new Date().toISOString()
-                };
-                setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
-                renderReviewsTab();
-                showNotification('✅ Ответ добавлен!');
-            }
-        }
-
-        function editMasterResponse(reviewId) {
-            const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-            const review = userData.reviews?.received?.find(r => r.id === reviewId);
-            if (!review || !review.masterResponse) return;
-            const hoursSince = (Date.now() - new Date(review.masterResponse.createdAt).getTime()) / (1000 * 60 * 60);
-            if (hoursSince > 24) {
-                showNotification('❌ Редактирование доступно только в течение 24 часов');
-                return;
-            }
-            const newResponse = prompt('✏️ Редактировать ответ:', review.masterResponse.text);
-            if (newResponse && newResponse.trim().length >= 2) {
-                review.masterResponse.text = newResponse.trim();
-                review.masterResponse.editedAt = new Date().toISOString();
-                setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
-                renderReviewsTab();
-                showNotification('✅ Ответ обновлён!');
-            }
-        }
-
-        // Функция для оставления отзыва после завершения сделки
-        window.leaveReviewForDeal = function(dealId) {
-            triggerHapticFeedback();
-            const deal = getDealById(dealId);
-            if (!deal) {
-                alert('❌ Сделка не найдена');
-                return;
-            }
-            if (deal.status !== 'completed') {
-                alert('❌ Отзыв можно оставить только после завершения сделки');
-                return;
-            }
-
-            // Проверяем, не оставлял ли уже отзыв
-            const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-            const existingReview = userData.reviews?.given?.find(r => r.dealId === dealId);
-            if (existingReview) {
-                alert('❌ Вы уже оставили отзыв на эту сделку');
-                return;
-            }
-
-            // Определяем, кто является мастером в сделке
-            const isClient = deal.clientId === PUBLIC_USER_ID;
-            const masterId = isClient ? deal.masterId : deal.clientId;
-            const masterName = isClient ? deal.masterName : deal.clientName;
-
-            // Создаём модальное окно для отзыва
-            const modalHtml = `
-                <div class="modal-overlay" id="reviewDealModal" style="display: flex; z-index: 8000;">
-                    <div class="modal-content" style="max-width: 500px;">
-                        <button class="modal-close" onclick="document.getElementById('reviewDealModal').remove();">×</button>
-                        <div class="modal-title">💬 Оставить отзыв о мастере</div>
-                        <div style="text-align: center; margin-bottom: 15px; color: #2d3748;">
-                            <strong>${masterName}</strong>
-                            <div style="font-size: 14px; color: #666;">${deal.title}</div>
-                        </div>
-                        <div style="margin: 15px 0;">
-                            <label style="display: block; color: #2d3748; margin-bottom: 8px; font-weight: 600;">⭐ Оценка по критериям</label>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                ${['quality', 'punctuality', 'price', 'communication', 'professionalism'].map(criterion => `
-                                    <div style="background: #f7fafc; padding: 10px; border-radius: 8px; text-align: center;">
-                                        <div style="font-size: 12px; color: #666; margin-bottom: 4px;">${{
-                                            quality: 'Качество',
-                                            punctuality: 'Пунктуальность',
-                                            price: 'Цена',
-                                            communication: 'Общение',
-                                            professionalism: 'Профессионализм'
-                                        }[criterion]}</div>
-                                        <div class="rating-stars" id="star_${criterion}" style="font-size: 20px; cursor: pointer;">
-                                            ${[1,2,3,4,5].map(n => `<span onclick="setReviewStar('${criterion}', ${n})" data-value="${n}">☆</span>`).join('')}
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        <div style="margin: 15px 0;">
-                            <label style="display: block; color: #2d3748; margin-bottom: 8px; font-weight: 600;">📝 Комментарий</label>
-                            <textarea id="reviewCommentInput" class="input-field" placeholder="Расскажите о вашем опыте работы с мастером..." style="background: white; min-height: 80px;"></textarea>
-                        </div>
-                        <div style="margin: 15px 0;">
-                            <label style="display: block; color: #2d3748; margin-bottom: 8px; font-weight: 600;">📸 Фото работы (до 3)</label>
-                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                ${[1,2,3].map(i => `
-                                    <div style="width: 80px; height: 80px; border: 2px dashed #667eea; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #f7fafc;" onclick="document.getElementById('reviewPhotoInput${i}').click();">
-                                        <span id="reviewPhotoLabel${i}" style="font-size: 12px; color: #666;">📷</span>
-                                        <input type="file" id="reviewPhotoInput${i}" accept="image/*" style="display: none;" onchange="handleReviewPhotoUpload(${i}, event)">
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                        <button class="submit-button" onclick="submitDealReview('${dealId}', '${masterId}')" style="margin-top: 10px;">
-                            📤 Отправить отзыв
-                        </button>
-                        <button class="modal-button modal-cancel" onclick="document.getElementById('reviewDealModal').remove();" style="margin-top: 10px;">Отмена</button>
-                    </div>
-                </div>
-            `;
-
-            // Добавляем модальное окно
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = modalHtml;
-            document.body.appendChild(tempDiv.firstElementChild);
-
-            // Сохраняем данные для отзыва в глобальной переменной
-            window._reviewData = {
-                dealId: dealId,
-                masterId: masterId,
-                masterName: masterName,
-                ratings: {},
-                photos: [],
-                comment: ''
-            };
-        };
-
-        // Функция для установки звёзд в отзыве
-        window.setReviewStar = function(criterion, value) {
-            const container = document.getElementById(`star_${criterion}`);
-            if (!container) return;
-            const stars = container.querySelectorAll('span');
-            stars.forEach((star, index) => {
-                if (index < value) {
-                    star.textContent = '★';
-                    star.style.color = '#FFD700';
-                } else {
-                    star.textContent = '☆';
-                    star.style.color = '';
-                }
-            });
-            if (!window._reviewData) window._reviewData = { ratings: {} };
-            window._reviewData.ratings[criterion] = value;
-        };
-
-        // Загрузка фото для отзыва
-        window.handleReviewPhotoUpload = async function(index, event) {
-            triggerHapticFeedback();
-            const file = event.target.files[0];
-            if (!file) return;
-            if (!file.type.match('image.*')) {
-                alert('❌ Пожалуйста, выберите изображение');
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                alert('❌ Файл слишком большой. Максимальный размер: 5MB');
-                return;
-            }
-            try {
-                const compressed = await compressImage(file, 400, 400, 0.7);
-                const label = document.getElementById(`reviewPhotoLabel${index}`);
-                if (label) {
-                    label.innerHTML = '✅';
-                    label.style.color = '#48bb78';
-                }
-                if (!window._reviewData) window._reviewData = { photos: [] };
-                if (!window._reviewData.photos) window._reviewData.photos = [];
-                window._reviewData.photos.push(compressed.dataUrl);
-                showNotification(`✅ Фото ${index} загружено!`);
-            } catch (error) {
-                console.error('Ошибка загрузки фото:', error);
-            }
-        };
-
-        // Отправка отзыва
-        window.submitDealReview = function(dealId, masterId) {
-            triggerHapticFeedback();
-            const comment = document.getElementById('reviewCommentInput')?.value?.trim();
-            if (!comment || comment.length < 10) {
-                alert('❌ Комментарий должен содержать минимум 10 символов');
-                return;
-            }
-
-            const ratings = window._reviewData?.ratings || {};
-            const required = ['quality', 'punctuality', 'price', 'communication', 'professionalism'];
-            const missing = required.filter(r => !ratings[r]);
-            if (missing.length > 0) {
-                alert('❌ Пожалуйста, поставьте оценку по всем критериям');
-                return;
-            }
-
-            // Вычисляем общую оценку
-            const sum = required.reduce((acc, r) => acc + ratings[r], 0);
-            const overall = sum / required.length;
-
-            const review = {
-                id: 'review_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
-                dealId: dealId,
-                masterId: masterId,
-                clientId: PUBLIC_USER_ID,
-                userName: getOrCreateUserProfile(PUBLIC_USER_ID).firstName || PUBLIC_USER_NAME,
-                rating: ratings,
-                overall: overall,
-                comment: comment,
-                photos: window._reviewData?.photos || [],
-                createdAt: new Date().toISOString(),
-                status: 'published',
-                masterResponse: null
-            };
-
-            // Сохраняем отзыв в профиле пользователя (в отданные)
-            const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-            if (!userData.reviews) userData.reviews = { received: [], given: [] };
-            userData.reviews.given.push(review);
-            setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
-
-            // Сохраняем отзыв в профиле мастера (в полученные)
-            const masterData = getOrCreateUserProfile(masterId);
-            if (!masterData.reviews) masterData.reviews = { received: [], given: [] };
-            masterData.reviews.received.push(review);
-            setLocalStorage(`user_${masterId}`, masterData);
-
-            // Обновляем рейтинг мастера в умейках
-            const allSkills = getLocalStorage('umeyka_global_skills') || [];
-            const masterSkills = allSkills.filter(s => s.userId === masterId);
-            masterSkills.forEach(skill => {
-                if (!skill.rating) skill.rating = { average: 5, count: 0 };
-                const reviewsForSkill = masterData.reviews.received.filter(r => r.skillId === skill._id || !r.skillId);
-                if (reviewsForSkill.length > 0) {
-                    const avg = reviewsForSkill.reduce((acc, r) => acc + r.overall, 0) / reviewsForSkill.length;
-                    skill.rating.average = avg;
-                    skill.rating.count = reviewsForSkill.length;
-                }
-                addGlobalSkill(skill);
-            });
-
-            // Закрываем модальное окно
-            const modal = document.getElementById('reviewDealModal');
-            if (modal) modal.remove();
-
-            showNotification('✅ Отзыв успешно отправлен! Спасибо!');
-            window._reviewData = null;
-            renderReviewsTab();
-            loadDeals();
         };
 
         // ========== ФУНКЦИИ ДЛЯ СДЕЛОК ==========
@@ -9054,12 +7914,10 @@
                     const showSignButton = deal.status === 'pending' &&
                         ((isClient && !deal.clientSigned) || (isMaster && !deal.masterSigned));
                     const showCompleteButton = deal.status === 'active' && isMaster;
-                    const showPayButton = isClient && (deal.status === 'pending' || deal.status === 'active') && (!deal
-                        .paymentStatus || deal.paymentStatus === 'pending');
+                    const showPayButton = isClient && (deal.status === 'pending' || deal.status === 'active') && (!deal.paymentStatus || deal.paymentStatus === 'pending');
                     const showEscrowInfo = deal.paymentStatus === 'paid' || deal.paymentStatus === 'released';
                     const showDeleteButton = deal.status === 'completed';
                     const showReviewButton = deal.status === 'completed' && isClient;
-                    // Проверяем, оставлен ли уже отзыв
                     const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
                     const hasReview = userData.reviews?.given?.some(r => r.dealId === deal.id);
 
@@ -9073,100 +7931,40 @@
                             <p style="margin: 10px 0; color: #666;">${deal.description}</p>
                             ${getPaymentStatusBadge(deal.paymentStatus || 'pending')}
                             <div class="deal-details">
-                                <div class="deal-detail">
-                                    <span style="color: #667eea;">💰</span>
-                                    <span>${deal.amount} ₽</span>
-                                </div>
-                                <div class="deal-detail">
-                                    <span style="color: #667eea;">⏱️</span>
-                                    <span>${deal.period}</span>
-                                </div>
-                                <div class="deal-detail">
-                                    <span style="color: #667eea;">⭐</span>
-                                    <span>${qualityText}</span>
-                                </div>
-                                <div class="deal-detail">
-                                    <span style="color: #667eea;">📅</span>
-                                    <span>${new Date(deal.createdAt).toLocaleDateString('ru-RU')}</span>
-                                </div>
+                                <div class="deal-detail"><span style="color: #667eea;">💰</span><span>${deal.amount} ₽</span></div>
+                                <div class="deal-detail"><span style="color: #667eea;">⏱️</span><span>${deal.period}</span></div>
+                                <div class="deal-detail"><span style="color: #667eea;">⭐</span><span>${qualityText}</span></div>
+                                <div class="deal-detail"><span style="color: #667eea;">📅</span><span>${new Date(deal.createdAt).toLocaleDateString('ru-RU')}</span></div>
                             </div>
                             <div style="margin: 10px 0; padding: 10px; background: #f7fafc; border-radius: 8px;">
                                 <div style="margin: 5px 0; font-weight: bold;">${isClient ? 'Мастер' : 'Клиент'}:</div>
-                                <div style="margin: 5px 0; color: #666;">
-                                    ${isClient ? deal.masterName : deal.clientName}
-                                </div>
-                                ${isClient && deal.masterSkill ? `
-                                    <div style="margin: 5px 0; color: #48bb78; font-weight: bold;">
-                                        Услуга: ${deal.masterSkill}
-                                    </div>
-                                ` : ''}
+                                <div style="margin: 5px 0; color: #666;">${isClient ? deal.masterName : deal.clientName}</div>
+                                ${isClient && deal.masterSkill ? `<div style="margin: 5px 0; color: #48bb78; font-weight: bold;">Услуга: ${deal.masterSkill}</div>` : ''}
                             </div>
                             ${showEscrowInfo ? `
                                 <div class="escrow-info">
-                                    <div class="escrow-title">
-                                        🔒 Гарант сделки
-                                    </div>
+                                    <div class="escrow-title">🔒 Гарант сделки</div>
                                     <div class="escrow-details">
-                                        ${deal.paymentStatus === 'paid' ? 
-                                            `💰 ${deal.escrowBalance || deal.amount} Stars заморожено до завершения работ` :
-                                            `✅ Выплачено мастеру: ${deal.masterPayout || Math.round(deal.amount * 0.95)} Stars`
-                                        }
+                                        ${deal.paymentStatus === 'paid' ? `💰 ${deal.escrowBalance || deal.amount} Stars заморожено до завершения работ` : `✅ Выплачено мастеру: ${deal.masterPayout || Math.round(deal.amount * 0.95)} Stars`}
                                     </div>
                                 </div>
                             ` : ''}
                             <div class="signatures">
-                                <div class="signature ${deal.clientSigned ? 'signed' : 'unsigned'}">
-                                    <span>👤</span>
-                                    <span>Клиент ${deal.clientSigned ? 'подписал' : 'не подписал'}</span>
-                                </div>
-                                <div class="signature ${deal.masterSigned ? 'signed' : 'unsigned'}">
-                                    <span>🔧</span>
-                                    <span>Мастер ${deal.masterSigned ? 'подписал' : 'не подписал'}</span>
-                                </div>
+                                <div class="signature ${deal.clientSigned ? 'signed' : 'unsigned'}"><span>👤</span><span>Клиент ${deal.clientSigned ? 'подписал' : 'не подписал'}</span></div>
+                                <div class="signature ${deal.masterSigned ? 'signed' : 'unsigned'}"><span>🔧</span><span>Мастер ${deal.masterSigned ? 'подписал' : 'не подписал'}</span></div>
                             </div>
                             <div class="deal-commission" style="background: #f7fafc; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 14px;">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span>Сумма:</span>
-                                    <span>${deal.amount} ⭐</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; color: #48bb78;">
-                                    <span>Комиссия (5%):</span>
-                                    <span>${Math.round(deal.amount * 0.05)} ⭐</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 5px;">
-                                    <span>Итого к оплате:</span>
-                                    <span>${Math.round(deal.amount * 1.05)} ⭐</span>
-                                </div>
+                                <div style="display: flex; justify-content: space-between;"><span>Сумма:</span><span>${deal.amount} ⭐</span></div>
+                                <div style="display: flex; justify-content: space-between; color: #48bb78;"><span>Комиссия (5%):</span><span>${Math.round(deal.amount * 0.05)} ⭐</span></div>
+                                <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 5px;"><span>Итого к оплате:</span><span>${Math.round(deal.amount * 1.05)} ⭐</span></div>
                             </div>
                             <div class="deal-actions">
-                                ${showSignButton ? `
-                                    <button class="deal-button sign-button" onclick="triggerHapticFeedback(); signDeal('${deal.id}');">
-                                        ✍️ Подписать
-                                    </button>
-                                ` : ''}
-                                ${showPayButton ? `
-                                    <button class="deal-button pay-button" onclick="triggerHapticFeedback(); payForDeal('${deal.id}');">
-                                        💳 Оплатить
-                                    </button>
-                                ` : ''}
-                                ${showCompleteButton ? `
-                                    <button class="deal-button complete-button" onclick="triggerHapticFeedback(); completeDeal('${deal.id}');">
-                                        ✅ Завершить
-                                    </button>
-                                ` : ''}
-                                <button class="deal-button view-button" onclick="triggerHapticFeedback(); viewDealDetails('${deal.id}');">
-                                    👁️ Подробнее
-                                </button>
-                                ${showDeleteButton ? `
-                                    <button class="deal-button delete-deal" onclick="triggerHapticFeedback(); deleteDeal('${deal.id}');">
-                                        🗑️ Удалить
-                                    </button>
-                                ` : ''}
-                                ${showReviewButton && !hasReview ? `
-                                    <button class="deal-button" onclick="triggerHapticFeedback(); leaveReviewForDeal('${deal.id}');" style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);">
-                                        💬 Оставить отзыв
-                                    </button>
-                                ` : ''}
+                                ${showSignButton ? `<button class="deal-button sign-button" onclick="triggerHapticFeedback(); signDeal('${deal.id}');">✍️ Подписать</button>` : ''}
+                                ${showPayButton ? `<button class="deal-button pay-button" onclick="triggerHapticFeedback(); payForDeal('${deal.id}');">💳 Оплатить</button>` : ''}
+                                ${showCompleteButton ? `<button class="deal-button complete-button" onclick="triggerHapticFeedback(); completeDeal('${deal.id}');">✅ Завершить</button>` : ''}
+                                <button class="deal-button view-button" onclick="triggerHapticFeedback(); viewDealDetails('${deal.id}');">👁️ Подробнее</button>
+                                ${showDeleteButton ? `<button class="deal-button delete-deal" onclick="triggerHapticFeedback(); deleteDeal('${deal.id}');">🗑️ Удалить</button>` : ''}
+                                ${showReviewButton && !hasReview ? `<button class="deal-button" onclick="triggerHapticFeedback(); leaveReviewForDeal('${deal.id}');" style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);">💬 Оставить отзыв</button>` : ''}
                             </div>
                         </div>
                     `;
@@ -9250,10 +8048,6 @@
                         userData.completedDeals = (userData.completedDeals || 0) + 1;
                         userData.rating = (userData.rating || 0) + 0.5;
                         setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
-                        const clientData = getOrCreateUserProfile(deal.clientId, deal.clientName);
-                        clientData.completedDeals = (clientData.completedDeals || 0) + 1;
-                        clientData.rating = (clientData.rating || 0) + 0.5;
-                        setLocalStorage(`user_${deal.clientId}`, clientData);
                         alert('✅ Сделка успешно завершена! Средства переведены на ваш баланс (за вычетом комиссии 5%). Получена +1 🪙 монета!');
                         loadDeals();
                         loadUserProfile();
@@ -9388,8 +8182,7 @@
             document.querySelectorAll('.quality-option').forEach(option => {
                 option.classList.remove('selected');
             });
-            document.getElementById('quality' + quality.charAt(0).toUpperCase() + quality.slice(1)).classList.add(
-            'selected');
+            document.getElementById('quality' + quality.charAt(0).toUpperCase() + quality.slice(1)).classList.add('selected');
             updateDealCommission();
         };
 
@@ -9436,7 +8229,7 @@
                 const masterSkill = document.getElementById('dealMasterSkill').value;
                 const masterContact = document.getElementById('dealMasterContact').value;
                 const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-                const clientName = userData.firstName || PUBLIC_USER_NAME;
+                const clientName = userData.firstName || 'Гость';
                 if (!title || !description || !period || !amount) {
                     alert('❌ Заполните все обязательные поля (отмечены *)');
                     return;
@@ -9518,15 +8311,14 @@
                 masterContact: masterContact
             };
             const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-            const clientName = userData.firstName || PUBLIC_USER_NAME;
+            const clientName = userData.firstName || 'Гость';
             getOrCreateUserProfile(masterId, masterName);
             document.getElementById('dealMasterId').value = masterId;
             document.getElementById('dealMasterName').value = masterName;
             document.getElementById('dealMasterSkill').value = skillName;
             document.getElementById('dealMasterContact').value = masterContact;
             document.getElementById('dealTitle').value = `${skillName} - ${masterName}`;
-            document.getElementById('dealDescription').value =
-                `Сделка между ${clientName} (клиент) и ${masterName} (мастер) на услугу "${skillName}"`;
+            document.getElementById('dealDescription').value = `Сделка между ${clientName} (клиент) и ${masterName} (мастер) на услугу "${skillName}"`;
             showSection('createDealSection');
         };
 
@@ -9559,86 +8351,6 @@
         function saveReferralData(data) {
             setLocalStorage(`referral_${PUBLIC_USER_ID}`, data);
         }
-
-        function updateReferralStats() {
-            const data = getReferralData();
-            document.getElementById('referralCount').textContent = data.referralCount;
-            document.getElementById('starsEarned').textContent = data.starsEarned;
-            const referralLink = generateReferralLink();
-            document.getElementById('referralLinkText').textContent = referralLink;
-            updateReferralFriendsList(data.invitedFriends);
-            const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
-            setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
-        }
-
-        function generateReferralLink() {
-            return `${TELEGRAM_BOT_URL}?start=${PUBLIC_USER_ID}`;
-        }
-
-        function updateReferralFriendsList(friends) {
-            const listElement = document.getElementById('referralFriendsList');
-            if (!friends || friends.length === 0) {
-                listElement.innerHTML = `
-                    <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 30px;">
-                        <div style="font-size: 50px; margin-bottom: 15px;">👥</div>
-                        <div style="font-size: 16px;">Вы пока никого не пригласили</div>
-                        <div style="opacity: 0.7; margin-top: 5px; font-size: 14px;">Поделитесь реферальной ссылкой с друзьями</div>
-                    </div>
-                `;
-                return;
-            }
-            listElement.innerHTML = friends.map((friend, index) => `
-                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 4px solid #667eea;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: bold; color: white;">${friend.name || `Друг ${index + 1}`}</div>
-                            <div style="font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 5px;">
-                                Приглашён: ${new Date(friend.invitedAt).toLocaleDateString('ru-RU')}
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            ${friend.registered ? 
-                                `<div style="background: #48bb78; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">
-                                    ✅ Зарегистрирован
-                                </div>` : 
-                                `<div style="background: #ed8936; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">
-                                    ⏳ Ожидает регистрации
-                                </div>`
-                            }
-                            ${friend.registered ? 
-                                `<div style="background: #f6e05e; color: #744210; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">
-                                    ⭐ +1 звезда
-                                </div>` : ''
-                            }
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        window.shareReferralLink = function() {
-            triggerHapticFeedback();
-            const referralLink = generateReferralLink();
-            const shareText =
-                `Привет! Хочу порекомендовать полезное приложение — Ymeyka. Ymeyka — сервис для поиска мастеров на все руки. Быстро, надёжно, рядом с вами.\n\n${referralLink}`;
-            const tgShareUrl =
-                `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
-            if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.openTelegramLink(tgShareUrl);
-            } else {
-                window.open(tgShareUrl, '_blank');
-            }
-        };
-
-        window.copyReferralLink = function() {
-            triggerHapticFeedback();
-            const referralLink = generateReferralLink();
-            navigator.clipboard.writeText(referralLink).then(() => {
-                showNotification('✅ Реферальная ссылка скопирована!');
-            }).catch(err => {
-                alert('❌ Не удалось скопировать ссылку');
-            });
-        };
 
         function addCoin() {
             const currentCoins = getCoinsData();
@@ -9701,43 +8413,10 @@
             { name: "Другое", emoji: "📦" }
         ];
 
-        const subcategoriesMap = {
-            "Такси": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Плиточник": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Строитель": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Парикмахер": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Ремонт техники": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Электрик": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Кровельщик": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Отделочник": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Повар": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Копаю": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Доктор": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Вяжу": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Сантехник": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Дизайнер интерьера": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Автослесарь": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Компьютерный мастер": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Ремонт телефонов": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Уборка/Клининг": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Грузчик": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Репетитор": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Тренер/Фитнес": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Кинолог/Выгул собак": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Садовник": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Столяр/Плотник": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Сварщик": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Маляр": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Монтажник": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Холодильщик": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Отопление/Газ": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Фотограф": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Видеограф": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Кондитер": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Косметолог": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Массажист": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"],
-            "Другое": ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"]
-        };
+        const subcategoriesMap = {};
+        skillCategories.forEach(cat => {
+            subcategoriesMap[cat.name] = ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"];
+        });
 
         function initCitySelector() {
             const select = document.getElementById('cityFilterSelect');
@@ -9891,18 +8570,13 @@
 
         window.showSubcategories = function(categoryName) {
             triggerHapticFeedback();
-            const subcats = subcategoriesMap[categoryName] || ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)",
-                "Новичок"
-            ];
+            const subcats = subcategoriesMap[categoryName] || ["Мастер (от 15 лет)", "Опытный (от 5 лет)", "Ученик (от 1 года)", "Новичок"];
             const container = document.getElementById('categoriesList');
             const resultsContainer = document.getElementById('categorySearchResults');
             if (container) container.style.display = 'none';
             const selectedCity = getSelectedCity();
             const subcatCounts = subcats.map(sub => {
-                return {
-                    name: sub,
-                    count: countMastersByWorkFormat(categoryName, sub, selectedCity)
-                };
+                return { name: sub, count: countMastersByWorkFormat(categoryName, sub, selectedCity) };
             });
             resultsContainer.innerHTML = `
                 <div style="margin-bottom: 20px;">
@@ -10224,9 +8898,7 @@
             }
             const completedDeals = globalDeals.filter(d => d.status === 'completed');
             const satisfiedClients = completedDeals.filter(d => d.paymentStatus !== 'refunded').length;
-            const satisfactionRate = completedDeals.length > 0 ?
-                Math.round((satisfiedClients / completedDeals.length) * 100) :
-                0;
+            const satisfactionRate = completedDeals.length > 0 ? Math.round((satisfiedClients / completedDeals.length) * 100) : 0;
             return {
                 mastersCount: uniqueMasters || Math.floor(Math.random() * 500) + 500,
                 dealsCount: dealsCount || Math.floor(Math.random() * 1000) + 1000,
@@ -10267,8 +8939,7 @@
             stars.innerHTML = '';
             for (let i = 1; i <= 5; i++) {
                 stars.innerHTML += i <= rating ?
-                    '<span style="cursor: pointer; color: #FFD700;" onclick="triggerHapticFeedback(); setProjectRating(' + i +
-                    ');">★</span>' :
+                    '<span style="cursor: pointer; color: #FFD700;" onclick="triggerHapticFeedback(); setProjectRating(' + i + ');">★</span>' :
                     '<span style="cursor: pointer;" onclick="triggerHapticFeedback(); setProjectRating(' + i + ');">☆</span>';
             }
         };
@@ -10294,7 +8965,7 @@
                 rating: projectRating,
                 comment: comment,
                 userId: PUBLIC_USER_ID,
-                userName: userData.firstName || PUBLIC_USER_NAME,
+                userName: userData.firstName || 'Гость',
                 userAvatar: userData.avatar || null,
                 createdAt: new Date().toISOString(),
                 hasCompletedDeals: true
@@ -10328,9 +8999,7 @@
                     </div>
                 `;
             } else {
-                const sortedReviews = [...reviews].sort((a, b) =>
-                    new Date(b.createdAt) - new Date(a.createdAt)
-                );
+                const sortedReviews = [...reviews].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 listContainer.innerHTML = sortedReviews.map(review => {
                     const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
                     const avatar = review.userAvatar ?
@@ -10341,10 +9010,7 @@
                             <div class="review-header">
                                 <div class="review-author">
                                     <div class="review-avatar">${avatar}</div>
-                                    <div>
-                                        <div class="review-name">${review.userName}</div>
-                                        <div class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU')}</div>
-                                    </div>
+                                    <div><div class="review-name">${review.userName}</div><div class="review-date">${new Date(review.createdAt).toLocaleDateString('ru-RU')}</div></div>
                                 </div>
                                 <div class="review-rating">${stars}</div>
                             </div>
@@ -10389,21 +9055,22 @@
             window.open(adminUrl, '_blank');
         }
 
-        // ========== ОПРЕДЕЛЕНИЕ USER ID ==========
+        // ========== ОПРЕДЕЛЕНИЕ USER ID (ВСЕГДА ПУБЛИЧНЫЙ) ==========
 
         function checkAndSetUserId() {
-            // Всегда используем публичного пользователя
+            console.log('🔍 Использование публичного пользователя (без авторизации)');
             currentUserId = PUBLIC_USER_ID;
-            console.log('✅ Используется публичный пользователь:', currentUserId);
-            localStorage.setItem('umeyka_user_id', currentUserId);
+            localStorage.setItem('umeyka_user_id', PUBLIC_USER_ID);
             return currentUserId;
+        }
+
+        function processReferralLink() {
+            console.log('🎁 [Referral] Реферальная система отключена (публичный режим)');
         }
 
         // ======================================================================
         // ========== НОВЫЙ РАЗДЕЛ: ИГРЫ ==========
         // ======================================================================
-
-        // -------- ИГРА 1: ГОНКА ЗА ЗВЁЗДАМИ --------
 
         let raceGame = {
             canvas: null,
@@ -10412,34 +9079,28 @@
             animationId: null,
             gameLoop: null,
             timerInterval: null,
-
             timeLeft: 60,
             score: 0,
             speed: 3,
             baseSpeed: 3,
             isRunning: false,
             isOver: false,
-
             lanes: [-1, 0, 1],
             laneWidth: 0,
             carWidth: 40,
             carHeight: 50,
             carX: 0,
             carY: 0,
-
             obstacles: [],
             stars: [],
             spawnTimer: 0,
             starSpawnTimer: 0,
             difficultyTimer: 0,
-
             boostActive: false,
             boostTimer: 0,
             boostStreak: 0,
-
             width: 0,
             height: 0,
-
             touchStartX: 0,
             isDragging: false,
 
@@ -10447,14 +9108,11 @@
                 this.canvas = document.getElementById('raceCanvas');
                 this.ctx = this.canvas.getContext('2d');
                 this.container = document.getElementById('raceGameContainer');
-
                 this.resize();
                 window.addEventListener('resize', () => this.resize());
-
                 this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
                 this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
                 this.canvas.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
-
                 document.addEventListener('keydown', (e) => {
                     if (!this.isRunning || this.isOver) return;
                     if (e.key === 'ArrowLeft' || e.key === 'a') {
@@ -10473,7 +9131,6 @@
                 this.height = rect.height;
                 this.canvas.width = this.width;
                 this.canvas.height = this.height;
-
                 this.laneWidth = this.width / 3;
                 this.carWidth = Math.min(40, this.laneWidth * 0.6);
                 this.carHeight = this.carWidth * 1.25;
@@ -10483,7 +9140,6 @@
 
             start() {
                 if (this.isRunning) return;
-
                 this.timeLeft = 60;
                 this.score = 0;
                 this.speed = this.baseSpeed;
@@ -10498,13 +9154,10 @@
                 this.boostTimer = 0;
                 this.boostStreak = 0;
                 this.carX = this.width / 2 - this.carWidth / 2;
-
                 document.getElementById('raceTimer').textContent = this.timeLeft;
                 document.getElementById('raceScore').textContent = this.score;
                 document.getElementById('raceOverlay').classList.remove('active');
-
                 this.updateUI();
-
                 if (this.timerInterval) clearInterval(this.timerInterval);
                 this.timerInterval = setInterval(() => {
                     this.timeLeft--;
@@ -10513,7 +9166,6 @@
                         this.endGame();
                     }
                 }, 1000);
-
                 if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
                 this.gameLoop = requestAnimationFrame(() => this.update());
             },
@@ -10523,27 +9175,23 @@
                     this.gameLoop = requestAnimationFrame(() => this.update());
                     return;
                 }
-
                 this.difficultyTimer += 1 / 60;
                 if (this.difficultyTimer > 2) {
                     this.difficultyTimer = 0;
                     this.speed += 0.15;
                     if (this.speed > 8) this.speed = 8;
                 }
-
                 this.spawnTimer += 1 / 60;
                 const spawnInterval = Math.max(0.8, 2.2 - this.speed * 0.12);
                 if (this.spawnTimer > spawnInterval) {
                     this.spawnTimer = 0;
                     this.spawnObstacle();
                 }
-
                 this.starSpawnTimer += 1 / 60;
                 if (this.starSpawnTimer > 0.6) {
                     this.starSpawnTimer = 0;
                     this.spawnStar();
                 }
-
                 const currentSpeed = this.boostActive ? this.speed * 1.6 : this.speed;
                 for (let i = this.obstacles.length - 1; i >= 0; i--) {
                     const obs = this.obstacles[i];
@@ -10557,7 +9205,6 @@
                         return;
                     }
                 }
-
                 for (let i = this.stars.length - 1; i >= 0; i--) {
                     const star = this.stars[i];
                     star.y += currentSpeed;
@@ -10569,18 +9216,15 @@
                         this.score++;
                         this.boostStreak++;
                         document.getElementById('raceScore').textContent = this.score;
-
                         if (this.boostStreak >= 10 && !this.boostActive) {
                             this.boostActive = true;
                             this.boostTimer = 0;
                             this.boostStreak = 0;
                             this.showBoostNotification('⚡ РЕЖИМ УСКОРЕНИЯ! Звёзды x2!');
                         }
-
                         this.stars.splice(i, 1);
                     }
                 }
-
                 if (this.boostActive) {
                     this.boostTimer += 1 / 60;
                     if (this.boostTimer > 5) {
@@ -10589,9 +9233,7 @@
                         this.showBoostNotification('⏳ Режим ускорения закончился');
                     }
                 }
-
                 this.draw();
-
                 this.gameLoop = requestAnimationFrame(() => this.update());
             },
 
@@ -10599,15 +9241,12 @@
                 const ctx = this.ctx;
                 const w = this.width;
                 const h = this.height;
-
                 ctx.clearRect(0, 0, w, h);
-
                 const gradient = ctx.createLinearGradient(0, 0, 0, h);
                 gradient.addColorStop(0, '#1a1a2e');
                 gradient.addColorStop(1, '#2d2d44');
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, w, h);
-
                 ctx.strokeStyle = 'rgba(255,255,255,0.15)';
                 ctx.lineWidth = 2;
                 for (let i = 0; i < 3; i++) {
@@ -10617,7 +9256,6 @@
                     ctx.lineTo(x, h);
                     ctx.stroke();
                 }
-
                 ctx.strokeStyle = 'rgba(255,255,255,0.3)';
                 ctx.lineWidth = 3;
                 ctx.setLineDash([20, 20]);
@@ -10626,7 +9264,6 @@
                 ctx.lineTo(w / 2, h);
                 ctx.stroke();
                 ctx.setLineDash([]);
-
                 ctx.strokeStyle = 'rgba(255,255,255,0.2)';
                 ctx.lineWidth = 4;
                 ctx.beginPath();
@@ -10637,21 +9274,16 @@
                 ctx.moveTo(w, 0);
                 ctx.lineTo(w, h);
                 ctx.stroke();
-
                 ctx.fillStyle = 'rgba(132, 204, 22, 0.15)';
                 ctx.fillRect(0, 0, 6, h);
                 ctx.fillRect(w - 6, 0, 6, h);
-
                 for (const star of this.stars) {
                     this.drawStar(ctx, star.x, star.y, 14, '#FFD700');
                 }
-
                 for (const obs of this.obstacles) {
                     this.drawObstacle(ctx, obs);
                 }
-
                 this.drawCar(ctx, this.carX, this.carY);
-
                 if (this.boostActive) {
                     ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
                     ctx.fillRect(0, 0, w, 4);
@@ -10664,10 +9296,8 @@
             drawCar(ctx, x, y) {
                 const w = this.carWidth;
                 const h = this.carHeight;
-
                 ctx.shadowColor = 'rgba(0,0,0,0.4)';
                 ctx.shadowBlur = 20;
-
                 const gradient = ctx.createLinearGradient(x, y, x + w, y + h);
                 if (this.boostActive) {
                     gradient.addColorStop(0, '#FFD700');
@@ -10681,7 +9311,6 @@
                 ctx.fillStyle = gradient;
                 ctx.shadowColor = this.boostActive ? 'rgba(255, 215, 0, 0.6)' : 'rgba(0,0,0,0.3)';
                 ctx.shadowBlur = this.boostActive ? 30 : 15;
-
                 const r = 8;
                 ctx.beginPath();
                 ctx.moveTo(x + r, y);
@@ -10695,22 +9324,18 @@
                 ctx.quadraticCurveTo(x, y, x + r, y);
                 ctx.closePath();
                 ctx.fill();
-
                 ctx.shadowBlur = 0;
-
                 ctx.fillStyle = 'rgba(100, 200, 255, 0.4)';
                 const winW = w * 0.3;
                 const winH = h * 0.25;
                 ctx.fillRect(x + w * 0.1, y + h * 0.08, winW, winH);
                 ctx.fillRect(x + w * 0.6, y + h * 0.08, winW, winH);
-
                 ctx.fillStyle = '#FFD700';
                 ctx.shadowColor = '#FFD700';
                 ctx.shadowBlur = 10;
                 ctx.fillRect(x + 2, y - 2, 8, 5);
                 ctx.fillRect(x + w - 10, y - 2, 8, 5);
                 ctx.shadowBlur = 0;
-
                 ctx.fillStyle = '#ff4444';
                 ctx.fillRect(x + 2, y + h - 4, 8, 4);
                 ctx.fillRect(x + w - 10, y + h - 4, 8, 4);
@@ -10720,10 +9345,8 @@
                 const x = obs.x;
                 const y = obs.y;
                 const size = obs.size || 30;
-
                 ctx.shadowColor = 'rgba(0,0,0,0.3)';
                 ctx.shadowBlur = 15;
-
                 if (obs.type === 'car') {
                     const w = size * 1.2;
                     const h = size * 1.5;
@@ -10748,7 +9371,6 @@
                     ctx.arc(x - size * 0.15, y - size * 0.15, size * 0.2, 0, Math.PI * 2);
                     ctx.fill();
                 }
-
                 ctx.shadowBlur = 0;
             },
 
@@ -10778,13 +9400,7 @@
                 const x = lane * this.laneWidth + this.laneWidth / 2;
                 const type = Math.random() > 0.5 ? 'car' : 'rock';
                 const size = type === 'car' ? 25 + Math.random() * 15 : 20 + Math.random() * 20;
-                this.obstacles.push({
-                    x: x,
-                    y: -50 - Math.random() * 50,
-                    lane: lane,
-                    type: type,
-                    size: size
-                });
+                this.obstacles.push({ x, y: -50 - Math.random() * 50, lane, type, size });
             },
 
             spawnStar() {
@@ -10801,12 +9417,10 @@
                 const halfSize = size / 2;
                 const halfW = this.carWidth / 2 - 4;
                 const halfH = this.carHeight / 2 - 4;
-
                 const dx = Math.abs(cx - obs.x);
                 const dy = Math.abs(cy - obs.y);
                 const overlapX = dx < halfW + halfSize;
                 const overlapY = dy < halfH + halfSize;
-
                 if (overlapX && overlapY) {
                     if (obs.type === 'car') {
                         return true;
@@ -10886,44 +9500,35 @@
                 if (this.isOver) return;
                 this.isRunning = false;
                 this.isOver = true;
-
                 if (this.timerInterval) clearInterval(this.timerInterval);
                 if (this.gameLoop) cancelAnimationFrame(this.gameLoop);
-
                 this.saveScore(this.score);
-
                 const overlay = document.getElementById('raceOverlay');
                 const title = document.getElementById('raceOverlayTitle');
                 const scoreEl = document.getElementById('raceOverlayScore');
                 const desc = document.getElementById('raceOverlayDesc');
-
                 title.textContent = '🏁 Гонка завершена!';
                 scoreEl.textContent = `${this.score} ⭐`;
-
                 if (this.score >= 30) desc.textContent = '🌟 Отличный результат! Ты настоящий гонщик!';
                 else if (this.score >= 20) desc.textContent = '🚗 Хорошая езда! Продолжай в том же духе!';
                 else if (this.score >= 10) desc.textContent = '👍 Неплохо, но можно лучше!';
                 else desc.textContent = '💪 Тренируйся, и звёзды будут твои!';
-
                 overlay.classList.add('active');
             },
 
             saveScore(score) {
                 const statsKey = `game_stats_${PUBLIC_USER_ID}`;
-                let stats = getLocalStorage(statsKey) || { totalStars: 0, raceHighScore: 0, wheelLastSpin: null,
-                    wheelCooldown: false };
+                let stats = getLocalStorage(statsKey) || { totalStars: 0, raceHighScore: 0, wheelLastSpin: null, wheelCooldown: false };
                 stats.totalStars = (stats.totalStars || 0) + score;
                 if (score > (stats.raceHighScore || 0)) {
                     stats.raceHighScore = score;
                 }
                 setLocalStorage(statsKey, stats);
-
                 const referralData = getReferralData();
                 if (referralData) {
                     referralData.starsEarned = (referralData.starsEarned || 0) + score;
                     saveReferralData(referralData);
                 }
-
                 console.log(`⭐ Сохранено ${score} звёзд от игры Гонка. Всего: ${stats.totalStars}`);
                 this.updateLeaderboard();
             },
@@ -10959,15 +9564,11 @@
             };
         }
 
-        // -------- ИГРА 2: КОЛЕСО УДАЧИ --------
-
         let wheelGame = {
             canvas: null,
             ctx: null,
             segments: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-            colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF8A5C', '#A29BFE', '#FD79A8',
-                '#00CEC9'
-            ],
+            colors: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF8A5C', '#A29BFE', '#FD79A8', '#00CEC9'],
             currentAngle: 0,
             isSpinning: false,
             spinVelocity: 0,
@@ -10992,14 +9593,11 @@
                 const radius = Math.min(canvas.width, canvas.height) / 2 - 10;
                 const numSegments = this.segments.length;
                 const angleStep = (Math.PI * 2) / numSegments;
-
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-
                 for (let i = 0; i < numSegments; i++) {
                     const startAngle = this.currentAngle + i * angleStep;
                     const endAngle = startAngle + angleStep;
                     const color = this.colors[i % this.colors.length];
-
                     ctx.beginPath();
                     ctx.moveTo(centerX, centerY);
                     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -11009,7 +9607,6 @@
                     ctx.strokeStyle = 'rgba(255,255,255,0.3)';
                     ctx.lineWidth = 2;
                     ctx.stroke();
-
                     ctx.save();
                     ctx.translate(centerX, centerY);
                     ctx.rotate(startAngle + angleStep / 2);
@@ -11022,13 +9619,11 @@
                     ctx.fillText(this.segments[i], radius * 0.7, 0);
                     ctx.restore();
                 }
-
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
                 ctx.strokeStyle = 'rgba(255,255,255,0.2)';
                 ctx.lineWidth = 4;
                 ctx.stroke();
-
                 const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 30);
                 grad.addColorStop(0, '#FFD700');
                 grad.addColorStop(1, '#F59E0B');
@@ -11039,7 +9634,6 @@
                 ctx.strokeStyle = 'rgba(255,255,255,0.4)';
                 ctx.lineWidth = 3;
                 ctx.stroke();
-
                 for (let i = 0; i < 20; i++) {
                     const angle = (i / 20) * Math.PI * 2;
                     const x = centerX + radius * Math.cos(angle);
@@ -11053,41 +9647,32 @@
 
             spin() {
                 if (this.isSpinning) return;
-
                 if (this.isCooldownActive()) {
                     const remaining = this.getCooldownRemaining();
                     document.getElementById('wheelResult').textContent = `⏳ Доступно через ${remaining}`;
                     return;
                 }
-
                 this.isSpinning = true;
                 document.getElementById('wheelSpinBtn').disabled = true;
                 document.getElementById('wheelResult').textContent = '🎡 Крутим...';
-
                 this.spinVelocity = this.minSpinSpeed + Math.random() * (this.maxSpinSpeed - this.minSpinSpeed);
                 this.spinVelocity += 360 * (2 + Math.random() * 3);
-
                 const spinInterval = setInterval(() => {
                     this.spinVelocity *= this.spinDecay;
                     this.currentAngle += this.spinVelocity * 0.01;
-
                     this.drawWheel();
-
                     if (this.spinVelocity < 0.5) {
                         clearInterval(spinInterval);
                         this.isSpinning = false;
                         document.getElementById('wheelSpinBtn').disabled = false;
-
                         const numSegments = this.segments.length;
                         const angleStep = (Math.PI * 2) / numSegments;
                         let normalizedAngle = this.currentAngle % (Math.PI * 2);
                         if (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
-
                         const pointerAngle = -Math.PI / 2;
                         let rawIndex = Math.floor((pointerAngle - normalizedAngle) / angleStep);
                         let index = rawIndex % numSegments;
                         if (index < 0) index += numSegments;
-
                         const result = this.segments[index];
                         this.handleResult(result);
                     }
@@ -11097,23 +9682,18 @@
             handleResult(value) {
                 this.lastSpinDate = new Date().toISOString();
                 localStorage.setItem(`wheel_last_spin_${PUBLIC_USER_ID}`, this.lastSpinDate);
-
                 const statsKey = `game_stats_${PUBLIC_USER_ID}`;
-                let stats = getLocalStorage(statsKey) || { totalStars: 0, raceHighScore: 0, wheelLastSpin: null,
-                    wheelCooldown: false };
+                let stats = getLocalStorage(statsKey) || { totalStars: 0, raceHighScore: 0, wheelLastSpin: null, wheelCooldown: false };
                 stats.totalStars = (stats.totalStars || 0) + value;
                 stats.wheelLastSpin = this.lastSpinDate;
                 setLocalStorage(statsKey, stats);
-
                 const referralData = getReferralData();
                 if (referralData) {
                     referralData.starsEarned = (referralData.starsEarned || 0) + value;
                     saveReferralData(referralData);
                 }
-
                 document.getElementById('wheelResult').textContent = `🎉 ${value} ⭐`;
                 this.showResultNotification(`🎉 Вы выиграли ${value} звёзд!`);
-
                 this.updateLeaderboard();
                 this.checkCooldown();
             },
@@ -11175,7 +9755,6 @@
                     const remaining = this.getCooldownRemaining();
                     timerEl.textContent = `⏳ Доступно через ${remaining}`;
                     document.getElementById('wheelSpinBtn').disabled = true;
-
                     if (this._timerInterval) clearInterval(this._timerInterval);
                     this._timerInterval = setInterval(() => {
                         if (!this.isCooldownActive()) {
@@ -11201,12 +9780,9 @@
             }
         };
 
-        // -------- ТАБЛИЦА ЛИДЕРОВ --------
-
         function renderLeaderboard() {
             const container = document.getElementById('gamesLeaderboard');
             if (!container) return;
-
             const usersStats = [];
             const keys = Object.keys(localStorage);
             for (const key of keys) {
@@ -11228,17 +9804,12 @@
                     }
                 }
             }
-
             usersStats.sort((a, b) => b.totalStars - a.totalStars);
-
             const top3 = usersStats.slice(0, 3);
-
             if (top3.length === 0) {
-                container.innerHTML =
-                    '<div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; padding: 8px;">Нет данных</div>';
+                container.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.4); font-size: 14px; padding: 8px;">Нет данных</div>';
                 return;
             }
-
             const medals = ['🥇', '🥈', '🥉'];
             container.innerHTML = top3.map((user, index) => `
                 <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; 
@@ -11256,8 +9827,6 @@
             `).join('');
         }
 
-        // -------- ОБЩИЕ ФУНКЦИИ ДЛЯ ИГР --------
-
         function openGamesModal() {
             triggerHapticFeedback();
             document.getElementById('gamesModal').classList.add('active');
@@ -11274,7 +9843,6 @@
             closeGamesModal();
             const container = document.getElementById('raceGameFullscreen');
             container.classList.add('active');
-
             if (!raceGame.canvas) {
                 raceGame.init();
             }
@@ -11304,7 +9872,6 @@
             closeGamesModal();
             const container = document.getElementById('wheelGameFullscreen');
             container.classList.add('active');
-
             if (!wheelGame.canvas) {
                 wheelGame.init();
             }
@@ -11357,10 +9924,198 @@
         `;
         document.head.appendChild(styleSheet);
 
+        // ========== ФУНКЦИЯ ДЛЯ ОТЗЫВОВ ПОСЛЕ ЗАВЕРШЕНИЯ СДЕЛКИ ==========
+
+        window.leaveReviewForDeal = function(dealId) {
+            triggerHapticFeedback();
+            const deal = getDealById(dealId);
+            if (!deal) {
+                alert('❌ Сделка не найдена');
+                return;
+            }
+            if (deal.status !== 'completed') {
+                alert('❌ Отзыв можно оставить только после завершения сделки');
+                return;
+            }
+            const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
+            const existingReview = userData.reviews?.given?.find(r => r.dealId === dealId);
+            if (existingReview) {
+                alert('❌ Вы уже оставили отзыв на эту сделку');
+                return;
+            }
+            const isClient = deal.clientId === PUBLIC_USER_ID;
+            const masterId = isClient ? deal.masterId : deal.clientId;
+            const masterName = isClient ? deal.masterName : deal.clientName;
+
+            const modalHtml = `
+                <div class="modal-overlay" id="reviewDealModal" style="display: flex; z-index: 8000;">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <button class="modal-close" onclick="document.getElementById('reviewDealModal').remove();">×</button>
+                        <div class="modal-title">💬 Оставить отзыв о мастере</div>
+                        <div style="text-align: center; margin-bottom: 15px; color: #2d3748;">
+                            <strong>${masterName}</strong>
+                            <div style="font-size: 14px; color: #666;">${deal.title}</div>
+                        </div>
+                        <div style="margin: 15px 0;">
+                            <label style="display: block; color: #2d3748; margin-bottom: 8px; font-weight: 600;">⭐ Оценка по критериям</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                ${['quality', 'punctuality', 'price', 'communication', 'professionalism'].map(criterion => `
+                                    <div style="background: #f7fafc; padding: 10px; border-radius: 8px; text-align: center;">
+                                        <div style="font-size: 12px; color: #666; margin-bottom: 4px;">${{
+                                            quality: 'Качество',
+                                            punctuality: 'Пунктуальность',
+                                            price: 'Цена',
+                                            communication: 'Общение',
+                                            professionalism: 'Профессионализм'
+                                        }[criterion]}</div>
+                                        <div class="rating-stars" id="star_${criterion}" style="font-size: 20px; cursor: pointer;">
+                                            ${[1,2,3,4,5].map(n => `<span onclick="setReviewStar('${criterion}', ${n})" data-value="${n}">☆</span>`).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div style="margin: 15px 0;">
+                            <label style="display: block; color: #2d3748; margin-bottom: 8px; font-weight: 600;">📝 Комментарий</label>
+                            <textarea id="reviewCommentInput" class="input-field" placeholder="Расскажите о вашем опыте работы с мастером..." style="background: white; min-height: 80px;"></textarea>
+                        </div>
+                        <div style="margin: 15px 0;">
+                            <label style="display: block; color: #2d3748; margin-bottom: 8px; font-weight: 600;">📸 Фото работы (до 3)</label>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                ${[1,2,3].map(i => `
+                                    <div style="width: 80px; height: 80px; border: 2px dashed #667eea; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #f7fafc;" onclick="document.getElementById('reviewPhotoInput${i}').click();">
+                                        <span id="reviewPhotoLabel${i}" style="font-size: 12px; color: #666;">📷</span>
+                                        <input type="file" id="reviewPhotoInput${i}" accept="image/*" style="display: none;" onchange="handleReviewPhotoUpload(${i}, event)">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button class="submit-button" onclick="submitDealReview('${dealId}', '${masterId}')" style="margin-top: 10px;">
+                            📤 Отправить отзыв
+                        </button>
+                        <button class="modal-button modal-cancel" onclick="document.getElementById('reviewDealModal').remove();" style="margin-top: 10px;">Отмена</button>
+                    </div>
+                </div>
+            `;
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = modalHtml;
+            document.body.appendChild(tempDiv.firstElementChild);
+            window._reviewData = {
+                dealId: dealId,
+                masterId: masterId,
+                masterName: masterName,
+                ratings: {},
+                photos: [],
+                comment: ''
+            };
+        };
+
+        window.setReviewStar = function(criterion, value) {
+            const container = document.getElementById(`star_${criterion}`);
+            if (!container) return;
+            const stars = container.querySelectorAll('span');
+            stars.forEach((star, index) => {
+                if (index < value) {
+                    star.textContent = '★';
+                    star.style.color = '#FFD700';
+                } else {
+                    star.textContent = '☆';
+                    star.style.color = '';
+                }
+            });
+            if (!window._reviewData) window._reviewData = { ratings: {} };
+            window._reviewData.ratings[criterion] = value;
+        };
+
+        window.handleReviewPhotoUpload = async function(index, event) {
+            triggerHapticFeedback();
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.match('image.*')) {
+                alert('❌ Пожалуйста, выберите изображение');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                alert('❌ Файл слишком большой. Максимальный размер: 5MB');
+                return;
+            }
+            try {
+                const compressed = await compressImage(file, 400, 400, 0.7);
+                const label = document.getElementById(`reviewPhotoLabel${index}`);
+                if (label) {
+                    label.innerHTML = '✅';
+                    label.style.color = '#48bb78';
+                }
+                if (!window._reviewData) window._reviewData = { photos: [] };
+                if (!window._reviewData.photos) window._reviewData.photos = [];
+                window._reviewData.photos.push(compressed.dataUrl);
+                showNotification(`✅ Фото ${index} загружено!`);
+            } catch (error) {
+                console.error('Ошибка загрузки фото:', error);
+            }
+        };
+
+        window.submitDealReview = function(dealId, masterId) {
+            triggerHapticFeedback();
+            const comment = document.getElementById('reviewCommentInput')?.value?.trim();
+            if (!comment || comment.length < 10) {
+                alert('❌ Комментарий должен содержать минимум 10 символов');
+                return;
+            }
+            const ratings = window._reviewData?.ratings || {};
+            const required = ['quality', 'punctuality', 'price', 'communication', 'professionalism'];
+            const missing = required.filter(r => !ratings[r]);
+            if (missing.length > 0) {
+                alert('❌ Пожалуйста, поставьте оценку по всем критериям');
+                return;
+            }
+            const sum = required.reduce((acc, r) => acc + ratings[r], 0);
+            const overall = sum / required.length;
+            const review = {
+                id: 'review_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                dealId: dealId,
+                masterId: masterId,
+                clientId: PUBLIC_USER_ID,
+                userName: getOrCreateUserProfile(PUBLIC_USER_ID).firstName || 'Гость',
+                rating: ratings,
+                overall: overall,
+                comment: comment,
+                photos: window._reviewData?.photos || [],
+                createdAt: new Date().toISOString(),
+                status: 'published',
+                masterResponse: null
+            };
+            const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
+            if (!userData.reviews) userData.reviews = { received: [], given: [] };
+            userData.reviews.given.push(review);
+            setLocalStorage(`user_${PUBLIC_USER_ID}`, userData);
+            const masterData = getOrCreateUserProfile(masterId);
+            if (!masterData.reviews) masterData.reviews = { received: [], given: [] };
+            masterData.reviews.received.push(review);
+            setLocalStorage(`user_${masterId}`, masterData);
+            const allSkills = getLocalStorage('umeyka_global_skills') || [];
+            const masterSkills = allSkills.filter(s => s.userId === masterId);
+            masterSkills.forEach(skill => {
+                if (!skill.rating) skill.rating = { average: 5, count: 0 };
+                const reviewsForSkill = masterData.reviews.received.filter(r => r.skillId === skill._id || !r.skillId);
+                if (reviewsForSkill.length > 0) {
+                    const avg = reviewsForSkill.reduce((acc, r) => acc + r.overall, 0) / reviewsForSkill.length;
+                    skill.rating.average = avg;
+                    skill.rating.count = reviewsForSkill.length;
+                }
+                addGlobalSkill(skill);
+            });
+            const modal = document.getElementById('reviewDealModal');
+            if (modal) modal.remove();
+            showNotification('✅ Отзыв успешно отправлен! Спасибо!');
+            window._reviewData = null;
+            loadDeals();
+        };
+
         // ========== ИНИЦИАЛИЗАЦИЯ ==========
 
         document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 Ymeyka app loaded successfully!');
+            console.log('🚀 Ymeyka app loaded successfully! (Публичный режим, без авторизации)');
 
             initSwipeNavigation();
 
@@ -11376,6 +10131,7 @@
             await preloadAllSkills();
             generateMainScreenQR();
             hideLoadingIndicator();
+            processReferralLink();
             handleDeepLink();
             const tg = window.Telegram?.WebApp;
             if (tg) {
@@ -11403,7 +10159,6 @@
             updateFinanceUI();
             initCitySelector();
 
-            // Проверяем, есть ли завершённые сделки для предложения оставить отзыв
             setTimeout(() => {
                 const userData = getOrCreateUserProfile(PUBLIC_USER_ID);
                 const completedDeals = getUserDeals(PUBLIC_USER_ID).filter(d => d.status === 'completed');
